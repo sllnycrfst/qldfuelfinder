@@ -1,0 +1,74 @@
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f0f8ff;
+  color: #333;
+}
+
+header {
+  background-color: #387cc2;
+  padding: 1rem;
+  text-align: center;
+  color: white;
+}
+
+h1 {
+  margin: 0 0 1rem;
+  font-size: 1.5rem;
+}
+
+#fuel-buttons button,
+#view-tabs button {
+  background: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  margin: 0.25rem;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#fuel-buttons button.active,
+#view-tabs button.active {
+  background-color: #387cc2;
+  color: white;
+}
+
+#map {
+  width: 100%;
+  height: 70vh;
+}
+
+#list {
+  list-style: none;
+  padding: 1rem;
+  margin: 0;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+#list li {
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.hidden {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.2rem;
+  }
+
+  #fuel-buttons button,
+  #view-tabs button {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
