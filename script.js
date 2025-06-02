@@ -80,15 +80,27 @@ const stations = sites.map(site => {
 
   renderMap(stations);
   renderList(stations);
+  function getPinColor(price, min, max) {
+  const range = max - min;
+  const step = range / 8;
+  if (price <= min + step) return "#00e400";       // bright green
+  if (price <= min + step * 3) return "#ffff00";    // yellow
+  if (price <= min + step * 5) return "#ff8c00";    // orange
+  return "#ff0000";                                 // red
+}
+
 }
 
 function renderMap(stations) {
   markers.forEach((m) => map.removeLayer(m));
   markers = [];
+  const pricesInRange = stations.map(s => s.price);
+  const minPrice = Math.min(...pricesInRange);
+  const maxPrice = Math.max(...pricesInRange);
 
   stations.forEach((s) => {
     const rawPrice = parseFloat(s.price.replace("$", ""));
-    const color = rawPrice <= 1.5 ? "green" : rawPrice <= 1.7 ? "orange" : "red";
+    const color = getPinColor(s.price, minPrice, maxPrice);
 
     const marker = L.circleMarker([s.lat, s.lng], {
       radius: 8,
