@@ -87,7 +87,7 @@ async function fetchData() {
       suburb: site.P,
       lat: site.Lat,
       lng: site.Lng,
-      price: price.Price / 100,
+      price: price.Price / 1000,
       dist: userLatLng ? map.distance(userLatLng, L.latLng(site.Lat, site.Lng)) / 1000 : Infinity
     } : null;
   }).filter(Boolean).filter(s => s.dist <= 5);
