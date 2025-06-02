@@ -60,22 +60,22 @@ async function fetchData() {
 
   const priceData = priceDataRaw.SitePrices || []; // ✅ fix here
 
-  const stations = siteRes
-    .map(site => {
-      const match = priceData.find(
-        p => p.SiteId === site.SiteId && p.FuelId === fuelId
-      );
-      return match
-        ? {
-            name: site.Name,
-            suburb: site.Suburb,
-            lat: site.Latitude,
-            lng: site.Longitude,
-            price: match.Price / 100 // convert from cents to dollars
-          }
-        : null;
-    })
-    .filter(Boolean);
+  const sites = siteRes.S || [];
+const stations = sites.map(site => {
+  const match = priceData.find(
+    p => p.SiteId === site.S && p.FuelId === fuelId
+  );
+  return match
+    ? {
+        name: site.N,
+        suburb: site.Su || "", // optional
+        lat: site.Lat,
+        lng: site.Lng,
+        price: match.Price / 100
+      }
+    : null;
+}).filter(Boolean);
+
 
   renderMap(stations);
   renderList(stations);
