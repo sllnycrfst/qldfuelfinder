@@ -87,7 +87,8 @@ function renderMap(stations) {
   markers = [];
 
   stations.forEach((s) => {
-    const color = s.price <= 1.5 ? "green" : s.price <= 1.7 ? "orange" : "red";
+    const rawPrice = parseFloat(s.price.replace("$", ""));
+    const color = rawPrice <= 1.5 ? "green" : rawPrice <= 1.7 ? "orange" : "red";
 
     const marker = L.circleMarker([s.lat, s.lng], {
       radius: 8,
@@ -97,7 +98,7 @@ function renderMap(stations) {
       fillOpacity: 0.9
     }).addTo(map);
 
-    marker.bindPopup(`${s.name}<br>${currentFuel}: $${s.price.toFixed(2)}`);
+    marker.bindPopup(`${s.name}<br>${currentFuel}: ${s.price}`);
     markers.push(marker);
   });
 }
@@ -109,11 +110,13 @@ function renderList(stations) {
   const nearby = stations.map(s => {
     const d = map.distance(map.getCenter(), L.latLng(s.lat, s.lng)) / 1000;
     return d <= 10 ? { ...s, dist: d } : null;
-  }).filter(Boolean).sort((a, b) => a.price - b.price);
+  }).filter(Boolean)
+    .sort((a, b) => parseFloat(a.price.replace("$", "")) - parseFloat(b.price.replace("$", "")));
+
 
   nearby.forEach((s) => {
     const li = document.createElement("li");
-    li.textContent = `${s.name} – $${s.price.toFixed(2)} (${s.suburb})`;
+    li.textContent = `${s.name} – ${s.price} (${s.suburb})`;
     listEl.appendChild(li);
   });
 }
