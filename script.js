@@ -1,4 +1,3 @@
-
 let map;
 let markers = [];
 let currentFuel = localStorage.getItem("selectedFuel") || "E10";
@@ -12,19 +11,6 @@ const fuelIdMap = {
 };
 
 const API_URL = "https://fuel-proxy.onrender.com/prices";
-const headers = {
-  "Content-Type": "application/json"
-};
-
-function getPinColor(price, min, max) {
-  const range = max - min;
-  const step = range / 4;
-
-  if (price <= min + step) return "#00e400";      // green
-  if (price <= min + step * 2) return "#ffff00";  // yellow
-  if (price <= min + step * 3) return "#ff8c00";  // orange
-  return "#ff0000";                               // red
-}
 
 function initMap() {
   map = L.map("map").setView([-27.4698, 153.0251], 12);
@@ -39,7 +25,14 @@ function initMap() {
     navigator.geolocation.getCurrentPosition((pos) => {
       const { latitude, longitude } = pos.coords;
       map.setView([latitude, longitude], 13);
-      L.marker([latitude, longitude], { title: "You" }).addTo(map).bindPopup("You are here");
+      L.marker([latitude, longitude], {
+        title: "You",
+        icon: L.icon({
+          iconUrl: "https://cdn-icons-png.flaticon.com/512/64/64113.png",
+          iconSize: [25, 41],
+          iconAnchor: [12, 41]
+        })
+      }).addTo(map).bindPopup("You are here");
     });
   }
 
@@ -48,11 +41,10 @@ function initMap() {
 
 async function fetchPrices() {
   try {
-    const res = await fetch(API_URL, { headers });
+    const res = await fetch(API_URL);
     if (!res.ok) throw new Error("Failed to fetch prices");
-    const data = await res.json();
-    console.log("✅ Prices loaded:", data);
-    return data.SitePrices || [];
+    const json = await res.json();
+    return json.SitePrices || [];
   } catch (err) {
     console.error("❌ Price fetch error:", err);
     return [];
@@ -64,50 +56,73 @@ async function fetchData() {
 
   const [priceData, siteRes] = await Promise.all([
     fetchPrices(),
-    fetch("sites.json").then(r => r.json())
+    fetch("sites.json").then((r) => r.json())
   ]);
 
-  const sites = siteRes.S || [];
+  if (!siteRes.S || !Array.isArray(siteRes.S)) return;
 
-  const stations = sites.map(site => {
+  const nearbyStations = siteRes.S.map((site) => {
     const match = priceData.find(
-      p => p.SiteId === site.S && p.FuelId === fuelId
+      (p) => p.SiteId === site.S && p.FuelId === fuelId
     );
-    return match
-      ? {
-          name: site.N,
-          suburb: site.P,
-          lat: site.Lat,
-          lng: site.Lng,
-          price: match.Price / 1000
-        }
-      : null;
+    if (!match) return null;
+
+    const price = match.Price / 100;
+
+    return {
+      id: site.S,
+      name: site.N,
+      suburb: site.P,
+      lat: site.Lat,
+      lng: site.Lng,
+      price
+    };
   }).filter(Boolean);
 
-  renderMap(stations);
-  renderList(stations);
+  const center = map.getCenter();
+  const within10km = nearbyStations
+    .map((s) => {
+      const dist = map.distance(center, [s.lat, s.lng]) / 1000;
+      return { ...s, dist };
+    })
+    .filter((s) => s.dist <= 10)
+    .sort((a, b) => a.price - b.price);
+
+  renderMap(within10km);
+  renderList(within10km);
+}
+
+function getColor(price, min, max) {
+  const steps = 5;
+  const stepSize = (max - min) / steps;
+  if (price <= min + stepSize * 1) return "#28a745"; // Green
+  if (price <= min + stepSize * 2) return "#a6d04e";
+  if (price <= min + stepSize * 3) return "#ffc107"; // Yellow
+  if (price <= min + stepSize * 4) return "#fd7e14";
+  return "#dc3545"; // Red
 }
 
 function renderMap(stations) {
   markers.forEach((m) => map.removeLayer(m));
   markers = [];
 
-  const prices = stations.map(s => s.price);
-  const minPrice = Math.min(...prices);
-  const maxPrice = Math.max(...prices);
+  if (!stations.length) return;
 
-  stations.forEach((s) => {
-    const color = getPinColor(s.price, minPrice, maxPrice);
+  const min = stations[0].price;
+  const max = stations[stations.length - 1].price;
 
-    const icon = L.divIcon({
-      className: 'custom-pin',
-      html: `<div class="pin" style="background:${color}"><div class="pin-shadow"></div></div>`,
-      iconSize: [20, 40],
-      iconAnchor: [10, 40]
-    });
+  stations.forEach((s, index) => {
+    const color = getColor(s.price, min, max);
 
-    const marker = L.marker([s.lat, s.lng], { icon }).addTo(map);
-    marker.bindPopup(`${s.name}<br>${currentFuel}: $${s.price.toFixed(2)}`);
+    const marker = L.circleMarker([s.lat, s.lng], {
+      radius: 9,
+      fillColor: color,
+      color: index === 0 ? "#000" : "#fff", // black outline for cheapest
+      weight: 2,
+      fillOpacity: 1
+    }).addTo(map);
+
+    marker.bindPopup(`${s.name}<br><strong>$${s.price.toFixed(2)}</strong>`);
     markers.push(marker);
   });
 }
@@ -116,20 +131,9 @@ function renderList(stations) {
   const listEl = document.getElementById("list");
   listEl.innerHTML = "";
 
-  const userLatLng = map.getCenter();
-
-  const nearby = stations
-    .map(s => {
-      const dist = map.distance(userLatLng, L.latLng(s.lat, s.lng)) / 1000;
-      return dist <= 10 ? { ...s, dist } : null;
-    })
-    .filter(Boolean)
-    .sort((a, b) => a.price - b.price)
-    .slice(0, 10);
-
-  nearby.forEach((s) => {
+  stations.slice(0, 10).forEach((s) => {
     const li = document.createElement("li");
-    li.textContent = `${s.name} – $${s.price.toFixed(2)} (${s.dist.toFixed(1)} km away)`;
+    li.innerHTML = `<strong>${s.name}</strong> – $${s.price.toFixed(2)} (${s.dist.toFixed(1)}km away)`;
     listEl.appendChild(li);
   });
 }
