@@ -5,6 +5,97 @@ body {
   background: #f0f8ff;
   color: #333;
 }
+body {
+  font-family: Roboto, sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#search-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5em;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+#search-input {
+  flex: 1;
+  padding: 0.5em;
+  margin-right: 0.5em;
+  font-size: 1em;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+#fuel-select {
+  padding: 0.5em;
+  font-size: 1em;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* View Tabs (Map / List) */
+#view-tabs {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  background: white;
+  border-top: 1px solid #ddd;
+  z-index: 999;
+}
+
+#view-tabs button {
+  flex: 1;
+  padding: 1em;
+  font-size: 1.2em;
+  background: none;
+  border: none;
+  border-right: 1px solid #eee;
+}
+
+#view-tabs button:last-child {
+  border-right: none;
+}
+
+/* Recenter Button */
+#recenter-btn {
+  position: fixed;
+  bottom: 70px;
+  right: 10px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.2em;
+  z-index: 999;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Main Views */
+#map, #list {
+  position: absolute;
+  top: 60px; /* below search */
+  bottom: 60px; /* above tab bar */
+  left: 0;
+  right: 0;
+}
+
+.hidden {
+  display: none;
+}
+
 
 header {
   background-color: #387cc2;
