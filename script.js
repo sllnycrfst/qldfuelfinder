@@ -71,7 +71,7 @@ const stations = sites.map(site => {
         suburb: site.Su || "", // optional
         lat: site.Lat,
         lng: site.Lng,
-        $${s.price.toFixed(2)}
+        $${s.price.toFixed(2)
       }
     : null;
 }).filter(Boolean);
