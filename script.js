@@ -39,10 +39,7 @@ function initMap() {
 
 async function fetchPrices() {
   try {
-    const res = await fetch(`${API_URL}/Price/GetSitesPrices?countryId=21&geoRegionLevel=3&geoRegionId=1`, {
-      headers
-    });
-
+    const res = await fetch("https://fuel-proxy.onrender.com/prices"); // Replace with your actual Render URL
     if (!res.ok) throw new Error("Failed to fetch prices");
     const data = await res.json();
     console.log("✅ Prices loaded:", data);
@@ -52,6 +49,7 @@ async function fetchPrices() {
     return [];
   }
 }
+
 async function fetchData() {
   const fuelId = fuelIdMap[currentFuel];
 
