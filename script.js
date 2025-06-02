@@ -53,10 +53,12 @@ async function fetchPrices() {
 async function fetchData() {
   const fuelId = fuelIdMap[currentFuel];
 
-  const [priceData, siteRes] = await Promise.all([
+  const [priceDataRaw, siteRes] = await Promise.all([
     fetchPrices(),
     fetch("sites.json").then(r => r.json())
   ]);
+
+  const priceData = priceDataRaw.SitePrices || []; // ✅ fix here
 
   const stations = siteRes
     .map(site => {
@@ -69,7 +71,7 @@ async function fetchData() {
             suburb: site.Suburb,
             lat: site.Latitude,
             lng: site.Longitude,
-            price: match.Price / 100  // convert from cents to dollars
+            price: match.Price / 100 // convert from cents to dollars
           }
         : null;
     })
@@ -78,7 +80,6 @@ async function fetchData() {
   renderMap(stations);
   renderList(stations);
 }
-
 
 function renderMap(stations) {
   markers.forEach((m) => map.removeLayer(m));
