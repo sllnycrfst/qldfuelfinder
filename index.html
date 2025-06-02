@@ -20,6 +20,31 @@
       <button data-fuel="98">98</button>
       <button data-fuel="Diesel">Diesel</button>
     </div>
+    <!-- Search Bar + Fuel Type Selector -->
+<div id="search-bar">
+  <input type="text" id="search-input" placeholder="Search suburb or station...">
+  <select id="fuel-select">
+    <option value="E10">E10</option>
+    <option value="91">91</option>
+    <option value="95">95</option>
+    <option value="98">98</option>
+    <option value="Diesel">Diesel</option>
+  </select>
+</div>
+
+<!-- Map and List Containers -->
+<div id="map" class="tab-view"></div>
+<ul id="list" class="tab-view hidden"></ul>
+
+<!-- Floating Target Button -->
+<button id="recenter-btn">📍</button>
+
+<!-- Fixed Bottom Tabs -->
+<div id="view-tabs">
+  <button id="map-tab">🗺️</button>
+  <button id="list-tab">📄</button>
+</div>
+
     <div id="view-tabs">
       <button id="map-tab">Map</button>
       <button id="list-tab">List</button>
