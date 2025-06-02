@@ -66,14 +66,15 @@ const stations = sites.map(site => {
     p => p.SiteId === site.S && p.FuelId === fuelId
   );
   return match
-    ? {
-        name: site.N,
-        suburb: site.Su || "", // optional
-        lat: site.Lat,
-        lng: site.Lng,
-        $${s.price.toFixed(2)
-      }
-    : null;
+  ? {
+      name: site.N,
+      suburb: site.Su || "",
+      lat: site.Lat,
+      lng: site.Lng,
+      price: match.Price / 100 // ✅ Correct and safe
+    }
+  : null;
+
 }).filter(Boolean);
 
 
