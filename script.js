@@ -71,7 +71,7 @@ const stations = sites.map(site => {
       suburb: site.Su || "",
       lat: site.Lat,
       lng: site.Lng,
-      price: match.Price / 100 // ✅ Correct and safe
+      price: $${(match.Price / 100).toFixed(2)}
     }
   : null;
 
