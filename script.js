@@ -117,7 +117,6 @@ function renderMap(stations) {
   offset: [0, -8],
   className: "fuel-tooltip"
 });
-}
 
 function renderList(stations) {
   const listEl = document.getElementById("list");
