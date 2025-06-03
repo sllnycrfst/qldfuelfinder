@@ -1,31 +1,70 @@
 let map;
-let userMarker;
-let stationMarkers = [];
-let currentPosition = null;
+let markers = [];
+let currentFuel = localStorage.getItem("selectedFuel") || "E10";
+
+const fuelIdMap = {
+  E10: 12,
+  "91": 2,
+  "95": 5,
+  "98": 8,
+  Diesel: 3
+};
+
+const API_URL = "https://fuel-proxy-1l9d.onrender.com/prices";
+const headers = {
+  "Content-Type": "application/json"
+};
+
+function initMap() {
+  map = L.map("map").setView([-27.4698, 153.0251], 12);
+
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+    attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+    subdomains: "abcd",
+    maxZoom: 19
+  }).addTo(map);
+
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((pos) => {
+      const { latitude, longitude } = pos.coords;
+      map.setView([latitude, longitude], 13);
+      L.marker([latitude, longitude], {
+        title: "You",
+        icon: L.icon({
+          iconUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon.png",
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [0, -41]
+        })
+      }).addTo(map).bindPopup("You");
+    });
+  }
+
+  fetchData();
+  map.on("moveend", fetchData);
+}
 
 async function fetchPrices() {
   try {
-    const response = await fetch("https://fuel-proxy-1l9d.onrender.com/prices");
-    if (!response.ok) throw new Error("Failed to fetch prices");
-    return await response.json();
-  } catch (error) {
-    console.error("❌ Price fetch error:", error);
-    throw error;
+    const res = await fetch(API_URL, { headers });
+    if (!res.ok) throw new Error("Failed to fetch prices");
+    const data = await res.json();
+    return data.SitePrices || [];
+  } catch (err) {
+    console.error("❌ Price fetch error:", err);
+    return [];
   }
 }
 
 async function fetchData() {
-  const [siteRes, priceData, fuelTypes] = await Promise.all([
-    fetch("sites.json").then(res => res.json()),
+  const fuelId = fuelIdMap[currentFuel];
+
+  const [priceData, siteRes] = await Promise.all([
     fetchPrices(),
-    fetch("fueltypes.json").then(res => res.json())
+    fetch("sites.json").then(r => r.json()).then(d => d.S || [])
   ]);
 
-  const fuelId = 1; // Default to E10 for now
-
-  const stations = siteRes.SitePrices.map(site => {
-    console.log("💡 siteRes =", siteRes);
-
+  const stations = siteRes.map(site => {
     const match = priceData.find(p => p.SiteId === site.S && p.FuelId === fuelId);
     return match
       ? {
@@ -33,7 +72,7 @@ async function fetchData() {
           suburb: site.P,
           lat: site.Lat,
           lng: site.Lng,
-          price: match.Price / 10
+          price: match.Price / 10 // <-- this is correct now
         }
       : null;
   }).filter(Boolean);
@@ -43,107 +82,63 @@ async function fetchData() {
 }
 
 function renderMap(stations) {
-  if (!map) return;
+  markers.forEach((m) => map.removeLayer(m));
+  markers = [];
 
-  stationMarkers.forEach(m => map.removeLayer(m));
-  stationMarkers = [];
+  const center = map.getCenter();
+  const nearby = stations.map(s => {
+    const dist = map.distance(center, L.latLng(s.lat, s.lng)) / 1000;
+    return { ...s, dist };
+  }).filter(s => s.dist <= 5);
 
-  const prices = stations.map(s => s.price);
-  const minPrice = Math.min(...prices);
-  const maxPrice = Math.max(...prices);
+  const pricesInView = nearby.map(s => s.price);
+  const minPrice = Math.min(...pricesInView);
+  const maxPrice = Math.max(...pricesInView);
 
   stations.forEach((s) => {
-    const color = s.price === minPrice
-      ? "green"
-      : s.price === maxPrice
-        ? "red"
-        : "orange";
+    let color = "orange";
+    const isNearby = s.dist <= 5;
+
+    if (isNearby && s.price === minPrice) color = "green";
+    else if (isNearby && s.price === maxPrice) color = "red";
 
     const marker = L.circleMarker([s.lat, s.lng], {
       radius: 10,
       fillColor: color,
       color: "#000",
       weight: 1,
-      opacity: 1,
-      fillOpacity: 0.8
-    });
+      fillOpacity: 0.9
+    }).addTo(map);
 
-    marker.bindTooltip(`${s.price.toFixed(1)}c`, {
+    marker.bindTooltip(`${s.price.toFixed(1)}`, {
       permanent: true,
       direction: "top",
       offset: [0, -8],
       className: "fuel-tooltip"
     });
 
-    marker.addTo(map);
-    stationMarkers.push(marker);
+    markers.push(marker);
   });
 }
 
 function renderList(stations) {
-  const list = document.getElementById("station-list");
-  if (!list) return;
+  const listEl = document.getElementById("list");
+  if (!listEl) return;
+  listEl.innerHTML = "";
 
-  const sorted = stations
-    .map(s => ({
-      ...s,
-      distance: currentPosition
-        ? getDistance(currentPosition.lat, currentPosition.lng, s.lat, s.lng)
-        : Infinity
-    }))
-    .sort((a, b) => a.distance - b.distance)
-    .slice(0, 10);
+  const center = map.getCenter();
+  const nearby = stations.map(s => {
+    const dist = map.distance(center, L.latLng(s.lat, s.lng)) / 1000;
+    return dist <= 10 ? { ...s, dist } : null;
+  }).filter(Boolean).sort((a, b) => a.price - b.price).slice(0, 10);
 
-  list.innerHTML = sorted.map(s =>
-    `<li>${s.name} (${s.suburb}) - ${s.price.toFixed(1)}c – ${s.distance.toFixed(1)}km away</li>`
-  ).join("");
-}
-
-function getDistance(lat1, lon1, lat2, lon2) {
-  const toRad = deg => deg * Math.PI / 180;
-  const R = 6371;
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-    Math.sin(dLon / 2) ** 2;
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-}
-
-function initMap() {
-  map = L.map("map").setView([-27.4705, 153.026], 12);
-
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map);
-
-  map.on("moveend", fetchData);
+  nearby.forEach((s) => {
+    const li = document.createElement("li");
+    li.textContent = `${s.name} – ${s.price.toFixed(1)} – ${s.dist.toFixed(1)}km away`;
+    listEl.appendChild(li);
+  });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   initMap();
-
-  navigator.geolocation.getCurrentPosition(pos => {
-    currentPosition = {
-      lat: pos.coords.latitude,
-      lng: pos.coords.longitude
-    };
-
-    userMarker = L.circleMarker([currentPosition.lat, currentPosition.lng], {
-      radius: 10,
-      fillColor: "blue",
-      color: "#000",
-      weight: 1,
-      opacity: 1,
-      fillOpacity: 0.8
-    }).addTo(map);
-
-    map.setView([currentPosition.lat, currentPosition.lng], 13);
-    fetchData();
-  }, () => {
-    console.warn("Geolocation failed. Using default.");
-    fetchData();
-  });
 });
