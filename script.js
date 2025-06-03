@@ -111,13 +111,13 @@ function renderMap(stations) {
       fillOpacity: 0.9
     }).addTo(map);
 
-    marker.bindTooltip(`${s.price.toFixed(1)}c`, {
+    marker.bindTooltip(`${s.price.toFixed(2)}`, {
   permanent: true,
   direction: "top",
   offset: [0, -8],
   className: "fuel-tooltip"
 });
-
+    
 function renderList(stations) {
   const listEl = document.getElementById("list");
   if (!listEl) return;
