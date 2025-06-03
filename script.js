@@ -37,7 +37,7 @@ function initMap() {
           iconAnchor: [12, 41],
           popupAnchor: [0, -41]
         })
-      }).addTo(map).bindPopup("You are here");
+      }).addTo(map).bindPopup("You");
     });
   }
 
@@ -111,9 +111,12 @@ function renderMap(stations) {
       fillOpacity: 0.9
     }).addTo(map);
 
-    marker.bindTooltip(`$${s.price.toFixed(2)}`, { permanent: true, direction: "top", offset: [0, -8], className: "fuel-tooltip" });
-    markers.push(marker);
-  });
+    marker.bindTooltip(`${s.price.toFixed(1)}c`, {
+  permanent: true,
+  direction: "top",
+  offset: [0, -8],
+  className: "fuel-tooltip"
+});
 }
 
 function renderList(stations) {
