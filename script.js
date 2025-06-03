@@ -76,6 +76,8 @@ async function fetchData() {
         }
       : null;
   }).filter(Boolean);
+renderMap(stations);
+renderList(stations);
 
 function renderMap(stations) {
   markers.forEach((m) => map.removeLayer(m));
