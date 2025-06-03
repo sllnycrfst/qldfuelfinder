@@ -1,4 +1,3 @@
-
 let map;
 let markers = [];
 let currentFuel = localStorage.getItem("selectedFuel") || "E10";
@@ -73,7 +72,7 @@ async function fetchData() {
           suburb: site.P,
           lat: site.Lat,
           lng: site.Lng,
-          price: match.Price / 100
+          price: match.Price / 10 // <-- this is correct now
         }
       : null;
   }).filter(Boolean);
@@ -111,13 +110,17 @@ function renderMap(stations) {
       fillOpacity: 0.9
     }).addTo(map);
 
-    marker.bindTooltip(`${s.price.toFixed(2)}`, {
-  permanent: true,
-  direction: "top",
-  offset: [0, -8],
-  className: "fuel-tooltip"
-});
-    
+    marker.bindTooltip(`${s.price.toFixed(1)}`, {
+      permanent: true,
+      direction: "top",
+      offset: [0, -8],
+      className: "fuel-tooltip"
+    });
+
+    markers.push(marker);
+  });
+}
+
 function renderList(stations) {
   const listEl = document.getElementById("list");
   if (!listEl) return;
@@ -131,12 +134,11 @@ function renderList(stations) {
 
   nearby.forEach((s) => {
     const li = document.createElement("li");
-    li.textContent = `${s.name} – $${s.price.toFixed(2)} – ${s.dist.toFixed(1)}km away`;
+    li.textContent = `${s.name} – ${s.price.toFixed(1)} – ${s.dist.toFixed(1)}km away`;
     listEl.appendChild(li);
   });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   initMap();
-  });
-}
+});
