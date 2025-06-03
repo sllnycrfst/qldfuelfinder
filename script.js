@@ -23,7 +23,8 @@ async function fetchData() {
 
   const fuelId = 1; // Default to E10 for now
 
-  const stations = siteRes.sites.map(site => {
+  const stations = siteRes.SitePrices.map(site => {
+
     const match = priceData.find(p => p.SiteId === site.S && p.FuelId === fuelId);
     return match
       ? {
