@@ -73,7 +73,7 @@ async function fetchData() {
           suburb: site.P,
           lat: site.Lat,
           lng: site.Lng,
-          price: match.Price / 1000
+          price: match.Price / 100
         }
       : null;
   }).filter(Boolean);
