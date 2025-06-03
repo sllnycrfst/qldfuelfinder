@@ -11,7 +11,7 @@ const fuelIdMap = {
   Diesel: 3
 };
 
-const API_URL = "https://fuel-proxy.onrender.com/prices";
+const API_URL = "https://fuel-proxy-1l9d.onrender.com/prices";
 const headers = {
   "Content-Type": "application/json"
 };
