@@ -144,3 +144,4 @@ function renderList(stations) {
 document.addEventListener("DOMContentLoaded", () => {
   initMap();
 });
+}
