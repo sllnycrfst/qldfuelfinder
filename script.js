@@ -77,10 +77,6 @@ async function fetchData() {
       : null;
   }).filter(Boolean);
 
-  renderMap(stations);
-  renderList(stations);
-}
-
 function renderMap(stations) {
   markers.forEach((m) => map.removeLayer(m));
   markers = [];
@@ -91,9 +87,14 @@ function renderMap(stations) {
     return { ...s, dist };
   }).filter(s => s.dist <= 5);
 
-  const pricesInView = nearby.map(s => s.price);
-  const minPrice = Math.min(...pricesInView);
-  const maxPrice = Math.max(...pricesInView);
+  let minPrice = Infinity;
+  let maxPrice = -Infinity;
+
+  if (nearby.length > 0) {
+    const pricesInView = nearby.map(s => s.price);
+    minPrice = Math.min(...pricesInView);
+    maxPrice = Math.max(...pricesInView);
+  }
 
   stations.forEach((s) => {
     let color = "orange";
@@ -120,6 +121,7 @@ function renderMap(stations) {
     markers.push(marker);
   });
 }
+
 
 function renderList(stations) {
   const listEl = document.getElementById("list");
