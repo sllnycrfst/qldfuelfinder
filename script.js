@@ -66,17 +66,17 @@ async function fetchData() {
   ]);
 
   const stations = siteRes.map(site => {
-  const match = priceData.find(p => p.SiteId === site.S && p.FuelId === fuelId);
-  return match
-    ? {
-        name: site.N,
-        suburb: site.P,
-        lat: site.Lat,
-        lng: site.Lng,
-        price: `$${(match.Price / 100).toFixed(2)}`
-      }
-    : null;
-}).filter(Boolean);
+    const match = priceData.find(p => p.SiteId === site.S && p.FuelId === fuelId);
+    return match
+      ? {
+          name: site.N,
+          suburb: site.P,
+          lat: site.Lat,
+          lng: site.Lng,
+          price: match.Price / 1000
+        }
+      : null;
+  }).filter(Boolean);
 
   renderMap(stations);
   renderList(stations);
