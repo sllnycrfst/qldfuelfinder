@@ -55,7 +55,7 @@ stations.forEach(s => {
   marker.bindPopup(`<a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(s.address)}" target="_blank">${s.address}</a>`);
   marker.addTo(map);
   markers.push(marker);
-});
+  });
 
   // Initial fetch
   fetchData();
