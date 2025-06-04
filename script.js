@@ -21,19 +21,19 @@ async function fetchData() {
     const res = await fetch("https://fuel-proxy-1l9d.onrender.com/prices");
     const data = await res.json();
     const siteRes = await (await fetch("sites.json")).json();
-    const stations = siteRes.map(site => {
-      const match = data.find(p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]);
-      return match
-        ? {
-            name: site.N,
-            suburb: site.P,
-            lat: site.Lat,
-            lng: site.Lng,
-            price: match.Price / 10,
-            address: site.A
-          }
-        : null;
-    }).filter(Boolean);
+    const stations = sites.map(site => {
+  const match = data.SitePrices.find(p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]);
+  return match
+    ? {
+        name: site.N,
+        suburb: site.P,
+        lat: site.Lat,
+        lng: site.Lng,
+        price: match.Price / 10,
+        address: site.A
+      }
+    : null;
+}).filter(Boolean);
 
     renderMap(stations);
     renderList(stations);
