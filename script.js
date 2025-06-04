@@ -18,47 +18,44 @@ document.addEventListener("DOMContentLoaded", () => {
   const markers = [];
 
   async function fetchData() {
-    try {
-      const res = await fetch("https://fuel-proxy-1l9d.onrender.com/prices");
-      const data = await res.json();
+  try {
+    const [siteRes, priceRes] = await Promise.all([
+      fetch("data/sites.json").then(r => r.json()),
+      fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
+    ]);
 
-      const siteRes = await fetch("sites.json");
-      const sites = await siteRes.json();
+    const sites = siteRes; // this is your site metadata
+    const priceData = priceRes.SitePrices; // this is the price data from the API
 
-      const stations = Sites.map(site => {
-  const match = SitePrices.find(p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]);
-  return match
-    ? {
-        name: site.N,
-        suburb: site.P,
-        lat: site.Lat,
-        lng: site.Lng,
-        price: match.Price / 10,
-        address: site.A
-      }
-    : null;
-}).filter(Boolean);
-
-
+    const stations = sites.map(site => {
+      const match = priceData.find(p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]);
+      return match
+        ? {
+            name: site.N,
+            suburb: site.P,
+            lat: site.Lat,
+            lng: site.Lng,
+            price: match.Price / 10,
+            address: site.A
+          }
+        : null;
+    }).filter(Boolean);
+    
       markers.forEach(m => map.removeLayer(m));
-      markers.length = 0;
+markers.length = 0;
 
-      stations.forEach(s => {
-        const marker = L.marker([s.lat, s.lng]);
-        marker.bindTooltip(`${s.price.toFixed(1)}`, {
-          permanent: true,
-          direction: "top",
-          offset: [0, -8],
-          className: "fuel-tooltip"
-        });
-        marker.bindPopup(`<a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(s.address)}" target="_blank">${s.address}</a>`);
-        marker.addTo(map);
-        markers.push(marker);
-      });
-    } catch (err) {
-      console.error("❌ Price fetch error:", err);
-    }
-  }
+stations.forEach(s => {
+  const marker = L.marker([s.lat, s.lng]);
+  marker.bindTooltip(`${s.price.toFixed(1)}`, {
+    permanent: true,
+    direction: "top",
+    offset: [0, -8],
+    className: "fuel-tooltip"
+  });
+  marker.bindPopup(`<a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(s.address)}" target="_blank">${s.address}</a>`);
+  marker.addTo(map);
+  markers.push(marker);
+});
 
   // Initial fetch
   fetchData();
