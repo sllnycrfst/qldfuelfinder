@@ -21,7 +21,7 @@ async function fetchData() {
     const priceRes = await fetch('https://fuel-proxy-1l9d.onrender.com/prices');
     const priceData = await priceRes.json();
     const siteRes = await (await fetch("sites.json")).json();
-    const stations = sites.map(site => {
+    const stations = siteRes.map(site => {
   const match = data.SitePrices.find(p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]);
   return match
     ? {
