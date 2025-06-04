@@ -18,58 +18,60 @@ document.addEventListener("DOMContentLoaded", () => {
   const markers = [];
 
   async function fetchData() {
-  try {
-    const [siteRes, priceRes] = await Promise.all([
-      fetch("data/sites.json").then(r => r.json()),
-      fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
-    ]);
+    try {
+      const [siteRes, priceRes] = await Promise.all([
+        fetch("data/sites.json").then(r => r.json()),
+        fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
+      ]);
 
-    const sites = siteRes;
-    const priceData = priceRes.SitePrices; // this is the price data from the API
+      const sites = siteRes;
+      const priceData = priceRes.SitePrices;
 
-    const stations = sites.map(site => {
-      const match = priceData.find(p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]);
-      return match
-        ? {
-            name: site.N,
-            suburb: site.P,
-            lat: site.Lat,
-            lng: site.Lng,
-            price: match.Price / 10,
-            address: site.A
-          }
-        : null;
-    }).filter(Boolean);
-    
+      const stations = sites.map(site => {
+        const match = priceData.find(p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]);
+        return match
+          ? {
+              name: site.N,
+              suburb: site.P,
+              lat: site.Lat,
+              lng: site.Lng,
+              price: match.Price / 10,
+              address: site.A
+            }
+          : null;
+      }).filter(Boolean);
+
+      const bounds = map.getBounds();
+
       markers.forEach(m => map.removeLayer(m));
       markers.length = 0;
 
-stations.forEach(s => {
-  const marker = L.marker([s.lat, s.lng]);
-  marker.bindTooltip(`${s.price.toFixed(1)}`, {
-    permanent: true,
-    direction: "top",
-    offset: [0, -8],
-    className: "fuel-tooltip"
-  });
-  marker.bindPopup(`<a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(s.address)}" target="_blank">${s.address}</a>`);
-  marker.addTo(map);
-  markers.push(marker);
-  });
-    } catch (err) {
-    console.error("❌ Price fetch error:", err);
-  }
-}
+      const visibleStations = stations.filter(s => bounds.contains([s.lat, s.lng]));
 
-  // Initial fetch
+      visibleStations.forEach(s => {
+        const priceIcon = L.divIcon({
+          className: "price-only-icon",
+          html: `<div class="price-label">${s.price.toFixed(1)}</div>`,
+          iconSize: [40, 20],
+          iconAnchor: [20, 20]
+        });
+
+        const marker = L.marker([s.lat, s.lng], { icon: priceIcon });
+        marker.bindPopup(`<a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(s.address)}" target="_blank">${s.address}</a>`);
+        marker.addTo(map);
+        markers.push(marker);
+      });
+    } catch (err) {
+      console.error("❌ Price fetch error:", err);
+    }
+  }
+
   fetchData();
 
-  // Refetch when fuel type changes
   document.getElementById("fuel-select").addEventListener("change", (e) => {
     currentFuel = e.target.value;
     fetchData();
   });
 
-  // Refetch on map move
   map.on("moveend", fetchData);
 });
