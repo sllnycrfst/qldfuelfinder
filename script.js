@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }).filter(Boolean);
     
       markers.forEach(m => map.removeLayer(m));
-markers.length = 0;
+      markers.length = 0;
 
 stations.forEach(s => {
   const marker = L.marker([s.lat, s.lng]);
@@ -56,6 +56,10 @@ stations.forEach(s => {
   marker.addTo(map);
   markers.push(marker);
   });
+    } catch (err) {
+    console.error("❌ Price fetch error:", err);
+  }
+}
 
   // Initial fetch
   fetchData();
