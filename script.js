@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const map = L.map("map").setView([-27.4698, 153.0251], 13);
 
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  L.tileLayer("https://tile.jawg.io/jawg-lagoon/{z}/{x}/{y}{r}.png", {
     maxZoom: 19,
   }).addTo(map);
 
