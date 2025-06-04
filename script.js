@@ -7,15 +7,15 @@ const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3 };
 const markers = [];
 const markerLayer = L.layerGroup().addTo(map);
 const listEl = document.getElementById("list");
-
-document.getElementById("fuel-select").addEventListener("change", e => {
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("fuel-select").addEventListener("change", e => {
   currentFuel = e.target.value;
   fetchData();
 });
 
-map.on("moveend", fetchData);
+  map.on("moveend", fetchData);
 
-async function fetchData() {
+  async function fetchData() {
   try {
     const priceRes = await fetch('https://fuel-proxy-1l9d.onrender.com/prices');
     const priceData = await priceRes.json();
