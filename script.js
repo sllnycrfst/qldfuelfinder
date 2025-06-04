@@ -51,19 +51,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const visibleStations = stations.filter(s => bounds.contains([s.lat, s.lng]));
 
-      visibleStations.forEach(s => {
-        const priceIcon = L.divIcon({
-          className: "price-only-icon",
-          html: `<div class="price-label">${s.price.toFixed(1)}</div>`,
-          iconSize: [40, 20],
-          iconAnchor: [20, 20]
-        });
+      stations.forEach(s => {
+        const color =
+          s.price === minPrice ? 'green' :
+          s.price === secondMinPrice ? 'yellow' :
+          'orange';
 
-        const marker = L.marker([s.lat, s.lng], { icon: priceIcon });
-        marker.bindPopup(`<a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(s.address)}" target="_blank">${s.address}</a>`);
-        marker.addTo(map);
-        markers.push(marker);
-      });
+        const icon = L.divIcon({
+          className: `custom-icon ${color}`,
+          html: `
+      <div class="marker-box">
+        <div class="price">${s.price.toFixed(1)}</div>
+        <img src="icons/${s.logo}.png" alt="${s.name}" class="logo"/>
+      </div>
+    `,
+    iconSize: [60, 70],
+    iconAnchor: [30, 70],
+    popupAnchor: [0, -70]
+  });
+
+  const marker = L.marker([s.lat, s.lng], { icon });
+  marker.bindPopup(`<a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(s.address)}" target="_blank">${s.name}<br>${s.address}</a>`);
+  marker.addTo(map);
+  markers.push(marker);
+});
+
     } catch (err) {
       console.error("❌ Price fetch error:", err);
     }
