@@ -11,9 +11,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const map = L.map("map").setView([-27.4698, 153.0251], 13);
 
-  L.tileLayer("https://tile.jawg.io/jawg-lagoon/{z}/{x}/{y}{r}.png", {
-    maxZoom: 19,
-  }).addTo(map);
+  L.tileLayer('https://tile.jawg.io/jawg-lagoon/{z}/{x}/{y}{r}.png?access-token=rWQf0gGxJI7ihaBx57CMZyv2NeEcNTWlUSiR5rYePZOnKErq6RqUgzkLlJ4MJZzo', {
+  attribution: '<a href="https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  minZoom: 0,
+  maxZoom: 22
+}).addTo(map);
+
 
   const markers = [];
 
