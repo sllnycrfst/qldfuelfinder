@@ -1,77 +1,139 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const fuelIdMap = {
-    E10: 12,
-    "91": 2,
-    "95": 5,
-    "98": 8,
-    Diesel: 3
-  };
 
-  let currentFuel = "91";
+let map;
+let markers = [];
+let currentFuel = localStorage.getItem("selectedFuel") || "E10";
 
-  const map = L.map("map").setView([-27.4698, 153.0251], 13);
+const fuelIdMap = {
+  E10: 12,
+  "91": 2,
+  "95": 5,
+  "98": 8,
+  Diesel: 3
+};
 
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
+const API_URL = "https://fuel-proxy.onrender.com/prices";
+const headers = {
+  "Content-Type": "application/json"
+};
+
+function initMap() {
+  map = L.map("map").setView([-27.4698, 153.0251], 12);
+
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+    attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+    subdomains: "abcd",
+    maxZoom: 19
   }).addTo(map);
 
-  const markers = [];
-
-  async function fetchData() {
-    try {
-      const [siteRes, priceRes] = await Promise.all([
-        fetch("data/sites.json").then(r => r.json()),
-        fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
-      ]);
-
-      const sites = siteRes;
-      const priceData = priceRes.SitePrices;
-
-      const stations = sites.map(site => {
-        const match = priceData.find(p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]);
-        return match
-          ? {
-              name: site.N,
-              suburb: site.P,
-              lat: site.Lat,
-              lng: site.Lng,
-              price: match.Price / 10,
-              address: site.A
-            }
-          : null;
-      }).filter(Boolean);
-
-      const bounds = map.getBounds();
-
-      markers.forEach(m => map.removeLayer(m));
-      markers.length = 0;
-
-      const visibleStations = stations.filter(s => bounds.contains([s.lat, s.lng]));
-
-      visibleStations.forEach(s => {
-        const priceIcon = L.divIcon({
-          className: "price-only-icon",
-          html: `<div class="price-label">${s.price.toFixed(1)}</div>`,
-          iconSize: [40, 20],
-          iconAnchor: [20, 20]
-        });
-
-        const marker = L.marker([s.lat, s.lng], { icon: priceIcon });
-        marker.bindPopup(`<a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(s.address)}" target="_blank">${s.address}</a>`);
-        marker.addTo(map);
-        markers.push(marker);
-      });
-    } catch (err) {
-      console.error("❌ Price fetch error:", err);
-    }
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((pos) => {
+      const { latitude, longitude } = pos.coords;
+      map.setView([latitude, longitude], 13);
+      L.marker([latitude, longitude], {
+        title: "You",
+        icon: L.icon({
+          iconUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon.png",
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [0, -41]
+        })
+      }).addTo(map).bindPopup("You are here");
+    });
   }
 
   fetchData();
-
-  document.getElementById("fuel-select").addEventListener("change", (e) => {
-    currentFuel = e.target.value;
-    fetchData();
-  });
-
   map.on("moveend", fetchData);
+}
+
+async function fetchPrices() {
+  try {
+    const res = await fetch(API_URL, { headers });
+    if (!res.ok) throw new Error("Failed to fetch prices");
+    const data = await res.json();
+    return data.SitePrices || [];
+  } catch (err) {
+    console.error("â Price fetch error:", err);
+    return [];
+  }
+}
+
+async function fetchData() {
+  const fuelId = fuelIdMap[currentFuel];
+
+  const [priceData, siteRes] = await Promise.all([
+    fetchPrices(),
+    fetch("sites.json").then(r => r.json()).then(d => d.S || [])
+  ]);
+
+  const stations = siteRes.map(site => {
+    const match = priceData.find(p => p.SiteId === site.S && p.FuelId === fuelId);
+    return match
+      ? {
+          name: site.N,
+          suburb: site.P,
+          lat: site.Lat,
+          lng: site.Lng,
+          price: match.Price / 100
+        }
+      : null;
+  }).filter(Boolean);
+
+  renderMap(stations);
+  renderList(stations);
+}
+
+function renderMap(stations) {
+  markers.forEach((m) => map.removeLayer(m));
+  markers = [];
+
+  const center = map.getCenter();
+  const nearby = stations.map(s => {
+    const dist = map.distance(center, L.latLng(s.lat, s.lng)) / 1000;
+    return { ...s, dist };
+  }).filter(s => s.dist <= 5);
+
+  const pricesInView = nearby.map(s => s.price);
+  const minPrice = Math.min(...pricesInView);
+  const maxPrice = Math.max(...pricesInView);
+
+  stations.forEach((s) => {
+    let color = "orange";
+    const isNearby = s.dist <= 5;
+
+    if (isNearby && s.price === minPrice) color = "green";
+    else if (isNearby && s.price === maxPrice) color = "red";
+
+    const marker = L.circleMarker([s.lat, s.lng], {
+      radius: 10,
+      fillColor: color,
+      color: "#000",
+      weight: 1,
+      fillOpacity: 0.9
+    }).addTo(map);
+
+    marker.bindTooltip(`$${s.price.toFixed(2)}`, { permanent: true, direction: "top", offset: [0, -8], className: "fuel-tooltip" });
+    markers.push(marker);
+  });
+}
+
+function renderList(stations) {
+  const listEl = document.getElementById("list");
+  if (!listEl) return;
+  listEl.innerHTML = "";
+
+  const center = map.getCenter();
+  const nearby = stations.map(s => {
+    const dist = map.distance(center, L.latLng(s.lat, s.lng)) / 1000;
+    return dist <= 10 ? { ...s, dist } : null;
+  }).filter(Boolean).sort((a, b) => a.price - b.price).slice(0, 10);
+
+  nearby.forEach((s) => {
+    const li = document.createElement("li");
+    li.textContent = `${s.name} â $${s.price.toFixed(2)} â ${s.dist.toFixed(1)}km away`;
+    listEl.appendChild(li);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  initMap();
 });
