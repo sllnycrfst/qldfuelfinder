@@ -45,6 +45,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }).filter(Boolean);
 
       const bounds = map.getBounds();
+      // Get the two lowest unique prices for color-coding
+      const uniquePrices = [...new Set(stations.map(s => s.price))].sort((a, b) => a - b);
+      const minPrice = uniquePrices[0];
+      const secondMinPrice = uniquePrices[1] || uniquePrices[0]; // fallback in case there's only one
 
       markers.forEach(m => map.removeLayer(m));
       markers.length = 0;
