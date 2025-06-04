@@ -25,19 +25,20 @@ document.addEventListener("DOMContentLoaded", () => {
       const siteRes = await fetch("sites.json");
       const sites = await siteRes.json();
 
-      const stations = sites.map(site => {
-        const match = data.SitePrices.find(p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]);
-        return match
-          ? {
-              name: site.N,
-              suburb: site.P,
-              lat: site.Lat,
-              lng: site.Lng,
-              price: match.Price / 10,
-              address: site.A
-            }
-          : null;
-      }).filter(Boolean);
+      const stations = Sites.map(site => {
+  const match = SitePrices.find(p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]);
+  return match
+    ? {
+        name: site.N,
+        suburb: site.P,
+        lat: site.Lat,
+        lng: site.Lng,
+        price: match.Price / 10,
+        address: site.A
+      }
+    : null;
+}).filter(Boolean);
+
 
       markers.forEach(m => map.removeLayer(m));
       markers.length = 0;
