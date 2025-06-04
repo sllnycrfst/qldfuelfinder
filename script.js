@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
       fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
     ]);
 
-    const sites = siteRes; // this is your site metadata
+    const sites = siteRes.Sites; // this is your site metadata
     const priceData = priceRes.SitePrices; // this is the price data from the API
 
     const stations = sites.map(site => {
