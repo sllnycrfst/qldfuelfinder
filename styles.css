@@ -16,7 +16,7 @@ header {
 .search-bar {
   display: flex;
   background: white;
-  width: 40%;
+  width: 100%;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   overflow: hidden;
@@ -66,15 +66,6 @@ header {
 .fuel-marker .marker-box.orange {
   border-color: darkorange;
   background-color: #ffe5cc;
-}
-
-.leaflet-control-zoom {
-  bottom: auto !important; /* push up above the tabs */
-  top: 200px !important;
-  right: 10px !important;
-  left: auto !important;
-  position: absolute !important;
-  z-index: 1200;
 }
 
 #bottom-tabs {
