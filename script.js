@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", () => {
   const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3 };
   let currentFuel = "91";
@@ -50,22 +49,24 @@ document.addEventListener("DOMContentLoaded", () => {
         else if (s.rawPrice === secondMin) color = "yellow";
 
         const icon = L.divIcon({
-  className: "fuel-marker",
- html: `<div class="marker-box ${color}"><div class="price">${s.price.toFixed(1)}</div></div>`
-});
-
+          className: "fuel-marker",
+          html: `<div class="marker-box ${color}"><div class="price">${s.price.toFixed(1)}</div></div>`
+        });
 
         const marker = L.marker([s.lat, s.lng], { icon });
-        marker.bindPopup(\`<strong>\${s.name}</strong><br><a href="https://www.google.com/maps/dir/?api=1&destination=\${encodeURIComponent(s.address)}" target="_blank">\${s.address}</a>\`);
+        const encodedAddress = encodeURIComponent(s.address);
+        
+        marker.bindPopup(
+        `<strong>${s.name}</strong><br><a href="https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}" target="_blank">${s.address}</a>`
+        );
         marker.addTo(map);
         markers.push(marker);
       });
     } catch (err) {
       console.error("❌ Price fetch error:", err);
     }
-  }
 
-  fetchData();
+    fetchData();
 
   document.getElementById("fuel-select")?.addEventListener("change", (e) => {
     currentFuel = e.target.value;
@@ -73,4 +74,4 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   map.on("moveend", fetchData);
-});
+  });
