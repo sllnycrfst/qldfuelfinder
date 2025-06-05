@@ -66,6 +66,38 @@ header {
   border-color: darkorange;
   background-color: #ffe5cc;
 }
+#bottom-tabs {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 56px;
+  background: #ffffff;
+  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 1000;
+}
+#bottom-tabs .tab {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  text-align: center;
+  padding: 4px 0;
+  color: #777;
+  font-size: 14px;
+}
+#bottom-tabs .tab.active {
+  color: #2196f3;
+}
+#bottom-tabs .tab img {
+  width: 24px;
+  height: 24px;
+  display: block;
+  margin: 0 auto 2px;
+}
 
 .fuel-tooltip {
   font-weight: bold;
