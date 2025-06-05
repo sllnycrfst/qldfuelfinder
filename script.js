@@ -10,27 +10,25 @@ document.addEventListener("DOMContentLoaded", () => {
     maxZoom: 22
   }).addTo(map);
 
-async function fetchData() {
-  try {
-    const [siteRes, priceRes] = await Promise.all([
-      fetch("data/sites.json").then(r => r.json()),
-      fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
-    ]);
+  async function fetchData() {
+    try {
+      const [siteRes, priceRes] = await Promise.all([
+        fetch("data/sites.json").then(r => r.json()),
+        fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
+      ]);
 
-    const sites = siteRes.S;
-    const priceData = priceRes.SitePrices;
+      const sites = siteRes.S;
+      const priceData = priceRes.SitePrices;
 
-    const fuelPrices = priceData.filter(p => p.FuelId === fuelIdMap[currentFuel]);
-    console.log("fuelPrices", fuelPrices.length);
+      const fuelPrices = priceData.filter(p => p.FuelId === fuelIdMap[currentFuel]);
+      const sortedPrices = [...fuelPrices].sort((a, b) => a.Price - b.Price);
+      const minPrice = sortedPrices[0]?.Price;
+      const secondMin = sortedPrices[1]?.Price;
 
-    const sortedPrices = [...fuelPrices].sort((a, b) => a.Price - b.Price);
-    const minPrice = sortedPrices[0]?.Price;
-    const secondMin = sortedPrices[1]?.Price;
-
-    const stations = sites.map(site => {
-      const match = priceData.find(p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]);
-      return match
-        ? {
+      const stations = sites.map(site => {
+        const match = priceData.find(p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]);
+        return match
+          ? {
             name: site.N,
             suburb: site.P,
             lat: site.Lat,
