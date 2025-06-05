@@ -84,6 +84,4 @@ document.getElementById("fuel-select")?.addEventListener("change", (e) => {
 });
 
 map.on("moveend", fetchData);
-  } // close fetchData
 }); // close DOMContentLoaded
-
