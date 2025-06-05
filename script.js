@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const icon = L.divIcon({
   className: "fuel-marker",
-  html: '<div class="marker-box ' + color + '"><div class="price">' + s.price.toFixed(1) + '</div></div>'
+ html: `<div class="marker-box ${color}"><div class="price">${s.price.toFixed(1)}</div></div>`
 });
 
 
