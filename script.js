@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentFuel = "91";
   // Default center (Brisbane) and closer zoom
   const defaultCenter = [-27.4698, 153.0251];
-  const defaultZoom = 16;
+  const defaultZoom = 18;
   const map = L.map("map").setView(defaultCenter, defaultZoom);
   const markers = [];
 
@@ -30,8 +30,6 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     console.warn("Geolocation not supported by this browser.");
   }
-  
-  // ...rest of your fetchData and event logic remains as before...
 
   async function fetchData() {
     try {
@@ -40,71 +38,75 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
       ]);
 
+      // Accept sites.json as array or as {S: [...]}
       const sites = Array.isArray(siteRes) ? siteRes : siteRes.S;
-      const priceData = priceRes.SitePrices;
+      if (!sites) {
+        console.error("🚫 Invalid siteRes format", siteRes);
+        return;
+      }
 
+      const priceData = priceRes.SitePrices;
       const fuelPrices = priceData.filter(p => p.FuelId === fuelIdMap[currentFuel]);
       const sortedPrices = [...fuelPrices].sort((a, b) => a.Price - b.Price);
       const minPrice = sortedPrices[0]?.Price;
       const secondMin = sortedPrices[1]?.Price;
 
       const stations = sites.map(site => {
-        const match = priceData.find(p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]);
+        const match = priceData.find(p => p.SiteId === (site.S ?? site.SiteId) && p.FuelId === fuelIdMap[currentFuel]);
         return match
           ? {
-            name: site.N,
-            suburb: site.P,
-            lat: site.Lat,
-            lng: site.Lng,
-            price: match.Price / 10,
-            rawPrice: match.Price,
-            address: site.A,
-            brand: site.B
-          }
-        : null;
-    }).filter(Boolean);
+              name: site.N,
+              suburb: site.P,
+              lat: site.Lat,
+              lng: site.Lng,
+              price: match.Price / 10,
+              rawPrice: match.Price,
+              address: site.A,
+              brand: site.B
+            }
+          : null;
+      }).filter(Boolean);
 
-    console.log("stations", stations.length);
+      console.log("stations", stations.length);
 
-    markers.forEach(m => map.removeLayer(m));
-    markers.length = 0;
+      markers.forEach(m => map.removeLayer(m));
+      markers.length = 0;
 
-    stations.forEach(s => {
-      let color = "orange";
-      if (s.rawPrice === minPrice) color = "green";
-      else if (s.rawPrice === secondMin) color = "yellow";
+      stations.forEach(s => {
+        let color = "orange";
+        if (s.rawPrice === minPrice) color = "green";
+        else if (s.rawPrice === secondMin) color = "yellow";
 
-      const icon = L.divIcon({
-        className: "fuel-marker",
-        html: `
-          <div class="marker-box ${color}">
-            <div class="price">${s.price.toFixed(1)}</div>
-            <img src="/assets/logos/${s.brand}.png" class="brand-logo" onerror="this.style.display='none';" />
-          </div>
-        `
+        const icon = L.divIcon({
+          className: "fuel-marker",
+          html: `
+            <div class="marker-box ${color}">
+              <div class="price">${s.price.toFixed(1)}</div>
+              <img src="/assets/logos/${s.brand}.png" class="brand-logo" onerror="this.style.display='none';" />
+            </div>
+          `
+        });
+
+        const marker = L.marker([s.lat, s.lng], { icon });
+        const encodedAddress = encodeURIComponent(s.address);
+        marker.bindPopup(
+          `<strong>${s.name}</strong><br><a href="https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}" target="_blank">${s.address}</a>`
+        );
+        marker.addTo(map);
+        markers.push(marker);
       });
 
-      const marker = L.marker([s.lat, s.lng], { icon });
-      const encodedAddress = encodeURIComponent(s.address);
-      marker.bindPopup(
-        `<strong>${s.name}</strong><br><a href="https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}" target="_blank">${s.address}</a>`
-      );
-      marker.addTo(map);
-      markers.push(marker);
-    });
-
-  } catch (err) {
-    console.error("❌ Price fetch error:", err);
+    } catch (err) {
+      console.error("❌ Price fetch error:", err);
+    }
   }
-}
 
-
-fetchData();
-
-document.getElementById("fuel-select")?.addEventListener("change", (e) => {
-  currentFuel = e.target.value;
   fetchData();
-});
 
-map.on("moveend", fetchData);
-}); // close DOMContentLoaded
+  document.getElementById("fuel-select")?.addEventListener("change", (e) => {
+    currentFuel = e.target.value;
+    fetchData();
+  });
+
+  map.on("moveend", fetchData);
+});
