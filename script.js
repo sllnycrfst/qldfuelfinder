@@ -3,9 +3,43 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentFuel = "91";
   // Default center (Brisbane) and closer zoom
   const defaultCenter = [-27.4698, 153.0251];
-  const defaultZoom = 14;
+  const defaultZoom = 12;
   const map = L.map("map").setView(defaultCenter, defaultZoom);
   const markers = [];
+  // ... other functions and variables
+
+function getDistance(lat1, lng1, lat2, lng2) {
+  // Haversine formula for distance in km
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLng/2) * Math.sin(dLng/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
+
+function showListView(userLat, userLng, stations) {
+  // Filter within 5km
+  const nearby = stations.filter(s =>
+    getDistance(userLat, userLng, s.Lat, s.Lng) <= 5
+  );
+  // Sort by price (assuming s.Price exists)
+  nearby.sort((a, b) => a.Price - b.Price);
+
+  const listHtml = nearby.map(s => `
+    <div class="station">
+      <span class="brand">${s.N.split(' ')[0]}</span>
+      <span class="address">${s.A}</span>
+      <span class="price">$${s.Price.toFixed(2)}</span>
+    </div>
+  `).join('');
+  document.getElementById('list-container').innerHTML = listHtml;
+}
+
+// ... rest of your code
 
   L.tileLayer("https://tile.jawg.io/jawg-lagoon/{z}/{x}/{y}{r}.png?access-token=rWQf0gGxJI7ihaBx57CMZyv2NeEcNTWlUSiR5rYePZOnKErq6RqUgzkLlJ4MJZzo", {
     attribution: '<a href="https://jawg.io" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
