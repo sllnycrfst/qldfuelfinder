@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentFuel = "91";
   // Default center (Brisbane) and closer zoom
   const defaultCenter = [-27.4698, 153.0251];
-  const defaultZoom = 18;
+  const defaultZoom = 14;
   const map = L.map("map").setView(defaultCenter, defaultZoom);
   const markers = [];
 
