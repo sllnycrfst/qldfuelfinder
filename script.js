@@ -52,7 +52,7 @@ function showListView(userLat, userLng, stations) {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const userLatLng = [position.coords.latitude, position.coords.longitude];
-        map.setView(userLatLng, defaultZoom);
+        map.setView([userLat, userLng], desiredZoomLevel);
         // Optional: add a marker for user
         L.marker(userLatLng).addTo(map).bindPopup("You are here").openPopup();
       },
