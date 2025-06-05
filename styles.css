@@ -69,8 +69,8 @@ header {
 }
 
 .leaflet-control-zoom {
-  bottom: 80px !important; /* push up above the tabs */
-  top: auto !important;
+  bottom: auto !important; /* push up above the tabs */
+  top: 200px !important;
   right: 10px !important;
   left: auto !important;
   position: absolute !important;
