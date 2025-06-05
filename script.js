@@ -17,12 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
       ]);
 
-      if (!siteRes || !siteRes.S) {
-        console.error("🚫 Invalid siteRes format", siteRes);
-        return;
-      }
-
-const sites = Array.isArray(siteRes) ? siteRes : siteRes.S;
+      const sites = Array.isArray(siteRes) ? siteRes : siteRes.S;
       const priceData = priceRes.SitePrices;
 
       const fuelPrices = priceData.filter(p => p.FuelId === fuelIdMap[currentFuel]);
