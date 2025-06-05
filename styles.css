@@ -16,6 +16,7 @@ header {
 .search-bar {
   display: flex;
   background: white;
+  width: 40%;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   overflow: hidden;
@@ -100,7 +101,7 @@ header {
   font-size: 14px;
 }
 #bottom-tabs .tab.active {
-  color: #2196f3;
+  color: #387cc2;
 }
 #bottom-tabs .tab img {
   width: 24px;
