@@ -74,4 +74,4 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   map.on("moveend", fetchData);
-  });
+});
