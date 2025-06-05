@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-const sites = siteRes.S;
+const sites = Array.isArray(siteRes) ? siteRes : siteRes.S;
       const priceData = priceRes.SitePrices;
 
       const fuelPrices = priceData.filter(p => p.FuelId === fuelIdMap[currentFuel]);
