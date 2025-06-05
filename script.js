@@ -50,9 +50,10 @@ document.addEventListener("DOMContentLoaded", () => {
         else if (s.rawPrice === secondMin) color = "yellow";
 
         const icon = L.divIcon({
-          className: "fuel-marker",
-          html: \`<div class="marker-box \${color}"><div class="price">\${s.price.toFixed(1)}</div></div>\`
-        });
+  className: "fuel-marker",
+  html: '<div class="marker-box ' + color + '"><div class="price">' + s.price.toFixed(1) + '</div></div>'
+});
+
 
         const marker = L.marker([s.lat, s.lng], { icon });
         marker.bindPopup(\`<strong>\${s.name}</strong><br><a href="https://www.google.com/maps/dir/?api=1&destination=\${encodeURIComponent(s.address)}" target="_blank">\${s.address}</a>\`);
