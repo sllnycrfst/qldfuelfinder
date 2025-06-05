@@ -66,6 +66,15 @@ header {
   border-color: darkorange;
   background-color: #ffe5cc;
 }
+
+.leaflet-control-zoom {
+  bottom: 80px !important; /* push up above the tabs */
+  top: auto !important;
+  right: 10px !important;
+  left: auto !important;
+  position: absolute !important;
+  z-index: 1200;
+}
 #bottom-tabs {
   position: fixed;
   bottom: 0;
