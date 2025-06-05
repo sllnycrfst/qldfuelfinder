@@ -1,24 +1,15 @@
+
 document.addEventListener("DOMContentLoaded", () => {
-  const fuelIdMap = {
-    E10: 12,
-    "91": 2,
-    "95": 5,
-    "98": 8,
-    Diesel: 3
-  };
-
+  const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3 };
   let currentFuel = "91";
-
   const map = L.map("map").setView([-27.4698, 153.0251], 13);
-
-  L.tileLayer('https://tile.jawg.io/jawg-lagoon/{z}/{x}/{y}{r}.png?access-token=rWQf0gGxJI7ihaBx57CMZyv2NeEcNTWlUSiR5rYePZOnKErq6RqUgzkLlJ4MJZzo', {
-  attribution: '<a href="https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-  minZoom: 0,
-  maxZoom: 22
-}).addTo(map);
-
-
   const markers = [];
+
+  L.tileLayer("https://tile.jawg.io/jawg-lagoon/{z}/{x}/{y}{r}.png?access-token=rWQf0gGxJI7ihaBx57CMZyv2NeEcNTWlUSiR5rYePZOnKErq6RqUgzkLlJ4MJZzo", {
+    attribution: '<a href="https://jawg.io" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    minZoom: 0,
+    maxZoom: 22
+  }).addTo(map);
 
   async function fetchData() {
     try {
@@ -27,8 +18,13 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
       ]);
 
-      const sites = siteRes;
+      const sites = siteRes.S;
       const priceData = priceRes.SitePrices;
+
+      const fuelPrices = priceData.filter(p => p.FuelId === fuelIdMap[currentFuel]);
+      const sortedPrices = [...fuelPrices].sort((a, b) => a.Price - b.Price);
+      const minPrice = sortedPrices[0]?.Price;
+      const secondMin = sortedPrices[1]?.Price;
 
       const stations = sites.map(site => {
         const match = priceData.find(p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]);
@@ -39,47 +35,30 @@ document.addEventListener("DOMContentLoaded", () => {
               lat: site.Lat,
               lng: site.Lng,
               price: match.Price / 10,
+              rawPrice: match.Price,
               address: site.A
             }
           : null;
       }).filter(Boolean);
 
-      const bounds = map.getBounds();
-      // Get the two lowest unique prices for color-coding
-      const uniquePrices = [...new Set(stations.map(s => s.price))].sort((a, b) => a - b);
-      const minPrice = uniquePrices[0];
-      const secondMinPrice = uniquePrices[1] || uniquePrices[0]; // fallback in case there's only one
-
       markers.forEach(m => map.removeLayer(m));
       markers.length = 0;
 
-      const visibleStations = stations.filter(s => bounds.contains([s.lat, s.lng]));
-
       stations.forEach(s => {
-        const color =
-          s.price === minPrice ? 'green' :
-          s.price === secondMinPrice ? 'yellow' :
-          'orange';
+        let color = "orange";
+        if (s.rawPrice === minPrice) color = "green";
+        else if (s.rawPrice === secondMin) color = "yellow";
 
         const icon = L.divIcon({
-          className: `custom-icon ${color}`,
-          html: `
-      <div class="marker-box">
-        <div class="price">${s.price.toFixed(1)}</div>
-        <img src="icons/${s.logo}.png" alt="${s.name}" class="logo"/>
-      </div>
-    `,
-    iconSize: [60, 70],
-    iconAnchor: [30, 70],
-    popupAnchor: [0, -70]
-  });
+          className: "fuel-marker",
+          html: \`<div class="marker-box \${color}"><div class="price">\${s.price.toFixed(1)}</div></div>\`
+        });
 
-  const marker = L.marker([s.lat, s.lng], { icon });
-  marker.bindPopup(`<a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(s.address)}" target="_blank">${s.name}<br>${s.address}</a>`);
-  marker.addTo(map);
-  markers.push(marker);
-});
-
+        const marker = L.marker([s.lat, s.lng], { icon });
+        marker.bindPopup(\`<strong>\${s.name}</strong><br><a href="https://www.google.com/maps/dir/?api=1&destination=\${encodeURIComponent(s.address)}" target="_blank">\${s.address}</a>\`);
+        marker.addTo(map);
+        markers.push(marker);
+      });
     } catch (err) {
       console.error("❌ Price fetch error:", err);
     }
@@ -87,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   fetchData();
 
-  document.getElementById("fuel-select").addEventListener("change", (e) => {
+  document.getElementById("fuel-select")?.addEventListener("change", (e) => {
     currentFuel = e.target.value;
     fetchData();
   });
