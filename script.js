@@ -69,8 +69,8 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchData();
 
   document.getElementById("fuel-select")?.addEventListener("change", (e) => {
-    currentFuel = e.target.value;
-    fetchData();
-  });
+  currentFuel = e.target.value;
+  fetchData();
+});
 
-  map.on("moveend", fetchData);
+map.on("moveend", fetchData);
