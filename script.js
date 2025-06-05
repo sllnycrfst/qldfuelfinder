@@ -1,7 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
   const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3 };
   let currentFuel = "91";
-  const map = L.map("map").setView([-27.4698, 153.0251], 13);
+  // Default center (Brisbane) and closer zoom
+  const defaultCenter = [-27.4698, 153.0251];
+  const defaultZoom = 16;
+  const map = L.map("map").setView(defaultCenter, defaultZoom);
   const markers = [];
 
   L.tileLayer("https://tile.jawg.io/jawg-lagoon/{z}/{x}/{y}{r}.png?access-token=rWQf0gGxJI7ihaBx57CMZyv2NeEcNTWlUSiR5rYePZOnKErq6RqUgzkLlJ4MJZzo", {
@@ -9,6 +12,26 @@ document.addEventListener("DOMContentLoaded", () => {
     minZoom: 0,
     maxZoom: 22
   }).addTo(map);
+
+  // Ask for user location on load
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const userLatLng = [position.coords.latitude, position.coords.longitude];
+        map.setView(userLatLng, defaultZoom);
+        // Optional: add a marker for user
+        L.marker(userLatLng).addTo(map).bindPopup("You are here").openPopup();
+      },
+      (error) => {
+        // User denied or error, stay at default center
+        console.warn("Geolocation error or denied. Using default location.", error);
+      }
+    );
+  } else {
+    console.warn("Geolocation not supported by this browser.");
+  }
+  
+  // ...rest of your fetchData and event logic remains as before...
 
   async function fetchData() {
     try {
