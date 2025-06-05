@@ -76,9 +76,9 @@ document.addEventListener("DOMContentLoaded", () => {
 }
 
 
-    fetchData();
+fetchData();
 
-  document.getElementById("fuel-select")?.addEventListener("change", (e) => {
+document.getElementById("fuel-select")?.addEventListener("change", (e) => {
   currentFuel = e.target.value;
   fetchData();
 });
