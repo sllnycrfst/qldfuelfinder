@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function fetchData() {
     try {
       const [siteRes, priceRes] = await Promise.all([
-        fetch("/data/sites.json").then(r => r.json()),
+        fetch("data/sites.json").then(r => r.json()),
         fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
       ]);
 
