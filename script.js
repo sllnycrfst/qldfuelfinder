@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentFuel = "91";
   const map = L.map("map").setView([-27.4698, 153.0251], 13);
   const markers = [];
+  let userMarker = null; // Store the user's location marker
 
   L.tileLayer("https://tile.jawg.io/jawg-lagoon/{z}/{x}/{y}{r}.png?access-token=rWQf0gGxJI7ihaBx57CMZyv2NeEcNTWlUSiR5rYePZOnKErq6RqUgzkLlJ4MJZzo", {
     attribution: '<a href="https://jawg.io" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -16,6 +17,18 @@ document.addEventListener("DOMContentLoaded", () => {
       pos => {
         const userLatLng = [pos.coords.latitude, pos.coords.longitude];
         map.setView(userLatLng, 14);
+
+        // Remove old user marker if it exists
+        if (userMarker) map.removeLayer(userMarker);
+
+        // Add a small blue circular marker (no popup)
+        userMarker = L.circleMarker(userLatLng, {
+          radius: 8,
+          color: "#007bff",
+          fillColor: "#339cff",
+          fillOpacity: 1,
+          weight: 2
+        }).addTo(map);
       },
       err => {
         // Graceful error handling for location errors
