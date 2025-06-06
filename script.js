@@ -2,8 +2,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3 };
   let currentFuel = "91";
   let userLatLng = [-27.4698, 153.0251]; // default to Brisbane
-
-  // Remove zoom controls
   const map = L.map("map", { zoomControl: false }).setView(userLatLng, 13);
   const markers = [];
 
@@ -33,19 +31,12 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
       ]);
 
-      const [siteRes, priceRes] = await Promise.all([
-        fetch("data/sites.json").then(r => r.json()),
-        fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
-      ]);
-
+      // Accept both {S:[...]} and [...] formats
       const sites = Array.isArray(siteRes) ? siteRes : siteRes.S;
       if (!sites) {
         console.error("🚫 Invalid siteRes format", siteRes);
-      return;
+        return;
       }
-      const priceData = priceRes.SitePrices;
-
-      const sites = siteRes.S;
       const priceData = priceRes.SitePrices;
 
       const fuelPrices = priceData.filter(p => p.FuelId === fuelIdMap[currentFuel]);
@@ -66,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
             address: site.A,
             brand: site.B
           }
-        : null;
+          : null;
       }).filter(Boolean);
 
       console.log("stations", stations.length);
@@ -75,6 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
       markers.length = 0;
 
       stations.forEach(s => {
+        // Use gas pump icon (FontAwesome) as marker
         const icon = L.divIcon({
           className: "fuel-marker",
           html: `
