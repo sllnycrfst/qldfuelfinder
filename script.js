@@ -1,6 +1,6 @@
 // QLD Fuel Finder main script
 document.addEventListener("DOMContentLoaded", () => {
-  // UTILITY: Mobile detection for initial zoom
+  // Mobile zoom utility
   function isMobile() {
     return /Mobi|Android/i.test(navigator.userAgent);
   }
@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   ).addTo(map);
 
-  // FUEL ID MAP
+  // Data holders
   const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3 };
   let currentFuel = "91";
   let allSites = [];
@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let markers = [];
   let userMarker = null;
 
-  // --- Geolocation: blue marker for user location ---
+  // --- Geolocation for user marker ---
   function showUserLocation() {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
@@ -51,12 +51,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   showUserLocation();
 
-  // Recenter button
-  document.getElementById("recenter-btn").addEventListener("click", () => {
-    showUserLocation();
-  });
+  // --- Event: recenter button ---
+  document.getElementById("recenter-btn").addEventListener("click", showUserLocation);
 
-  // --- Fetch site and price data once, then update per map bounds ---
+  // --- Fetch site and price data once ---
   async function fetchSitesAndPrices() {
     try {
       const [siteRes, priceRes] = await Promise.all([
@@ -71,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- Utility: filter and render only stations in current map bounds ---
+  // --- Filter & render stations in map bounds ---
   function updateVisibleStations() {
     if (!allSites.length || !allPrices.length) return;
     const bounds = map.getBounds();
@@ -132,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Throttle station update on move/zoom
+  // --- Keep stations updated as map moves ---
   let updateTimeout;
   function throttledUpdate() {
     if (updateTimeout) clearTimeout(updateTimeout);
@@ -141,11 +139,17 @@ document.addEventListener("DOMContentLoaded", () => {
   map.on("moveend", throttledUpdate);
   map.on("zoomend", throttledUpdate);
 
-  // --- Fuel select change ---
+  // --- Event: fuel select change ---
   document.getElementById("fuel-select").addEventListener("change", e => {
     currentFuel = e.target.value;
     updateVisibleStations();
   });
+
+  // --- Tab switching logic (NO tab creation, NO innerHTML) ---
+  const mapTab = document.getElementById("map-tab");
+  const listTab = document.getElementById("list-tab");
+  const mapDiv = document.getElementById("map");
+  const listDiv = document.getElementById("list");
 
   mapTab.addEventListener("click", () => {
     mapTab.classList.add("active");
@@ -162,7 +166,6 @@ document.addEventListener("DOMContentLoaded", () => {
     renderList();
   });
 
-  // --- Render the station list for the list tab ---
   function renderList() {
     if (!allSites.length || !allPrices.length) return;
     const bounds = map.getBounds();
@@ -191,7 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .filter(Boolean);
 
-    // Sort by price, cheapest first
+    // Sort stations by price, cheapest first
     visibleStations.sort((a, b) => a.rawPrice - b.rawPrice);
 
     const minPrice =
