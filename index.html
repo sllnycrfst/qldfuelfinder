@@ -10,20 +10,23 @@
     crossorigin=""
   />
   <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
   <header>
     <div class="search-bar">
-      <input type="text" id="search" placeholder="Search suburb" />
+      <span class="fa-stack fuel-icon-in-search">
+        <i class="fa-solid fa-gas-pump"></i>
+      </span>
+      <input type="text" id="search" placeholder="Search suburb or station..." />
       <select id="fuel-select">
         <option value="E10">E10</option>
         <option value="91" selected>91</option>
         <option value="95">95</option>
         <option value="98">98</option>
-        <option value="Diesel">DSL</option>
+        <option value="Diesel">Diesel</option>
       </select>
-
     </div>
   </header>
 
@@ -40,16 +43,5 @@
 
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" crossorigin=""></script>
   <script src="script.js"></script>
-
-  <div id="bottom-tabs">
-  <button id="tab-map" class="tab active">
-    <i class="fa-solid fa-map"></i>
-    <span>Map</span>
-  </button>
-  <button id="tab-list" class="tab">
-    <i class="fa-regular fa-rectangle-list"></i>
-    <span>List</span>
-  </button>
-</div>
 </body>
 </html>
