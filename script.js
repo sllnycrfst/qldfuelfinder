@@ -147,12 +147,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updateVisibleStations();
   });
 
-  // --- Tab handling ---
-  const mapTab = document.getElementById("map-tab");
-  const listTab = document.getElementById("list-tab");
-  const mapDiv = document.getElementById("map");
-  const listDiv = document.getElementById("list");
-
   mapTab.addEventListener("click", () => {
     mapTab.classList.add("active");
     listTab.classList.remove("active");
