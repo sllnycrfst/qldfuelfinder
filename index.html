@@ -12,6 +12,8 @@
   <link rel="stylesheet" href="styles.css" />
   <!-- FontAwesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Favicon for browser tab, can use your own icon for best effect -->
+  <link rel="icon" href="assets/icons/fuel.svg" type="image/svg+xml">
 </head>
 <body>
   <header>
@@ -36,10 +38,11 @@
     <button id="recenter-btn" title="Recenter map">📍</button>
   </main>
 
-  <footer>
+  <!-- BOTTOM TABS CONTAINER (MATCH JS/CSS) -->
+  <div id="bottom-tabs">
     <button id="map-tab" class="tab active">🗺️ Map</button>
     <button id="list-tab" class="tab">📋 List</button>
-  </footer>
+  </div>
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" crossorigin=""></script>
