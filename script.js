@@ -1,8 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3 };
   let currentFuel = "91";
-  let userLatLng = [-27.4698, 153.0251]; // default to Brisbane
-  const map = L.map("map", { zoomControl: false }).setView(userLatLng, 13);
+  const map = L.map("map").setView([-27.4698, 153.0251], 13);
   const markers = [];
 
   L.tileLayer("https://tile.jawg.io/jawg-lagoon/{z}/{x}/{y}{r}.png?access-token=rWQf0gGxJI7ihaBx57CMZyv2NeEcNTWlUSiR5rYePZOnKErq6RqUgzkLlJ4MJZzo", {
@@ -13,19 +12,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Try to get user's location on load and recenter
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(pos => {
-      userLatLng = [pos.coords.latitude, pos.coords.longitude];
-      map.setView(userLatLng, 14);
-    });
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        const userLatLng = [pos.coords.latitude, pos.coords.longitude];
+        map.setView(userLatLng, 14);
+      },
+      err => {
+        // Graceful error handling for location errors
+        console.warn("Geolocation error:", err);
+        // Map will stay at default location
+      }
+    );
   }
-
-  // Recenter button functionality
-  document.getElementById("recenter-btn")?.addEventListener("click", () => {
-    map.setView(userLatLng, 14);
-  });
 
   async function fetchData() {
     try {
+      // USE RELATIVE PATH for GitHub Pages project sites!
       const [siteRes, priceRes] = await Promise.all([
         fetch("data/sites.json").then(r => r.json()),
         fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
@@ -66,23 +68,24 @@ document.addEventListener("DOMContentLoaded", () => {
       markers.length = 0;
 
       stations.forEach(s => {
-        // Use gas pump icon (FontAwesome) as marker
+        let color = "orange";
+        if (s.rawPrice === minPrice) color = "green";
+        else if (s.rawPrice === secondMin) color = "yellow";
+
         const icon = L.divIcon({
           className: "fuel-marker",
           html: `
-            <div class="marker-box">
-              <i class="fa-solid fa-gas-pump"></i>
+            <div class="marker-box ${color}">
+              <div class="price">${s.price.toFixed(1)}</div>
+              <img src="assets/logos/${s.brand}.png" class="brand-logo" onerror="this.style.display='none';" />
             </div>
-          `,
-          iconSize: [36, 36],
-          iconAnchor: [18, 18],
-          popupAnchor: [0, -18]
+          `
         });
 
         const marker = L.marker([s.lat, s.lng], { icon });
         const encodedAddress = encodeURIComponent(s.address);
         marker.bindPopup(
-          `<strong>${s.name}</strong><br><a href="https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}" target="_blank">${s.address}</a><br>Price: $${s.price.toFixed(1)}`
+          `<strong>${s.name}</strong><br><a href="https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}" target="_blank">${s.address}</a>`
         );
         marker.addTo(map);
         markers.push(marker);
