@@ -64,7 +64,7 @@ header {
 }
 
 .fuel-marker .marker-box .fa-gas-pump {
-  font-size: 22px;
+  font-size: 18px;
   color: #2196f3;
 }
 
@@ -96,7 +96,7 @@ header {
   border: none;
   background: #eee;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 16px;
 }
 .fuel-icon {
   display: inline-block;
