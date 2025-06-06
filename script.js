@@ -33,10 +33,17 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
       ]);
 
-      if (!siteRes || !siteRes.S) {
+      const [siteRes, priceRes] = await Promise.all([
+        fetch("data/sites.json").then(r => r.json()),
+        fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
+      ]);
+
+      const sites = Array.isArray(siteRes) ? siteRes : siteRes.S;
+      if (!sites) {
         console.error("🚫 Invalid siteRes format", siteRes);
-        return;
+      return;
       }
+      const priceData = priceRes.SitePrices;
 
       const sites = siteRes.S;
       const priceData = priceRes.SitePrices;
