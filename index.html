@@ -19,7 +19,7 @@
       <span class="fa-stack fuel-icon-in-search">
         <i class="fa-solid fa-gas-pump"></i>
       </span>
-      <input type="text" id="search" placeholder="Search suburb or station..." />
+      <input type="text" id="search" placeholder="Search suburb or station..." autocomplete="off" />
       <select id="fuel-select">
         <option value="E10">E10</option>
         <option value="91" selected>91</option>
@@ -41,6 +41,7 @@
     <button id="list-tab" class="tab">📋 List</button>
   </footer>
 
+  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" crossorigin=""></script>
   <script src="script.js"></script>
 </body>
