@@ -76,3 +76,32 @@ header {
 .leaflet-control-zoom {
   display: none !important;
 }
+
+#bottom-tabs {
+  position: fixed;
+  bottom: 0;
+  left: 0; right: 0;
+  height: 56px;
+  background: #fff;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid #ddd;
+  z-index: 1000;
+}
+.tab-btn {
+  flex: 1;
+  height: 40px;
+  margin: 0 8px;
+  border: none;
+  background: #eee;
+  border-radius: 4px;
+  font-size: 16px;
+}
+.fuel-icon {
+  display: inline-block;
+  margin-right: 4px;
+}
+.marker-box.green { background: #44d65c; }
+.marker-box.orange { background: #ffd233; }
+.marker-box .price { font-weight: bold; }
