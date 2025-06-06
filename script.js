@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const initialCenter = [-27.4698, 153.0251];
   const map = L.map("map").setView(initialCenter, initialZoom);
 
-  L.tileLayer('https://{s}.tile.jawg.io/jawg-streets/{z}/{x}/{y}{r}.png?access-token=public', {
+  L.tileLayer('https://{s}.tile.jawg.io/jawg-streets/{z}/{x}/{y}{r}.png?access-token=rWQf0gGxJI7ihaBx57CMZyv2NeEcNTWlUSiR5rYePZOnKErq6RqUgzkLlJ4MJZzo', {
     attribution: '<a href="https://jawg.io" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     minZoom: 4,
     maxZoom: 16
