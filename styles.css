@@ -63,6 +63,12 @@ header {
   color: #2196f3;
 }
 
+.marker-box .price {
+  font-size: 0.85em;
+  font-weight: bold;
+  /* add more styles if you like */
+}
+
 .fuel-marker .marker-box .fa-gas-pump {
   font-size: 14px;
   color: #2196f3;
