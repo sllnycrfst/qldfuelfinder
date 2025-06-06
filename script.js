@@ -1,31 +1,14 @@
+// QLD Fuel Finder main script
 document.addEventListener("DOMContentLoaded", () => {
-  // Utility to detect mobile
+  // UTILITY: Mobile detection for initial zoom
   function isMobile() {
     return /Mobi|Android/i.test(navigator.userAgent);
   }
 
-  // Initial zoom: 13 (default), zoom in (14) for desktop, zoom out (12) for mobile
+  // Map setup
   const initialZoom = isMobile() ? 12 : 14;
   const initialCenter = [-27.4698, 153.0251];
   const map = L.map("map").setView(initialCenter, initialZoom);
-  const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3 };
-  let currentFuel = "91";
-  let markers = [];
-  let userMarker = null;
-
-  // Restore bottom tabs
-  document.getElementById("bottom-tabs").innerHTML = `
-    <button id="tab1" class="tab-btn">Tab 1</button>
-    <button id="tab2" class="tab-btn">Tab 2</button>
-  `;
-
-  // Add fuel icon to search bar beside dropdown
-  document.getElementById("fuel-select-wrapper").innerHTML = `
-    <span class="fuel-icon" style="vertical-align: middle;">
-      <img src="assets/icons/fuel.svg" alt="Fuel" style="width: 24px; height: 24px;">
-    </span>
-    ${document.getElementById("fuel-select").outerHTML}
-  `;
 
   L.tileLayer(
     "https://tile.jawg.io/jawg-lagoon/{z}/{x}/{y}{r}.png?access-token=rWQf0gGxJI7ihaBx57CMZyv2NeEcNTWlUSiR5rYePZOnKErq6RqUgzkLlJ4MJZzo",
@@ -37,10 +20,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   ).addTo(map);
 
-  // Geolocate user (add blue marker)
-  if (navigator.geolocation) {
+  // FUEL ID MAP
+  const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3 };
+  let currentFuel = "91";
+  let allSites = [];
+  let allPrices = [];
+  let markers = [];
+  let userMarker = null;
+
+  // --- Geolocation: blue marker for user location ---
+  function showUserLocation() {
+    if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      pos => {
         const userLatLng = [pos.coords.latitude, pos.coords.longitude];
         map.setView(userLatLng, map.getZoom());
         if (userMarker) map.removeLayer(userMarker);
@@ -52,35 +44,41 @@ document.addEventListener("DOMContentLoaded", () => {
           weight: 2,
         }).addTo(map);
       },
-      (err) => {
+      err => {
         console.warn("Geolocation error:", err);
       }
     );
   }
+  showUserLocation();
 
-  // Fetch all sites ONCE and cache (since sites rarely move)
-  let allSites = [];
-  let allPrices = [];
+  // Recenter button
+  document.getElementById("recenter-btn").addEventListener("click", () => {
+    showUserLocation();
+  });
+
+  // --- Fetch site and price data once, then update per map bounds ---
   async function fetchSitesAndPrices() {
-    const [siteRes, priceRes] = await Promise.all([
-      fetch("data/sites.json").then((r) => r.json()),
-      fetch("https://fuel-proxy-1l9d.onrender.com/prices").then((r) => r.json()),
-    ]);
-    allSites = Array.isArray(siteRes) ? siteRes : siteRes.S;
-    allPrices = priceRes.SitePrices;
-    updateVisibleStations();
+    try {
+      const [siteRes, priceRes] = await Promise.all([
+        fetch("data/sites.json").then(r => r.json()),
+        fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json()),
+      ]);
+      allSites = Array.isArray(siteRes) ? siteRes : siteRes.S;
+      allPrices = priceRes.SitePrices;
+      updateVisibleStations();
+    } catch (err) {
+      console.error("Failed to fetch site/price data:", err);
+    }
   }
 
-  // Only update on pan/zoom end with debounce/throttle
-  let updateTimeout;
+  // --- Utility: filter and render only stations in current map bounds ---
   function updateVisibleStations() {
     if (!allSites.length || !allPrices.length) return;
     const bounds = map.getBounds();
-    // Only show stations in bounds
     const visibleStations = allSites
-      .map((site) => {
+      .map(site => {
         const match = allPrices.find(
-          (p) => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]
+          p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]
         );
         if (
           match &&
@@ -90,45 +88,52 @@ document.addEventListener("DOMContentLoaded", () => {
             ...site,
             price: match.Price / 10,
             rawPrice: match.Price,
-            match,
+            brand: site.B,
+            address: site.A,
+            name: site.N,
+            suburb: site.P,
+            lat: site.Lat,
+            lng: site.Lng,
           };
         }
         return null;
       })
       .filter(Boolean);
 
-    // Find minimum price among visible stations
+    // Find lowest price among visible stations
     const minPrice =
       visibleStations.length > 0
-        ? Math.min(...visibleStations.map((s) => s.rawPrice))
+        ? Math.min(...visibleStations.map(s => s.rawPrice))
         : null;
 
     // Remove old markers
-    markers.forEach((m) => map.removeLayer(m));
-    markers.length = 0;
+    markers.forEach(m => map.removeLayer(m));
+    markers = [];
 
-    visibleStations.forEach((s) => {
+    // Render visible stations
+    visibleStations.forEach(s => {
       let color = s.rawPrice === minPrice ? "green" : "orange";
       const icon = L.divIcon({
         className: "fuel-marker",
         html: `
           <div class="marker-box ${color}">
             <div class="price">${s.price.toFixed(1)}</div>
-            <img src="assets/logos/${s.B}.png" class="brand-logo" onerror="this.style.display='none';" />
+            <img src="assets/logos/${s.brand}.png" class="brand-logo" onerror="this.style.display='none';" />
           </div>
         `,
       });
-      const marker = L.marker([s.Lat, s.Lng], { icon });
-      const encodedAddress = encodeURIComponent(s.A);
+      const marker = L.marker([s.lat, s.lng], { icon });
+      const encodedAddress = encodeURIComponent(s.address);
       marker.bindPopup(
-        `<strong>${s.N}</strong><br><a href="https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}" target="_blank">${s.A}</a>`
+        `<strong>${s.name}</strong><br><a href="https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}" target="_blank">${s.address}</a>`
       );
       marker.addTo(map);
       markers.push(marker);
     });
   }
 
-  // Throttle update on map move/zoom
+  // Throttle station update on move/zoom
+  let updateTimeout;
   function throttledUpdate() {
     if (updateTimeout) clearTimeout(updateTimeout);
     updateTimeout = setTimeout(updateVisibleStations, 300);
@@ -136,12 +141,88 @@ document.addEventListener("DOMContentLoaded", () => {
   map.on("moveend", throttledUpdate);
   map.on("zoomend", throttledUpdate);
 
-  document.getElementById("fuel-select-wrapper").addEventListener("change", (e) => {
-    if (e.target && e.target.id === "fuel-select") {
-      currentFuel = e.target.value;
-      updateVisibleStations();
-    }
+  // --- Fuel select change ---
+  document.getElementById("fuel-select").addEventListener("change", e => {
+    currentFuel = e.target.value;
+    updateVisibleStations();
   });
 
+  // --- Tab handling ---
+  const mapTab = document.getElementById("map-tab");
+  const listTab = document.getElementById("list-tab");
+  const mapDiv = document.getElementById("map");
+  const listDiv = document.getElementById("list");
+
+  mapTab.addEventListener("click", () => {
+    mapTab.classList.add("active");
+    listTab.classList.remove("active");
+    mapDiv.style.display = "";
+    listDiv.classList.add("hidden");
+    map.invalidateSize();
+  });
+  listTab.addEventListener("click", () => {
+    listTab.classList.add("active");
+    mapTab.classList.remove("active");
+    mapDiv.style.display = "none";
+    listDiv.classList.remove("hidden");
+    renderList();
+  });
+
+  // --- Render the station list for the list tab ---
+  function renderList() {
+    if (!allSites.length || !allPrices.length) return;
+    const bounds = map.getBounds();
+    const visibleStations = allSites
+      .map(site => {
+        const match = allPrices.find(
+          p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]
+        );
+        if (
+          match &&
+          bounds.contains([site.Lat, site.Lng])
+        ) {
+          return {
+            ...site,
+            price: match.Price / 10,
+            rawPrice: match.Price,
+            brand: site.B,
+            address: site.A,
+            name: site.N,
+            suburb: site.P,
+            lat: site.Lat,
+            lng: site.Lng,
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
+
+    // Sort by price, cheapest first
+    visibleStations.sort((a, b) => a.rawPrice - b.rawPrice);
+
+    const minPrice =
+      visibleStations.length > 0
+        ? Math.min(...visibleStations.map(s => s.rawPrice))
+        : null;
+
+    listDiv.innerHTML = visibleStations.length
+      ? visibleStations
+          .map(
+            s => `
+          <li class="station-row${s.rawPrice === minPrice ? " cheapest" : ""}">
+            <span class="station-brand">
+              <img src="assets/logos/${s.brand}.png" class="brand-logo" onerror="this.style.display='none';" />
+            </span>
+            <span class="station-name">${s.name}</span>
+            <span class="station-suburb">${s.suburb}</span>
+            <span class="station-price${s.rawPrice === minPrice ? " cheapest-price" : ""}">${s.price.toFixed(1)}</span>
+          </li>
+        `
+          )
+          .join("")
+      : "<li>No stations visible in this area.</li>";
+  }
+
+  // --- Initial fetch ---
   fetchSitesAndPrices();
 });
