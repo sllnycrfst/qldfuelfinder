@@ -64,25 +64,35 @@ header {
 }
 
 .marker-stack {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.custom-marker-img {
-  width: 60px !important;
-  height: 60px !important;
+  position: relative;
+  width: 50px;     /* match your marker image width */
+  height: 50px;    /* match your marker image height */
   display: block;
 }
 
-.marker-stack {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.custom-marker-img {
+  width: 50px;
+  height: 50px;
+  display: block;
 }
 
-.fuel-tooltip {
-  font-weight: bold;
+.marker-price {
+  position: absolute;
+  top: 9px;    /* adjust so it sits perfectly on the dark part */
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-family: 'Segment7', monospace, sans-serif;
+  font-size: 18px;           /* adjust as needed */
+  color: #fff;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  pointer-events: none;
+  user-select: none;
+  text-shadow: 0 2px 6px #000, 0 0 2px #000;
+  font-weight: normal;
 }
 
 /* Hide default Leaflet zoom controls if any reappear */
