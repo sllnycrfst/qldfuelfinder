@@ -17,16 +17,30 @@
       <input type="text" id="search" placeholder="Search suburb" autocomplete="on" />
       <span class="fa-stack fuel-icon-in-select">
         <i class="fa-solid fa-gas-pump"></i>
-          </span>
-          <select id="fuel-select">
-            <option value="E10">E10</option>
-            <option value="91" selected>91</option>
-            <option value="95">95</option>
-            <option value="98">98</option>
-            <option value="Diesel">DSL</option>
-          </select>
+      </span>
+      <select id="fuel-select">
+        <option value="E10">E10</option>
+        <option value="91" selected>91</option>
+        <option value="95">95</option>
+        <option value="98">98</option>
+        <option value="Diesel">DSL</option>
+      </select>
     </div>
   </header>
+
+  <main>
+    <div id="map" class="map"></div>
+    <ul id="list" class="hidden"></ul>
+    <button id="recenter-btn" title="Recenter map">
+      <i class="fa-solid fa-location-crosshairs"></i>
+    </button>
+  </main>
+
+  <footer>
+    <button id="map-tab" class="tab active"><i class="fa-solid fa-map"></i> Map</button>
+    <button id="list-tab" class="tab"><i class="fa-solid fa-list"></i> List</button>
+  </footer>
+
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" crossorigin=""></script>
   <script src="script.js"></script>
 </body>
