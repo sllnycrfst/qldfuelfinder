@@ -104,19 +104,19 @@ document.addEventListener("DOMContentLoaded", () => {
     markers.forEach(m => map.removeLayer(m));
     markers = [];
 
-    // Render visible stations (all using price-above 7-segment marker)
+    // Render visible stations (overlay price on marker image, 7-segment font, no box)
     visibleStations.forEach(s => {
       const icon = L.divIcon({
         className: "fuel-marker",
         html: `
           <div class="marker-stack">
-            <div class="price-sevensegment">${s.price.toFixed(1)}</div>
             <img src="images/my-marker.png" class="custom-marker-img" />
+            <div class="marker-price">${s.price.toFixed(1)}</div>
           </div>
         `,
-        iconSize: [20, 4], // 10 for marker, 8 for price above; adjust to fit
-        iconAnchor: [5, 17], // center horizontally, bottom at marker tip
-        popupAnchor: [0, -18]
+        iconSize: [40, 56],      // set to your marker image's width and height
+        iconAnchor: [20, 55],    // bottom center (adjust if needed)
+        popupAnchor: [0, -45]
       });
 
       const marker = L.marker([s.lat, s.lng], { icon });
