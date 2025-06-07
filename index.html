@@ -13,6 +13,9 @@
 </head>
 <body>
   <header>
+    <div style="font-family: 'DigitalDisplayRegular', monospace, sans-serif; font-size: 32px;">
+      TEST 123
+    </div>
     <div class="search-bar">
       <input type="text" id="search" placeholder="Search suburb" autocomplete="on" />
       <span class="fa-stack fuel-icon-in-select">
@@ -27,15 +30,6 @@
           </select>
     </div>
   </header>
-
-  <main>
-    <div id="map" class="map"></div>
-    <ul id="list" class="hidden"></ul>
-    <!-- Updated recenter button with a unique ID and FontAwesome icon -->
-    <button id="recenter-btn" title="Recenter map">
-      <i class="fa-solid fa-location-crosshairs"></i>
-    </button>
-  </main>
 
   <footer>
     <button id="map-tab" class="tab active"><i class="fa-solid fa-map"></i> Map</button>
