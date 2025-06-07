@@ -1,3 +1,10 @@
+@font-face {
+  font-family: 'DigitalDisplayRegular';
+  src: url('fonts/DigitalDisplayRegular-ODEO.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body, html {
   margin: 0;
   padding: 0;
@@ -60,7 +67,7 @@ header {
   left: 13px;
   width: 100%;
   text-align: center;
-  font-family: 'VT323', monospace, sans-serif !important;
+  font-family: 'DigitalDisplayRegular', monospace, sans-serif !important;
   font-size: 16px;         /* Change font size */
   color: #fff;
   background: none;
