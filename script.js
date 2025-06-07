@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Map setup
-  const initialZoom = isMobile() ? 16 : 12; // Updated zoom levels
+  const initialZoom = isMobile() ? 14 : 16; // Updated zoom levels
   const initialCenter = [-27.4698, 153.0251];
   // Disable default zoom control to reposition it later
   const map = L.map("map", { zoomControl: false }).setView(initialCenter, initialZoom);
