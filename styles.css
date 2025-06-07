@@ -83,11 +83,6 @@ header {
   display: block;
 }
 
-/* Hide default Leaflet zoom controls if any reappear */
-.leaflet-control-zoom {
-  display: none !important;
-}
-
 #bottom-tabs {
   position: fixed;
   bottom: 0;
