@@ -40,6 +40,7 @@ header {
   padding: 10px;
   font-size: 16px;
   outline: none;
+  font-family: 'DigitalDisplayRegular', monospace, sans-serif !important;
 }
 
 .search-bar input {
@@ -51,41 +52,42 @@ header {
   background: none;
 }
 
-.leaflet-control-zoom {
-  top: 100px !important;  /* Adjust value as needed */
-  bottom: auto !important;
-}
-
-.map {
+#map {
   width: 100vw;
   height: 100vh;
 }
 
-.marker-price {
+#list {
   position: absolute;
-  top: 26px;                /* Move font up (smaller = higher) */
-  left: 13px;
-  width: 100%;
-  text-align: center;
+  top: 80px;
+  left: 10px;
+  right: 10px;
+  bottom: 60px;
+  background: white;
+  z-index: 1000;
+  overflow-y: auto;
+  border-radius: 8px;
+  padding: 8px 0;
   font-family: 'DigitalDisplayRegular', monospace, sans-serif !important;
-  font-size: 16px;         /* Change font size */
-  color: #fff;
-  background: none;
-  border: none;
-  padding: 0 1px;          /* Add horizontal gap if needed */
-  margin: 0;               /* Adjust margin if you want more/less space */
-  pointer-events: none;
-  user-select: none;
-  text-shadow: 0 2px 6px #000, 0 0 2px #000;
-  font-weight: normal;
-  letter-spacing: 0px;     /* Adjust character spacing if needed */
-  line-height: 1.1;        /* Adjust vertical gap between lines if multiline */
 }
+#list.hidden { display: none; }
 
-.custom-marker-img {
-  width: 80px;
-  height: 80px;
-  display: block;
+#recenter-btn {
+  position: absolute;
+  bottom: 70px;
+  right: 20px;
+  z-index: 1100;
+  background: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  font-size: 19px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #bottom-tabs {
@@ -100,7 +102,7 @@ header {
   border-top: 1px solid #ddd;
   z-index: 1000;
 }
-.tab-btn {
+.tab {
   flex: 1;
   height: 40px;
   margin: 0 8px;
@@ -108,3 +110,32 @@ header {
   background: #eee;
   border-radius: 4px;
   font-size: 16px;
+  font-family: 'DigitalDisplayRegular', monospace, sans-serif !important;
+  cursor: pointer;
+  color: #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tab.active {
+  background: #2196f3;
+  color: #fff;
+}
+
+.marker-price {
+  font-family: 'DigitalDisplayRegular', monospace, sans-serif !important;
+  font-size: 16px;
+  color: #2196f3;
+  text-shadow: 0 2px 6px #fff, 0 0 2px #fff;
+}
+
+.brand-logo {
+  height: 24px;
+  width: auto;
+  vertical-align: middle;
+}
+
+.cheapest-price {
+  color: #009688;
+  font-weight: bold;
+}
