@@ -15,15 +15,15 @@ document.addEventListener("DOMContentLoaded", () => {
     {
       attribution:
         '<a href="https://jawg.io" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      minZoom: 0,
-      maxZoom: 22,
+      minZoom: 10,
+      maxZoom: 18,
     }
   ).addTo(map);
 
   // --- Custom marker icon for ALL stations ---
   const myCustomIcon = L.icon({
     iconUrl: 'images/my-marker.png', // <-- Your custom marker image
-    iconSize: [42, 55],              // <-- Adjust to match your image size
+    iconSize: [46, 53],              // <-- Adjust to match your image size
     iconAnchor: [16, 32],            // <-- Adjust as needed
     popupAnchor: [0, -32]
   });
