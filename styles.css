@@ -1,3 +1,10 @@
+@font-face {
+  font-family: 'DigitalDisplayRegular';
+  src: url('fonts/DigitalDisplayRegular-ODEO.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body, html {
   margin: 0;
   padding: 0;
@@ -49,9 +56,8 @@ header {
   height: 100vh;
 }
 
-@font-face {
-  font-family: 'DigitalDisplayRegular';
-  src: url('fonts/DigitalDisplayRegular-ODEO.ttf') format('truetype');
+.marker-price {
+  font-family: 'DigitalDisplayRegular', monospace, sans-serif !important;
   font-weight: normal;
   font-style: normal;
   font-size: 10px;         /* Small enough to fit above a 10px marker */
