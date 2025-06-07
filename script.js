@@ -1,7 +1,7 @@
 // QLD Fuel Finder - Apple MapKit JS version
 document.addEventListener("DOMContentLoaded", () => {
   // Apple MapKit JS API token
-  const MAPKIT_TOKEN = "eyJraWQiOiJaVk1ZV0FIWTdLIiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzQ5Mjk0NjY2LCJvcmlnaW4iOiJzZWxsYW55Y2FyZmFzdC5jb20uYXUifQ.6-RYPSZWxmIAX1e9XYEq3SJqDGhMirwwDDZ_DRYcINY9NtCbmlkonV3cRNge7iYiI-ehjt6mXIjEQAeeoo8FhA";
+  const MAPKIT_TOKEN = "eyJraWQiOiJITjU3RDk2VVM2IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzQ5Mjk3NTc1LCJvcmlnaW4iOiIqLnNsbG55Y3Jmc3QuZ2l0aHViLmlvIn0.jQhOmgBdgRkR6RU6Ewe9YEgRjk0IzabAzkJYb-_ePHoqhOgWp-xDFL_qSrGEbfrPY1hyOQmhrCEpYUEIpdaycQ";
 
   // Init MapKit
   mapkit.init({
@@ -13,16 +13,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const map = new mapkit.Map("map", {
     center: initialCoord,
-    region: new mapkit.CoordinateRegion(
-      initialCoord,
-      new mapkit.CoordinateSpan(0.15, 0.15)
-    ),
-    zoom: 12,
     showsCompass: mapkit.FeatureVisibility.Visible,
     showsZoomControl: true,
     showsMapTypeControl: true,
-    pitchEnabled: true,      // Enable 3D tilt
-    rotationEnabled: true    // Enable rotation
+    showsPitchControl: true,
+    showsRotationControl: true
   });
 
   // FUEL ID MAP
