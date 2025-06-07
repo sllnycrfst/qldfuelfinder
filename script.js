@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <img src="images/my-marker.png" class="custom-marker-img" />
           </div>
         `,
-        iconSize: [21, 37], // Adjust based on your marker image + price area
+        iconSize: [10, 10], // Adjust based on your marker image + price area
         iconAnchor: [0, 4], // Adjust so the tip of the marker points correctly
         popupAnchor: [0, -44]
       });
