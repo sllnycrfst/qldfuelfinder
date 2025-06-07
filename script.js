@@ -1,47 +1,111 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>QLD Fuel Finder</title>
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
-    crossorigin=""
-  />
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <header>
-    <div class="search-bar">
-      <input type="text" id="search" placeholder="Search suburb" autocomplete="on" />
-      <span class="fa-stack fuel-icon-in-select">
-        <i class="fa-solid fa-gas-pump"></i>
-      </span>
-      <select id="fuel-select">
-        <option value="E10">E10</option>
-        <option value="91" selected>91</option>
-        <option value="95">95</option>
-        <option value="98">98</option>
-        <option value="Diesel">DSL</option>
-      </select>
-    </div>
-  </header>
+@font-face {
+  font-family: 'DigitalDisplayRegular';
+  src: url('fonts/DigitalDisplayRegular-ODEO.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
-  <main>
-    <div id="map" class="map"></div>
-    <ul id="list" class="hidden"></ul>
-    <button id="recenter-btn" title="Recenter map">
-      <i class="fa-solid fa-location-crosshairs"></i>
-    </button>
-  </main>
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
 
-  <footer>
-    <button id="map-tab" class="tab active"><i class="fa-solid fa-map"></i> Map</button>
-    <button id="list-tab" class="tab"><i class="fa-solid fa-list"></i> List</button>
-  </footer>
+header {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  z-index: 1000;
+}
 
-  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" crossorigin=""></script>
-  <script src="script.js"></script>
-</body>
-</html>
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  overflow: hidden;
+  gap: 6px;
+}
+
+.fuel-icon-in-search {
+  color: #2196f3;
+  font-size: 1.3em;
+  margin-left: 8px;
+}
+
+.search-bar input, .search-bar select {
+  border: none;
+  padding: 10px;
+  font-size: 16px;
+  outline: none;
+}
+
+.search-bar input {
+  flex: 1;
+}
+
+.search-bar select {
+  border-left: 1px solid #ccc;
+  background: none;
+}
+
+.map {
+  width: 100vw;
+  height: 100vh;
+}
+
+.marker-price {
+  position: absolute;
+  top: 5px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-family: 'DigitalDisplayRegular', monospace, sans-serif !important;
+  font-size: 19px;
+  color: #fff;
+  background: none;
+  border: none;
+  padding: 0 3px;
+  margin: 0;
+  pointer-events: none;
+  user-select: none;
+  text-shadow: 0 2px 6px #000, 0 0 2px #000;
+  font-weight: normal;
+  letter-spacing: 2px;
+  line-height: 1.1;
+}
+
+.custom-marker-img {
+  width: 64px;
+  height: 64px;
+  display: block;
+}
+
+/* Remove or comment out the following to show zoom controls! */
+/* .leaflet-control-zoom {
+  display: none !important;
+} */
+
+#bottom-tabs {
+  position: fixed;
+  bottom: 0;
+  left: 0; right: 0;
+  height: 56px;
+  background: #fff;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid #ddd;
+  z-index: 1000;
+}
+.tab-btn {
+  flex: 1;
+  height: 40px;
+  margin: 0 8px;
+  border: none;
+  background: #eee;
+  border-radius: 4px;
+  font-size: 16px;
+}
