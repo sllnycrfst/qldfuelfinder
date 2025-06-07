@@ -45,7 +45,7 @@ header {
 }
 
 .leaflet-control-zoom {
-  top: 140px !important;  /* Adjust value as needed */
+  top: 100px !important;  /* Adjust value as needed */
   bottom: auto !important;
 }
 
@@ -61,7 +61,7 @@ header {
   width: 100%;
   text-align: center;
   font-family: 'VT323', monospace, sans-serif !important;
-  font-size: 19px;         /* Change font size */
+  font-size: 16px;         /* Change font size */
   color: #fff;
   background: none;
   border: none;
@@ -76,8 +76,8 @@ header {
 }
 
 .custom-marker-img {
-  width: 88px;
-  height: 88px;
+  width: 80px;
+  height: 80px;
   display: block;
 }
 
