@@ -63,13 +63,6 @@ header {
   letter-spacing: 1px;
 }
 
-.marker-stack {
-  position: relative;
-  width: 64px;     /* match your marker image width */
-  height: 64px;    /* match your marker image height */
-  display: block;
-}
-
 .custom-marker-img {
   width: 64px;
   height: 64px;
