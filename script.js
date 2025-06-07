@@ -104,20 +104,23 @@ document.addEventListener("DOMContentLoaded", () => {
     markers.forEach(m => map.removeLayer(m));
     markers = [];
 
-    // Render visible stations (all using price-above dot matrix marker)
     visibleStations.forEach(s => {
       const icon = L.divIcon({
         className: "fuel-marker",
         html: `
           <div class="marker-stack">
-            <div class="price-dotmatrix">${s.price.toFixed(1)}</div>
+            <div class="price-sevensegment">${s.price.toFixed(1)}</div>
             <img src="images/my-marker.png" class="custom-marker-img" />
           </div>
         `,
-        iconSize: [10, 10], // Adjust based on your marker image + price area
-        iconAnchor: [0, 4], // Adjust so the tip of the marker points correctly
-        popupAnchor: [0, -44]
-      });
+      iconSize: [10, 18], // 10 for marker + 8 for price height (adjust as needed)
+      iconAnchor: [5, 17], // half width, total height-1
+      popupAnchor: [0, -18]
+    });
+
+    const marker = L.marker([s.lat, s.lng], { icon });
+    // ... rest of your marker code ...
+   });
 
       const marker = L.marker([s.lat, s.lng], { icon });
       const encodedAddress = encodeURIComponent(s.address);
