@@ -44,6 +44,11 @@ header {
   background: none;
 }
 
+.leaflet-control-zoom {
+  top: 140px !important;  /* Adjust value as needed */
+  bottom: auto !important;
+}
+
 .map {
   width: 100vw;
   height: 100vh;
@@ -52,7 +57,7 @@ header {
 .marker-price {
   position: absolute;
   top: 26px;                /* Move font up (smaller = higher) */
-  left: 14px;
+  left: 13px;
   width: 100%;
   text-align: center;
   font-family: 'VT323', monospace, sans-serif !important;
