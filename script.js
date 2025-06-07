@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Map setup
-  const initialZoom = 12; // or any number you prefer
+  const initialZoom = isMobile() ? 20 : 16; // Updated zoom levels
   const initialCenter = [-27.4698, 153.0251];
   const map = L.map("map").setView(initialCenter, initialZoom);
 
@@ -104,6 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
     markers.forEach(m => map.removeLayer(m));
     markers = [];
 
+    // Render visible stations (all using price-above 7-segment marker)
     visibleStations.forEach(s => {
       const icon = L.divIcon({
         className: "fuel-marker",
@@ -113,14 +114,10 @@ document.addEventListener("DOMContentLoaded", () => {
             <img src="images/my-marker.png" class="custom-marker-img" />
           </div>
         `,
-      iconSize: [10, 18], // 10 for marker + 8 for price height (adjust as needed)
-      iconAnchor: [5, 17], // half width, total height-1
-      popupAnchor: [0, -18]
-    });
-
-    const marker = L.marker([s.lat, s.lng], { icon });
-    // ... rest of your marker code ...
-   });
+        iconSize: [10, 18], // 10 for marker, 8 for price above; adjust to fit
+        iconAnchor: [5, 17], // center horizontally, bottom at marker tip
+        popupAnchor: [0, -18]
+      });
 
       const marker = L.marker([s.lat, s.lng], { icon });
       const encodedAddress = encodeURIComponent(s.address);
