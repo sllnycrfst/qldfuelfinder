@@ -1,24 +1,26 @@
-// QLD Fuel Finder - Apple MapKit JS version
+// QLD Fuel Finder main script (Leaflet + CartoDB Positron)
 document.addEventListener("DOMContentLoaded", () => {
-  // Apple MapKit JS API token
-  const MAPKIT_TOKEN = "eyJraWQiOiJITjU3RDk2VVM2IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzQ5Mjk3NTc1LCJvcmlnaW4iOiIqLnNsbG55Y3Jmc3QuZ2l0aHViLmlvIn0.jQhOmgBdgRkR6RU6Ewe9YEgRjk0IzabAzkJYb-_ePHoqhOgWp-xDFL_qSrGEbfrPY1hyOQmhrCEpYUEIpdaycQ";
+  function isMobile() {
+    return /Mobi|Android/i.test(navigator.userAgent);
+  }
 
-  // Init MapKit
-  mapkit.init({
-    authorizationCallback: function(done) { done(MAPKIT_TOKEN); }
-  });
+  const initialZoom = isMobile() ? 14 : 16;
+  const initialCenter = [-27.4698, 153.0251];
 
-  // Map setup
-  const initialCoord = new mapkit.Coordinate(-27.4698, 153.0251);
+  // CartoDB Positron tiles: soft, low-color, free to use with attribution
+  const tileUrl = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+  const tileAttrib = '&copy; <a href="https://carto.com/attributions">CARTO</a> | &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>';
 
-  const map = new mapkit.Map("map", {
-    center: initialCoord,
-    showsCompass: mapkit.FeatureVisibility.Visible,
-    showsZoomControl: true,
-    showsMapTypeControl: true,
-    showsPitchControl: true,
-    showsRotationControl: true
-  });
+  const map = L.map("map", { zoomControl: false }).setView(initialCenter, initialZoom);
+
+  L.tileLayer(tileUrl, {
+    attribution: tileAttrib,
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(map);
+
+  // Add zoom control top-right
+  L.control.zoom({ position: 'topright' }).addTo(map);
 
   // FUEL ID MAP
   const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3 };
@@ -26,25 +28,26 @@ document.addEventListener("DOMContentLoaded", () => {
   let allSites = [];
   let allPrices = [];
   let markers = [];
-  let userAnnotation = null;
+  let userMarker = null;
 
   // --- Geolocation: blue marker for user location ---
   function showUserLocation() {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
       pos => {
-        const userCoord = new mapkit.Coordinate(pos.coords.latitude, pos.coords.longitude);
-        map.setCenterAnimated(userCoord);
-        if (userAnnotation) map.removeAnnotation(userAnnotation);
-        userAnnotation = new mapkit.MarkerAnnotation(userCoord, {
-          color: "#2196f3",
-          glyphText: "●",
-          title: "You are here"
-        });
-        map.addAnnotation(userAnnotation);
+        const userLatLng = [pos.coords.latitude, pos.coords.longitude];
+        map.setView(userLatLng, map.getZoom());
+        if (userMarker) map.removeLayer(userMarker);
+        userMarker = L.circleMarker(userLatLng, {
+          radius: 8,
+          color: "#007bff",
+          fillColor: "#339cff",
+          fillOpacity: 1,
+          weight: 2,
+        }).addTo(map);
       },
       err => {
-        alert("Could not get your location.");
+        console.warn("Geolocation error:", err);
       }
     );
   }
@@ -73,17 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Utility: filter and render only stations in current map bounds ---
   function updateVisibleStations() {
     if (!allSites.length || !allPrices.length) return;
-    // Get map bounds as a rectangle
-    const bounds = map.region;
-    function inBounds(lat, lng) {
-      return (
-        lat > bounds.center.latitude - bounds.span.latitudeDelta/2 &&
-        lat < bounds.center.latitude + bounds.span.latitudeDelta/2 &&
-        lng > bounds.center.longitude - bounds.span.longitudeDelta/2 &&
-        lng < bounds.center.longitude + bounds.span.longitudeDelta/2
-      );
-    }
-
+    const bounds = map.getBounds();
     const visibleStations = allSites
       .map(site => {
         const match = allPrices.find(
@@ -91,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
         if (
           match &&
-          inBounds(site.Lat, site.Lng)
+          bounds.contains([site.Lat, site.Lng])
         ) {
           return {
             ...site,
@@ -110,24 +103,31 @@ document.addEventListener("DOMContentLoaded", () => {
       .filter(Boolean);
 
     // Remove old markers
-    markers.forEach(m => map.removeAnnotation(m));
+    markers.forEach(m => map.removeLayer(m));
     markers = [];
 
-    // Render visible stations (overlay price on marker, 7-segment font)
+    // Render visible stations (overlay price on marker image, 7-segment font, no box)
     visibleStations.forEach(s => {
-      const coord = new mapkit.Coordinate(s.lat, s.lng);
-      const marker = new mapkit.MarkerAnnotation(coord, {
-        color: "#fff",
-        glyphText: s.price.toFixed(1),
-        title: s.name,
-        subtitle: s.address,
-        glyphTextStyle: "light"
+      const icon = L.divIcon({
+        className: "fuel-marker",
+        html: `
+          <div class="marker-stack">
+            <img src="images/my-marker.png" class="custom-marker-img" />
+            <div class="marker-price">${s.price.toFixed(1)}</div>
+          </div>
+        `,
+        iconSize: [60, 84],
+        iconAnchor: [20, 55],
+        popupAnchor: [0, -45]
       });
-      // Use a custom font for the glyph
-      marker.element.style.fontFamily = "'DigitalDisplayRegular', monospace, sans-serif";
-      marker.element.style.fontSize = "18px";
+
+      const marker = L.marker([s.lat, s.lng], { icon });
+      const encodedAddress = encodeURIComponent(s.address);
+      marker.bindPopup(
+        `<strong>${s.name}</strong><br><a href="https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}" target="_blank">${s.address}</a>`
+      );
+      marker.addTo(map);
       markers.push(marker);
-      map.addAnnotation(marker);
     });
   }
 
@@ -137,7 +137,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (updateTimeout) clearTimeout(updateTimeout);
     updateTimeout = setTimeout(updateVisibleStations, 300);
   }
-  map.addEventListener("region-change-end", throttledUpdate);
+  map.on("moveend", throttledUpdate);
+  map.on("zoomend", throttledUpdate);
 
   // --- Fuel select change ---
   const fuelSelect = document.getElementById("fuel-select");
@@ -160,6 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
       listTab.classList.remove("active");
       mapDiv.style.display = "";
       listDiv.classList.add("hidden");
+      map.invalidateSize();
     });
     listTab.addEventListener("click", () => {
       listTab.classList.add("active");
@@ -173,17 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Render the station list for the list tab ---
   function renderList() {
     if (!allSites.length || !allPrices.length) return;
-    // Use current map region for bounds
-    const bounds = map.region;
-    function inBounds(lat, lng) {
-      return (
-        lat > bounds.center.latitude - bounds.span.latitudeDelta/2 &&
-        lat < bounds.center.latitude + bounds.span.latitudeDelta/2 &&
-        lng > bounds.center.longitude - bounds.span.longitudeDelta/2 &&
-        lng < bounds.center.longitude + bounds.span.longitudeDelta/2
-      );
-    }
-
+    const bounds = map.getBounds();
     const visibleStations = allSites
       .map(site => {
         const match = allPrices.find(
@@ -191,7 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
         if (
           match &&
-          inBounds(site.Lat, site.Lng)
+          bounds.contains([site.Lat, site.Lng])
         ) {
           return {
             ...site,
@@ -244,8 +236,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // Look for first site matching suburb
       const match = allSites.find(site => site.P && site.P.toLowerCase().includes(query));
       if (match) {
-        const coord = new mapkit.Coordinate(match.Lat, match.Lng);
-        map.setCenterAnimated(coord, { latitudeDelta: 0.04, longitudeDelta: 0.04 });
+        const latlng = [match.Lat, match.Lng];
+        map.setView(latlng, 14);
       } else {
         alert("No suburb match.");
       }
