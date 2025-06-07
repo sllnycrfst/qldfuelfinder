@@ -73,7 +73,25 @@ document.addEventListener("DOMContentLoaded", () => {
       ]);
       allSites = Array.isArray(siteRes) ? siteRes : siteRes.S;
       allPrices = priceRes.SitePrices;
-      updateVisibleStations();
+      visibleStations.forEach(s => {
+  const icon = L.divIcon({
+    className: "fuel-marker",
+    html: `
+      <div class="marker-stack">
+        <div class="price-dotmatrix">${s.price.toFixed(1)}</div>
+        <img src="images/my-marker.png" class="custom-marker-img" />
+      </div>
+    `,
+    iconSize: [32, 48], // Adjust based on your marker size + price space
+    iconAnchor: [16, 44], // Adjust so marker tip points to the station
+    popupAnchor: [0, -44]
+  });
+
+  const marker = L.marker([s.lat, s.lng], { icon });
+  // ... rest of popup code ...
+  marker.addTo(map);
+  markers.push(marker);
+});
     } catch (err) {
       console.error("Failed to fetch site/price data:", err);
     }
