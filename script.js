@@ -14,15 +14,21 @@ document.addEventListener("DOMContentLoaded", () => {
   // Add zoom control at top-right
   L.control.zoom({ position: 'topright' }).addTo(map);
 
-  L.tileLayer(
-    "https://tile.jawg.io/jawg-lagoon/{z}/{x}/{y}{r}.png?access-token=rWQf0gGxJI7ihaBx57CMZyv2NeEcNTWlUSiR5rYePZOnKErq6RqUgzkLlJ4MJZzo",
-    {
-      attribution:
-        '<a href="https://jawg.io" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      minZoom: 0,
-      maxZoom: 22,
-    }
-  ).addTo(map);
+  mapkit.init({
+  authorizationCallback: function(done) {
+    done("YOUR_MAPKIT_JS_TOKEN");
+  }
+});
+
+var map = new mapkit.Map("map", {
+  center: new mapkit.Coordinate(-27.4705, 153.0260), // Brisbane
+  zoom: 10,
+  showsCompass: mapkit.FeatureVisibility.Visible,
+  showsZoomControl: true,
+  showsMapTypeControl: true,
+  pitchEnabled: true,   // allows tilt/3D effect
+  rotationEnabled: true // allows rotation
+});
 
   // FUEL ID MAP
   const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3 };
