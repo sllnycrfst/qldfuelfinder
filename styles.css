@@ -52,7 +52,7 @@ header {
 .marker-price {
   position: absolute;
   top: 26px;                /* Move font up (smaller = higher) */
-  left: 15px;
+  left: 14px;
   width: 100%;
   text-align: center;
   font-family: 'VT323', monospace, sans-serif !important;
