@@ -49,12 +49,13 @@ header {
   height: 100vh;
 }
 
-.price-sevensegment {
-  font-family: 'Segment7', monospace, sans-serif !important;
+@font-face {
+  font-family: 'DigitalDisplayRegular';
+  src: url('fonts/DigitalDisplayRegular-ODEO.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
   font-size: 10px;         /* Small enough to fit above a 10px marker */
   color: #fdfdfd;
-  background: #0b3a2f;    /* Or your preferred background */
-  border-radius: 2px;
   padding: 0 2px;
   margin-bottom: 0px;
   display: inline-block;
