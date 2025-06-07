@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   ).addTo(map);
 
-  // --- Custom marker icon for the cheapest station ---
+  // --- Custom marker icon for ALL stations ---
   const myCustomIcon = L.icon({
     iconUrl: 'images/my-marker.png', // <-- Your custom marker image
     iconSize: [32, 32],              // <-- Adjust to match your image size
@@ -108,35 +108,15 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .filter(Boolean);
 
-    // Find lowest price among visible stations
-    const minPrice =
-      visibleStations.length > 0
-        ? Math.min(...visibleStations.map(s => s.rawPrice))
-        : null;
-
     // Remove old markers
     markers.forEach(m => map.removeLayer(m));
     markers = [];
 
     // Render visible stations
     visibleStations.forEach(s => {
-      let marker;
-      if (s.rawPrice === minPrice) {
-        // Use custom marker icon for the cheapest station
-        marker = L.marker([s.lat, s.lng], { icon: myCustomIcon });
-      } else {
-        // Use the existing divIcon for other stations
-        const icon = L.divIcon({
-          className: "fuel-marker",
-          html: `
-            <div class="marker-box orange">
-              <div class="price">${s.price.toFixed(1)}</div>
-              <img src="assets/logos/${s.brand}.png" class="brand-logo" onerror="this.style.display='none';" />
-            </div>
-          `,
-        });
-        marker = L.marker([s.lat, s.lng], { icon });
-      }
+      // Use custom marker icon for ALL stations
+      const marker = L.marker([s.lat, s.lng], { icon: myCustomIcon });
+
       const encodedAddress = encodeURIComponent(s.address);
       marker.bindPopup(
         `<strong>${s.name}</strong><br><a href="https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}" target="_blank">${s.address}</a>`
