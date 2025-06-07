@@ -51,8 +51,8 @@ header {
 
 .price-sevensegment {
   font-family: 'Segment7', monospace, sans-serif;
-  font-size: 7px;         /* Small enough to fit above a 10px marker */
-  color: #333;
+  font-size: 10px;         /* Small enough to fit above a 10px marker */
+  color: #eee;
   background: #0b3a2f;    /* Or your preferred background */
   border-radius: 2px;
   padding: 0 2px;
