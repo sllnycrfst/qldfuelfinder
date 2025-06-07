@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Map setup
-  const initialZoom = 12; // or any number you prefer
+  const initialZoom = isMobile() ? 20 : 16; // Updated zoom levels
   const initialCenter = [-27.4698, 153.0251];
   const map = L.map("map").setView(initialCenter, initialZoom);
 
@@ -15,18 +15,10 @@ document.addEventListener("DOMContentLoaded", () => {
     {
       attribution:
         '<a href="https://jawg.io" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      minZoom: 14,
-      maxZoom: 20,
+      minZoom: 0,
+      maxZoom: 22,
     }
   ).addTo(map);
-
-  // --- Custom marker icon for ALL stations ---
-  const myCustomIcon = L.icon({
-    iconUrl: 'images/my-marker.png', // <-- Your custom marker image
-    iconSize: [46, 53],              // <-- Adjust to match your image size
-    iconAnchor: [16, 32],            // <-- Adjust as needed
-    popupAnchor: [0, -32]
-  });
 
   // FUEL ID MAP
   const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3 };
@@ -73,25 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ]);
       allSites = Array.isArray(siteRes) ? siteRes : siteRes.S;
       allPrices = priceRes.SitePrices;
-      visibleStations.forEach(s => {
-  const icon = L.divIcon({
-    className: "fuel-marker",
-    html: `
-      <div class="marker-stack">
-        <div class="price-dotmatrix">${s.price.toFixed(1)}</div>
-        <img src="images/my-marker.png" class="custom-marker-img" />
-      </div>
-    `,
-    iconSize: [32, 48], // Adjust based on your marker size + price space
-    iconAnchor: [16, 44], // Adjust so marker tip points to the station
-    popupAnchor: [0, -44]
-  });
-
-  const marker = L.marker([s.lat, s.lng], { icon });
-  // ... rest of popup code ...
-  marker.addTo(map);
-  markers.push(marker);
-});
+      updateVisibleStations();
     } catch (err) {
       console.error("Failed to fetch site/price data:", err);
     }
@@ -130,11 +104,22 @@ document.addEventListener("DOMContentLoaded", () => {
     markers.forEach(m => map.removeLayer(m));
     markers = [];
 
-    // Render visible stations
+    // Render visible stations (all using price-above dot matrix marker)
     visibleStations.forEach(s => {
-      // Use custom marker icon for ALL stations
-      const marker = L.marker([s.lat, s.lng], { icon: myCustomIcon });
+      const icon = L.divIcon({
+        className: "fuel-marker",
+        html: `
+          <div class="marker-stack">
+            <div class="price-dotmatrix">${s.price.toFixed(1)}</div>
+            <img src="images/my-marker.png" class="custom-marker-img" />
+          </div>
+        `,
+        iconSize: [32, 48], // Adjust based on your marker image + price area
+        iconAnchor: [16, 44], // Adjust so the tip of the marker points correctly
+        popupAnchor: [0, -44]
+      });
 
+      const marker = L.marker([s.lat, s.lng], { icon });
       const encodedAddress = encodeURIComponent(s.address);
       marker.bindPopup(
         `<strong>${s.name}</strong><br><a href="https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}" target="_blank">${s.address}</a>`
