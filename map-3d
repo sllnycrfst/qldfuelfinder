@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>3D Effect Map Example (MapLibre GL JS)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- MapLibre GL JS CSS -->
+  <link href="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.css" rel="stylesheet" />
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    #map {
+      width: 100vw;
+      height: 100vh;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    /* Optional: Add a shadow/3D border for more “pop” */
+    #map {
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <!-- MapLibre GL JS -->
+  <script src="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.js"></script>
+  <script>
+    // Example: Brisbane city center.
+    const centerCoords = [153.0260, -27.4705];
+    const map = new maplibregl.Map({
+      container: 'map',
+      style: 'https://demotiles.maplibre.org/style.json', // Free demo vector tiles
+      center: centerCoords,
+      zoom: 14,
+      pitch: 55,    // Tilt for 3D effect
+      bearing: -20  // A little rotation for style
+    });
+
+    // Optional: Add navigation controls (zoom, rotate)
+    map.addControl(new maplibregl.NavigationControl(), 'top-right');
+
+    // Optional: Marker at the center
+    new maplibregl.Marker()
+      .setLngLat(centerCoords)
+      .addTo(map);
+
+    // Note: For real 3D buildings, you’d need a vector tile source that includes building heights (not in this free demo).
+    // You can swap the `style` URL for any MapLibre/MapTiler/OpenMapTiles vector style for more options.
+  </script>
+</body>
+</html>
