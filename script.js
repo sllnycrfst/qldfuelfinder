@@ -1,22 +1,34 @@
 // QLD Fuel Finder main script
 document.addEventListener("DOMContentLoaded", () => {
-  // Mobile zoom utility
+  // UTILITY: Mobile detection for initial zoom
   function isMobile() {
     return /Mobi|Android/i.test(navigator.userAgent);
   }
 
   // Map setup
-  const initialZoom = isMobile() ? 14 : 14;
+  const initialZoom = isMobile() ? 12 : 14;
   const initialCenter = [-27.4698, 153.0251];
   const map = L.map("map").setView(initialCenter, initialZoom);
 
-  L.tileLayer('https://{s}.tile.jawg.io/jawg-light/{z}/{x}/{y}{r}.png?access-token=rWQf0gGxJI7ihaBx57CMZyv2NeEcNTWlUSiR5rYePZOnKErq6RqUgzkLlJ4MJZzo', {
-    attribution: '<a href="https://jawg.io" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    minZoom: 4,
-    maxZoom: 16
-  }).addTo(map);
+  L.tileLayer(
+    "https://tile.jawg.io/jawg-lagoon/{z}/{x}/{y}{r}.png?access-token=rWQf0gGxJI7ihaBx57CMZyv2NeEcNTWlUSiR5rYePZOnKErq6RqUgzkLlJ4MJZzo",
+    {
+      attribution:
+        '<a href="https://jawg.io" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      minZoom: 0,
+      maxZoom: 22,
+    }
+  ).addTo(map);
 
-  // Data holders
+  // --- Custom marker icon for the cheapest station ---
+  const myCustomIcon = L.icon({
+    iconUrl: 'images/my-marker.png', // <-- Your custom marker image
+    iconSize: [32, 32],              // <-- Adjust to match your image size
+    iconAnchor: [16, 32],            // <-- Adjust as needed
+    popupAnchor: [0, -32]
+  });
+
+  // FUEL ID MAP
   const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3 };
   let currentFuel = "91";
   let allSites = [];
@@ -24,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let markers = [];
   let userMarker = null;
 
-  // --- Geolocation for user marker ---
+  // --- Geolocation: blue marker for user location ---
   function showUserLocation() {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
@@ -47,10 +59,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   showUserLocation();
 
-  // --- Event: recenter button ---
-  document.getElementById("recenter-btn").addEventListener("click", showUserLocation);
+  // Recenter button
+  document.getElementById("recenter-btn").addEventListener("click", () => {
+    showUserLocation();
+  });
 
-  // --- Fetch site and price data once ---
+  // --- Fetch site and price data once, then update per map bounds ---
   async function fetchSitesAndPrices() {
     try {
       const [siteRes, priceRes] = await Promise.all([
@@ -65,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- Filter & render stations in map bounds ---
+  // --- Utility: filter and render only stations in current map bounds ---
   function updateVisibleStations() {
     if (!allSites.length || !allPrices.length) return;
     const bounds = map.getBounds();
@@ -106,17 +120,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Render visible stations
     visibleStations.forEach(s => {
-      let color = s.rawPrice === minPrice ? "green" : "orange";
-      const icon = L.divIcon({
-        className: "fuel-marker",
-        html: `
-          <div class="marker-box ${color}">
-            <div class="price">${s.price.toFixed(1)}</div>
-            <img src="assets/logos/${s.brand}.png" class="brand-logo" onerror="this.style.display='none';" />
-          </div>
-        `,
-      });
-      const marker = L.marker([s.lat, s.lng], { icon });
+      let marker;
+      if (s.rawPrice === minPrice) {
+        // Use custom marker icon for the cheapest station
+        marker = L.marker([s.lat, s.lng], { icon: myCustomIcon });
+      } else {
+        // Use the existing divIcon for other stations
+        const icon = L.divIcon({
+          className: "fuel-marker",
+          html: `
+            <div class="marker-box orange">
+              <div class="price">${s.price.toFixed(1)}</div>
+              <img src="assets/logos/${s.brand}.png" class="brand-logo" onerror="this.style.display='none';" />
+            </div>
+          `,
+        });
+        marker = L.marker([s.lat, s.lng], { icon });
+      }
       const encodedAddress = encodeURIComponent(s.address);
       marker.bindPopup(
         `<strong>${s.name}</strong><br><a href="https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}" target="_blank">${s.address}</a>`
@@ -126,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- Keep stations updated as map moves ---
+  // Throttle station update on move/zoom
   let updateTimeout;
   function throttledUpdate() {
     if (updateTimeout) clearTimeout(updateTimeout);
@@ -135,13 +155,13 @@ document.addEventListener("DOMContentLoaded", () => {
   map.on("moveend", throttledUpdate);
   map.on("zoomend", throttledUpdate);
 
-  // --- Event: fuel select change ---
+  // --- Fuel select change ---
   document.getElementById("fuel-select").addEventListener("change", e => {
     currentFuel = e.target.value;
     updateVisibleStations();
   });
 
-  // --- Tab switching logic (NO tab creation, NO innerHTML) ---
+  // --- Tab handling ---
   const mapTab = document.getElementById("map-tab");
   const listTab = document.getElementById("list-tab");
   const mapDiv = document.getElementById("map");
@@ -162,6 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderList();
   });
 
+  // --- Render the station list for the list tab ---
   function renderList() {
     if (!allSites.length || !allPrices.length) return;
     const bounds = map.getBounds();
@@ -190,7 +211,7 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .filter(Boolean);
 
-    // Sort stations by price, cheapest first
+    // Sort by price, cheapest first
     visibleStations.sort((a, b) => a.rawPrice - b.rawPrice);
 
     const minPrice =
