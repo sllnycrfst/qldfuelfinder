@@ -60,7 +60,7 @@ header {
   color: #fff;
   background: none;
   border: none;
-  padding: 0 3px;          /* Add horizontal gap if needed */
+  padding: 0 1px;          /* Add horizontal gap if needed */
   margin: 0;               /* Adjust margin if you want more/less space */
   pointer-events: none;
   user-select: none;
