@@ -65,14 +65,14 @@ header {
 
 .marker-stack {
   position: relative;
-  width: 50px;     /* match your marker image width */
-  height: 50px;    /* match your marker image height */
+  width: 64px;     /* match your marker image width */
+  height: 64px;    /* match your marker image height */
   display: block;
 }
 
 .custom-marker-img {
-  width: 50px;
-  height: 50px;
+  width: 64px;
+  height: 64px;
   display: block;
 }
 
@@ -82,7 +82,7 @@ header {
   left: 0;
   width: 100%;
   text-align: center;
-  font-family: 'Segment7', monospace, sans-serif;
+  font-family: 'Segment7', monospace, sans-serif !important;
   font-size: 18px;           /* adjust as needed */
   color: #fff;
   background: none;
