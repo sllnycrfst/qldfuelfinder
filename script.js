@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Map setup
-  const initialZoom = isMobile() ? 20 : 16;
+  const initialZoom = 14; // or any number you prefer
   const initialCenter = [-27.4698, 153.0251];
   const map = L.map("map").setView(initialCenter, initialZoom);
 
@@ -15,8 +15,8 @@ document.addEventListener("DOMContentLoaded", () => {
     {
       attribution:
         '<a href="https://jawg.io" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      minZoom: 12,
-      maxZoom: 18,
+      minZoom: 14,
+      maxZoom: 20,
     }
   ).addTo(map);
 
