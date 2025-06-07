@@ -84,8 +84,8 @@ header {
 }
 
 .custom-marker-img {
-  width: 10px !important;
-  height: 10px !important;
+  width: 40px !important;
+  height: 40px !important;
   display: block;
 }
 
@@ -141,10 +141,7 @@ header {
   border-radius: 4px;
   font-size: 16px;
 }
-.fuel-icon {
-  display: inline-block;
-  margin-right: 4px;
-}
+
 .marker-box.green { background: #44d65c; }
 .marker-box.orange { background: #ffd233; }
 .marker-box .price { font-weight: bold; }
