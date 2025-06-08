@@ -8,7 +8,7 @@
 body, html {
   margin: 0;
   padding: 0;
-  font-family: 'DigitalDisplayRegular', monospace, sans-serif !important;
+  font-family: 'Teko', monospace, sans-serif !important;
 }
 
 header {
@@ -40,7 +40,7 @@ header {
   padding: 10px;
   font-size: 16px;
   outline: none;
-  font-family: 'DigitalDisplayRegular', monospace, sans-serif !important;
+  font-family: 'Teko', monospace, sans-serif !important;
 }
 
 .search-bar input {
@@ -68,7 +68,7 @@ header {
   overflow-y: auto;
   border-radius: 8px;
   padding: 8px 0;
-  font-family: 'DigitalDisplayRegular', monospace, sans-serif !important;
+  font-family: 'Teko', monospace, sans-serif !important;
 }
 #list.hidden { display: none; }
 
@@ -136,6 +136,6 @@ header {
 }
 
 .cheapest-price {
-  color: #009688;
-  font-weight: bold;
+  color: #0dc800;
+  font-weight: 400;
 }
