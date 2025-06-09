@@ -114,37 +114,45 @@ header {
 }
 
 .marker-stack {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  width: 50px;
-  height: 80px; /* a little taller to fit brand + marker + price */
   position: relative;
-}
-
-.marker-brand-img {
-  width: 20px;
-  height: 10px;
-  object-fit: contain;
-  margin-bottom: 1px;
-  display: block;
+  width: 64px;  /* marker image width */
+  height: 96px; /* marker image height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .custom-marker-img {
-  width: 50px;
-  height: 80px;
+  width: 64px;
+  height: 96px;
   display: block;
-  margin: 0 auto;
+}
+
+.marker-brand-img {
+  position: absolute;
+  top: 10px;      /* adjust to fit in the blue area */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;    /* adjust size to fit blue box */
+  height: 18px;   /* adjust size to fit blue box */
+  object-fit: contain;
 }
 
 .marker-price {
-  font-size: 16px;
-  color: #2196f3;
-  text-shadow: 0 2px 6px #fff, 0 0 2px #fff;
-  line-height: 1;
-  margin-top: 0;
-  margin-bottom: 0;
+  position: absolute;
+  top: 60px;      /* adjust so it sits over the black rectangle */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 44px;    /* width of the black rectangle */
+  height: 22px;   /* height of the black rectangle */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #fff;
+  font-family: 'Teko', monospace, sans-serif;
+  background: none; /* Let the PNG's black rectangle show through */
+  text-shadow: 0 1px 2px #333, 0 0 2px #333;
 }
 
 .brand-logo {
