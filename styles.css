@@ -129,19 +129,10 @@ ul#list.hidden { display: none; }
   max-width: 36px;
   max-height: 36px;
 }
-.station-price {
-  margin-left: auto;
-  font-size: 1.2em;
-  font-weight: bold;
-}
-.station-price.cheapest-price {
-  color: #0dc800;
-}
 
 /* --- Map Marker Styles --- */
 .fuel-marker,
 .custom-cluster-icon {
-  /* For Leaflet divIcons */
   background: none !important;
   border: none !important;
   box-shadow: none !important;
@@ -166,9 +157,12 @@ ul#list.hidden { display: none; }
   z-index: 2;
   background: #fff;
   border-radius: 5px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.10);
   border: 1px solid #eaeaea;
+  box-shadow:
+    0 2px 6px rgba(0,0,0,0.13),
+    0 1.5px 10px 2.5px rgba(255,255,255,0.75);
 }
+
 .custom-marker-img {
   position: absolute;
   top: 0;
@@ -177,6 +171,7 @@ ul#list.hidden { display: none; }
   height: 80px;
   z-index: 1;
 }
+
 .marker-price {
   position: absolute;
   bottom: 12px;
@@ -205,35 +200,53 @@ ul#list.hidden { display: none; }
 
 .custom-cluster-icon img,
 .custom-cluster-icon .marker-stack {
-  /* For stacked icons in cluster */
   box-shadow: 0 2px 8px rgba(0,0,0,0.18);
   border-radius: 8px;
   background: none;
 }
 
-/* Cluster count badge - handled inline but can be enforced here */
 .custom-cluster-icon > div:not(.marker-stack) {
-  /* The cluster count badge */
   background: #fff;
   color: #222;
   border-radius: 14px;
   min-width: 28px;
   padding: 1px 6px;
-  font-family: Teko, sans-serif;
+  font-family: 'Teko', Arial, sans-serif;
   font-size: 18px;
   font-weight: bold;
   border: 2px solid #2196f3;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
   text-align: center;
   z-index: 200;
   pointer-events: none;
 }
 
-/* Responsive */
+/* Leaflet zoom control margin */
+.leaflet-top.leaflet-right .leaflet-control-zoom {
+  margin-top: 80px;
+  margin-right: 18px;
+}
+
+/* Responsive tweaks for smaller screens */
 @media (max-width: 600px) {
   .search-bar { flex-direction: column; }
   #search { width: 100%; margin-bottom: 8px; }
   #fuel-select { margin-left: 0; }
   #recenter-btn { top: 70px; right: 8px; }
   ul#list { top: 62px; bottom: 52px; }
+  .marker-stack {
+    width: 36px;
+    height: 60px;
+  }
+  .custom-marker-img {
+    width: 36px;
+    height: 60px;
+  }
+  .marker-brand-img {
+    width: 20px;
+    height: 20px;
+  }
+  .marker-price {
+    font-size: 1em;
+    min-width: 28px;
+  }
 }
