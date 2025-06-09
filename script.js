@@ -27,7 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentFuel = "E10";
   let allSites = [];
   let allPrices = [];
-  let markers = [];
   let userMarker = null;
 
   // --- Geolocation: blue marker for user location ---
@@ -57,6 +56,15 @@ document.addEventListener("DOMContentLoaded", () => {
     recenterBtn.addEventListener("click", showUserLocation);
   }
 
+  // --- MarkerCluster setup ---
+  // (Make sure you have included the leaflet.markercluster JS and CSS in your HTML)
+  let markerCluster = L.markerClusterGroup({
+    // Optional: Customize cluster options here
+    // maxClusterRadius: 40,
+    // showCoverageOnHover: false,
+  });
+  map.addLayer(markerCluster);
+
   // --- Fetch site and price data once, then update per map bounds ---
   async function fetchSitesAndPrices() {
     try {
@@ -72,84 +80,77 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-// Add this near your top-level map setup, after map is created:
-let markerCluster = L.markerClusterGroup({
-  // Optional: custom cluster styling or options here
-  // maxClusterRadius: 40, // adjust as needed
-  // showCoverageOnHover: false
-});
-map.addLayer(markerCluster);
+  // --- Utility: filter and render only stations in current map bounds ---
+  function updateVisibleStations() {
+    if (!allSites.length || !allPrices.length) return;
+    const bounds = map.getBounds();
+    const visibleStations = allSites
+      .map(site => {
+        const match = allPrices.find(
+          p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]
+        );
+        if (
+          match &&
+          bounds.contains([site.Lat, site.Lng])
+        ) {
+          return {
+            ...site,
+            price: match.Price / 10,
+            rawPrice: match.Price,
+            brand: site.B,
+            address: site.A,
+            name: site.N,
+            suburb: site.P,
+            lat: site.Lat,
+            lng: site.Lng,
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
 
-// In your updateVisibleStations function:
-function updateVisibleStations() {
-  if (!allSites.length || !allPrices.length) return;
-  const bounds = map.getBounds();
-  const visibleStations = allSites
-    .map(site => {
-      const match = allPrices.find(
-        p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]
+    // Find the minimum price among visible stations
+    const minPrice =
+      visibleStations.length > 0
+        ? Math.min(...visibleStations.map(s => s.rawPrice))
+        : null;
+
+    // Remove all markers from the cluster group
+    markerCluster.clearLayers();
+
+    // Sort so the cheapest comes first in the array (for spiderfy)
+    visibleStations.sort((a, b) => a.rawPrice - b.rawPrice);
+
+    visibleStations.forEach(s => {
+      const isCheapest = s.rawPrice === minPrice;
+      const priceClass = isCheapest
+        ? "marker-price marker-price-cheapest"
+        : "marker-price";
+
+      const icon = L.divIcon({
+        className: "fuel-marker",
+        html: `
+          <div class="marker-stack">
+            <img src="images/${s.brand}.png" class="marker-brand-img" onerror="this.style.display='none';" />
+            <img src="images/my-marker3.png" class="custom-marker-img" />
+            <div class="${priceClass}">${s.price.toFixed(1)}</div>
+          </div>
+        `,
+        iconSize: [50, 80], // adjust as needed
+        iconAnchor: [25, 80], // bottom center for 50x80 marker
+        popupAnchor: [0, -80]
+      });
+
+      // Cheapest marker gets higher zIndexOffset
+      const marker = L.marker([s.lat, s.lng], { icon, zIndexOffset: isCheapest ? 1000 : 0 });
+
+      const encodedAddress = encodeURIComponent(s.address);
+      marker.bindPopup(
+        `<strong>${s.name}</strong><br><a href="https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}" target="_blank">${s.address}</a>`
       );
-      if (
-        match &&
-        bounds.contains([site.Lat, site.Lng])
-      ) {
-        return {
-          ...site,
-          price: match.Price / 10,
-          rawPrice: match.Price,
-          brand: site.B,
-          address: site.A,
-          name: site.N,
-          suburb: site.P,
-          lat: site.Lat,
-          lng: site.Lng,
-        };
-      }
-      return null;
-    })
-    .filter(Boolean);
-
-  // Find the minimum price among visible stations
-  const minPrice =
-    visibleStations.length > 0
-      ? Math.min(...visibleStations.map(s => s.rawPrice))
-      : null;
-
-  // Remove all markers from the cluster group
-  markerCluster.clearLayers();
-
-  // Sort so the cheapest comes first in the array (for spiderfy)
-  visibleStations.sort((a, b) => a.rawPrice - b.rawPrice);
-
-  visibleStations.forEach(s => {
-    const isCheapest = s.rawPrice === minPrice;
-    const priceClass = isCheapest
-      ? "marker-price marker-price-cheapest"
-      : "marker-price";
-
-    const icon = L.divIcon({
-      className: "fuel-marker",
-      html: `
-        <div class="marker-stack">
-          <img src="images/${s.brand}.png" class="marker-brand-img" onerror="this.style.display='none';" />
-          <img src="images/my-marker3.png" class="custom-marker-img" />
-          <div class="${priceClass}">${s.price.toFixed(1)}</div>
-        </div>
-      `,
-      iconSize: [50, 80], // adjust as needed
-      iconAnchor: [25, 80], // bottom center for 50x80 marker
-      popupAnchor: [0, -80]
+      markerCluster.addLayer(marker);
     });
-
-    const marker = L.marker([s.lat, s.lng], { icon, zIndexOffset: isCheapest ? 1000 : 0 });
-
-    const encodedAddress = encodeURIComponent(s.address);
-    marker.bindPopup(
-      `<strong>${s.name}</strong><br><a href="https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}" target="_blank">${s.address}</a>`
-    );
-    markerCluster.addLayer(marker);
-  });
-}
+  }
 
   // Throttle station update on move/zoom
   let updateTimeout;
