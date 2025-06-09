@@ -138,9 +138,9 @@ header {
   top: 10px;      /* adjust to fit in the blue area */
   left: 50%;
   transform: translateX(-50%);
-  width: 30px;    /* adjust size to fit blue box */
-  height: 30px;   /* adjust size to fit blue box */
-  filter: drop-shadow(0 0 4px #fff) drop-shadow(0 0 2px #fff);
+  width: 29px;    /* adjust size to fit blue box */
+  height: 29px;   /* adjust size to fit blue box */
+  filter: drop-shadow(0 0 4px #fff) drop-shadow(0 0 1px #fff);
   object-fit: contain;
 }
 
