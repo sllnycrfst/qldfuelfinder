@@ -105,19 +105,20 @@ document.addEventListener("DOMContentLoaded", () => {
     markers.forEach(m => map.removeLayer(m));
     markers = [];
 
-    // Render visible stations (overlay price on marker image, 7-segment font, no box)
+    // Render visible stations (brand above marker, then price)
     visibleStations.forEach(s => {
       const icon = L.divIcon({
         className: "fuel-marker",
         html: `
           <div class="marker-stack">
+            <img src="images/${s.brand}.png" class="marker-brand-img" onerror="this.style.display='none';" />
             <img src="images/my-marker3.png" class="custom-marker-img" />
             <div class="marker-price">${s.price.toFixed(1)}</div>
           </div>
         `,
-        iconSize: [20, 20],
-        iconAnchor: [20, 20],
-        popupAnchor: [0, -20]
+        iconSize: [20, 32], // width, height (taller for brand+marker+price)
+        iconAnchor: [10, 32], // bottom center
+        popupAnchor: [0, -32]
       });
 
       const marker = L.marker([s.lat, s.lng], { icon });
