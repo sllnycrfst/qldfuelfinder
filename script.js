@@ -1,9 +1,4 @@
-diff --git a/script.js b/script.js
-index e4ad6861a81a34bd3f9afa9b088e4161e875617a..c9776807c59669f2b3b24df296f98517e64b20f5 100644
---- a/script.js
-+++ b/script.js
-@@ -1,150 +1,161 @@
- document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
    // Utility for Roboto & Teko fonts
    function setFont(node, family, weight = 400) {
      node.style.fontFamily = family;
