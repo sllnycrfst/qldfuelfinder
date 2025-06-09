@@ -72,8 +72,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- Utility: filter and render only stations in current map bounds ---
-  function updateVisibleStations() {
+// Add this near your top-level map setup, after map is created:
+let markerCluster = L.markerClusterGroup({
+  // Optional: custom cluster styling or options here
+  // maxClusterRadius: 40, // adjust as needed
+  // showCoverageOnHover: false
+});
+map.addLayer(markerCluster);
+
+// In your updateVisibleStations function:
+function updateVisibleStations() {
   if (!allSites.length || !allPrices.length) return;
   const bounds = map.getBounds();
   const visibleStations = allSites
@@ -107,17 +115,17 @@ document.addEventListener("DOMContentLoaded", () => {
       ? Math.min(...visibleStations.map(s => s.rawPrice))
       : null;
 
-  // Remove old markers
-  markers.forEach(m => map.removeLayer(m));
-  markers = [];
+  // Remove all markers from the cluster group
+  markerCluster.clearLayers();
 
-  // Render visible stations (brand above marker, then price)
+  // Sort so the cheapest comes first in the array (for spiderfy)
+  visibleStations.sort((a, b) => a.rawPrice - b.rawPrice);
+
   visibleStations.forEach(s => {
-    // Add the green class if this is the cheapest
-    const priceClass =
-      s.rawPrice === minPrice
-        ? "marker-price marker-price-cheapest"
-        : "marker-price";
+    const isCheapest = s.rawPrice === minPrice;
+    const priceClass = isCheapest
+      ? "marker-price marker-price-cheapest"
+      : "marker-price";
 
     const icon = L.divIcon({
       className: "fuel-marker",
@@ -129,17 +137,17 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       `,
       iconSize: [50, 80], // adjust as needed
-      iconAnchor: [10, 32],
-      popupAnchor: [0, -32]
+      iconAnchor: [25, 80], // bottom center for 50x80 marker
+      popupAnchor: [0, -80]
     });
 
-    const marker = L.marker([s.lat, s.lng], { icon });
+    const marker = L.marker([s.lat, s.lng], { icon, zIndexOffset: isCheapest ? 1000 : 0 });
+
     const encodedAddress = encodeURIComponent(s.address);
     marker.bindPopup(
       `<strong>${s.name}</strong><br><a href="https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}" target="_blank">${s.address}</a>`
     );
-    marker.addTo(map);
-    markers.push(marker);
+    markerCluster.addLayer(marker);
   });
 }
 
