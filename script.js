@@ -56,16 +56,31 @@ document.addEventListener("DOMContentLoaded", () => {
     recenterBtn.addEventListener("click", showUserLocation);
   }
 
-  // --- MarkerCluster setup with custom cluster icon ---
+  // --- MarkerCluster setup with custom cluster icon, cheapest marker on top ---
   let markerCluster = L.markerClusterGroup({
     iconCreateFunction: function(cluster) {
-      const count = cluster.getChildCount();
-      // Limit number of stacked markers for visual clarity
+      const markers = cluster.getAllChildMarkers();
+      // Extract prices and sort by price (cheapest last, so it's drawn on top)
+      const sortedMarkers = markers
+        .map(m => {
+          let price = 999999;
+          if (m.options && typeof m.options.rawPrice !== "undefined") price = m.options.rawPrice;
+          else {
+            const match = (m.getPopup()?.getContent() || "").match(/(\d+\.\d+)/);
+            if (match) price = parseFloat(match[1]);
+          }
+          return { marker: m, price };
+        })
+        .sort((a, b) => b.price - a.price); // draw expensive first, cheapest last
+
+      const count = sortedMarkers.length;
       const maxStack = Math.min(5, count);
       let html = '';
       for (let i = 0; i < maxStack; i++) {
-        // Offset each marker: 8px right and 10px up per stack
-        html += `<img src="images/my-marker3.png" 
+        const { marker, price } = sortedMarkers[i];
+        // Last one (cheapest, i==0 after sort) gets green border
+        const isCheapest = i === 0;
+        html += `<img src="images/my-marker3.png"
           style="
             position: absolute;
             left: ${i*8}px;
@@ -73,9 +88,10 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 55px; height: 82px;
             z-index: ${100+i};
             pointer-events: none;
+            ${isCheapest ? "border: 3px solid #0dc800; border-radius: 10px;" : ""}
           ">`;
       }
-      // Add a count badge
+      // Add count badge
       html += `<div style="
         position: absolute;
         left: ${maxStack*8 + 8}px;
@@ -176,13 +192,17 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="${priceClass}">${s.price.toFixed(1)}</div>
           </div>
         `,
-        iconSize: [50, 80], // adjust as needed
-        iconAnchor: [25, 80], // bottom center for 50x80 marker
+        iconSize: [50, 80],
+        iconAnchor: [25, 80],
         popupAnchor: [0, -80]
       });
 
       // Cheapest marker gets higher zIndexOffset
-      const marker = L.marker([s.lat, s.lng], { icon, zIndexOffset: isCheapest ? 1000 : 0 });
+      const marker = L.marker([s.lat, s.lng], {
+        icon,
+        zIndexOffset: isCheapest ? 1000 : 0,
+        rawPrice: s.rawPrice // so the cluster icon can access it
+      });
 
       const encodedAddress = encodeURIComponent(s.address);
       marker.bindPopup(
