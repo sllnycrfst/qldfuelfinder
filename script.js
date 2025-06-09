@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="marker-price">${s.price.toFixed(1)}</div>
           </div>
         `,
-        iconSize: [20, 32], // width, height (taller for brand+marker+price)
+        iconSize: [50, 80], // width, height (taller for brand+marker+price)
         iconAnchor: [10, 32], // bottom center
         popupAnchor: [0, -32]
       });
