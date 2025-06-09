@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return /Mobi|Android/i.test(navigator.userAgent);
   }
 
-  const defaultZoom = isMobile() ? 12 : 14;
+  const defaultZoom = isMobile() ? 12 : 12;
   const defaultCenter = [-27.4698, 153.0251];
 
   // Ask for geolocation BEFORE map is created
