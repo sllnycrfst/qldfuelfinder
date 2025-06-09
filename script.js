@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let html = '';
         // Stack all markers (up to 6)
         for (let i = 0; i < Math.min(sorted.length, 6); i++) {
-          html += `<img src="images/my-marker3.png" class="custom-marker-img" style="position:absolute; left:${i*7}px; top:${i*-8}px; z-index:${100+i}; width:50px; height:80px;">`;
+          html += `<img src="images/my-new-marker.png" class="custom-marker-img" style="position:absolute; left:${i*7}px; top:${i*-8}px; z-index:${100+i}; width:50px; height:80px;">`;
         }
         // Cheapest price at the front
         const cheapest = sorted.length ? sorted[sorted.length-1] : null;
@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Compose marker HTML
         const html = `
-          <img src="images/my-marker3.png" class="custom-marker-img" />
+          <img src="images/my-new-marker.png" class="custom-marker-img" />
           <img src="images/${s.brand}.png" class="marker-brand-img" onerror="this.style.display='none';" />
           <div class="${priceClass}" style="font-size:1.3em;">
             ${s.price.toFixed(1)}
