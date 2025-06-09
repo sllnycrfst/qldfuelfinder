@@ -1,359 +1,267 @@
-// QLD Fuel Finder main script (Leaflet + CartoDB Positron)
-document.addEventListener("DOMContentLoaded", () => {
-  function isMobile() {
-    return /Mobi|Android/i.test(navigator.userAgent);
-  }
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', Arial, sans-serif;
+  background: #f7f7f7;
+}
+body, main, #map {
+  width: 100vw; height: 100vh; margin: 0; padding: 0;
+}
+header {
+  width: 100vw;
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 1002;
+}
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 16px 0 16px;
+  background: transparent;
+}
+#search {
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 1.1em;
+  width: 260px;
+  max-width: 90vw;
+  padding: 7px 14px;
+  border: 1px solid #ddd;
+  border-radius: 7px;
+  box-shadow: 0 2px 9px rgba(0,0,0,0.07);
+}
+.right-controls {
+  display: flex;
+  align-items: center;
+}
+#fuel-select {
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 1.08em;
+  padding: 7px 28px 7px 12px;
+  border-radius: 7px;
+  border: 1px solid #bbb;
+  background: #fff url('fuel-pump.svg') no-repeat 97% center;
+  background-size: 22px 22px;
+  min-width: 125px;
+  margin-left: 18px;
+  box-shadow: 0 2px 9px rgba(0,0,0,0.07);
+}
 
-  const defaultZoom = isMobile() ? 12 : 14;
-  const defaultCenter = [-27.4698, 153.0251];
-  let userMarker = null;
+#map {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 0;
+}
 
-  // Always create the map, but center on location if allowed
-  const map = L.map("map", { zoomControl: false }).setView(defaultCenter, defaultZoom);
+/* Zoom control below the selector */
+.leaflet-top.leaflet-right .leaflet-control-zoom {
+  margin-top: 80px;
+  margin-right: 18px;
+}
 
-  // CartoDB Positron tiles: soft, low-color, free to use with attribution
-  const tileUrl = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
-  const tileAttrib = '&copy; <a href="https://carto.com/attributions">CARTO</a> | &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>';
+/* Recenter button bottom-right */
+#recenter-btn {
+  position: absolute;
+  bottom: 95px;
+  right: 18px;
+  z-index: 1001;
+  background: #fff;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+#recenter-btn img {
+  width: 32px;
+  height: 32px;
+  display: block;
+}
 
-  L.tileLayer(tileUrl, {
-    attribution: tileAttrib,
-    subdomains: 'abcd',
-    maxZoom: 18
-  }).addTo(map);
+#bottom-tabs {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  background: #fff;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.11);
+  display: flex;
+  z-index: 1200;
+  height: 54px;
+}
+.tab {
+  flex: 1;
+  border: none;
+  background: none;
+  font-size: 1.25em;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  outline: none;
+  transition: background 0.15s;
+  padding: 0;
+  height: 100%;
+}
+.tab.active {
+  background: #2196f3;
+  color: #fff;
+  font-weight: bold;
+}
+.tab img {
+  width: 28px;
+  height: 28px;
+  opacity: 0.7;
+}
+.tab.active img {
+  opacity: 1;
+}
 
-  // Add zoom control top-right
-  L.control.zoom({ position: 'topright' }).addTo(map);
+/* Station list */
+ul#list {
+  position: absolute;
+  top: 70px;
+  left: 0;
+  right: 0;
+  bottom: 60px;
+  background: #fff;
+  overflow-y: auto;
+  z-index: 400;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+ul#list.hidden { display: none; }
+.station-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #ececec;
+  padding: 8px 16px;
+  font-size: 1.2em;
+}
+.station-row.cheapest {
+  background: #e8f9e8;
+}
+.station-brand {
+  margin-right: 10px;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #2196f3;
+  border-radius: 7px;
+}
+.brand-logo {
+  max-width: 32px;
+  max-height: 32px;
+}
 
-  // FUEL ID MAP
-  const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3 };
-  let currentFuel = "91";
-  let allSites = [];
-  let allPrices = [];
+.station-name { font-weight: bold; margin-right: 8px; }
+.station-suburb { color: #888; margin-right: 8px; }
+.station-price {
+  margin-left: auto;
+  font-family: 'Teko', Arial, sans-serif;
+  font-size: 1.2em;
+  font-weight: bold;
+  background: none;
+  color: #222;
+}
+.station-price.cheapest-price {
+  color: #0dc800;
+}
 
-  // --- Geolocation: blue marker for user location ---
-  function showUserLocation(setView = false) {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        const userLatLng = [pos.coords.latitude, pos.coords.longitude];
-        if (setView) map.setView(userLatLng, defaultZoom);
-        if (userMarker) map.removeLayer(userMarker);
-        userMarker = L.circleMarker(userLatLng, {
-          radius: 8,
-          color: "#007bff",
-          fillOpacity: 1,
-          weight: 2,
-        }).addTo(map);
-      },
-      err => {
-        console.warn("Geolocation error:", err);
-      }
-    );
-  }
+.fuel-marker, .custom-cluster-icon {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.marker-stack {
+  position: relative;
+  width: 50px;
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.marker-brand-img {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 32px;
+  z-index: 2;
+  background: #2196f3;
+  border-radius: 7px;
+  border: 2.5px solid #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.11);
+  object-fit: contain;
+  padding: 2px;
+}
+.custom-marker-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50px;
+  height: 80px;
+  z-index: 1;
+}
+.marker-price {
+  position: absolute;
+  bottom: 17px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Teko', Arial, sans-serif;
+  font-weight: 700;
+  font-size: 1.55em;
+  color: #fff;
+  background: none;
+  border: none;
+  box-shadow: none;
+  z-index: 3;
+  min-width: 36px;
+  text-align: center;
+  letter-spacing: 1px;
+}
+.marker-price-cheapest {
+  color: #0dc800 !important;
+}
+.custom-cluster-icon .marker-stack { box-shadow: none; border-radius: 0; }
 
-  // Prompt for location immediately and center if allowed
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        // User allowed: center and show marker
-        showUserLocation(true);
-      },
-      err => {
-        // User denied/error: stay at default center, no marker
-      }
-    );
-  }
+.custom-cluster-icon .cluster-count {
+  position: absolute;
+  left: 50%; top: 53%;
+  transform: translate(-50%,-50%);
+  background: #2196f3;
+  color: #fff;
+  font-family: 'Teko', Arial, sans-serif;
+  font-size: 1.3em;
+  font-weight: 700;
+  border-radius: 12px;
+  min-width: 30px;
+  padding: 2px 10px 1px 10px;
+  border: 2px solid #fff;
+  z-index: 10;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.18);
+  pointer-events: none;
+}
 
-  // Recenter button
-  const recenterBtn = document.getElementById("recenter-btn");
-  if (recenterBtn) {
-    recenterBtn.addEventListener("click", () => showUserLocation(true));
-  }
-
-  // --- MarkerCluster setup with custom cluster icon, cheapest marker on top and showing brand and price ---
-  let markerCluster = L.markerClusterGroup({
-    iconCreateFunction: function(cluster) {
-      const markers = cluster.getAllChildMarkers();
-      // Sort so cheapest is last (drawn on top/front)
-      const sorted = markers
-        .map(m => ({
-          marker: m,
-          price: m.options && typeof m.options.rawPrice !== "undefined" ? m.options.rawPrice : 999999,
-          brand: m.options && m.options.brand,
-          priceValue: m.options && m.options.price,
-          name: m.options && m.options.name
-        }))
-        .sort((a, b) => a.price - b.price);
-
-      const count = sorted.length;
-      const maxStack = Math.min(5, count);
-      let html = '';
-
-      for (let i = 0; i < maxStack; i++) {
-        const isTop = (i === maxStack - 1); // top/front marker
-        if (isTop) {
-          const cheapest = sorted[i];
-          html += `
-            <div class="marker-stack" style="position:absolute; left:${i*8}px; top:${i*-10}px; z-index:${100+i};">
-              <img src="images/${cheapest.brand}.png" class="marker-brand-img" onerror="this.style.display='none';" />
-              <img src="images/my-marker3.png" class="custom-marker-img" />
-              <div class="marker-price" style="font-size:20px;">${(typeof cheapest.priceValue === "number") ? cheapest.priceValue.toFixed(1) : ""}</div>
-            </div>
-          `;
-        } else {
-          html += `<img src="images/my-marker3.png"
-            style="position:absolute; left:${i*8}px; top:${i*-10}px; width:55px; height:82px; z-index:${100+i}; pointer-events:none;">`;
-        }
-      }
-
-      html += `<div style="
-        position: absolute;
-        left: ${maxStack*8 + 8}px;
-        top: -10px;
-        background: #fff;
-        color: #222;
-        border-radius: 14px;
-        min-width: 28px;
-        padding: 1px 6px;
-        font-family: Teko, sans-serif;
-        font-size: 18px;
-        font-weight: bold;
-        border: 2px solid #2196f3;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.18);
-        text-align: center;
-        z-index: 200;
-        pointer-events: none;
-      ">${count}</div>`;
-
-      return L.divIcon({
-        html: `<div style="position: relative; width: ${55 + (maxStack-1)*8 + 36}px; height: 82px;">${html}</div>`,
-        className: "custom-cluster-icon",
-        iconSize: [55 + (maxStack-1)*8 + 36, 82],
-        iconAnchor: [27, 82]
-      });
-    }
-  });
-  map.addLayer(markerCluster);
-
-  // --- Fetch site and price data once, then update per map bounds ---
-  async function fetchSitesAndPrices() {
-    try {
-      const [siteRes, priceRes] = await Promise.all([
-        fetch("data/sites.json").then(r => r.json()),
-        fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json()),
-      ]);
-      allSites = Array.isArray(siteRes) ? siteRes : siteRes.S;
-      allPrices = priceRes.SitePrices;
-      updateVisibleStations();
-    } catch (err) {
-      console.error("Failed to fetch site/price data:", err);
-    }
-  }
-
-  // --- Utility: filter and render only stations in current map bounds ---
-  function updateVisibleStations() {
-    if (!allSites.length || !allPrices.length) return;
-    const bounds = map.getBounds();
-    const visibleStations = allSites
-      .map(site => {
-        const match = allPrices.find(
-          p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]
-        );
-        if (
-          match &&
-          bounds.contains([site.Lat, site.Lng])
-        ) {
-          return {
-            ...site,
-            price: match.Price / 10,
-            rawPrice: match.Price,
-            brand: site.B,
-            address: site.A,
-            name: site.N,
-            suburb: site.P,
-            lat: site.Lat,
-            lng: site.Lng,
-          };
-        }
-        return null;
-      })
-      .filter(Boolean);
-
-    // Find the minimum price among visible stations
-    const minPrice =
-      visibleStations.length > 0
-        ? Math.min(...visibleStations.map(s => s.rawPrice))
-        : null;
-
-    // Remove all markers from the cluster group
-    markerCluster.clearLayers();
-
-    // Sort so the cheapest comes first in the array (for spiderfy)
-    visibleStations.sort((a, b) => a.rawPrice - b.rawPrice);
-
-    visibleStations.forEach(s => {
-      const isCheapest = s.rawPrice === minPrice;
-      const priceClass = isCheapest
-        ? "marker-price marker-price-cheapest"
-        : "marker-price";
-
-      const icon = L.divIcon({
-        className: "fuel-marker",
-        html: `
-          <div class="marker-stack">
-            <img src="images/${s.brand}.png" class="marker-brand-img" onerror="this.style.display='none';" />
-            <img src="images/my-marker3.png" class="custom-marker-img" />
-            <div class="${priceClass}">${s.price.toFixed(1)}</div>
-          </div>
-        `,
-        iconSize: [50, 80],
-        iconAnchor: [25, 80],
-        popupAnchor: [0, -80]
-      });
-
-      // Cheapest marker gets higher zIndexOffset
-      const marker = L.marker([s.lat, s.lng], {
-        icon,
-        zIndexOffset: isCheapest ? 1000 : 0,
-        rawPrice: s.rawPrice,
-        brand: s.brand,
-        price: s.price,
-        name: s.name
-      });
-
-      const encodedAddress = encodeURIComponent(s.address);
-      marker.bindPopup(
-        `<strong>${s.name}</strong><br><a href="https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}" target="_blank">${s.address}</a>`
-      );
-      markerCluster.addLayer(marker);
-    });
-  }
-
-  // Throttle station update on move/zoom
-  let updateTimeout;
-  function throttledUpdate() {
-    if (updateTimeout) clearTimeout(updateTimeout);
-    updateTimeout = setTimeout(updateVisibleStations, 300);
-  }
-  map.on("moveend", throttledUpdate);
-  map.on("zoomend", throttledUpdate);
-
-  // --- Fuel select change ---
-  const fuelSelect = document.getElementById("fuel-select");
-  if (fuelSelect) {
-    fuelSelect.addEventListener("change", e => {
-      currentFuel = e.target.value;
-      updateVisibleStations();
-    });
-  }
-
-  // --- Tab handling ---
-  const mapTab = document.getElementById("map-tab");
-  const listTab = document.getElementById("list-tab");
-  const mapDiv = document.getElementById("map");
-  const listDiv = document.getElementById("list");
-
-  if (mapTab && listTab && mapDiv && listDiv) {
-    mapTab.addEventListener("click", () => {
-      mapTab.classList.add("active");
-      listTab.classList.remove("active");
-      mapDiv.style.display = "";
-      listDiv.classList.add("hidden");
-      map.invalidateSize();
-    });
-    listTab.addEventListener("click", () => {
-      listTab.classList.add("active");
-      mapTab.classList.remove("active");
-      mapDiv.style.display = "none";
-      listDiv.classList.remove("hidden");
-      renderList();
-    });
-  }
-
-  // --- Render the station list for the list tab ---
-  function renderList() {
-    if (!allSites.length || !allPrices.length) return;
-    const bounds = map.getBounds();
-    const visibleStations = allSites
-      .map(site => {
-        const match = allPrices.find(
-          p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]
-        );
-        if (
-          match &&
-          bounds.contains([site.Lat, site.Lng])
-        ) {
-          return {
-            ...site,
-            price: match.Price / 10,
-            rawPrice: match.Price,
-            brand: site.B,
-            address: site.A,
-            name: site.N,
-            suburb: site.P,
-            lat: site.Lat,
-            lng: site.Lng,
-          };
-        }
-        return null;
-      })
-      .filter(Boolean);
-
-    // Sort by price, cheapest first
-    visibleStations.sort((a, b) => a.rawPrice - b.rawPrice);
-
-    const minPrice =
-      visibleStations.length > 0
-        ? Math.min(...visibleStations.map(s => s.rawPrice))
-        : null;
-
-    listDiv.innerHTML = visibleStations.length
-      ? visibleStations
-          .map(
-            s => `
-          <li class="station-row${s.rawPrice === minPrice ? " cheapest" : ""}">
-            <span class="station-brand">
-              <img src="assets/logos/${s.brand}.png" class="brand-logo" onerror="this.style.display='none';" />
-            </span>
-            <span class="station-name">${s.name}</span>
-            <span class="station-suburb">${s.suburb}</span>
-            <span class="station-price${s.rawPrice === minPrice ? " cheapest-price" : ""}">${s.price.toFixed(1)}</span>
-          </li>
-        `
-          )
-          .join("")
-      : "<li>No stations visible in this area.</li>";
-  }
-
-  // --- Suburb search (improved: match partial and center map on area with most stations) ---
-  const searchInput = document.getElementById("search");
-  if (searchInput) {
-    searchInput.addEventListener("change", () => {
-      const query = searchInput.value.trim().toLowerCase();
-      if (!query) return;
-
-      // Find all matching sites, not just the first, and cluster by suburb
-      const matches = allSites.filter(site => site.P && site.P.toLowerCase().includes(query));
-      if (matches.length > 0) {
-        // Find the most common suburb among matches (for broad queries)
-        const suburbCounts = {};
-        matches.forEach(site => {
-          const suburb = site.P.toLowerCase();
-          suburbCounts[suburb] = (suburbCounts[suburb] || 0) + 1;
-        });
-        const bestSuburb = Object.keys(suburbCounts).reduce((a, b) => suburbCounts[a] > suburbCounts[b] ? a : b);
-
-        // Find the sites in the bestSuburb and average their lat/lng for centering
-        const bestMatches = matches.filter(site => site.P.toLowerCase() === bestSuburb);
-        const avgLat = bestMatches.reduce((sum, s) => sum + s.Lat, 0) / bestMatches.length;
-        const avgLng = bestMatches.reduce((sum, s) => sum + s.Lng, 0) / bestMatches.length;
-        map.setView([avgLat, avgLng], 14);
-      } else {
-        alert("No suburb match.");
-      }
-    });
-  }
-
-  // --- Initial fetch ---
-  fetchSitesAndPrices();
-});
+@media (max-width: 600px) {
+  .top-bar { flex-direction: column; align-items: stretch; padding: 10px 4px 0 4px; }
+  #search { width: 100%; margin-bottom: 7px; }
+  .right-controls { justify-content: flex-end; }
+  #fuel-select { margin-left: 0; }
+  #recenter-btn { bottom: 68px; right: 8px; }
+  ul#list { top: 62px; bottom: 52px; }
+  .marker-stack { width: 36px; height: 60px; }
+  .custom-marker-img { width: 36px; height: 60px; }
+  .marker-brand-img { width: 20px; height: 20px; }
+  .marker-price { font-size: 1em; min-width: 28px; }
+  .custom-cluster-icon .cluster-count { font-size: 1em; min-width: 22px; }
+}
