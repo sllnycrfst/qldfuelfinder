@@ -116,9 +116,9 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="marker-price">${s.price.toFixed(1)}</div>
           </div>
         `,
-        iconSize: [24, 64],
-        iconAnchor: [20, 55],
-        popupAnchor: [0, -45]
+        iconSize: [20, 20],
+        iconAnchor: [20, 20],
+        popupAnchor: [0, -20]
       });
 
       const marker = L.marker([s.lat, s.lng], { icon });
