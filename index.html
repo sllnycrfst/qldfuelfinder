@@ -1,138 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>QLD Fuel Finder</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <!-- Roboto & Teko fonts -->
-  <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
-  <!-- ZCOOL QingKe HuangYou font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=ZCOOL+QingKe+HuangYou&display=swap" rel="stylesheet">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="styles.css" />
-  <style>
-    /* Example usage for ZCOOL font in a price label */
-    .fuel-price {
-      font-family: 'ZCOOL QingKe HuangYou', cursive;
-      font-size: 2em;
-      color: #ff9800;
-    }
-    /* General layout tweaks for demo */
-    body {
-      font-family: 'Roboto', Arial, sans-serif;
-      margin: 0;
-      background: #f7f7f7;
-    }
-    .top-bar {
-      background: #fff;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.5em 1em;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-    }
-    .right-controls select {
-      font-family: inherit;
-      font-size: 1em;
-      padding: 0.2em 1em 0.2em 2em;
-      background: url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/svgs/solid/gas-pump.svg") no-repeat 0.5em center/1em auto;
-      appearance: none;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    #map {
-      width: 100vw;
-      height: 60vh;
-      margin-bottom: 1em;
-    }
-    #recenter-btn {
-      position: absolute;
-      top: 70px;
-      right: 20px;
-      background: #fff;
-      border: none;
-      border-radius: 50%;
-      width: 44px;
-      height: 44px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.6em;
-    }
-    #bottom-tabs {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      background: #fff;
-      box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100vw;
-      padding: 0.5em 0;
-    }
-    .tab {
-      background: none;
-      border: none;
-      font-size: 1.8em;
-      color: #888;
-      cursor: pointer;
-      padding: 0.5em 1em;
-    }
-    .tab.active {
-      color: #0072ff;
-    }
-    .hidden {
-      display: none;
-    }
-    /* Demo for fuel price with ZCOOL font */
-    .fuel-price-demo {
-      margin: 1em;
-      text-align: center;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <div class="top-bar">
-      <input type="text" id="search" placeholder="Search QLD suburb…" />
-      <div class="right-controls">
-        <select id="fuel-type">
-          <option value="91">ULP 91</option>
-          <option value="95">PULP 95</option>
-          <option value="98">PULP 98</option>
-          <option value="E10">E10</option>
-          <option value="Diesel">Diesel</option>
-        </select>
-        <i class="fa-solid fa-gas-pump" style="margin-left:8px;color:#0072ff;"></i>
-      </div>
-    </div>
-  </header>
-  <main>
-    <div id="map"></div>
-    <button id="recenter-btn" title="Go to my location">
-      <i class="fa-solid fa-location-crosshairs"></i>
-    </button>
-    <ul id="list" class="hidden"></ul>
-    <nav id="bottom-tabs">
-      <button class="tab active" id="map-tab" title="Map"><i class="fa-solid fa-map"></i></button>
-      <button class="tab" id="list-tab" title="List"><i class="fa-solid fa-rectangle-list"></i></button>
-    </nav>
-    <!-- Demo of using ZCOOL font for fuel price -->
-    <div class="fuel-price-demo">
-      <span class="fuel-price">$1.879</span>
-      <span style="font-size:1em;color:#888;">(ULP 91)</span>
-    </div>
-  </main>
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="script.js"></script>
-</body>
-</html>
+diff --git a/index.html b/index.html
+index fe71f6b16f780dfc3c1a7b9623f7c8aa1a3e1d05..94e13de60ca8255df0219a48287c8dd0b1226b60 100644
+--- a/index.html
++++ b/index.html
+@@ -82,51 +82,51 @@
+       background: none;
+       border: none;
+       font-size: 1.8em;
+       color: #888;
+       cursor: pointer;
+       padding: 0.5em 1em;
+     }
+     .tab.active {
+       color: #0072ff;
+     }
+     .hidden {
+       display: none;
+     }
+     /* Demo for fuel price with ZCOOL font */
+     .fuel-price-demo {
+       margin: 1em;
+       text-align: center;
+     }
+   </style>
+ </head>
+ <body>
+   <header>
+     <div class="top-bar">
+       <input type="text" id="search" placeholder="Search QLD suburb…" />
+       <div class="right-controls">
+-        <select id="fuel-type">
++        <select id="fuel-select">
+           <option value="E10">E10</option>
+           <option value="91">91</option>
+           <option value="95">95</option>
+           <option value="98">98</option>
+           <option value="Diesel">Diesel</option>
+         </select>
+         <i class="fa-solid fa-gas-pump" style="margin-left:8px;color:#0072ff;"></i>
+       </div>
+     </div>
+   </header>
+   <main>
+     <div id="map"></div>
+     <button id="recenter-btn" title="Go to my location">
+       <i class="fa-solid fa-location-crosshairs"></i>
+     </button>
+     <ul id="list" class="hidden"></ul>
+     <nav id="bottom-tabs">
+       <button class="tab active" id="map-tab" title="Map"><i class="fa-solid fa-map"></i></button>
+       <button class="tab" id="list-tab" title="List"><i class="fa-solid fa-rectangle-list"></i></button>
+     </nav>
+     <!-- Demo of using ZCOOL font for fuel price -->
+     <div class="fuel-price-demo">
+       <span class="fuel-price">$1.879</span>
+       <span style="font-size:1em;color:#888;">(ULP 91)</span>
+     </div>
