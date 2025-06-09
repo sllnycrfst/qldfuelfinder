@@ -74,62 +74,74 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Utility: filter and render only stations in current map bounds ---
   function updateVisibleStations() {
-    if (!allSites.length || !allPrices.length) return;
-    const bounds = map.getBounds();
-    const visibleStations = allSites
-      .map(site => {
-        const match = allPrices.find(
-          p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]
-        );
-        if (
-          match &&
-          bounds.contains([site.Lat, site.Lng])
-        ) {
-          return {
-            ...site,
-            price: match.Price / 10,
-            rawPrice: match.Price,
-            brand: site.B,
-            address: site.A,
-            name: site.N,
-            suburb: site.P,
-            lat: site.Lat,
-            lng: site.Lng,
-          };
-        }
-        return null;
-      })
-      .filter(Boolean);
-
-    // Remove old markers
-    markers.forEach(m => map.removeLayer(m));
-    markers = [];
-
-    // Render visible stations (brand above marker, then price)
-    visibleStations.forEach(s => {
-      const icon = L.divIcon({
-        className: "fuel-marker",
-        html: `
-          <div class="marker-stack">
-            <img src="images/${s.brand}.png" class="marker-brand-img" onerror="this.style.display='none';" />
-            <img src="images/my-marker3.png" class="custom-marker-img" />
-            <div class="marker-price">${s.price.toFixed(1)}</div>
-          </div>
-        `,
-        iconSize: [50, 80], // width, height (taller for brand+marker+price)
-        iconAnchor: [10, 32], // bottom center
-        popupAnchor: [0, -32]
-      });
-
-      const marker = L.marker([s.lat, s.lng], { icon });
-      const encodedAddress = encodeURIComponent(s.address);
-      marker.bindPopup(
-        `<strong>${s.name}</strong><br><a href="https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}" target="_blank">${s.address}</a>`
+  if (!allSites.length || !allPrices.length) return;
+  const bounds = map.getBounds();
+  const visibleStations = allSites
+    .map(site => {
+      const match = allPrices.find(
+        p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]
       );
-      marker.addTo(map);
-      markers.push(marker);
+      if (
+        match &&
+        bounds.contains([site.Lat, site.Lng])
+      ) {
+        return {
+          ...site,
+          price: match.Price / 10,
+          rawPrice: match.Price,
+          brand: site.B,
+          address: site.A,
+          name: site.N,
+          suburb: site.P,
+          lat: site.Lat,
+          lng: site.Lng,
+        };
+      }
+      return null;
+    })
+    .filter(Boolean);
+
+  // Find the minimum price among visible stations
+  const minPrice =
+    visibleStations.length > 0
+      ? Math.min(...visibleStations.map(s => s.rawPrice))
+      : null;
+
+  // Remove old markers
+  markers.forEach(m => map.removeLayer(m));
+  markers = [];
+
+  // Render visible stations (brand above marker, then price)
+  visibleStations.forEach(s => {
+    // Add the green class if this is the cheapest
+    const priceClass =
+      s.rawPrice === minPrice
+        ? "marker-price marker-price-cheapest"
+        : "marker-price";
+
+    const icon = L.divIcon({
+      className: "fuel-marker",
+      html: `
+        <div class="marker-stack">
+          <img src="images/${s.brand}.png" class="marker-brand-img" onerror="this.style.display='none';" />
+          <img src="images/my-marker3.png" class="custom-marker-img" />
+          <div class="${priceClass}">${s.price.toFixed(1)}</div>
+        </div>
+      `,
+      iconSize: [50, 80], // adjust as needed
+      iconAnchor: [10, 32],
+      popupAnchor: [0, -32]
     });
-  }
+
+    const marker = L.marker([s.lat, s.lng], { icon });
+    const encodedAddress = encodeURIComponent(s.address);
+    marker.bindPopup(
+      `<strong>${s.name}</strong><br><a href="https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}" target="_blank">${s.address}</a>`
+    );
+    marker.addTo(map);
+    markers.push(marker);
+  });
+}
 
   // Throttle station update on move/zoom
   let updateTimeout;
