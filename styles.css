@@ -176,7 +176,7 @@ ul#list.hidden { display: none; }
   color: #0dc800;
 }
 
-.fuel-marker, .custom-cluster-icon {
+.fuel-marker {
   background: none !important;
   border: none !important;
   box-shadow: none !important;
@@ -229,25 +229,7 @@ ul#list.hidden { display: none; }
 .marker-price-cheapest {
   color: #0dc800 !important;
 }
-.custom-cluster-icon .marker-stack { box-shadow: none; border-radius: 0; }
 
-.custom-cluster-icon .cluster-count {
-  position: absolute;
-  left: 50%; top: 53%;
-  transform: translate(-50%,-50%);
-  background: #2196f3;
-  color: #fff;
-  font-family: 'Teko', Arial, sans-serif;
-  font-size: 1.3em;
-  font-weight: 700;
-  border-radius: 12px;
-  min-width: 30px;
-  padding: 2px 10px 1px 10px;
-  border: 2px solid #fff;
-  z-index: 10;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.18);
-  pointer-events: none;
-}
 
 @media (max-width: 600px) {
   .top-bar { flex-direction: column; align-items: stretch; padding: 10px 4px 0 4px; }
@@ -260,5 +242,4 @@ ul#list.hidden { display: none; }
   .custom-marker-img { width: 36px; height: 60px; }
   .marker-brand-img { width: 20px; height: 20px; }
   .marker-price { font-size: 1em; min-width: 28px; }
-  .custom-cluster-icon .cluster-count { font-size: 1em; min-width: 22px; }
 }
