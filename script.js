@@ -163,6 +163,3 @@ document.addEventListener("DOMContentLoaded", () => {
      const mapTab = document.getElementById("map-tab");
      const listTab = document.getElementById("list-tab");
      const mapDiv = document.getElementById("map");
- 
-EOF
-)
