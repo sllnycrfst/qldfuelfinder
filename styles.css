@@ -23,7 +23,7 @@ header {
 .fuel-icon-in-search {
   color: #387CC2;
   font-size: 1.3em;
-  margin-left: 10px;
+  margin-left: 6px;
 }
 
 .search-bar input, .search-bar select {
@@ -45,7 +45,7 @@ header {
 
 .leaflet-control-zoom.leaflet-bar {
   margin-top: 100px !important;
-  margin-right: 10px !important;
+  margin-right: 20px !important;
 }
 
 #map {
