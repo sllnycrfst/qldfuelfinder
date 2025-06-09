@@ -139,7 +139,7 @@ header {
   left: 50%;
   transform: translateX(-50%);
   width: 36px;    /* adjust size to fit blue box */
-  height: 20px;   /* adjust size to fit blue box */
+  height: 36px;   /* adjust size to fit blue box */
   object-fit: contain;
 }
 
