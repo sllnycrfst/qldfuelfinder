@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // FUEL ID MAP
   const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3 };
-  let currentFuel = "91";
+  let currentFuel = "E10";
   let allSites = [];
   let allPrices = [];
   let markers = [];
@@ -41,7 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
         userMarker = L.circleMarker(userLatLng, {
           radius: 8,
           color: "#007bff",
-          fillColor: "#339cff",
           fillOpacity: 1,
           weight: 2,
         }).addTo(map);
