@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return /Mobi|Android/i.test(navigator.userAgent);
   }
 
-  const initialZoom = isMobile() ? 16 : 14;
+  const initialZoom = isMobile() ? 12 : 12;
   const initialCenter = [-27.4698, 153.0251];
 
   // CartoDB Positron tiles: soft, low-color, free to use with attribution
