@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // FUEL ID MAP
   const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3 };
-  let currentFuel = "E10";
+  let currentFuel = "91";
   let allSites = [];
   let allPrices = [];
   let userMarker = null;
@@ -57,12 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --- MarkerCluster setup ---
-  // (Make sure you have included the leaflet.markercluster JS and CSS in your HTML)
-  let markerCluster = L.markerClusterGroup({
-    // Optional: Customize cluster options here
-    // maxClusterRadius: 40,
-    // showCoverageOnHover: false,
-  });
+  let markerCluster = L.markerClusterGroup();
   map.addLayer(markerCluster);
 
   // --- Fetch site and price data once, then update per map bounds ---
@@ -248,17 +243,29 @@ document.addEventListener("DOMContentLoaded", () => {
       : "<li>No stations visible in this area.</li>";
   }
 
-  // --- Suburb search ---
+  // --- Suburb search (improved: match partial and center map on area with most stations) ---
   const searchInput = document.getElementById("search");
   if (searchInput) {
     searchInput.addEventListener("change", () => {
       const query = searchInput.value.trim().toLowerCase();
       if (!query) return;
-      // Look for first site matching suburb
-      const match = allSites.find(site => site.P && site.P.toLowerCase().includes(query));
-      if (match) {
-        const latlng = [match.Lat, match.Lng];
-        map.setView(latlng, 14);
+
+      // Find all matching sites, not just the first, and cluster by suburb
+      const matches = allSites.filter(site => site.P && site.P.toLowerCase().includes(query));
+      if (matches.length > 0) {
+        // Find the most common suburb among matches (for broad queries)
+        const suburbCounts = {};
+        matches.forEach(site => {
+          const suburb = site.P.toLowerCase();
+          suburbCounts[suburb] = (suburbCounts[suburb] || 0) + 1;
+        });
+        const bestSuburb = Object.keys(suburbCounts).reduce((a, b) => suburbCounts[a] > suburbCounts[b] ? a : b);
+
+        // Find the sites in the bestSuburb and average their lat/lng for centering
+        const bestMatches = matches.filter(site => site.P.toLowerCase() === bestSuburb);
+        const avgLat = bestMatches.reduce((sum, s) => sum + s.Lat, 0) / bestMatches.length;
+        const avgLng = bestMatches.reduce((sum, s) => sum + s.Lng, 0) / bestMatches.length;
+        map.setView([avgLat, avgLng], 14);
       } else {
         alert("No suburb match.");
       }
