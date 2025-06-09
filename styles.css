@@ -1,13 +1,4 @@
-.teko-<uniquifier> {
-  font-family: "Teko", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 400;
-  font-style: normal;
-}
-
-body, html {
-  margin: 0;
-  padding: 0;
+body, html, .marker-price, #list, .tab, .search-bar input, .search-bar select {
   font-family: 'Teko', monospace, sans-serif !important;
 }
 
@@ -122,11 +113,38 @@ header {
   color: #fff;
 }
 
+.marker-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  width: 20px;
+  height: 32px; /* a little taller to fit brand + marker + price */
+  position: relative;
+}
+
+.marker-brand-img {
+  width: 20px;
+  height: 10px;
+  object-fit: contain;
+  margin-bottom: 1px;
+  display: block;
+}
+
+.custom-marker-img {
+  width: 20px;
+  height: 20px;
+  display: block;
+  margin: 0 auto;
+}
+
 .marker-price {
-  font-family: 'Teko', monospace, sans-serif !important;
   font-size: 16px;
   color: #2196f3;
   text-shadow: 0 2px 6px #fff, 0 0 2px #fff;
+  line-height: 1;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .brand-logo {
