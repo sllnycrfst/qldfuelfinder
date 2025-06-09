@@ -46,45 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       );
     }
-
-    // --- MarkerCluster setup: stack all, cheapest at front, cluster icon = count ---
-    let markerCluster = L.markerClusterGroup({
-      iconCreateFunction: function(cluster) {
-        const markers = cluster.getAllChildMarkers();
-        // Sort so cheapest is last (drawn on top/front)
-        const sorted = markers
-          .map(m => ({
-            marker: m,
-            price: typeof m.options.rawPrice !== "undefined" ? m.options.rawPrice : 999999,
-            priceValue: m.options.price,
-          }))
-          .sort((a, b) => a.price - b.price);
-
-        let html = '';
-        // Stack all markers (up to 6)
-        for (let i = 0; i < Math.min(sorted.length, 6); i++) {
-          html += `<img src="images/my-new-marker.png" class="custom-marker-img" style="position:absolute; left:${i*7}px; top:${i*-8}px; z-index:${100+i}; width:50px; height:80px;">`;
-        }
-        // Cheapest price at the front
-        const cheapest = sorted.length ? sorted[sorted.length-1] : null;
-        if (cheapest) {
-          html += `<div class="marker-price" style="position:absolute; bottom:17px; left:50%; transform:translateX(-50%); font-size:1.4em; font-family:'Teko',Arial,sans-serif; color:#0dc800; background:none; border:none;">
-            ${typeof cheapest.priceValue === "number" ? cheapest.priceValue.toFixed(1) : ""}
-          </div>`;
-        }
-        // Cluster count replaces brand
-        html += `<div class="cluster-count">${markers.length}</div>`;
-
-        return L.divIcon({
-          html: `<div style="position: relative; width: 70px; height: 80px;">${html}</div>`,
-          className: "custom-cluster-icon",
-          iconSize: [70, 80],
-          iconAnchor: [27, 80]
-        });
-      }
-    });
-    map.addLayer(markerCluster);
-
+    
     // --- Fetch site and price data ---
     async function fetchSitesAndPrices() {
       try {
@@ -130,14 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const minPrice = visibleStations.length
         ? Math.min(...visibleStations.map(s => s.rawPrice))
         : null;
-
-      // Remove all markers from the cluster group
-      markerCluster.clearLayers();
-
-      visibleStations.forEach(s => {
-        const isCheapest = s.rawPrice === minPrice;
-        const priceClass = isCheapest ? "marker-price marker-price-cheapest" : "marker-price";
-
+      
         // Compose marker HTML
         const html = `
           <img src="images/my-new-marker.png" class="custom-marker-img" />
@@ -168,7 +123,6 @@ document.addEventListener("DOMContentLoaded", () => {
             <span>${s.address}</span>
           </div>`
         );
-        markerCluster.addLayer(marker);
       });
     }
 
