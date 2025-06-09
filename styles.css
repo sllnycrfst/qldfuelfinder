@@ -171,6 +171,11 @@ header {
   vertical-align: middle;
 }
 
+.custom-cluster-icon img {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  border-radius: 8px;
+}
+
 .cheapest-price {
   color: #0dc800;
   font-weight: 400;
