@@ -22,6 +22,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     L.control.zoom({ position: 'topright' }).addTo(map);
 
+    // Layer to hold station markers
+    const markerLayer = L.layerGroup().addTo(map);
+
     // FUEL ID MAP
     const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3 };
     let currentFuel = "91";
@@ -52,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const [siteRes, priceRes] = await Promise.all([
           fetch("data/sites.json").then(r => r.json()),
-          fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json()),
+          fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
         ]);
         allSites = Array.isArray(siteRes) ? siteRes : siteRes.S;
         allPrices = priceRes.SitePrices;
@@ -65,6 +68,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- Render visible stations ---
     function updateVisibleStations() {
       if (!allSites.length || !allPrices.length) return;
+      markerLayer.clearLayers();
+
       const bounds = map.getBounds();
       const visibleStations = allSites
         .map(site => {
@@ -88,12 +93,16 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .filter(Boolean);
 
-      // Find minimum price
       const minPrice = visibleStations.length
         ? Math.min(...visibleStations.map(s => s.rawPrice))
         : null;
-      
-        // Compose marker HTML
+
+      visibleStations.forEach(s => {
+        const isCheapest = minPrice !== null && s.rawPrice === minPrice;
+        const priceClass = isCheapest
+          ? "marker-price marker-price-cheapest"
+          : "marker-price";
+
         const html = `
           <img src="images/my-new-marker.png" class="custom-marker-img" />
           <img src="images/${s.brand}.png" class="marker-brand-img" onerror="this.style.display='none';" />
@@ -123,6 +132,8 @@ document.addEventListener("DOMContentLoaded", () => {
             <span>${s.address}</span>
           </div>`
         );
+
+        markerLayer.addLayer(marker);
       });
     }
 
