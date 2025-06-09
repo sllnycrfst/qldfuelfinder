@@ -144,11 +144,11 @@ header {
 
 .marker-price {
   position: absolute;
-  top: 56px;      /* adjust so it sits over the black rectangle */
+  top: 46px;      /* adjust so it sits over the black rectangle */
   left: 50%;
   transform: translateX(-50%);
   width: 44px;    /* width of the black rectangle */
-  height: 22px;   /* height of the black rectangle */
+  height: 21px;   /* height of the black rectangle */
   display: flex;
   align-items: center;
   justify-content: center;
