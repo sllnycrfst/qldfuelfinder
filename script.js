@@ -55,7 +55,8 @@ document.addEventListener("DOMContentLoaded", () => {
        try {
          const [siteRes, priceRes] = await Promise.all([
            fetch("data/sites.json").then(r => r.json()),
-           fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json()),
+-          fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json()),
++          fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
          ]);
          allSites = Array.isArray(siteRes) ? siteRes : siteRes.S;
          allPrices = priceRes.SitePrices;
@@ -162,3 +163,6 @@ document.addEventListener("DOMContentLoaded", () => {
      const mapTab = document.getElementById("map-tab");
      const listTab = document.getElementById("list-tab");
      const mapDiv = document.getElementById("map");
+ 
+EOF
+)
