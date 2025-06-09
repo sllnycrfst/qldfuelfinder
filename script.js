@@ -56,8 +56,53 @@ document.addEventListener("DOMContentLoaded", () => {
     recenterBtn.addEventListener("click", showUserLocation);
   }
 
-  // --- MarkerCluster setup ---
-  let markerCluster = L.markerClusterGroup();
+  // --- MarkerCluster setup with custom cluster icon ---
+  let markerCluster = L.markerClusterGroup({
+    iconCreateFunction: function(cluster) {
+      const count = cluster.getChildCount();
+      // Limit number of stacked markers for visual clarity
+      const maxStack = Math.min(5, count);
+      let html = '';
+      for (let i = 0; i < maxStack; i++) {
+        // Offset each marker: 8px right and 10px up per stack
+        html += `<img src="images/my-marker3.png" 
+          style="
+            position: absolute;
+            left: ${i*8}px;
+            top: ${i*-10}px;
+            width: 55px; height: 82px;
+            z-index: ${100+i};
+            pointer-events: none;
+          ">`;
+      }
+      // Add a count badge
+      html += `<div style="
+        position: absolute;
+        left: ${maxStack*8 + 8}px;
+        top: ${-10}px;
+        background: #fff;
+        color: #222;
+        border-radius: 14px;
+        min-width: 28px;
+        padding: 1px 6px;
+        font-family: Teko, sans-serif;
+        font-size: 18px;
+        font-weight: bold;
+        border: 2px solid #2196f3;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+        text-align: center;
+        z-index: 200;
+        pointer-events: none;
+      ">${count}</div>`;
+
+      return L.divIcon({
+        html: `<div style="position: relative; width: ${55 + (maxStack-1)*8 + 36}px; height: 82px;">${html}</div>`,
+        className: "custom-cluster-icon",
+        iconSize: [55 + (maxStack-1)*8 + 36, 82],
+        iconAnchor: [27, 82]
+      });
+    }
+  });
   map.addLayer(markerCluster);
 
   // --- Fetch site and price data once, then update per map bounds ---
