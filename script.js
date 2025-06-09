@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
         className: "fuel-marker",
         html: `
           <div class="marker-stack">
-            <img src="images/my-marker.png" class="custom-marker-img" />
+            <img src="images/my-marker3.png" class="custom-marker-img" />
             <div class="marker-price">${s.price.toFixed(1)}</div>
           </div>
         `,
