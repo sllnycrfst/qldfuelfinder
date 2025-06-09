@@ -119,8 +119,8 @@ header {
 
 .marker-stack {
   position: relative;
-  width: 64px;  /* marker image width */
-  height: 96px; /* marker image height */
+  width: 55px;  /* marker image width */
+  height: 82px; /* marker image height */
   display: flex;
   align-items: center;
   justify-content: center;
