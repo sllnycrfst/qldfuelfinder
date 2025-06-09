@@ -45,6 +45,7 @@ header {
 
 .leaflet-control-zoom.leaflet-bar {
   margin-top: 100px !important;
+  margin-right: 10px !important;
 }
 
 #map {
