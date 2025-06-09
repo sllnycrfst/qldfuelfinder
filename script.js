@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Compose marker HTML
         const html = `
           <img src="images/my-marker3.png" class="custom-marker-img" />
-          <img src="assets/logos/${s.brand}.png" class="marker-brand-img" onerror="this.style.display='none';" />
+          <img src="images/${s.brand}.png" class="marker-brand-img" onerror="this.style.display='none';" />
           <div class="${priceClass}" style="font-size:1.3em;">
             ${s.price.toFixed(1)}
           </div>
@@ -249,7 +249,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ? visibleStations.map(s => `
           <li class="station-row${s.rawPrice === minPrice ? " cheapest" : ""}">
             <span class="station-brand">
-              <img src="assets/logos/${s.brand}.png" class="brand-logo" onerror="this.style.display='none';" />
+              <img src="images/${s.brand}.png" class="brand-logo" onerror="this.style.display='none';" />
             </span>
             <span class="station-name">${s.name}</span>
             <span class="station-suburb">${s.suburb}</span>
