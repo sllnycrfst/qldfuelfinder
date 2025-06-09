@@ -135,11 +135,11 @@ header {
 
 .marker-brand-img {
   position: absolute;
-  top: 10px;      /* adjust to fit in the blue area */
+  top: 14px;      /* adjust to fit in the blue area */
   left: 50%;
   transform: translateX(-50%);
-  width: 27px;    /* adjust size to fit blue box */
-  height: 27px;   /* adjust size to fit blue box */
+  width: 26px;    /* adjust size to fit blue box */
+  height: 26px;   /* adjust size to fit blue box */
   filter: drop-shadow(0 0 4px #fff) drop-shadow(0 0 1px #fff);
   object-fit: contain;
 }
