@@ -80,7 +80,7 @@ header, footer {
   padding: 12px 0;
   border: none;
   background: none;
-  font-size: 1.25em;
+  font-size: 1.35em;
   color: #666;
   cursor: pointer;
   outline: none;
@@ -145,6 +145,18 @@ ul#list.hidden { display: none; }
   background: none !important;
   border: none !important;
   box-shadow: none !important;
+}
+
+/* Position the Leaflet zoom control in the top right with margin */
+.leaflet-top.leaflet-right .leaflet-control-zoom {
+  margin-top: 80px;   /* adjust as needed */
+  margin-right: 18px; /* adjust as needed */
+}
+
+/* If you want to affect all leaflet controls in top right: */
+.leaflet-top.leaflet-right .leaflet-control {
+  margin-top: 80px;   /* adjust as needed */
+  margin-right: 18px; /* adjust as needed */
 }
 
 .marker-stack {
