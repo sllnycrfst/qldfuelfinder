@@ -138,8 +138,8 @@ header {
   top: 10px;      /* adjust to fit in the blue area */
   left: 50%;
   transform: translateX(-50%);
-  width: 29px;    /* adjust size to fit blue box */
-  height: 29px;   /* adjust size to fit blue box */
+  width: 27px;    /* adjust size to fit blue box */
+  height: 27px;   /* adjust size to fit blue box */
   filter: drop-shadow(0 0 4px #fff) drop-shadow(0 0 1px #fff);
   object-fit: contain;
 }
@@ -159,6 +159,11 @@ header {
   font-family: 'Teko', monospace, sans-serif;
   background: none; /* Let the PNG's black rectangle show through */
   text-shadow: 0 1px 2px #333, 0 0 2px #333;
+}
+
+.marker-price-cheapest {
+  color: #0dc800 !important;
+  text-shadow: 0 1px 2px #fff, 0 0 2px #fff !important;
 }
 
 .brand-logo {
