@@ -185,16 +185,16 @@ ul#list.hidden { display: none; }
   box-shadow: none !important;
 }
 .marker-stack {
-  width: 20px;
-  height: 28px;
+  width: 10px;
+  height: 12px;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 .custom-marker-img {
-  width: 18px;
-  height: 18px;
+  width: 10px;
+  height: 12px;
   display: block;
   z-index: 1;
 }
