@@ -114,16 +114,14 @@ ul#list.hidden { display: none; }
   padding: 0;
 }
 .marker-brand-img {
-  width: 32px;
-  height: 32px;
+  width: 18px;
+  height: 18px;
   position: absolute;
-  top: 3px;
+  top: 6px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 2;
-  border-radius: 50%;
-  background: #fff;
-  border: 1.5px solid #eee;
+  border-radius: 10%;
   object-fit: contain;
   box-shadow: 0 1px 3px rgba(0,0,0,0.09);
   padding: 1px;
@@ -139,8 +137,8 @@ ul#list.hidden { display: none; }
   align-items: center;
   justify-content: center;
   position: absolute;
-  left: 50%;
-  bottom: 66px;
+  left: 54%;
+  bottom: 64px;
   transform: translateX(-50%);
   padding: 0;
   margin: 0;
