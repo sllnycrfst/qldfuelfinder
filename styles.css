@@ -126,6 +126,10 @@ ul#list.hidden { display: none; }
   filter: drop-shadow(0 0 8px #fff);
   padding: 1px;
 }
+.brand-logo {
+  max-width: 10px;
+  max-height: 10px;
+}
 .marker-price {
   width: 38px;
   height: 24px;
