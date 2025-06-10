@@ -6,56 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <!-- Roboto & ZCOOL fonts -->
+  <!-- Roboto & ZCOOL font -->
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=ZCOOL+QingKe+HuangYou&display=swap" rel="stylesheet">
-  <!-- Font Awesome for icons -->
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css" />
   <link rel="icon" href="favicon.ico">
   <style>
-    body {
-      font-family: 'Roboto', Arial, sans-serif;
-      margin: 0;
-      background: #f7f7f7;
-    }
-    .top-bar {
-      background: #fff;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.5em 1em;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-    }
-    .right-controls select {
-      font-family: inherit;
-      font-size: 1em;
-      padding: 0.2em 1em 0.2em 2em;
-    }
-    .tab {
-      background: none;
-      border: none;
-      font-size: 1.8em;
-      color: #888;
-      cursor: pointer;
-      padding: 0.5em 1em;
-    }
-    .tab.active {
-      color: #0072ff;
-    }
-    .hidden {
-      display: none;
-    }
-    /* Demo for fuel price with ZCOOL font */
-    .fuel-price-demo {
-      margin: 1em;
-      text-align: center;
-    }
-    .fuel-price {
-      font-family: 'ZCOOL QingKe HuangYou', cursive;
-      font-size: 2em;
-      color: #ff9800;
-    }
+    html, body { height: 100%; margin: 0; padding: 0; }
+    #map { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0; }
   </style>
 </head>
 <body>
@@ -84,7 +44,12 @@
       <button class="tab active" id="map-tab" title="Map"><i class="fa-solid fa-map"></i></button>
       <button class="tab" id="list-tab" title="List"><i class="fa-solid fa-rectangle-list"></i></button>
     </nav>
+    <div class="fuel-price-demo" style="display:none">
+      <span class="fuel-price">$1.879</span>
+      <span style="font-size:1em;color:#888;">(ULP 91)</span>
+    </div>
   </main>
+  <!-- Load Leaflet JS at end of body -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="script.js"></script>
 </body>
