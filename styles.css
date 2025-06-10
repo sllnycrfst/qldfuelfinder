@@ -242,8 +242,8 @@ ul#list.hidden { display: none; }
   #fuel-select { margin-left: 0; }
   #recenter-btn { bottom: 68px; right: 8px; }
   ul#list { top: 62px; bottom: 52px; }
-  .marker-stack { width: 36px; height: 60px; }
-  .custom-marker-img { width: 36px; height: 60px; }
+  .marker-stack { width: 24px; height: 36px; }
+  .custom-marker-img { width: 24px; height: 28px; }
   .marker-brand-img { width: 20px; height: 20px; }
-  .marker-price { font-size: 1em; min-width: 28px; }
+  .marker-price { width: 22px; height: 13px; font-size: 0.8em; top: 21px; left: 1px; }
 }
