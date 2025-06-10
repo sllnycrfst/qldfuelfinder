@@ -1,17 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Utility for Roboto & Teko fonts
-  function setFont(node, family, weight = 400) {
-    node.style.fontFamily = family;
-    node.style.fontWeight = weight;
-  }
-
   const defaultCenter = [-27.4698, 153.0251];
   const defaultZoom = /Mobi|Android/i.test(navigator.userAgent) ? 12 : 14;
   let userMarker = null;
 
-  // Ask for geolocation before map loads
   function startApp(center) {
-    // Map setup
     const map = L.map("map", { zoomControl: false, attributionControl: false }).setView(center, defaultZoom);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -22,16 +14,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     L.control.zoom({ position: 'topright' }).addTo(map);
 
-    // Layer to hold station markers
     const markerLayer = L.layerGroup().addTo(map);
 
-    // FUEL ID MAP
     const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3 };
     let currentFuel = "91";
     let allSites = [];
     let allPrices = [];
 
-    // --- Geolocation: blue marker for user location ---
     function showUserLocation(setView) {
       if (!navigator.geolocation) return;
       navigator.geolocation.getCurrentPosition(
@@ -49,8 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       );
     }
-    
-    // --- Fetch site and price data ---
+
     async function fetchSitesAndPrices() {
       try {
         const [siteRes, priceRes] = await Promise.all([
@@ -60,13 +48,12 @@ document.addEventListener("DOMContentLoaded", () => {
         allSites = Array.isArray(siteRes) ? siteRes : siteRes.S;
         allPrices = priceRes.SitePrices;
         updateVisibleStations();
-        updateStationList(); // Also update list view
+        updateStationList();
       } catch (err) {
         console.error("Failed to fetch site/price data:", err);
       }
     }
 
-    // --- Render visible stations ---
     function updateVisibleStations() {
       if (!allSites.length || !allPrices.length) return;
       markerLayer.clearLayers();
@@ -93,30 +80,29 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .filter(Boolean);
 
-      // Find minimum price
       const minPrice = visibleStations.length
         ? Math.min(...visibleStations.map(s => s.rawPrice))
         : null;
-      
-      // Compose marker HTML
+
       visibleStations.forEach(s => {
         const isCheapest = minPrice !== null && s.rawPrice === minPrice;
         const priceClass = isCheapest
           ? "marker-price marker-price-cheapest"
           : "marker-price";
 
+        // Marker HTML: marker image, brand logo above, price in black box below
         const html = `
           <img src="images/my-new-marker.png" class="custom-marker-img" />
+          <img src="images/${s.brand}.png" class="marker-brand-img" onerror="this.style.display='none';" />
           <div class="${priceClass}">${s.price.toFixed(1)}</div>
-          </div>
         `;
 
         const icon = L.divIcon({
           className: "fuel-marker",
           html: `<div class="marker-stack">${html}</div>`,
-          iconSize: [10, 14],      // width, height (MUST match CSS)
-          iconAnchor: [12, 32],    // bottom center
-          popupAnchor: [0, -32]
+          iconSize: [36, 54],      // Match .marker-stack size
+          iconAnchor: [18, 54],    // bottom center
+          popupAnchor: [0, -54]
         });
 
         const marker = L.marker([s.lat, s.lng], {
@@ -137,7 +123,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // --- Render visible stations in list ---
     function updateStationList() {
       const listDiv = document.getElementById("list");
       if (!listDiv) return;
@@ -168,7 +153,6 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .filter(Boolean);
 
-      // Sort by price
       visibleStations.sort((a, b) => a.rawPrice - b.rawPrice);
       const minPrice = visibleStations.length
         ? Math.min(...visibleStations.map(s => s.rawPrice))
@@ -190,7 +174,6 @@ document.addEventListener("DOMContentLoaded", () => {
         : "<li>No stations visible in this area.</li>";
     }
 
-    // Throttle station and list update
     let updateTimeout;
     function throttledUpdate() {
       if (updateTimeout) clearTimeout(updateTimeout);
@@ -202,7 +185,6 @@ document.addEventListener("DOMContentLoaded", () => {
     map.on("moveend", throttledUpdate);
     map.on("zoomend", throttledUpdate);
 
-    // --- Fuel select change ---
     const fuelSelect = document.getElementById("fuel-select");
     if (fuelSelect) {
       fuelSelect.addEventListener("change", e => {
@@ -212,12 +194,10 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // --- Tab handling ---
     const mapTab = document.getElementById("map-tab");
     const listTab = document.getElementById("list-tab");
     const mapDiv = document.getElementById("map");
     const listDiv = document.getElementById("list");
-
     if (mapTab && listTab && mapDiv && listDiv) {
       mapTab.addEventListener("click", () => {
         mapTab.classList.add("active");
@@ -233,7 +213,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // --- Suburb search ---
     const searchInput = document.getElementById("search");
     function handleSearch() {
       const query = searchInput.value.trim().toLowerCase();
@@ -254,20 +233,16 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // --- Recenter button ---
     const recenterBtn = document.getElementById("recenter-btn");
     if (recenterBtn) {
       recenterBtn.addEventListener("click", () => showUserLocation(true));
     }
 
-    // --- Initial user location marker if allowed ---
     if (center !== defaultCenter) showUserLocation(false);
 
-    // --- Initial fetch ---
     fetchSitesAndPrices();
   }
 
-  // Ask for user location before loading map
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       pos => startApp([pos.coords.latitude, pos.coords.longitude]),
