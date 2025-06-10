@@ -21,7 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }).addTo(map);
 
     L.control.zoom({ position: 'topright' }).addTo(map);
-    L.control.zoom({ position: 'bottomright' }).addTo(map);
 
     // Layer to hold station markers
     const markerLayer = L.layerGroup().addTo(map);
@@ -56,12 +55,12 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const [siteRes, priceRes] = await Promise.all([
           fetch("data/sites.json").then(r => r.json()),
-          fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json()),
           fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
         ]);
         allSites = Array.isArray(siteRes) ? siteRes : siteRes.S;
         allPrices = priceRes.SitePrices;
         updateVisibleStations();
+        updateStationList(); // Also update list view
       } catch (err) {
         console.error("Failed to fetch site/price data:", err);
       }
@@ -99,8 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ? Math.min(...visibleStations.map(s => s.rawPrice))
         : null;
       
-        // Compose marker HTML
-
+      // Compose marker HTML
       visibleStations.forEach(s => {
         const isCheapest = minPrice !== null && s.rawPrice === minPrice;
         const priceClass = isCheapest
@@ -110,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const html = `
           <img src="images/my-new-marker.png" class="custom-marker-img" />
           <img src="images/${s.brand}.png" class="marker-brand-img" onerror="this.style.display='none';" />
-          <div class="${priceClass}" style="font-size:1.3em;">
+          <div class="${priceClass}" style="font-size:1.3em; font-family:'ZCOOL QingKe HuangYou',cursive;">
             ${s.price.toFixed(1)}
           </div>
         `;
@@ -141,29 +139,34 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Throttle station update
-    let updateTimeout;
-    function throttledUpdate() {
-      if (updateTimeout) clearTimeout(updateTimeout);
-      updateTimeout = setTimeout(updateVisibleStations, 300);
-    }
-    map.on("moveend", throttledUpdate);
-    map.on("zoomend", throttledUpdate);
-
-    // --- Fuel select change ---
-    const fuelSelect = document.getElementById("fuel-select");
-    if (fuelSelect) {
-      fuelSelect.addEventListener("change", e => {
-        currentFuel = e.target.value;
-        updateVisibleStations();
-      });
-    }
-
-    // --- Tab handling ---
-    const mapTab = document.getElementById("map-tab");
-    const listTab = document.getElementById("list-tab");
-    const mapDiv = document.getElementById("map");
-@@ -193,63 +204,66 @@ document.addEventListener("DOMContentLoaded", () => {
+    // --- Render visible stations in list ---
+    function updateStationList() {
+      const listDiv = document.getElementById("list");
+      if (!listDiv) return;
+      if (!allSites.length || !allPrices.length) {
+        listDiv.innerHTML = "<li>Loading…</li>";
+        return;
+      }
+      const bounds = map.getBounds();
+      const visibleStations = allSites
+        .map(site => {
+          const match = allPrices.find(
+            p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]
+          );
+          if (match && bounds.contains([site.Lat, site.Lng])) {
+            return {
+              ...site,
+              price: match.Price / 10,
+              rawPrice: match.Price,
+              brand: site.B,
+              address: site.A,
+              name: site.N,
+              suburb: site.P,
+              lat: site.Lat,
+              lng: site.Lng,
+            };
+          }
+          return null;
         })
         .filter(Boolean);
 
@@ -181,10 +184,55 @@ document.addEventListener("DOMContentLoaded", () => {
             </span>
             <span class="station-name">${s.name}</span>
             <span class="station-suburb">${s.suburb}</span>
-            <span class="station-price${s.rawPrice === minPrice ? " cheapest-price" : ""}">${s.price.toFixed(1)}</span>
+            <span class="station-price${s.rawPrice === minPrice ? " cheapest-price" : ""}" style="font-family:'ZCOOL QingKe HuangYou',cursive;">
+              ${s.price.toFixed(1)}
+            </span>
           </li>
         `).join("")
         : "<li>No stations visible in this area.</li>";
+    }
+
+    // Throttle station and list update
+    let updateTimeout;
+    function throttledUpdate() {
+      if (updateTimeout) clearTimeout(updateTimeout);
+      updateTimeout = setTimeout(() => {
+        updateVisibleStations();
+        updateStationList();
+      }, 300);
+    }
+    map.on("moveend", throttledUpdate);
+    map.on("zoomend", throttledUpdate);
+
+    // --- Fuel select change ---
+    const fuelSelect = document.getElementById("fuel-select");
+    if (fuelSelect) {
+      fuelSelect.addEventListener("change", e => {
+        currentFuel = e.target.value;
+        updateVisibleStations();
+        updateStationList();
+      });
+    }
+
+    // --- Tab handling ---
+    const mapTab = document.getElementById("map-tab");
+    const listTab = document.getElementById("list-tab");
+    const mapDiv = document.getElementById("map");
+    const listDiv = document.getElementById("list");
+
+    if (mapTab && listTab && mapDiv && listDiv) {
+      mapTab.addEventListener("click", () => {
+        mapTab.classList.add("active");
+        listTab.classList.remove("active");
+        mapDiv.style.display = "";
+        listDiv.classList.add("hidden");
+      });
+      listTab.addEventListener("click", () => {
+        listTab.classList.add("active");
+        mapTab.classList.remove("active");
+        mapDiv.style.display = "none";
+        listDiv.classList.remove("hidden");
+      });
     }
 
     // --- Suburb search ---
@@ -202,18 +250,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
     if (searchInput) {
-      searchInput.addEventListener("change", () => {
-        const query = searchInput.value.trim().toLowerCase();
-        if (!query) return;
-        const matches = allSites.filter(site => site.P && site.P.toLowerCase().includes(query));
-        if (matches.length > 0) {
-          // Center to first match (or average if many)
-          const avgLat = matches.reduce((sum, s) => sum + s.Lat, 0) / matches.length;
-          const avgLng = matches.reduce((sum, s) => sum + s.Lng, 0) / matches.length;
-          map.setView([avgLat, avgLng], 14);
-        } else {
-          alert("No suburb match.");
-        }
       searchInput.addEventListener("change", handleSearch);
       searchInput.addEventListener("keydown", e => {
         if (e.key === "Enter") handleSearch();
@@ -242,3 +278,5 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   } else {
     startApp(defaultCenter);
+  }
+});
