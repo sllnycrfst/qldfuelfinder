@@ -137,20 +137,14 @@ ul#list.hidden { display: none; }
   align-items: center;
   justify-content: center;
   position: absolute;
-  left: 54%;
+  left: 52%;
   bottom: 64px;
   transform: translateX(-50%);
   padding: 0;
   margin: 0;
   z-index: 3;
-  letter-spacing: 1.2px;
+  letter-spacing: 1.3px;
 }
 .marker-price-cheapest {
   color: #0dc800 !important;
-}
-@media (max-width: 600px) {
-  .marker-stack { width: 26px; height: 39px; }
-  .custom-marker-img { width: 26px; height: 26px; }
-  .marker-brand-img { width: 14px; height: 14px; top: 2px; }
-  .marker-price { width: 18px; height: 11px; font-size: 0.7em; bottom: 1px; }
 }
