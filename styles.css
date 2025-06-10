@@ -123,17 +123,17 @@ ul#list.hidden { display: none; }
   z-index: 2;
   border-radius: 10%;
   object-fit: contain;
-  filter: drop-shadow(0 0 8px #333);
+  filter: drop-shadow(2px 4px 8px #fff);
   padding: 1px;
 }
 .brand-logo {
-  max-width: 16px;
-  max-height: 16px;
+  max-width: 20px;
+  max-height: 20px;
 }
 .marker-price {
   width: 38px;
   height: 24px;
-  color: #fff !important;
+  color: #fff !important; 
   font-family: 'ZCOOL QingKe HuangYou', cursive !important;
   font-size: 1.1em;
   font-weight: 600;
