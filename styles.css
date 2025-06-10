@@ -95,8 +95,8 @@ ul#list.hidden { display: none; }
   margin: 0 !important;
 }
 .marker-stack {
-  width: 36px;
-  height: 54px;
+  width: 72px;
+  height: 108px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -131,12 +131,10 @@ ul#list.hidden { display: none; }
 .marker-price {
   width: 28px;
   height: 16px;
-  background: #111;
   color: #fff !important;
   font-family: 'ZCOOL QingKe HuangYou', cursive !important;
   font-size: 1em;
   font-weight: 700;
-  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -151,8 +149,7 @@ ul#list.hidden { display: none; }
   letter-spacing: 0.5px;
 }
 .marker-price-cheapest {
-  background: #0dc800 !important;
-  color: #fff !important;
+  color: #0dc800 !important;
 }
 @media (max-width: 600px) {
   .marker-stack { width: 26px; height: 39px; }
