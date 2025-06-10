@@ -100,9 +100,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const icon = L.divIcon({
           className: "fuel-marker",
           html: `<div class="marker-stack">${html}</div>`,
-          iconSize: [36, 54],      // Match .marker-stack size
-          iconAnchor: [18, 54],    // bottom center
-          popupAnchor: [0, -54]
+          iconSize: [72, 108],      // Match .marker-stack size
+          iconAnchor: [66, 108],    // bottom center
+          popupAnchor: [0, -108]
         });
 
         const marker = L.marker([s.lat, s.lng], {
