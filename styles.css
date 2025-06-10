@@ -114,16 +114,16 @@ ul#list.hidden { display: none; }
   padding: 0;
 }
 .marker-brand-img {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   position: absolute;
-  top: 6px;
+  top: 8px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 2;
   border-radius: 10%;
   object-fit: contain;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.09);
+  filter: drop-shadow(0 0 8px #fff);
   padding: 1px;
 }
 .marker-price {
