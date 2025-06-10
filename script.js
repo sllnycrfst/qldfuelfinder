@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const defaultCenter = [-27.4698, 153.0251];
-  const defaultZoom = /Mobi|Android/i.test(navigator.userAgent) ? 12 : 14;
+  const defaultZoom = /Mobi|Android/i.test(navigator.userAgent) ? 14 : 14;
   let userMarker = null;
 
   function startApp(center) {
