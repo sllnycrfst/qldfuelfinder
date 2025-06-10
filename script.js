@@ -71,7 +71,6 @@ document.addEventListener("DOMContentLoaded", () => {
     function updateVisibleStations() {
       if (!allSites.length || !allPrices.length) return;
       markerLayer.clearLayers();
-
       const bounds = map.getBounds();
       const visibleStations = allSites
         .map(site => {
