@@ -123,7 +123,7 @@ ul#list.hidden { display: none; }
   z-index: 2;
   border-radius: 10%;
   object-fit: contain;
-  filter: drop-shadow(0 0 8px #fff);
+  filter: drop-shadow(0 0 8px #333);
   padding: 1px;
 }
 .brand-logo {
