@@ -107,9 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const html = `
           <img src="images/my-new-marker.png" class="custom-marker-img" />
-          <img src="images/${s.brand}.png" class="marker-brand-img" onerror="this.style.display='none';" />
-          <div class="${priceClass}" style="font-size:1.3em; font-family:'ZCOOL QingKe HuangYou',cursive;">
-            ${s.price.toFixed(1)}
+          <div class="${priceClass}">${s.price.toFixed(1)}</div>
           </div>
         `;
 
