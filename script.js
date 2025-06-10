@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const icon = L.divIcon({
           className: "fuel-marker",
           html: `<div class="marker-stack">${html}</div>`,
-          iconSize: [24, 32],      // width, height (MUST match CSS)
+          iconSize: [10, 14],      // width, height (MUST match CSS)
           iconAnchor: [12, 32],    // bottom center
           popupAnchor: [0, -32]
         });
