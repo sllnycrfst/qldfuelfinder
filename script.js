@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
     const markerLayer = L.layerGroup().addTo(map);
-
     const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3 };
     let currentFuel = "91";
     let allSites = [];
@@ -47,8 +46,24 @@ document.addEventListener("DOMContentLoaded", () => {
         ]);
         allSites = Array.isArray(siteRes) ? siteRes : siteRes.S;
         allPrices = priceRes.SitePrices;
+
         updateVisibleStations();
         updateStationList();
+
+        // ✅ SEARCH FUNCTION hooked after allSites is available
+        document.getElementById("search").addEventListener("input", function (e) {
+          const query = e.target.value.toLowerCase().trim();
+          if (query.length < 2) return;
+
+          const match = allSites.find(s =>
+            s.P && s.P.toLowerCase().includes(query)
+          );
+
+          if (match) {
+            map.setView([match.Lat, match.Lng], 15);
+          }
+        });
+
       } catch (err) {
         console.error("Failed to fetch site/price data:", err);
       }
@@ -90,7 +105,6 @@ document.addEventListener("DOMContentLoaded", () => {
           ? "marker-price marker-price-cheapest"
           : "marker-price";
 
-        // Marker HTML: marker image, brand logo above, price in black box below
         const html = `
           <img src="images/my-new-marker8.png" class="custom-marker-img" />
           <img src="images/${s.brand}.png" class="marker-brand-img" onerror="this.style.display='none';" />
@@ -100,10 +114,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const icon = L.divIcon({
           className: "fuel-marker",
           html: `<div class="marker-stack">${html}</div>`,
-          iconSize: [80, 80],      // Match .marker-stack size
-          iconAnchor: [40, 78],    // bottom center
+          iconSize: [80, 80],
+          iconAnchor: [40, 78],
           popupAnchor: [20, -80]
         });
+
         const marker = L.marker([s.lat, s.lng], {
           icon,
           zIndexOffset: isCheapest ? 1000 : 0,
@@ -111,12 +126,12 @@ document.addEventListener("DOMContentLoaded", () => {
           price: s.price
         });
 
-        marker.bindPopup(
-          `<div style="font-family:'Roboto',Arial,sans-serif;font-size:1.1em;">
+        marker.bindPopup(`
+          <div style="font-family:'Roboto',Arial,sans-serif;font-size:1.1em;">
             <span style="font-weight:700;">${s.name}</span><br>
             <span>${s.address}</span>
-          </div>`
-        );
+          </div>
+        `);
 
         markerLayer.addLayer(marker);
       });
@@ -212,26 +227,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    const searchInput = document.getElementById("search");
-    function handleSearch() {
-      const query = searchInput.value.trim().toLowerCase();
-      if (!query) return;
-      const matches = allSites.filter(site => site.P && site.P.toLowerCase().includes(query));
-      if (matches.length > 0) {
-        const avgLat = matches.reduce((sum, s) => sum + s.Lat, 0) / matches.length;
-        const avgLng = matches.reduce((sum, s) => sum + s.Lng, 0) / matches.length;
-        map.setView([avgLat, avgLng], 14);
-      } else {
-        alert("No suburb match.");
-      }
-    }
-    if (searchInput) {
-      searchInput.addEventListener("change", handleSearch);
-      searchInput.addEventListener("keydown", e => {
-        if (e.key === "Enter") handleSearch();
-      });
-    }
-
     const recenterBtn = document.getElementById("recenter-btn");
     if (recenterBtn) {
       recenterBtn.addEventListener("click", () => showUserLocation(true));
@@ -246,7 +241,7 @@ document.addEventListener("DOMContentLoaded", () => {
     navigator.geolocation.getCurrentPosition(
       pos => startApp([pos.coords.latitude, pos.coords.longitude]),
       () => startApp(defaultCenter),
-      {timeout: 7000}
+      { timeout: 7000 }
     );
   } else {
     startApp(defaultCenter);
