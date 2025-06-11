@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
       maxZoom: 16
     }).addTo(map);
 
-    L.control.zoom({ position: 'topright' }).addTo(map);
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
 
     const markerLayer = L.layerGroup().addTo(map);
 
@@ -100,11 +100,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const icon = L.divIcon({
           className: "fuel-marker",
           html: `<div class="marker-stack">${html}</div>`,
-          iconSize: [72, 108],      // Match .marker-stack size
-          iconAnchor: [36, 108],    // bottom center
-          popupAnchor: [0, -108]
+          iconSize: [80, 80],      // Match .marker-stack size
+          iconAnchor: [40, 78],    // bottom center
+          popupAnchor: [20, -80]
         });
-
         const marker = L.marker([s.lat, s.lng], {
           icon,
           zIndexOffset: isCheapest ? 1000 : 0,

@@ -24,28 +24,31 @@ html, body {
   box-shadow: 0 2px 4px rgba(0,0,0,0.04);
 }
 .right-controls select {
-  font-family: inherit;
-  font-size: 1em;
-  padding: 0.2em 1em 0.2em 2em;
+  font-family: roboto;
+  font-size: 0.8em;
+  padding: 0.2em 0.2em 0.2em 1em;
+  border-radius: 10%;
+  width: 100px;
 }
 #recenter-btn {
   position: absolute;
-  bottom: 95px;
+  bottom: 65px;
   right: 18px;
+  opacity: 70%;
   z-index: 1001;
   background: #fff;
   border: none;
   border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  width: 52px;
-  height: 52px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   padding: 0;
 }
-#recenter-btn i { font-size: 1.5em; color: #0072ff; }
+#recenter-btn i { font-size: 1.5em; color: #000000; }
 #bottom-tabs {
   position: fixed;
   left: 0; right: 0; bottom: 0;
@@ -53,13 +56,13 @@ html, body {
   box-shadow: 0 -2px 8px rgba(0,0,0,0.11);
   display: flex;
   z-index: 1200;
-  height: 54px;
+  height: 40px;
 }
 .tab {
   flex: 1;
   border: none;
   background: none;
-  font-size: 1.8em;
+  font-size: 1.5em;
   color: #888;
   display: flex;
   align-items: center;
@@ -72,31 +75,11 @@ html, body {
 .tab.active {
   color: #0072ff;
 }
-ul#list {
-  position: absolute;
-  top: 70px;
-  left: 0;
-  right: 0;
-  bottom: 60px;
-  background: #fff;
-  overflow-y: auto;
-  z-index: 400;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
 ul#list.hidden { display: none; }
 /* MARKER STYLES */
-.fuel-marker {
-  background: none !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-}
 .marker-stack {
-  width: 72px;
-  height: 108px;
+  width: 120px;
+  height: 120px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -106,48 +89,60 @@ ul#list.hidden { display: none; }
   margin: 0;
 }
 .custom-marker-img {
-  width: 72px;
-  height: 72px;
+  width: 80px;
+  height: 80px;
   display: block;
   z-index: 1;
   margin: 0;
   padding: 0;
 }
+.leaflet-control-zoom {
+  top: auto;
+  bottom: 120px !important;  /* default is 10px */
+  right: 12px !important;
+  left: auto !important;  /* make sure it's not on the left */
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  opacity: 70%;
+  z-index: 1001;
+
+}
 .marker-brand-img {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   position: absolute;
-  top: 8px;
+  top: 10px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 2;
   border-radius: 10%;
   object-fit: contain;
-  filter: drop-shadow(2px 4px 8px #fff);
+  filter: drop-shadow(0px 0px 7px #faf9f9);
   padding: 1px;
 }
 .brand-logo {
-  max-width: 20px;
-  max-height: 20px;
+  max-width: 30px;
+  max-height: 30px;
 }
 .marker-price {
   width: 30px;
   height: 24px;
   color: #fff !important; 
-  font-family: "Quantico", sans-serif; !important;
+  font-family: "Roboto", sans-serif; !important;
   font-size: 1.0em;
-  font-weight: 400 !important;
+  font-weight: 500 !important;
   display: flex;
   align-items: center;
   justify-content: center;
   position: absolute;
-  left: 52%;
-  bottom: 62px;
+  left: 51%;
+  bottom: 70px;
   transform: translateX(-50%);
   padding: 0;
   margin: 0;
   z-index: 3;
-  letter-spacing: 1.0px;
+  letter-spacing: 0.1px;
 }
 .marker-price-cheapest {
   color: #0dc800 !important;
