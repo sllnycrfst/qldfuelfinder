@@ -131,11 +131,11 @@ ul#list.hidden { display: none; }
   max-height: 20px;
 }
 .marker-price {
-  width: 38px;
+  width: 30px;
   height: 24px;
   color: #fff !important; 
   font-family: "Quantico", sans-serif; !important;
-  font-size: 1.1em;
+  font-size: 1.0em;
   font-weight: 400 !important;
   display: flex;
   align-items: center;
@@ -147,7 +147,7 @@ ul#list.hidden { display: none; }
   padding: 0;
   margin: 0;
   z-index: 3;
-  letter-spacing: 1.3px;
+  letter-spacing: 1.0px;
 }
 .marker-price-cheapest {
   color: #0dc800 !important;
