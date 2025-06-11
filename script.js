@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a> | &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>',
       subdomains: 'abcd',
-      maxZoom: 18
+      maxZoom: 16
     }).addTo(map);
 
     L.control.zoom({ position: 'topright' }).addTo(map);
