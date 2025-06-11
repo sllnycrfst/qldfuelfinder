@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Marker HTML: marker image, brand logo above, price in black box below
         const html = `
-          <img src="images/my-new-marker66.png" class="custom-marker-img" />
+          <img src="images/my-new-marker8.png" class="custom-marker-img" />
           <img src="images/${s.brand}.png" class="marker-brand-img" onerror="this.style.display='none';" />
           <div class="${priceClass}">${s.price.toFixed(1)}</div>
         `;
