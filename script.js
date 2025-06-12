@@ -1,3 +1,5 @@
+// Optimized script.js with price lookup caching
+
 document.addEventListener("DOMContentLoaded", () => {
   const defaultCenter = [-27.4698, 153.0251];
   const defaultZoom = /Mobi|Android/i.test(navigator.userAgent) ? 14 : 14;
@@ -19,23 +21,22 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentFuel = "91";
     let allSites = [];
     let allPrices = [];
+    let priceMap = {}; // 🚀 New: fast lookup map
 
     function showUserLocation(setView) {
       if (!navigator.geolocation) return;
-      navigator.geolocation.getCurrentPosition(
-        pos => {
-          const userLatLng = [pos.coords.latitude, pos.coords.longitude];
-          if (setView) map.setView(userLatLng, map.getZoom());
-          if (userMarker) map.removeLayer(userMarker);
-          userMarker = L.circleMarker(userLatLng, {
-            radius: 10,
-            color: "#2196f3",
-            fillColor: "#2196f3",
-            fillOpacity: 0.85,
-            weight: 3,
-          }).addTo(map);
-        }
-      );
+      navigator.geolocation.getCurrentPosition(pos => {
+        const userLatLng = [pos.coords.latitude, pos.coords.longitude];
+        if (setView) map.setView(userLatLng, map.getZoom());
+        if (userMarker) map.removeLayer(userMarker);
+        userMarker = L.circleMarker(userLatLng, {
+          radius: 10,
+          color: "#2196f3",
+          fillColor: "#2196f3",
+          fillOpacity: 0.85,
+          weight: 3,
+        }).addTo(map);
+      });
     }
 
     async function fetchSitesAndPrices() {
@@ -47,21 +48,21 @@ document.addEventListener("DOMContentLoaded", () => {
         allSites = Array.isArray(siteRes) ? siteRes : siteRes.S;
         allPrices = priceRes.SitePrices;
 
+        // ✅ Build price lookup map
+        priceMap = {};
+        allPrices.forEach(p => {
+          if (!priceMap[p.SiteId]) priceMap[p.SiteId] = {};
+          priceMap[p.SiteId][p.FuelId] = p.Price;
+        });
+
         updateVisibleStations();
         updateStationList();
 
-        // ✅ SEARCH FUNCTION hooked after allSites is available
         document.getElementById("search").addEventListener("input", function (e) {
           const query = e.target.value.toLowerCase().trim();
           if (query.length < 2) return;
-
-          const match = allSites.find(s =>
-            s.P && s.P.toLowerCase().includes(query)
-          );
-
-          if (match) {
-            map.setView([match.Lat, match.Lng], 15);
-          }
+          const match = allSites.find(s => s.P && s.P.toLowerCase().includes(query));
+          if (match) map.setView([match.Lat, match.Lng], 15);
         });
 
       } catch (err) {
@@ -73,16 +74,15 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!allSites.length || !allPrices.length) return;
       markerLayer.clearLayers();
       const bounds = map.getBounds();
+
       const visibleStations = allSites
         .map(site => {
-          const match = allPrices.find(
-            p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]
-          );
-          if (match && bounds.contains([site.Lat, site.Lng])) {
+          const price = priceMap[site.S]?.[fuelIdMap[currentFuel]];
+          if (price && bounds.contains([site.Lat, site.Lng])) {
             return {
               ...site,
-              price: match.Price / 10,
-              rawPrice: match.Price,
+              price: price / 10,
+              rawPrice: price,
               brand: site.B,
               address: site.A,
               name: site.N,
@@ -95,15 +95,11 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .filter(Boolean);
 
-      const minPrice = visibleStations.length
-        ? Math.min(...visibleStations.map(s => s.rawPrice))
-        : null;
+      const minPrice = visibleStations.length ? Math.min(...visibleStations.map(s => s.rawPrice)) : null;
 
       visibleStations.forEach(s => {
         const isCheapest = minPrice !== null && s.rawPrice === minPrice;
-        const priceClass = isCheapest
-          ? "marker-price marker-price-cheapest"
-          : "marker-price";
+        const priceClass = isCheapest ? "marker-price marker-price-cheapest" : "marker-price";
 
         const html = `
           <img src="images/my-new-marker8.png" class="custom-marker-img" />
@@ -147,14 +143,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const bounds = map.getBounds();
       const visibleStations = allSites
         .map(site => {
-          const match = allPrices.find(
-            p => p.SiteId === site.S && p.FuelId === fuelIdMap[currentFuel]
-          );
-          if (match && bounds.contains([site.Lat, site.Lng])) {
+          const price = priceMap[site.S]?.[fuelIdMap[currentFuel]];
+          if (price && bounds.contains([site.Lat, site.Lng])) {
             return {
               ...site,
-              price: match.Price / 10,
-              rawPrice: match.Price,
+              price: price / 10,
+              rawPrice: price,
               brand: site.B,
               address: site.A,
               name: site.N,
@@ -168,9 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .filter(Boolean);
 
       visibleStations.sort((a, b) => a.rawPrice - b.rawPrice);
-      const minPrice = visibleStations.length
-        ? Math.min(...visibleStations.map(s => s.rawPrice))
-        : null;
+      const minPrice = visibleStations.length ? Math.min(...visibleStations.map(s => s.rawPrice)) : null;
 
       listDiv.innerHTML = visibleStations.length
         ? visibleStations.map(s => `
