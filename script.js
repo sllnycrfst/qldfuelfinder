@@ -224,8 +224,7 @@ document.addEventListener("DOMContentLoaded", () => {
       recenterBtn.addEventListener("click", () => showUserLocation(true));
     }
 
-    if (center !== defaultCenter) showUserLocation(false);
-
+    showUserLocation(false);
     fetchSitesAndPrices();
   }
 
