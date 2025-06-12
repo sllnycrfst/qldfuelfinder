@@ -7,8 +7,9 @@ html, body {
 }
 #map {
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 40px;
+  top: 0; left: 0; right: 0; bottom: 0;
   z-index: 0;
+  padding-bottom: 40px;
   min-height: 300px;
 }
 .top-bar {
