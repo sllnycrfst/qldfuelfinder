@@ -1,4 +1,4 @@
-// Optimized script.js with price lookup caching
+// Optimized script.js with price lookup caching + fixed user location handling
 
 document.addEventListener("DOMContentLoaded", () => {
   const defaultCenter = [-27.4698, 153.0251];
@@ -21,22 +21,27 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentFuel = "91";
     let allSites = [];
     let allPrices = [];
-    let priceMap = {}; // 🚀 New: fast lookup map
+    let priceMap = {}; // 🚀 fast lookup map
 
     function showUserLocation(setView) {
       if (!navigator.geolocation) return;
-      navigator.geolocation.getCurrentPosition(pos => {
-        const userLatLng = [pos.coords.latitude, pos.coords.longitude];
-        if (setView) map.setView(userLatLng, map.getZoom());
-        if (userMarker) map.removeLayer(userMarker);
-        userMarker = L.circleMarker(userLatLng, {
-          radius: 10,
-          color: "#2196f3",
-          fillColor: "#2196f3",
-          fillOpacity: 0.85,
-          weight: 3,
-        }).addTo(map);
-      });
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          const userLatLng = [pos.coords.latitude, pos.coords.longitude];
+          if (setView) map.setView(userLatLng, map.getZoom());
+          if (userMarker) map.removeLayer(userMarker);
+          userMarker = L.circleMarker(userLatLng, {
+            radius: 10,
+            color: "#2196f3",
+            fillColor: "#2196f3",
+            fillOpacity: 0.85,
+            weight: 3,
+          }).addTo(map);
+        },
+        err => {
+          console.warn("Geolocation failed or denied:", err.message);
+        }
+      );
     }
 
     async function fetchSitesAndPrices() {
@@ -48,7 +53,6 @@ document.addEventListener("DOMContentLoaded", () => {
         allSites = Array.isArray(siteRes) ? siteRes : siteRes.S;
         allPrices = priceRes.SitePrices;
 
-        // ✅ Build price lookup map
         priceMap = {};
         allPrices.forEach(p => {
           if (!priceMap[p.SiteId]) priceMap[p.SiteId] = {};
@@ -224,6 +228,7 @@ document.addEventListener("DOMContentLoaded", () => {
       recenterBtn.addEventListener("click", () => showUserLocation(true));
     }
 
+    // ✅ Always try to show user location once map loads
     showUserLocation(false);
     fetchSitesAndPrices();
   }
