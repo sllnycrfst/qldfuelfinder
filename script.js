@@ -1,4 +1,4 @@
-// Optimized script.js with price lookup caching + fixed user location handling
+// Optimized script.js with price lookup caching + fixed user location handling + filtered brands + fuel types
 
 document.addEventListener("DOMContentLoaded", () => {
   const defaultCenter = [-27.4698, 153.0251];
@@ -17,11 +17,25 @@ document.addEventListener("DOMContentLoaded", () => {
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
     const markerLayer = L.layerGroup().addTo(map);
-    const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3 };
+    const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3, "Premium Diesel": 10 }; // LPG and E85 excluded intentionally
     let currentFuel = "91";
     let allSites = [];
     let allPrices = [];
-    let priceMap = {}; // 🚀 fast lookup map
+    let priceMap = {};
+
+    const bannedStations = [
+      "BARA FUELS FOREST HILL", "Sommer Petroleum", "Wandoan Fuels", "Karumba Point Service Station",
+      "Cam's Corner Servo & Mini Mart", "CEQ Kowanyama Supermarket", "Coen Store", "Aurukun Bowsers",
+      "Independent Musgrave Roadhouse", "Ibis Thursday Island Service Station", "Badu Express",
+      "Astron Mount Isa", "IOR Petroleum Injune", "Mobil Norton's Store & Mechanical", "Fuel Central Isisford Unmanned",
+      "Astron Hughenden", "Winton Roadhouse", "The Old Empire Café", "The White Bull Roadhouse", "IOR Eromanga",
+      "Boulia Roadhouse", "Barcoo Shire Council Depot", "Birdsville Fuel Service", "Birdsville Roadhouse",
+      "Flinders Star", "Doomadgee Roadhouse", "Tirranna Springs Road House",
+      "IBIS Fuel St. Pauls", "Ibis Fuel Kubin", "IBIS Fuel Warraber Island", "IBIS Fuel Yam Island",
+      "IBIS Fuel Yorke Island", "Wujal Wujal Service Station", "Bloomfield Middle Shop",
+      "Hope Vale Service Station", "Miallo Fuel Station", "Roadhouse Service Station",
+      "Mareeba Service Station", "Port Douglas Service Station"
+    ];
 
     function showUserLocation(setView) {
       if (!navigator.geolocation) return;
@@ -50,8 +64,10 @@ document.addEventListener("DOMContentLoaded", () => {
           fetch("data/sites.json").then(r => r.json()),
           fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
         ]);
-        allSites = Array.isArray(siteRes) ? siteRes : siteRes.S;
-        allPrices = priceRes.SitePrices;
+        allSites = (Array.isArray(siteRes) ? siteRes : siteRes.S).filter(site => {
+          return !bannedStations.some(b => site.N && site.N.includes(b));
+        });
+        allPrices = priceRes.SitePrices.filter(p => Object.values(fuelIdMap).includes(p.FuelId));
 
         priceMap = {};
         allPrices.forEach(p => {
@@ -184,51 +200,11 @@ document.addEventListener("DOMContentLoaded", () => {
         : "<li>No stations visible in this area.</li>";
     }
 
-    let updateTimeout;
-    function throttledUpdate() {
-      if (updateTimeout) clearTimeout(updateTimeout);
-      updateTimeout = setTimeout(() => {
-        updateVisibleStations();
-        updateStationList();
-      }, 300);
-    }
-    map.on("moveend", throttledUpdate);
-    map.on("zoomend", throttledUpdate);
-
-    const fuelSelect = document.getElementById("fuel-select");
-    if (fuelSelect) {
-      fuelSelect.addEventListener("change", e => {
-        currentFuel = e.target.value;
-        updateVisibleStations();
-        updateStationList();
-      });
-    }
-
-    const mapTab = document.getElementById("map-tab");
-    const listTab = document.getElementById("list-tab");
-    const mapDiv = document.getElementById("map");
-    const listDiv = document.getElementById("list");
-    if (mapTab && listTab && mapDiv && listDiv) {
-      mapTab.addEventListener("click", () => {
-        mapTab.classList.add("active");
-        listTab.classList.remove("active");
-        mapDiv.style.display = "";
-        listDiv.classList.add("hidden");
-      });
-      listTab.addEventListener("click", () => {
-        listTab.classList.add("active");
-        mapTab.classList.remove("active");
-        mapDiv.style.display = "none";
-        listDiv.classList.remove("hidden");
-      });
-    }
-
     const recenterBtn = document.getElementById("recenter-btn");
     if (recenterBtn) {
       recenterBtn.addEventListener("click", () => showUserLocation(true));
     }
 
-    // ✅ Always try to show user location once map loads
     showUserLocation(false);
     fetchSitesAndPrices();
   }
