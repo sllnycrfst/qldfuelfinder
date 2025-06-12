@@ -205,6 +205,25 @@ document.addEventListener("DOMContentLoaded", () => {
       recenterBtn.addEventListener("click", () => showUserLocation(true));
     }
 
+    const fuelSelect = document.getElementById("fuel-select");
+    if (fuelSelect) {
+      fuelSelect.addEventListener("change", e => {
+        currentFuel = e.target.value;
+        updateVisibleStations();
+        updateStationList();
+      });
+    }
+
+    map.on("moveend", () => {
+      updateVisibleStations();
+      updateStationList();
+    });
+
+    map.on("zoomend", () => {
+      updateVisibleStations();
+      updateStationList();
+    });
+
     showUserLocation(false);
     fetchSitesAndPrices();
   }
