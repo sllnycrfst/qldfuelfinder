@@ -1,6 +1,25 @@
 // Optimized script.js with price lookup caching + fixed user location handling + filtered brands + fuel types
-
 document.addEventListener("DOMContentLoaded", () => {
+  const mapTab = document.getElementById("map-tab");
+  const listTab = document.getElementById("list-tab");
+  const mapDiv = document.getElementById("map");
+  const listUl = document.getElementById("list");
+
+  if (mapTab && listTab && mapDiv && listUl) {
+    mapTab.addEventListener("click", () => {
+      mapTab.classList.add("active");
+      listTab.classList.remove("active");
+      mapDiv.style.display = "";
+      listUl.classList.add("hidden");
+    });
+    listTab.addEventListener("click", () => {
+      listTab.classList.add("active");
+      mapTab.classList.remove("active");
+      mapDiv.style.display = "none";
+      listUl.classList.remove("hidden");
+    });
+  }
+
   const defaultCenter = [-27.4698, 153.0251];
   const defaultZoom = /Mobi|Android/i.test(navigator.userAgent) ? 14 : 14;
   let userMarker = null;
@@ -9,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const map = L.map("map", { zoomControl: false, attributionControl: false }).setView(center, defaultZoom);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a> | &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+      attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a> | &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
       subdomains: 'abcd',
       maxZoom: 16
     }).addTo(map);
@@ -90,6 +109,17 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    function getDistance(lat1, lon1, lat2, lon2) {
+      if (lat1 == null || lon1 == null) return null;
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat / 2) ** 2 +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) ** 2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
     function updateVisibleStations() {
       if (!allSites.length || !allPrices.length) return;
       markerLayer.clearLayers();
@@ -160,8 +190,17 @@ document.addEventListener("DOMContentLoaded", () => {
         listDiv.innerHTML = "<li>Loading…</li>";
         return;
       }
+
+      // Get user location if available
+      let userLat = null, userLng = null;
+      if (userMarker && userMarker.getLatLng) {
+        const pos = userMarker.getLatLng();
+        userLat = pos.lat;
+        userLng = pos.lng;
+      }
+
       const bounds = map.getBounds();
-      const visibleStations = allSites
+      const stations = allSites
         .map(site => {
           const price = priceMap[site.S]?.[fuelIdMap[currentFuel]];
           if (price && bounds.contains([site.Lat, site.Lng])) {
@@ -169,35 +208,70 @@ document.addEventListener("DOMContentLoaded", () => {
               ...site,
               price: price / 10,
               rawPrice: price,
+              allPrices: priceMap[site.S], // for feature site
               brand: site.B,
               address: site.A,
               name: site.N,
               suburb: site.P,
               lat: site.Lat,
               lng: site.Lng,
+              distance: userLat != null ? getDistance(userLat, userLng, site.Lat, site.Lng) : null
             };
           }
           return null;
         })
-        .filter(Boolean);
+        .filter(Boolean)
+        .sort((a, b) => a.rawPrice - b.rawPrice);
 
-      visibleStations.sort((a, b) => a.rawPrice - b.rawPrice);
-      const minPrice = visibleStations.length ? Math.min(...visibleStations.map(s => s.rawPrice)) : null;
+      if (stations.length === 0) {
+        listDiv.innerHTML = "<li>No stations found for this fuel type.</li>";
+        return;
+      }
 
-      listDiv.innerHTML = visibleStations.length
-        ? visibleStations.map(s => `
-          <li class="station-row${s.rawPrice === minPrice ? " cheapest" : ""}">
-            <span class="station-brand">
-              <img src="images/${s.brand}.png" class="brand-logo" onerror="this.style.display='none';" />
-            </span>
-            <span class="station-name">${s.name}</span>
-            <span class="station-suburb">${s.suburb}</span>
-            <span class="station-price${s.rawPrice === minPrice ? " cheapest-price" : ""}" style="font-family:'ZCOOL QingKe HuangYou',cursive;">
-              ${s.price.toFixed(1)}
-            </span>
-          </li>
-        `).join("")
-        : "<li>No stations visible in this area.</li>";
+      const featured = stations[0];
+      const others = stations.slice(1);
+
+      // --- FEATURED STATION ---
+      let featuredHTML = `
+        <li class="featured-station">
+          <div class="featured-img">
+            <img src="images/${featured.brand || 'default'}.png" alt="${featured.name}" 
+                 onerror="this.onerror=null;this.src='images/default.png';" />
+          </div>
+          <div class="featured-details">
+            <div class="featured-name">${featured.name}</div>
+            <div class="featured-address">
+              <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(featured.lat + ',' + featured.lng)}"
+                 target="_blank">${featured.address}, ${featured.suburb}</a>
+            </div>
+            <div class="featured-distance">
+              ${featured.distance != null ? featured.distance.toFixed(1) + ' km' : ''}
+            </div>
+            <div class="featured-prices">
+              ${
+                Object.entries(featured.allPrices || {})
+                  .map(([fid, price]) => {
+                    // Find fuel name from ID
+                    const fuelName = Object.keys(fuelIdMap).find(fn => fuelIdMap[fn] == fid) || fid;
+                    return `<div class="price-row"><span class="fuel-type">${fuelName}:</span> <span class="fuel-price">${(price/10).toFixed(1)}</span></div>`;
+                  }).join('')
+              }
+            </div>
+          </div>
+        </li>
+      `;
+
+      // --- OTHER STATIONS ---
+      let othersHTML = others.map(site => `
+        <li class="list-station">
+          <span class="list-logo"><img src="images/${site.brand || 'default'}.png" 
+            alt="${site.name}" onerror="this.onerror=null;this.src='images/default.png';"/></span>
+          <span class="list-name">${site.name}</span>
+          <span class="list-price">${site.price.toFixed(1)}</span>
+        </li>
+      `).join('');
+
+      listDiv.innerHTML = featuredHTML + othersHTML;
     }
 
     const recenterBtn = document.getElementById("recenter-btn");

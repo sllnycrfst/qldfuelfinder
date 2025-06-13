@@ -1,13 +1,27 @@
 html, body {
+  width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
-  font-family: 'Roboto', Arial, sans-serif;
-  background: #f7f7f7;
 }
+
+main {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  min-height: 300px;
+  box-sizing: border-box;
+}
+
 #map {
-  height: 100%;
-  padding-bottom: 80px; /* adjust based on how tall your buttons are */
+  position: relative;
+  width: 100%;                 /* this is the key! */
+  margin-top: 58px;            /* match your .top-bar height */
+  margin-bottom: 40px;         /* match your tab bar height */
+  left: 0;
+  right: 0;
+  height: calc(100vh - 100px); /* 60px top + 40px bottom bar, adjust if needed */
+  min-height: 300px;
   box-sizing: border-box;
 }
 .top-bar {
@@ -16,7 +30,7 @@ html, body {
   left: 0; 
   right: 0;
   z-index: 1002;
-  background: #ffffff;
+  background: #fff;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -130,6 +144,14 @@ ul#list.hidden { display: none; }
   padding: 0;
   margin: 0;
 }
+ul#list, table.my-table-class {
+  margin-top: 70px;
+  width: 100%;
+  font-family: 'Roboto', sans-serif;
+  max-width: 1100px;     /* or whatever you prefer */
+  padding: 0 16px;
+  box-sizing: border-box;
+}
 .custom-marker-img {
   width: 80px;
   height: 80px;
@@ -140,7 +162,7 @@ ul#list.hidden { display: none; }
 }
 .leaflet-control-zoom {
   top: auto;
-  bottom: 120px !important;  /* default is 10px */
+  bottom: 100px !important;  /* default is 10px */
   right: 12px !important;
   left: auto !important;  /* make sure it's not on the left */
   border: none !important;
@@ -189,3 +211,72 @@ ul#list.hidden { display: none; }
 .marker-price-cheapest {
   color: #0dc800 !important;
 }
+/* Add at the end of your styles.css for pretty list styling */
+.featured-station {
+  display: flex;
+  gap: 1em;
+  background: #f3f8ff;
+  border-radius: 12px;
+  margin: 1em 0;
+  padding: 1em;
+  box-shadow: 0 2px 8px rgba(80,130,255,0.10);
+  align-items: flex-start;
+}
+.featured-img img {
+  width: 78px;
+  height: 78px;
+  border-radius: 9px;
+  background: #ffffff;
+  object-fit: contain;
+  box-shadow: 0 0 6px #eef;
+}
+.featured-details {
+  flex: 1 1 auto;
+}
+.featured-name {
+  font-weight: bold;
+  font-size: 1.2em;
+  margin-bottom: 0.2em;
+}
+.featured-address a {
+  color: #1959ee;
+  text-decoration: underline;
+  font-size: 1em;
+}
+.featured-distance {
+  color: #0a8d0a;
+  font-size: 0.98em;
+  margin-bottom: 0.3em;
+}
+.featured-prices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em 1em;
+  margin-top: 0.45em;
+}
+.price-row {
+  background: #e3eeff;
+  border-radius: 5px;
+  padding: 0.25em 0.7em;
+  font-size: 1em;
+}
+.fuel-type { font-weight: 600; margin-right: 0.25em; }
+.fuel-price { color: #0067cf; font-weight: 700; }
+
+.list-station {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding: 0.6em 0.1em;
+  gap: 0.8em;
+  font-size: 1.06em;
+}
+.list-logo img {
+  width: 34px;
+  height: 34px;
+  border-radius: 7px;
+  object-fit: contain;
+  background: #fff;
+}
+.list-name { flex: 2 1 60%; }
+.list-price { flex: 0 1 15%; font-weight: 700; color: #1a4f8b; text-align: right; }
