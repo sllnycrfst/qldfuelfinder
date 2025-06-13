@@ -159,11 +159,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const icon = L.divIcon({
           className: "fuel-marker",
-          html: `<div class="marker-stack">${html}</div>`,
-          iconSize: [80, 80],
-          iconAnchor: [40, 78],
-          popupAnchor: [20, -80]
-        });
+          html: `
+            <div class="marker-stack" style="position:relative;width:38px;height:48px;">
+              <img src="images/my-new-marker8.png" class="custom-marker-img" style="width:38px;height:48px;"/>
+              <div style="position:absolute;top:6px;left:6px;width:26px;height:26px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;">
+                <img src="images/${s.brand}.png" class="marker-brand-img" style="width:20px;height:20px;" onerror="this.style.display='none';"/>
+            </div>
+            <div class="${priceClass}" style="position:absolute;bottom:3px;left:0;width:100%;text-align:center;font-weight:bold;font-size:14px;color:#222;background:rgba(255,255,255,0.85);border-radius:7px;">
+              ${s.price.toFixed(1)}
+            </div>
+          </div>
+        `,
+      iconSize: [38, 48],
+      iconAnchor: [19, 48],
+      popupAnchor: [0, -45]
+      });
 
         const marker = L.marker([s.lat, s.lng], {
           icon,
