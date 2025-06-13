@@ -90,3 +90,21 @@
 .station-info a:hover {
   text-decoration: underline;
 }
+.custom-marker-img {
+  width: 38px;
+  height: 48px;
+}
+.marker-brand-img {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+.marker-price {
+  font-weight: bold;
+  background: rgba(255,255,255,0.85);
+  border-radius: 7px;
+  font-size: 14px;
+  padding: 2px 0;
+}
