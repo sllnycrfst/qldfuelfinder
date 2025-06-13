@@ -1,0 +1,92 @@
+
+#map {
+  position: relative;
+  width: 100%;
+  margin-top: 58px;
+  margin-bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(100vh - 60px);
+  min-height: 300px;
+  box-sizing: border-box;
+}
+
+#openFeatureBtn {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 10;
+  background-color: white;
+  border: none;
+  border-radius: 50%;
+  padding: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  cursor: pointer;
+}
+#openFeatureBtn img {
+  width: 24px;
+  height: 24px;
+}
+
+#featurePanel {
+  position: fixed;
+  bottom: -100%;
+  left: 0;
+  width: 100%;
+  max-height: 70%;
+  overflow-y: auto;
+  background: white;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.2);
+  z-index: 9;
+  transition: bottom 0.3s ease;
+  padding: 16px;
+}
+
+.feature-card {
+  background: #f8f8f8;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.feature-card img {
+  height: 40px;
+  width: auto;
+}
+.feature-card .price-box {
+  background: #387cc2;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.station-card {
+  background: #f0f0f0;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.station-card img {
+  height: 32px;
+  width: auto;
+}
+.station-info {
+  flex-grow: 1;
+}
+.station-info a {
+  color: #387cc2;
+  text-decoration: none;
+  font-weight: 500;
+}
+.station-info a:hover {
+  text-decoration: underline;
+}
