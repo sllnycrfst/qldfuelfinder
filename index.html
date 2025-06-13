@@ -16,7 +16,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css" />
   <link rel="icon" href="favicon.ico">
-  
 </head>
 <body>
   <header>
@@ -39,12 +38,19 @@
     <button id="recenter-btn" title="Go to my location">
       <i class="fa-solid fa-location-crosshairs"></i>
     </button>
-    <ul id="list" class="hidden"></ul>
-    <nav id="bottom-tabs">
-      <button class="tab active" id="map-tab" title="Map"><i class="fa-solid fa-map"></i></button>
-      <button class="tab" id="list-tab" title="List"><i class="fa-solid fa-rectangle-list"></i></button>
-    </nav>
+
+    <!-- Floating list button -->
+    <button id="openFeatureBtn" title="Show Stations">
+      <img src="list-icon.svg" alt="Show Stations" />
+    </button>
+
+    <!-- Slide-up feature panel -->
+    <div id="featurePanel">
+      <div id="cheapestCard" class="feature-card"></div>
+      <div id="stationListContainer" class="station-list"></div>
+    </div>
   </main>
+
   <!-- Load Leaflet JS at end of body -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="script.js"></script>
