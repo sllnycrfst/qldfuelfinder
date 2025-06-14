@@ -125,23 +125,21 @@
 
 .marker-price {
   position: absolute;
-  top: 22px;
+  top: 2px;
   left: 0;
   width: 100%;
   font-family: quantico;
   text-align: center;
   font-weight: 500;
   font-size: 12px;
-  color: #ff;
-  border-radius: 7px;
+  color: #f9f9f9;
   z-index: 3;
   padding: 2px 0;
 }
 
 /* Optional: make the price label stand out for cheapest price */
 .marker-price-cheapest {
-  background: #ffd600;
-  color: #222;
+  color: #21ea00;
 }
 
 /* Cluster icon styles (for your custom cluster icon) */
