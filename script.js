@@ -34,8 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
     });
-    map.addLayer(markerLayer);
-
+  
     const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3, "Premium Diesel": 10 };
     let currentFuel = "91";
     let allSites = [];
