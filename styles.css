@@ -166,11 +166,10 @@ html, body {
 .marker-brand-img {
   position: absolute;
   top: 29px !important;
-  left: 28px;
+  left: 28px !important;
   width: 36px;
   height: 36px;
   z-index: 1;
-  opacity: 0.95;
   pointer-events: none;
   border-radius: 50%;
   background: #fff;
