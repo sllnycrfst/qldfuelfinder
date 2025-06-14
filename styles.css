@@ -186,7 +186,7 @@ html, body {
 }
 .marker-price {
   position: absolute;
-  top: 3px !important;
+  top: 2px !important;
   left: 2px !important;
   width: 100%;
   font-family: 'Quantico', sans-serif;
