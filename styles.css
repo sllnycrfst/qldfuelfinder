@@ -216,7 +216,7 @@ html, body, #map, #map-controls, #list-panel, #list, #list *, .feature-card, .ma
 .marker-price {
   font-family: 'Roboto', Arial, sans-serif !important;
   font-size: 18px !important;
-  font-weight: 700 !important;
+  font-weight: 500 !important;
   padding: 6px 0 6px 0;
-  line-height: 1.3;
+  line-height: 1.0;
 }
