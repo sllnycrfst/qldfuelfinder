@@ -103,10 +103,10 @@
 
 .marker-brand-img {
   position: absolute;
-  top: 28px !important;      /* Center in 80x80 marker: (80-30)/2 = 25, for 30x30 image */
+  top: 29px !important;      /* Center in 80x80 marker: (80-30)/2 = 25, for 30x30 image */
   left: 25px;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   z-index: 1;
   opacity: 0.85;
   pointer-events: none;
@@ -126,7 +126,7 @@
 .marker-price {
   position: absolute;
   top: 4px !important;        /* Adjust this value to move text vertically into your black box */
-  left: 4px !important;
+  left: 2px !important;
   width: 100%;
   font-family: 'Quantico', sans-serif;
   text-align: center;
