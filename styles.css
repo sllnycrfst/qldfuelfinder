@@ -3,7 +3,7 @@ html, body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Roboto', Arial, sans-serif;
+  font-family: 'Roboto', Arial, sans-serif !important;
   background: #f5f5f5;
 }
 #map {
@@ -11,6 +11,7 @@ html, body {
   top: 0; left: 0; right: 0; bottom: 0;
   width: 100vw; height: 100vh;
   z-index: 0;
+  font-family: 'Roboto', Arial, sans-serif !important;
 }
 #map-controls {
   position: absolute;
@@ -24,6 +25,7 @@ html, body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.11);
   padding: 10px 18px;
   border-radius: 14px;
+  font-family: 'Roboto', Arial, sans-serif !important;
 }
 #map-controls input,
 #map-controls select {
@@ -33,61 +35,23 @@ html, body {
   border: 1px solid #b7d0ef;
   background: #fff;
   outline: none;
+  font-family: 'Roboto', Arial, sans-serif !important;
 }
 #map-controls input {
   width: 180px;
 }
 
-.list-btn {
-  position: absolute;
-  left: 20px;
-  bottom: 20px;
-  z-index: 1003;
-  background: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  font-size: 28px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.13);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s;
-}
-.list-btn:hover {
-  background: #e9f3ff;
-}
-
-.recenter-btn {
-  position: absolute;
-  right: 20px;
-  bottom: 20px;
-  z-index: 1003;
-  background: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  font-size: 28px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.13);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s;
-}
-.recenter-btn:hover {
-  background: #e9f3ff;
+.list-btn, .recenter-btn {
+  font-family: 'Roboto', Arial, sans-serif !important;
 }
 
 .leaflet-control-zoom {
-  top: 40px !important;
+  top: 20px !important;
   right: 20px !important;
   left: unset !important;
   bottom: unset !important;
   z-index: 1002;
+  font-family: 'Roboto', Arial, sans-serif !important;
 }
 #list-panel {
   position: fixed;
@@ -101,6 +65,7 @@ html, body {
   transform: translateY(100%);
   display: flex;
   flex-direction: column;
+  font-family: 'Roboto', Arial, sans-serif !important;
 }
 #list-panel.visible {
   transform: translateY(0);
@@ -117,6 +82,7 @@ html, body {
   margin: 8px 18px 0 0;
   cursor: pointer;
   z-index: 1;
+  font-family: 'Roboto', Arial, sans-serif !important;
 }
 #list {
   list-style: none;
@@ -124,6 +90,7 @@ html, body {
   padding: 0 0 12px 0;
   background: transparent;
   overflow-y: auto;
+  font-family: 'Roboto', Arial, sans-serif !important;
 }
 #list li {
   padding: 12px 20px;
@@ -133,6 +100,7 @@ html, body {
   gap: 12px;
   font-size: 1.05em;
   background: #fff;
+  font-family: 'Roboto', Arial, sans-serif !important;
 }
 #list li.featured-station {
   background: #e6f2ff;
@@ -150,19 +118,17 @@ html, body {
 .list-name { flex: 1; }
 .list-price {
   font-weight: bold;
-  font-family: 'Quantico', monospace;
+  font-family: 'Roboto', Arial, sans-serif !important;
   color: #387cc2;
 }
-
-/* Featured station (top) */
 .featured-details .featured-name {
   font-size: 1.1em;
   margin-bottom: 2px;
 }
 .featured-address a {
   color: #387cc2;
-  font-size: 0.9em;
   text-decoration: none;
+  font-family: 'Roboto', Arial, sans-serif !important;
 }
 .featured-address a:hover {
   text-decoration: underline;
@@ -170,29 +136,32 @@ html, body {
 .featured-distance {
   color: #555;
   font-size: 0.95em;
+  font-family: 'Roboto', Arial, sans-serif !important;
 }
 .featured-prices .price-row {
   font-size: 0.98em;
   margin-top: 2px;
+  font-family: 'Roboto', Arial, sans-serif !important;
 }
 .fuel-type { color: #888; }
-.fuel-price { color: #222; font-weight: 500; }
+.fuel-price { color: #222; font-weight: 500; font-family: 'Roboto', Arial, sans-serif !important; }
 
-/* Your marker styles (do NOT edit below!) */
+/* Your marker styles (Roboto applied) */
 .fuel-marker .marker-stack {
   position: relative;
   width: 80px;
   height: 80px;
   display: block;
+  font-family: 'Roboto', Arial, sans-serif !important;
 }
 .marker-brand-img {
   position: absolute;
   top: 29px !important;
-  left: 25px !important;
-  width: 37px;
-  height: 37px;
+  left: 25px;
+  width: 36px;
+  height: 36px;
   z-index: 1;
-  opacity: 1 !important;
+  opacity: 0.95;
   pointer-events: none;
   border-radius: 50%;
   background: #fff;
@@ -211,14 +180,13 @@ html, body {
   top: 4px !important;
   left: 2px !important;
   width: 100%;
-  font-family: 'Quantico', sans-serif;
+  font-family: 'Roboto', Arial, sans-serif !important;
   text-align: center;
   font-weight: 700 !important;
-  font-size: 12px !important;
-  line-height: 1.6 !important;
+  font-size: 18px !important;
   color: #f9f9f9 !important;
   z-index: 3;
-  padding: 0;
+  padding: 6px 0 6px 0;
   background: none !important;
   border: none;
   box-shadow: none;
@@ -226,4 +194,27 @@ html, body {
 }
 .marker-price-cheapest {
   color: #21ea00 !important;
+}
+
+/* Glassmorphism (blurred glass) for Leaflet popup */
+.leaflet-popup-content-wrapper {
+  background: rgba(255,255,255,0.55) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 18px !important;
+  box-shadow: 0 4px 32px rgba(46, 54, 80, 0.18);
+  border: 1.5px solid rgba(200,200,200,0.25);
+  font-family: 'Roboto', Arial, sans-serif !important;
+}
+.leaflet-popup-content {
+  font-family: 'Roboto', Arial, sans-serif !important;
+  font-size: 1.08em;
+  color: #222;
+  background: transparent !important;
+}
+.leaflet-popup-tip {
+  background: rgba(255,255,255,0.55) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(200,200,200,0.25);
 }
