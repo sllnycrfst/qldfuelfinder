@@ -177,7 +177,7 @@ html, body {
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 .custom-marker-img {
-  left: 2px;
+  left: 8px;
   width: 80px;
   height: 80px;
   display: block;
