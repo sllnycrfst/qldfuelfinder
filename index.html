@@ -6,12 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <!-- Roboto & ZCOOL font -->
+  <!-- Roboto & Quantico font -->
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Quantico:wght@400;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Quantico:wght@400;700&family=VT323&display=swap" rel="stylesheet">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css" />
@@ -21,7 +18,7 @@
 <body>
   <header>
     <div class="top-bar">
-      <input type="text" id="search" placeholder="Search by Postcode" />
+      <input type="text" id="search" placeholder="Search by Postcode or Suburb" />
       <div class="right-controls">
         <select id="fuel-select">
           <option value="E10">E10</option>
@@ -35,31 +32,16 @@
     </div>
   </header>
   <main>
+    <div id="tabs">
+      <button id="map-tab" class="active">Map</button>
+      <button id="list-tab">List</button>
+    </div>
     <div id="map"></div>
     <button id="recenter-btn" title="Go to my location">
       <i class="fa-solid fa-location-crosshairs"></i>
     </button>
-
-    <div class="marker-stack" style="position:relative;width:80px;height:80px;">
-      <img src="images/brand.png" class="marker-brand-img" ... />
-      <img src="images/mymarker.png" class="custom-marker-img" ... />
-      <div class="marker-price">169.9</div>
-    </div>
-
-
-    <!-- Floating list button -->
-    <button id="openFeatureBtn" title="Show Stations">
-      <img src="images/list-icon.png" alt="Show Stations" />
-    </button>
-
-    <!-- Slide-up feature panel -->
-    <div id="featurePanel">
-      <div id="cheapestCard" class="feature-card"></div>
-      <div id="stationListContainer" class="station-list"></div>
-    </div>
+    <ul id="list" class="hidden"></ul>
   </main>
-
-  <!-- Load Leaflet JS, then MarkerCluster, then your script -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
   <script src="script.js"></script>
