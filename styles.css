@@ -215,6 +215,7 @@ html, body {
   text-align: center;
   font-weight: 700 !important;
   font-size: 12px !important;
+  line-height: 1.6;
   color: #f9f9f9 !important;
   z-index: 3;
   padding: 0;
