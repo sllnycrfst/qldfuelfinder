@@ -15,11 +15,11 @@
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css" />
-  <link rel="icon" href="favicon.ico">
-  <!-- Add to index.html head -->
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <!-- MarkerCluster CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
-  <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
 </head>
 <body>
   <header>
@@ -45,7 +45,7 @@
 
     <!-- Floating list button -->
     <button id="openFeatureBtn" title="Show Stations">
-      <img src="list-icon.svg" alt="Show Stations" />
+      <img src="images/list-icon.svg" alt="Show Stations" />
     </button>
 
     <!-- Slide-up feature panel -->
@@ -55,8 +55,9 @@
     </div>
   </main>
 
-  <!-- Load Leaflet JS at end of body -->
+  <!-- Load Leaflet JS, then MarkerCluster, then your script -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
