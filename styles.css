@@ -76,12 +76,9 @@ header .top-bar {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-#recenter-btn i {
   font-size: 22px;
   color: #387cc2;
 }
-/* List styling */
 #list li {
   padding: 12px 20px;
   border-bottom: 1px solid #eee;
@@ -139,7 +136,6 @@ header .top-bar {
   color: #222;
   font-weight: 500;
 }
-
 /* ------- YOUR MARKER STYLES (do NOT edit below) ------- */
 .fuel-marker .marker-stack {
   position: relative;
