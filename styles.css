@@ -188,7 +188,7 @@ html, body {
 .marker-brand-img {
   position: absolute;
   top: 29px !important;
-  left: 1px !important;
+  left: 28px !important;
   width: 36px;
   height: 36px;
   z-index: 1;
