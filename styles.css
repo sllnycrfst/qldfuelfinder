@@ -199,13 +199,16 @@ html, body {
 
 /* Glassmorphism for featured card */
 .glass-card {
-  background: rgba(255, 255, 255, 0.55) !important;
+  background: rgba(255,255,255,0.55) !important;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-radius: 20px !important;
   box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
   border: 1.5px solid rgba(200,200,200,0.20);
   font-family: 'Roboto', Arial, sans-serif !important;
+  /* Optional: to help with the visual effect */
+  position: relative;
+  z-index: 1;
 }
 
 /* All fonts Roboto for any missed elements */
