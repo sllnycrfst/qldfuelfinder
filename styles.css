@@ -177,6 +177,7 @@ html, body {
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 .custom-marker-img {
+  left: 1px;
   width: 80px;
   height: 80px;
   display: block;
@@ -199,7 +200,7 @@ html, body {
   background: none !important;
   border: none;
   box-shadow: none;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.5px !important;
 }
 .marker-price-cheapest {
   color: #21ea00 !important;
