@@ -1,83 +1,108 @@
-body {
+html, body {
+  height: 100%;
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
   font-family: 'Roboto', Arial, sans-serif;
   background: #f5f5f5;
 }
-header .top-bar {
+#map {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100vw; height: 100vh;
+  z-index: 0;
+}
+#map-controls {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1002;
+  display: flex;
+  gap: 12px;
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.11);
+  padding: 10px 18px;
+  border-radius: 14px;
+}
+#map-controls input,
+#map-controls select {
+  font-size: 1em;
+  padding: 7px 12px;
+  border-radius: 6px;
+  border: 1px solid #b7d0ef;
+  background: #fff;
+  outline: none;
+}
+#map-controls input {
+  width: 180px;
+}
+
+.bottom-left-controls {
+  position: absolute;
+  left: 20px;
+  bottom: 20px;
+  z-index: 1003;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.bottom-left-controls button {
+  background: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  font-size: 28px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.13);
+  cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  background: #387cc2;
-  padding: 8px 16px;
-  height: 48px;
+  justify-content: center;
+  transition: background 0.15s;
 }
-#search {
-  font-size: 1em;
-  padding: 8px;
-  border-radius: 6px;
-  border: none;
-  width: 200px;
-  margin-right: 16px;
+.bottom-left-controls button:hover {
+  background: #e9f3ff;
 }
-.right-controls select {
-  font-size: 1em;
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: none;
+.leaflet-control-zoom {
+  top: 20px !important;
+  right: 20px !important;
+  left: unset !important;
+  bottom: unset !important;
+  z-index: 1002;
 }
-#tabs {
+#list-panel {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.12);
+  max-height: 70vh;
+  z-index: 2000;
+  transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+  transform: translateY(100%);
   display: flex;
-  background: #e3eafe;
-  border-bottom: 1px solid #c2d0e8;
+  flex-direction: column;
 }
-#tabs button {
-  flex: 1;
-  padding: 10px;
-  border: none;
+#list-panel.visible {
+  transform: translateY(0);
+}
+#close-list-btn {
+  align-self: flex-end;
   background: none;
-  font-size: 1em;
+  border: none;
+  font-size: 2em;
+  color: #387cc2;
+  margin: 8px 18px 0 0;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-}
-#tabs button.active {
-  background: #387cc2;
-  color: #fff;
-  font-weight: bold;
-}
-#map {
-  width: 100%;
-  height: calc(100vh - 108px); /* header+tabs+margin */
-  min-height: 300px;
-  margin: 0;
-  position: relative;
   z-index: 1;
 }
 #list {
   list-style: none;
   margin: 0;
-  padding: 0;
-  background: #fff;
-  min-height: 200px;
-}
-#list.hidden {
-  display: none;
-}
-#recenter-btn {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  z-index: 1001;
-  background: #fff;
-  border: none;
-  border-radius: 50%;
-  padding: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  color: #387cc2;
+  padding: 0 0 12px 0;
+  background: transparent;
+  overflow-y: auto;
 }
 #list li {
   padding: 12px 20px;
@@ -86,6 +111,7 @@ header .top-bar {
   align-items: center;
   gap: 12px;
   font-size: 1.05em;
+  background: #fff;
 }
 #list li.featured-station {
   background: #e6f2ff;
@@ -99,17 +125,15 @@ header .top-bar {
   object-fit: contain;
   box-shadow: 0 1px 2px rgba(0,0,0,0.07);
 }
-.list-logo {
-  margin-right: 10px;
-}
-.list-name {
-  flex: 1;
-}
+.list-logo { margin-right: 10px; }
+.list-name { flex: 1; }
 .list-price {
   font-weight: bold;
   font-family: 'Quantico', monospace;
   color: #387cc2;
 }
+
+/* Featured station (top) */
 .featured-details .featured-name {
   font-size: 1.1em;
   margin-bottom: 2px;
@@ -129,14 +153,10 @@ header .top-bar {
   font-size: 0.98em;
   margin-top: 2px;
 }
-.fuel-type {
-  color: #888;
-}
-.fuel-price {
-  color: #222;
-  font-weight: 500;
-}
-/* ------- YOUR MARKER STYLES (do NOT edit below) ------- */
+.fuel-type { color: #888; }
+.fuel-price { color: #222; font-weight: 500; }
+
+/* Your marker styles (do NOT edit below!) */
 .fuel-marker .marker-stack {
   position: relative;
   width: 80px;
