@@ -103,7 +103,7 @@
 
 .marker-brand-img {
   position: absolute;
-  top: 10px !important;      /* Center in 80x80 marker: (80-30)/2 = 25, for 30x30 image */
+  top: 30px !important;      /* Center in 80x80 marker: (80-30)/2 = 25, for 30x30 image */
   left: 25px;
   width: 30px;
   height: 30px;
@@ -131,14 +131,14 @@
   font-family: 'Quantico', sans-serif;
   text-align: center;
   font-weight: 500 !important;
-  font-size: 18px !important; /* Adjust size to fit your black box */
+  font-size: 16px !important; /* Adjust size to fit your black box */
   color: #f9f9f9 !important;  /* Or whatever color you want */
   z-index: 3;
   padding: 0;
   background: none !important;/* Ensure no background */
   border: none;     /* Ensure no border */
   box-shadow: none; /* Remove any shadow */
-  letter-spacing: 1px;
+  letter-spacing: 0.8px;
 }
 
 /* Optional: make the price label stand out for cheapest price */
