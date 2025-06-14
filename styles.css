@@ -125,8 +125,8 @@
 
 .marker-price {
   position: absolute;
-  top: 5px;        /* Adjust this value to move text vertically into your black box */
-  left: 0;
+  top: 4px !important;        /* Adjust this value to move text vertically into your black box */
+  left: 4px !important;
   width: 100%;
   font-family: 'Quantico', sans-serif;
   text-align: center;
@@ -138,7 +138,7 @@
   background: none !important;/* Ensure no background */
   border: none;     /* Ensure no border */
   box-shadow: none; /* Remove any shadow */
-  letter-spacing: 0.8px;
+  letter-spacing: 0.6px;
 }
 
 /* Optional: make the price label stand out for cheapest price */
