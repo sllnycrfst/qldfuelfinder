@@ -196,6 +196,28 @@ html, body {
   color: #21ea00 !important;
 }
 
+/* Glassmorphism (blurred glass) for Leaflet popup */
+.leaflet-popup-content-wrapper {
+  background: rgba(255,255,255,0.55) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 18px !important;
+  box-shadow: 0 4px 32px rgba(46, 54, 80, 0.18);
+  border: 1.5px solid rgba(200,200,200,0.25);
+  font-family: 'Roboto', Arial, sans-serif !important;
+}
+.leaflet-popup-content {
+  font-family: 'Roboto', Arial, sans-serif !important;
+  font-size: 1.08em;
+  color: #222;
+  background: transparent !important;
+}
+.leaflet-popup-tip {
+  background: rgba(255,255,255,0.55) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(200,200,200,0.25);
+}
 /* Glassmorphism for featured card */
 .glass-card {
   background: rgba(255, 255, 255, 0.55) !important;
@@ -216,7 +238,7 @@ html, body, #map, #map-controls, #list-panel, #list, #list *, .feature-card, .ma
 .marker-price {
   font-family: 'Roboto', Arial, sans-serif !important;
   font-size: 18px !important;
-  font-weight: 500 !important;
+  font-weight: 700 !important;
   padding: 6px 0 6px 0;
-  line-height: 1.0;
+  line-height: 1.3;
 }
