@@ -1,20 +1,73 @@
-#map {
-  position: relative;
-  width: 100%;
-  margin-top: 0px;
-  margin-bottom: 0;
-  left: 0;
-  right: 0;
-  height: calc(100vh - 60px);
-  min-height: 300px;
-  box-sizing: border-box;
+body {
+  margin: 0;
+  font-family: 'Roboto', Arial, sans-serif;
+  background: #f5f5f5;
 }
-#openFeatureBtn {
+header .top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #387cc2;
+  padding: 8px 16px;
+  height: 48px;
+}
+#search {
+  font-size: 1em;
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  width: 200px;
+  margin-right: 16px;
+}
+.right-controls select {
+  font-size: 1em;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+}
+#tabs {
+  display: flex;
+  background: #e3eafe;
+  border-bottom: 1px solid #c2d0e8;
+}
+#tabs button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: none;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+#tabs button.active {
+  background: #387cc2;
+  color: #fff;
+  font-weight: bold;
+}
+#map {
+  width: 100%;
+  height: calc(100vh - 108px); /* header+tabs+margin */
+  min-height: 300px;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+#list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  min-height: 200px;
+}
+#list.hidden {
+  display: none;
+}
+#recenter-btn {
   position: absolute;
   bottom: 20px;
   left: 20px;
-  z-index: 1001; /* Make sure this is higher than the map's z-index */
-  background-color: white;
+  z-index: 1001;
+  background: #fff;
   border: none;
   border-radius: 50%;
   padding: 12px;
@@ -24,86 +77,79 @@
   align-items: center;
   justify-content: center;
 }
-#openFeatureBtn img {
-  width: 24px;
-  height: 24px;
-  display: block;
+#recenter-btn i {
+  font-size: 22px;
+  color: #387cc2;
 }
-
-#featurePanel {
-  position: fixed;
-  bottom: -100%;
-  left: 0;
-  width: 100%;
-  max-height: 70%;
-  overflow-y: auto;
-  background: white;
-  border-radius: 20px 20px 0 0;
-  box-shadow: 0 -4px 12px rgba(0,0,0,0.2);
-  z-index: 9;
-  transition: bottom 0.3s ease;
-  padding: 16px;
-}
-
-.feature-card {
-  background: #f8f8f8;
-  padding: 16px;
-  border-radius: 16px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  font-size: 18px;
+/* List styling */
+#list li {
+  padding: 12px 20px;
+  border-bottom: 1px solid #eee;
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 16px;
+  font-size: 1.05em;
 }
-.feature-card img {
-  height: 40px;
-  width: auto;
-}
-.feature-card .price-box {
-  background: #387cc2;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 8px;
+#list li.featured-station {
+  background: #e6f2ff;
   font-weight: bold;
 }
-
-.station-card {
-  background: #f0f0f0;
-  padding: 12px;
-  margin-bottom: 10px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.station-card img {
+#list img {
   height: 32px;
-  width: auto;
+  width: 32px;
+  border-radius: 50%;
+  background: #fff;
+  object-fit: contain;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.07);
 }
-.station-info {
-  flex-grow: 1;
+.list-logo {
+  margin-right: 10px;
 }
-.station-info a {
+.list-name {
+  flex: 1;
+}
+.list-price {
+  font-weight: bold;
+  font-family: 'Quantico', monospace;
+  color: #387cc2;
+}
+.featured-details .featured-name {
+  font-size: 1.1em;
+  margin-bottom: 2px;
+}
+.featured-address a {
   color: #387cc2;
   text-decoration: none;
-  font-weight: 500;
 }
-.station-info a:hover {
+.featured-address a:hover {
   text-decoration: underline;
 }
-/* Make the marker image 80x80, brand logo below the marker image, and price label above both */
+.featured-distance {
+  color: #555;
+  font-size: 0.95em;
+}
+.featured-prices .price-row {
+  font-size: 0.98em;
+  margin-top: 2px;
+}
+.fuel-type {
+  color: #888;
+}
+.fuel-price {
+  color: #222;
+  font-weight: 500;
+}
 
+/* ------- YOUR MARKER STYLES (do NOT edit below) ------- */
 .fuel-marker .marker-stack {
   position: relative;
   width: 80px;
   height: 80px;
   display: block;
 }
-
 .marker-brand-img {
   position: absolute;
-  top: 29px !important;      /* Center in 80x80 marker: (80-30)/2 = 25, for 30x30 image */
+  top: 29px !important;
   left: 25px;
   width: 36px;
   height: 36px;
@@ -122,26 +168,23 @@
   z-index: 2;
   pointer-events: none;
 }
-
 .marker-price {
   position: absolute;
-  top: 4px !important;        /* Adjust this value to move text vertically into your black box */
+  top: 4px !important;
   left: 2px !important;
   width: 100%;
   font-family: 'Quantico', sans-serif;
   text-align: center;
   font-weight: 500 !important;
-  font-size: 12px !important; /* Adjust size to fit your black box */
-  color: #f9f9f9 !important;  /* Or whatever color you want */
+  font-size: 12px !important;
+  color: #f9f9f9 !important;
   z-index: 3;
   padding: 0;
-  background: none !important;/* Ensure no background */
-  border: none;     /* Ensure no border */
-  box-shadow: none; /* Remove any shadow */
+  background: none !important;
+  border: none;
+  box-shadow: none;
   letter-spacing: 0.6px;
 }
-
-/* Optional: make the price label stand out for cheapest price */
 .marker-price-cheapest {
   color: #21ea00 !important;
 }
