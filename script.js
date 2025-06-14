@@ -33,16 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }).addTo(map);
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-    // Marker Cluster with custom cluster icon
-    const markerLayer = L.markerClusterGroup({
-      iconCreateFunction: function(cluster) {
-        return L.divIcon({
-          html: `<img src="images/clustericon.png" style="width:40px;height:40px;" /><span class="cluster-count" style="position:absolute;top:8px;left:0;width:40px;text-align:center;font-weight:bold;color:#222;font-size:15px;pointer-events:none;">${cluster.getChildCount()}</span>`,
-          className: 'custom-cluster-icon',
-          iconSize: [40, 40]
-        });
-      }
     });
     map.addLayer(markerLayer);
 
