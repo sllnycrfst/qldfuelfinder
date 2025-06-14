@@ -103,7 +103,7 @@
 
 .marker-brand-img {
   position: absolute;
-  top: 25px;      /* Center in 80x80 marker: (80-30)/2 = 25, for 30x30 image */
+  top: 22px;      /* Center in 80x80 marker: (80-30)/2 = 25, for 30x30 image */
   left: 25px;
   width: 30px;
   height: 30px;
@@ -125,14 +125,14 @@
 
 .marker-price {
   position: absolute;
-  bottom: 32px;
+  top: 22px;
   left: 0;
   width: 100%;
   font-family: quantico;
   text-align: center;
   font-weight: 500;
-  font-size: 14px;
-  color: #eee;
+  font-size: 12px;
+  color: #ff;
   border-radius: 7px;
   z-index: 3;
   padding: 2px 0;
