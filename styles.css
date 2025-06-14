@@ -166,7 +166,7 @@ html, body {
 .marker-brand-img {
   position: absolute;
   top: 29px !important;
-  left: 25px;
+  left: 27px;
   width: 36px;
   height: 36px;
   z-index: 1;
@@ -177,7 +177,6 @@ html, body {
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 .custom-marker-img {
-  left: 8px;
   width: 80px;
   height: 80px;
   display: block;
