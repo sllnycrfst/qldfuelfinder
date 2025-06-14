@@ -37,7 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function startApp(center) {
     map = L.map("map", { zoomControl: true, attributionControl: false }).setView(center, defaultZoom);
-    // Move zoom control to top right
     map.zoomControl.setPosition("topright");
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a> | &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -157,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="marker-stack" style="position:relative;width:80px;height:80px;">
             <img src="images/${s.brand}.png" class="marker-brand-img" style="position:absolute;top:25px;left:25px;width:30px;height:30px;z-index:1;opacity:0.85;pointer-events:none;" onerror="this.onerror=null;this.src='images/default.png';"/>
             <img src="images/mymarker.png" class="custom-marker-img" style="width:80px;height:80px;position:relative;z-index:2;pointer-events:none;"/>
-            <div class="${priceClass}" style="position:absolute;bottom:2px;left:0;width:100%;text-align:center;font-weight:bold;font-size:14px;color:#222;background:rgba(255,255,255,0.85);border-radius:7px;padding:2px 0;">
+            <div class="${priceClass}" style="position:absolute;bottom:2px;left:0;width:100%;text-align:center;font-weight:bold;font-size:18px;font-family:'Roboto',Arial,sans-serif!important;color:#222;background:rgba(255,255,255,0.85);border-radius:7px;padding:6px 0;">
               ${s.price.toFixed(1)}
             </div>
           </div>
@@ -174,20 +173,13 @@ document.addEventListener("DOMContentLoaded", () => {
         price: s.price
       });
 
+      // Marker click triggers list panel slide up, featuring this station
       marker.on("click", () => {
         forcedFeaturedSiteId = s.siteId;
-        // Show the list panel
         listPanel.classList.add("visible");
         listPanel.classList.remove("hidden");
         updateStationList();
       });
-
-      marker.bindPopup(`
-        <div style="font-family:'Roboto',Arial,sans-serif;font-size:1.1em;">
-          <span style="font-weight:700;">${s.name}</span><br>
-          <span>${s.address}</span>
-        </div>
-      `);
 
       markerLayer.addLayer(marker);
     });
@@ -251,7 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     let featuredHTML = `
-      <li class="featured-station">
+      <li class="featured-station glass-card" id="featured-station">
         <div class="featured-img">
           <img src="images/${featured.brand || 'default'}.png" alt="${featured.name}" 
                onerror="this.onerror=null;this.src='images/default.png';" />
@@ -288,6 +280,14 @@ document.addEventListener("DOMContentLoaded", () => {
     `).join('');
 
     listUl.innerHTML = featuredHTML + othersHTML;
+
+    // AUTOSCROLL the featured element into view if the panel is open
+    if (listPanel && listPanel.classList.contains("visible")) {
+      setTimeout(() => {
+        const featuredEl = document.getElementById("featured-station");
+        if (featuredEl) featuredEl.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 10);
+    }
   }
 
   // Recenter button
