@@ -125,14 +125,14 @@
 
 .marker-price {
   position: absolute;
-  bottom: 2px;
+  bottom: 32px;
   left: 0;
   width: 100%;
   font-family: quantico;
   text-align: center;
   font-weight: 500;
   font-size: 14px;
-  color: #222;
+  color: #eee;
   border-radius: 7px;
   z-index: 3;
   padding: 2px 0;
