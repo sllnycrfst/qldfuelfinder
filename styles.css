@@ -135,17 +135,15 @@
   color: #f9f9f9;  /* Or whatever color you want */
   z-index: 3;
   padding: 0;
-  background: none; /* Ensure no background */
+  background: none !important;/* Ensure no background */
   border: none;     /* Ensure no border */
   box-shadow: none; /* Remove any shadow */
   letter-spacing: 1px;
-  text-shadow: 0 1px 2px #000, 0 -1px 2px #000; /* Optional, for glow against dark bg */
 }
 
 /* Optional: make the price label stand out for cheapest price */
 .marker-price-cheapest {
   color: #21ea00;
-  text-shadow: 0 1px 2px #000, 0 -1px 2px #000;
 }
 
 /* Cluster icon styles (for your custom cluster icon) */
