@@ -35,8 +35,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    const markerLayer = L.markerClusterGroup();
+    // --- CUSTOM CLUSTER ICON ---
+    const markerLayer = L.markerClusterGroup({
+      iconCreateFunction: function(cluster) {
+        return L.divIcon({
+          html: `<img src="images/clustericon.png" style="width:40px;height:40px;" /> <span class="cluster-count">${cluster.getChildCount()}</span>`,
+          className: 'custom-cluster-icon',
+          iconSize: [40, 40]
+        });
+      }
+    });
     map.addLayer(markerLayer);
+
     const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3, "Premium Diesel": 10 }; // LPG and E85 excluded intentionally
     let currentFuel = "91";
     let allSites = [];
@@ -166,7 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
               <div style="position:absolute;top:6px;left:6px;width:26px;height:26px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;">
                 <img src="images/${s.brand}.png" class="marker-brand-img" style="width:20px;height:20px;" onerror="this.style.display='none';"/>
             </div>
-            <div class="${priceClass}" style="position:absolute;bottom:3px;left:0;width:100%;text-align:center;font-weight:bold;font-size:14px;color:#222;background:rgba(255,255,255,0.85);border-radius:7px;">
+            <div class="${priceClass}" style="position:absolute;bottom:3px;left:0;width:100%;text-align:center;font-weight:bold;font-size:14px;color:#222;background:rgba(255,255,255,0.85);border-radiu[...]
               ${s.price.toFixed(1)}
             </div>
           </div>
