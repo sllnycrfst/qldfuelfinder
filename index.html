@@ -12,32 +12,32 @@
   <link rel="icon" type="image/png" href="images/favicon.png">
 </head>
 <body>
-  <header>
-    <div class="top-bar">
-      <input type="text" id="search" placeholder="Search by Postcode or Suburb" />
-      <div class="right-controls">
-        <select id="fuel-select">
-          <option value="E10">E10</option>
-          <option value="91">Unleaded 91</option>
-          <option value="95">Premium 95</option>
-          <option value="98">Premium 98</option>
-          <option value="Diesel">Diesel</option>
-          <option value="Premium Diesel">Premium Diesel</option>
-        </select>
-      </div>
-    </div>
-  </header>
-  <main>
-    <div id="tabs">
-      <button id="map-tab" class="active">Map</button>
-      <button id="list-tab">List</button>
-    </div>
-    <div id="map"></div>
-    <button id="recenter-btn" title="Go to my location">
-      <span>📍</span>
-    </button>
-    <ul id="list" class="hidden"></ul>
-  </main>
+  <!-- Floating controls -->
+  <div id="map-controls">
+    <input type="text" id="search" placeholder="Search suburb or station..." autocomplete="off" />
+    <select id="fuel-select">
+      <option value="E10">E10</option>
+      <option value="91">Unleaded 91</option>
+      <option value="95">Premium 95</option>
+      <option value="98">Premium 98</option>
+      <option value="Diesel">Diesel</option>
+      <option value="Premium Diesel">Premium Diesel</option>
+    </select>
+  </div>
+
+  <div id="map"></div>
+
+  <div class="bottom-left-controls">
+    <button id="recenter-btn" title="Go to my location">📍</button>
+    <button id="list-btn" title="Show station list">☰</button>
+  </div>
+
+  <!-- Slide-up list panel -->
+  <div id="list-panel" class="hidden">
+    <button id="close-list-btn" title="Close list">&times;</button>
+    <ul id="list"></ul>
+  </div>
+
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="script.js"></script>
 </body>
