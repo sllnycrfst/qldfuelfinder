@@ -6,6 +6,7 @@ html, body {
   font-family: 'Roboto', Arial, sans-serif !important;
   background: #f5f5f5;
 }
+
 #map {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -13,6 +14,7 @@ html, body {
   z-index: 0;
   font-family: 'Roboto', Arial, sans-serif !important;
 }
+
 #map-controls {
   position: absolute;
   top: 20px;
@@ -27,6 +29,7 @@ html, body {
   border-radius: 14px;
   font-family: 'Roboto', Arial, sans-serif !important;
 }
+
 #map-controls input,
 #map-controls select {
   font-size: 1em;
@@ -37,12 +40,57 @@ html, body {
   outline: none;
   font-family: 'Roboto', Arial, sans-serif !important;
 }
+
 #map-controls input {
   width: 180px;
 }
 
 .list-btn, .recenter-btn {
   font-family: 'Roboto', Arial, sans-serif !important;
+}
+
+.list-btn {
+  position: absolute;
+  left: 20px;
+  bottom: 20px;
+  z-index: 1003;
+  background: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  font-size: 28px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.13);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.list-btn:hover {
+  background: #e9f3ff;
+}
+
+.recenter-btn {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  z-index: 1003;
+  background: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  font-size: 28px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.13);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.recenter-btn:hover {
+  background: #e9f3ff;
 }
 
 .leaflet-control-zoom {
@@ -53,12 +101,13 @@ html, body {
   z-index: 1002;
   font-family: 'Roboto', Arial, sans-serif !important;
 }
+
 #list-panel {
   position: fixed;
   left: 0; right: 0; bottom: 0;
   background: #fff;
   border-radius: 20px 20px 0 0;
-  box-shadow: 0 -4px 24px rgba(0,0,0,0.12);
+  box-shadow: 0 -4px 24px rgba(46,54,80,0.12);
   max-height: 70vh;
   z-index: 2000;
   transition: transform 0.3s cubic-bezier(.4,0,.2,1);
@@ -103,8 +152,10 @@ html, body {
   font-family: 'Roboto', Arial, sans-serif !important;
 }
 #list li.featured-station {
-  background: #e6f2ff;
+  background: none;
   font-weight: bold;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 #list img {
   height: 32px;
@@ -146,7 +197,23 @@ html, body {
 .fuel-type { color: #888; }
 .fuel-price { color: #222; font-weight: 500; font-family: 'Roboto', Arial, sans-serif !important; }
 
-/* Your marker styles (Roboto applied) */
+/* Glassmorphism for featured card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.55) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 20px !important;
+  box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
+  border: 1.5px solid rgba(200,200,200,0.20);
+  font-family: 'Roboto', Arial, sans-serif !important;
+}
+
+/* All fonts Roboto for any missed elements */
+html, body, #map, #map-controls, #list-panel, #list, #list *, .feature-card, .marker-price, .leaflet-control-zoom, .list-btn, .recenter-btn {
+  font-family: 'Roboto', Arial, sans-serif !important;
+}
+
+/* Marker styles */
 .fuel-marker .marker-stack {
   position: relative;
   width: 80px;
@@ -187,6 +254,7 @@ html, body {
   color: #f9f9f9 !important;
   z-index: 3;
   padding: 6px 0 6px 0;
+  line-height: 1.3;
   background: none !important;
   border: none;
   box-shadow: none;
@@ -194,51 +262,4 @@ html, body {
 }
 .marker-price-cheapest {
   color: #21ea00 !important;
-}
-
-/* Glassmorphism (blurred glass) for Leaflet popup */
-.leaflet-popup-content-wrapper {
-  background: rgba(255,255,255,0.55) !important;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 18px !important;
-  box-shadow: 0 4px 32px rgba(46, 54, 80, 0.18);
-  border: 1.5px solid rgba(200,200,200,0.25);
-  font-family: 'Roboto', Arial, sans-serif !important;
-}
-.leaflet-popup-content {
-  font-family: 'Roboto', Arial, sans-serif !important;
-  font-size: 1.08em;
-  color: #222;
-  background: transparent !important;
-}
-.leaflet-popup-tip {
-  background: rgba(255,255,255,0.55) !important;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1.5px solid rgba(200,200,200,0.25);
-}
-/* Glassmorphism for featured card */
-.glass-card {
-  background: rgba(255, 255, 255, 0.55) !important;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: 20px !important;
-  box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
-  border: 1.5px solid rgba(200,200,200,0.20);
-  font-family: 'Roboto', Arial, sans-serif !important;
-}
-
-/* All fonts Roboto */
-html, body, #map, #map-controls, #list-panel, #list, #list *, .feature-card, .marker-price, .leaflet-control-zoom, .list-btn, .recenter-btn {
-  font-family: 'Roboto', Arial, sans-serif !important;
-}
-
-/* Make marker price text bigger/taller and Roboto */
-.marker-price {
-  font-family: 'Roboto', Arial, sans-serif !important;
-  font-size: 18px !important;
-  font-weight: 700 !important;
-  padding: 6px 0 6px 0;
-  line-height: 1.3;
 }
