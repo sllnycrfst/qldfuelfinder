@@ -172,7 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
           className: "fuel-marker",
           html: `
             <div class="marker-stack" style="position:relative;width:38px;height:48px;">
-              <img src="images/my-new-marker8.png" class="custom-marker-img" style="width:38px;height:48px;"/>
+              <img src="images/mymarker.png" class="custom-marker-img" style="width:38px;height:48px;"/>
               <div style="position:absolute;top:6px;left:6px;width:26px;height:26px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;">
                 <img src="images/${s.brand}.png" class="marker-brand-img" style="width:20px;height:20px;" onerror="this.style.display='none';"/>
             </div>
