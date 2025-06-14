@@ -22,9 +22,25 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   cursor: pointer;
 }
+#openFeatureBtn {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1001; /* Make sure this is higher than the map's z-index */
+  background-color: white;
+  border: none;
+  border-radius: 50%;
+  padding: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 #openFeatureBtn img {
   width: 24px;
   height: 24px;
+  display: block;
 }
 
 #featurePanel {
