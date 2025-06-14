@@ -1,36 +1,23 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Tab setup
-  const mapTab = document.getElementById("map-tab");
-  const listTab = document.getElementById("list-tab");
-  const mapDiv = document.getElementById("map");
+  // UI controls
+  const recenterBtn = document.getElementById("recenter-btn");
+  const listBtn = document.getElementById("list-btn");
+  const listPanel = document.getElementById("list-panel");
+  const closeListBtn = document.getElementById("close-list-btn");
   const listUl = document.getElementById("list");
+  const searchInput = document.getElementById("search");
+  const fuelSelect = document.getElementById("fuel-select");
 
-  if (mapTab && listTab && mapDiv && listUl) {
-    mapTab.addEventListener("click", () => {
-      mapTab.classList.add("active");
-      listTab.classList.remove("active");
-      mapDiv.style.display = "";
-      listUl.classList.add("hidden");
-    });
-    listTab.addEventListener("click", () => {
-      listTab.classList.add("active");
-      mapTab.classList.remove("active");
-      mapDiv.style.display = "none";
-      listUl.classList.remove("hidden");
-    });
-  }
-
+  let map, markerLayer, userMarker;
   const defaultCenter = [-27.4698, 153.0251];
   const defaultZoom = 14;
-  let userMarker = null;
-  let map, markerLayer;
+
   const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3, "Premium Diesel": 10 };
   let currentFuel = "91";
   let allSites = [];
   let allPrices = [];
   let priceMap = {};
 
-  // Banned stations
   const bannedStations = [
     "BARA FUELS FOREST HILL", "Sommer Petroleum", "Wandoan Fuels", "Karumba Point Service Station",
     "Cam's Corner Servo & Mini Mart", "CEQ Kowanyama Supermarket", "Coen Store", "Aurukun Bowsers",
@@ -46,15 +33,14 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   function startApp(center) {
-    map = L.map("map", { zoomControl: false, attributionControl: false }).setView(center, defaultZoom);
-
+    map = L.map("map", { zoomControl: true, attributionControl: false }).setView(center, defaultZoom);
+    // Move zoom control to top right
+    map.zoomControl.setPosition("topright");
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a> | &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
       subdomains: 'abcd',
       maxZoom: 16
     }).addTo(map);
-
-    L.control.zoom({ position: 'bottomright' }).addTo(map);
 
     markerLayer = L.layerGroup();
     map.addLayer(markerLayer);
@@ -113,19 +99,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       updateVisibleStations();
       updateStationList();
-
-      const searchEl = document.getElementById("search");
-      if (searchEl) {
-        searchEl.addEventListener("input", function (e) {
-          const query = e.target.value.toLowerCase().trim();
-          if (query.length < 2) return;
-          const match = allSites.find(s =>
-            (s.P && s.P.toLowerCase().includes(query)) ||
-            (s.N && s.N.toLowerCase().includes(query))
-          );
-          if (match && map) map.setView([match.Lat, match.Lng], 15);
-        });
-      }
     } catch (err) {
       console.error("Failed to fetch site/price data:", err);
     }
@@ -209,10 +182,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function updateStationList() {
-    const listDiv = document.getElementById("list");
-    if (!listDiv) return;
+    if (!listUl) return;
     if (!allSites.length || !allPrices.length) {
-      listDiv.innerHTML = "<li>Loading…</li>";
+      listUl.innerHTML = "<li>Loading…</li>";
       return;
     }
 
@@ -248,7 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .sort((a, b) => a.rawPrice - b.rawPrice);
 
     if (stations.length === 0) {
-      listDiv.innerHTML = "<li>No stations found for this fuel type.</li>";
+      listUl.innerHTML = "<li>No stations found for this fuel type.</li>";
       return;
     }
 
@@ -292,24 +264,39 @@ document.addEventListener("DOMContentLoaded", () => {
       </li>
     `).join('');
 
-    listDiv.innerHTML = featuredHTML + othersHTML;
+    listUl.innerHTML = featuredHTML + othersHTML;
   }
 
   // Recenter button
-  const recenterBtn = document.getElementById("recenter-btn");
-  if (recenterBtn) {
-    recenterBtn.addEventListener("click", () => showUserLocation(true));
-  }
+  recenterBtn && recenterBtn.addEventListener("click", () => showUserLocation(true));
+
+  // List button open/close
+  listBtn && listBtn.addEventListener("click", () => {
+    listPanel.classList.add("visible");
+    listPanel.classList.remove("hidden");
+  });
+  closeListBtn && closeListBtn.addEventListener("click", () => {
+    listPanel.classList.remove("visible");
+    listPanel.classList.add("hidden");
+  });
 
   // Fuel selector
-  const fuelSelect = document.getElementById("fuel-select");
-  if (fuelSelect) {
-    fuelSelect.addEventListener("change", e => {
-      currentFuel = e.target.value;
-      updateVisibleStations();
-      updateStationList();
-    });
-  }
+  fuelSelect && fuelSelect.addEventListener("change", e => {
+    currentFuel = e.target.value;
+    updateVisibleStations();
+    updateStationList();
+  });
+
+  // Search suburb/station
+  searchInput && searchInput.addEventListener("input", function (e) {
+    const query = e.target.value.toLowerCase().trim();
+    if (query.length < 2) return;
+    const match = allSites.find(s =>
+      (s.P && s.P.toLowerCase().includes(query)) ||
+      (s.N && s.N.toLowerCase().includes(query))
+    );
+    if (match && map) map.setView([match.Lat, match.Lng], 15);
+  });
 
   // Start app with user location if possible
   if (navigator.geolocation) {
