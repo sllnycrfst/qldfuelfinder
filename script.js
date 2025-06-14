@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    markerLayer = L.markerClusterGroup ? L.markerClusterGroup() : L.layerGroup();
+    markerLayer = L.layerGroup();
     map.addLayer(markerLayer);
 
     showUserLocation(false);
