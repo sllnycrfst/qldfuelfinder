@@ -83,7 +83,7 @@ html, body {
 }
 
 .leaflet-control-zoom {
-  top: 20px !important;
+  top: 40px !important;
   right: 20px !important;
   left: unset !important;
   bottom: unset !important;
@@ -161,6 +161,7 @@ html, body {
 }
 .featured-address a {
   color: #387cc2;
+  font-size: 0.9em;
   text-decoration: none;
 }
 .featured-address a:hover {
@@ -191,7 +192,7 @@ html, body {
   width: 36px;
   height: 36px;
   z-index: 1;
-  opacity: 0.95;
+  opacity: 1;
   pointer-events: none;
   border-radius: 50%;
   background: #fff;
@@ -212,7 +213,7 @@ html, body {
   width: 100%;
   font-family: 'Quantico', sans-serif;
   text-align: center;
-  font-weight: 500 !important;
+  font-weight: 700 !important;
   font-size: 12px !important;
   color: #f9f9f9 !important;
   z-index: 3;
