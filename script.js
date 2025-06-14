@@ -163,7 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const priceClass = isCheapest ? "marker-price marker-price-cheapest" : "marker-price";
 
         const html = `
-          <img src="images/my-new-marker8.png" class="custom-marker-img" />
+          <img src="images/mymarker.png" class="custom-marker-img" />
           <img src="images/${s.brand}.png" class="marker-brand-img" onerror="this.style.display='none';" />
           <div class="${priceClass}">${s.price.toFixed(1)}</div>
         `;
