@@ -18,6 +18,9 @@ document.addEventListener("DOMContentLoaded", () => {
   let allPrices = [];
   let priceMap = {};
 
+  // This will store the SiteId (s.S) of the marker that should be featured
+  let forcedFeaturedSiteId = null;
+
   const bannedStations = [
     "BARA FUELS FOREST HILL", "Sommer Petroleum", "Wandoan Fuels", "Karumba Point Service Station",
     "Cam's Corner Servo & Mini Mart", "CEQ Kowanyama Supermarket", "Coen Store", "Aurukun Bowsers",
@@ -134,6 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
             suburb: site.P,
             lat: site.Lat,
             lng: site.Lng,
+            siteId: site.S,
           };
         }
         return null;
@@ -170,6 +174,14 @@ document.addEventListener("DOMContentLoaded", () => {
         price: s.price
       });
 
+      marker.on("click", () => {
+        forcedFeaturedSiteId = s.siteId;
+        // Show the list panel
+        listPanel.classList.add("visible");
+        listPanel.classList.remove("hidden");
+        updateStationList();
+      });
+
       marker.bindPopup(`
         <div style="font-family:'Roboto',Arial,sans-serif;font-size:1.1em;">
           <span style="font-weight:700;">${s.name}</span><br>
@@ -196,7 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const bounds = map.getBounds();
-    const stations = allSites
+    let stations = allSites
       .map(site => {
         const price = priceMap[site.S]?.[fuelIdMap[currentFuel]];
         if (price && bounds.contains([site.Lat, site.Lng])) {
@@ -211,7 +223,8 @@ document.addEventListener("DOMContentLoaded", () => {
             suburb: site.P,
             lat: site.Lat,
             lng: site.Lng,
-            distance: userLat != null ? getDistance(userLat, userLng, site.Lat, site.Lng) : null
+            distance: userLat != null ? getDistance(userLat, userLng, site.Lat, site.Lng) : null,
+            siteId: site.S,
           };
         }
         return null;
@@ -224,8 +237,18 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const featured = stations[0];
-    const others = stations.slice(1);
+    // FEATURED logic: if forcedFeaturedSiteId is set and visible, use that as featured
+    let featured, others;
+    if (
+      forcedFeaturedSiteId &&
+      stations.some(s => s.siteId === forcedFeaturedSiteId)
+    ) {
+      featured = stations.find(s => s.siteId === forcedFeaturedSiteId);
+      others = stations.filter(s => s.siteId !== forcedFeaturedSiteId);
+    } else {
+      featured = stations[0];
+      others = stations.slice(1);
+    }
 
     let featuredHTML = `
       <li class="featured-station">
@@ -272,17 +295,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // List button open/close
   listBtn && listBtn.addEventListener("click", () => {
+    forcedFeaturedSiteId = null;
     listPanel.classList.add("visible");
     listPanel.classList.remove("hidden");
+    updateStationList();
   });
   closeListBtn && closeListBtn.addEventListener("click", () => {
     listPanel.classList.remove("visible");
     listPanel.classList.add("hidden");
+    forcedFeaturedSiteId = null;
   });
 
   // Fuel selector
   fuelSelect && fuelSelect.addEventListener("change", e => {
     currentFuel = e.target.value;
+    forcedFeaturedSiteId = null;
     updateVisibleStations();
     updateStationList();
   });
