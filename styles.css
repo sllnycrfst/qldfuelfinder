@@ -125,14 +125,14 @@
 
 .marker-price {
   position: absolute;
-  top: 7px;        /* Adjust this value to move text vertically into your black box */
+  top: 5px;        /* Adjust this value to move text vertically into your black box */
   left: 0;
   width: 100%;
   font-family: 'Quantico', sans-serif;
   text-align: center;
-  font-weight: 700;
-  font-size: 20px; /* Adjust size to fit your black box */
-  color: #f9f9f9;  /* Or whatever color you want */
+  font-weight: 500 !important;
+  font-size: 18px; /* Adjust size to fit your black box */
+  color: #f9f9f9 !important;  /* Or whatever color you want */
   z-index: 3;
   padding: 0;
   background: none !important;/* Ensure no background */
