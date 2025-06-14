@@ -1,4 +1,3 @@
-// Optimized script.js with price lookup caching + fixed user location handling + filtered brands + fuel types
 document.addEventListener("DOMContentLoaded", () => {
   const mapTab = document.getElementById("map-tab");
   const listTab = document.getElementById("list-tab");
@@ -35,11 +34,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // --- CUSTOM CLUSTER ICON ---
+    // Marker Cluster with custom cluster icon
     const markerLayer = L.markerClusterGroup({
       iconCreateFunction: function(cluster) {
         return L.divIcon({
-          html: `<img src="images/clustericon.png" style="width:40px;height:40px;" /> <span class="cluster-count">${cluster.getChildCount()}</span>`,
+          html: `<img src="images/clustericon.png" style="width:40px;height:40px;" /><span class="cluster-count" style="position:absolute;top:8px;left:0;width:40px;text-align:center;font-weight:bold;color:#222;font-size:15px;pointer-events:none;">${cluster.getChildCount()}</span>`,
           className: 'custom-cluster-icon',
           iconSize: [40, 40]
         });
@@ -47,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     map.addLayer(markerLayer);
 
-    const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3, "Premium Diesel": 10 }; // LPG and E85 excluded intentionally
+    const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3, "Premium Diesel": 10 };
     let currentFuel = "91";
     let allSites = [];
     let allPrices = [];
@@ -162,29 +161,22 @@ document.addEventListener("DOMContentLoaded", () => {
         const isCheapest = minPrice !== null && s.rawPrice === minPrice;
         const priceClass = isCheapest ? "marker-price marker-price-cheapest" : "marker-price";
 
-        const html = `
-          <img src="images/mymarker.png" class="custom-marker-img" />
-          <img src="images/${s.brand}.png" class="marker-brand-img" onerror="this.style.display='none';" />
-          <div class="${priceClass}">${s.price.toFixed(1)}</div>
-        `;
-
+        // BRAND IMAGE IS UNDER MARKER IMAGE
         const icon = L.divIcon({
           className: "fuel-marker",
           html: `
-            <div class="marker-stack" style="position:relative;width:38px;height:48px;">
-              <img src="images/mymarker.png" class="custom-marker-img" style="width:38px;height:48px;"/>
-              <div style="position:absolute;top:6px;left:6px;width:26px;height:26px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;">
-                <img src="images/${s.brand}.png" class="marker-brand-img" style="width:20px;height:20px;" onerror="this.style.display='none';"/>
+            <div class="marker-stack" style="position:relative;width:80px;height:80px;">
+              <img src="images/${s.brand}.png" class="marker-brand-img" style="position:absolute;top:25px;left:25px;width:30px;height:30px;z-index:1;opacity:0.85;pointer-events:none;" onerror="this.style.display='none';"/>
+              <img src="images/mymarker.png" class="custom-marker-img" style="width:80px;height:80px;position:relative;z-index:2;pointer-events:none;"/>
+              <div class="${priceClass}" style="position:absolute;bottom:2px;left:0;width:100%;text-align:center;font-weight:bold;font-size:14px;color:#222;background:rgba(255,255,255,0.85);border-radius:7px;z-index:3;">
+                ${s.price.toFixed(1)}
+              </div>
             </div>
-            <div class="${priceClass}" style="position:absolute;bottom:3px;left:0;width:100%;text-align:center;font-weight:bold;font-size:14px;color:#222;background:rgba(255,255,255,0.85);border-radiu[...]
-              ${s.price.toFixed(1)}
-            </div>
-          </div>
-        `,
-      iconSize: [58, 58],
-      iconAnchor: [29, 58],
-      popupAnchor: [0, -58]
-      });
+          `,
+          iconSize: [80, 80],
+          iconAnchor: [40, 80],
+          popupAnchor: [0, -80]
+        });
 
         const marker = L.marker([s.lat, s.lng], {
           icon,
