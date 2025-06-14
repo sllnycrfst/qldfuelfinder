@@ -244,13 +244,13 @@ html, body, #map, #map-controls, #list-panel, #list, #list *, .feature-card, .ma
 }
 .marker-price {
   position: absolute;
-  top: 4px !important;
+  top: 2px !important;
   left: 2px !important;
   width: 100%;
   font-family: 'Roboto', Arial, sans-serif !important;
   text-align: center;
-  font-weight: 700 !important;
-  font-size: 18px !important;
+  font-weight: 500 !important;
+  font-size: 16px !important;
   color: #f9f9f9 !important;
   z-index: 3;
   padding: 6px 0 6px 0;
