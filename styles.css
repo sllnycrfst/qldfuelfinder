@@ -233,7 +233,8 @@ html, body {
 
 .featurestation-img {
   flex: 0 0 50%;
-  width: 35%;
+  transform: scale(0.7);
+  transform-origin: left center;
   max-width: 200px !important;
   min-width: 100px !important;
   height: 100%;
