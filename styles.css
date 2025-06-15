@@ -181,11 +181,10 @@ html, body {
 }
 
 .featurestation-image-wrap {
-  flex: 0 1 100%;
   display: flex;
   align-items: stretch;
   background: #f5f5f5;
-  border-radius: 12% !important;
+  border-radius: 18% !important;
   min-height: 120px;
   max-width: 260px;
   width: 100%;
