@@ -31,7 +31,7 @@ html, body {
   border-radius: 0;
   font-family: 'Roboto', Arial, sans-serif !important;
   width: 100%;
-  max-width: 540px;
+  max-width: 400px;
   margin: 0 auto;
 }
 
@@ -76,8 +76,8 @@ html, body {
   -webkit-backdrop-filter: blur(10px);
   color: #387cc2 !important;
   margin-left: 10px;
-  min-width: 120px;
-  max-width: 170px;
+  min-width: 100px;
+  max-width: 160px;
 }
 
 #search:focus,
@@ -95,7 +95,7 @@ html, body {
 .marker-brand-img {
   position: absolute;
   top: 29px !important;
-  left: 25px;
+  left: 25px !important;
   width: 35px !important;
   height: 35px !important;
   z-index: 1;
