@@ -31,7 +31,6 @@ html, body {
   font-family: 'Roboto', Arial, sans-serif !important;
 }
 
-/* Each input/select is a standalone glass pill, no border */
 #map-controls input,
 #map-controls select {
   font-size: 1em;
@@ -109,7 +108,6 @@ html, body {
   background: rgba(232, 247, 255, 0.8) !important;
 }
 
-/* Restore your original zoom control styling and position */
 .leaflet-control-zoom {
   top: 20px !important;
   right: 20px !important;
@@ -176,8 +174,10 @@ html, body {
   align-items: stretch;
   width: 100%;
   min-height: 170px;
+  padding: 0;
 }
 
+/* Left half: the image area */
 .featurestation-image-wrap {
   flex: 0 0 50%;
   max-width: 50%;
@@ -185,40 +185,47 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* For extra vertical centering if needed */
   padding: 24px 0 24px 24px;
   box-sizing: border-box;
 }
+
+/* The white box for the station image and logo */
 .featurestation-sign-wrap {
   position: relative;
-  width: 100%;
-  /* maintain aspect ratio, or set an explicit height if you want */
-  aspect-ratio: 1.5/1;
-  border-radius: 18px;
+  width: 95%;
+  aspect-ratio: 1.55/1;
+  border-radius: 26px;
   overflow: hidden;
-  box-shadow: 0 4px 24px rgba(46,54,80,0.13);
   background: #fff;
+  box-shadow: 0 2px 10px rgba(46,54,80,0.08);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+/* The petrol station image fits nicely in the sign box */
 .featurestation-img {
-  width: 100%;
-  height: auto;
-  display: block;
-  border-radius: 18px;
+  position: absolute;
+  left: 10%;
+  top: 50%;
+  width: 52%;
+  height: 62%;
   object-fit: cover;
+  border-radius: 10px;
+  transform: translateY(-50%);
+  box-shadow: 0 2px 8px rgba(46,54,80,0.08);
+  background: #fff;
+  z-index: 1;
 }
 
-/* This positions and warps the logo over the sign (tweak as needed) */
+/* The station brand logo sits on the sign, angled */
 .featurestation-logo-on-sign {
   position: absolute;
-  left: 58.5%;
-  top: 18px;
-  width: 32px;
-  height: 32px;
-  border-radius: 7px;
+  right: 10%;
+  top: 13%;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
   transform: rotate(-14deg) skewY(-17deg) skewX(-8deg) scale(1.05, 0.78);
   box-shadow: 0 2px 8px rgba(46,54,80,0.08);
   background: #fff;
@@ -227,6 +234,8 @@ html, body {
   z-index: 2;
   pointer-events: none;
 }
+
+/* Right half: details */
 .featured-details {
   flex: 1 1 0;
   min-width: 0;
@@ -328,7 +337,7 @@ html, body, #map, #map-controls, #list-panel, #list, #list *, .feature-card, .ma
 .marker-brand-img {
   position: absolute;
   top: 29px !important;
-  left: 26px;
+  left: 25px;
   width: 36px;
   height: 36px;
   z-index: 1;
@@ -353,7 +362,7 @@ html, body, #map, #map-controls, #list-panel, #list, #list *, .feature-card, .ma
   width: 100%;
   font-family: 'Roboto', Arial, sans-serif !important;
   text-align: center;
-  font-weight: 500 !important;
+  font-weight: 600 !important;
   font-size: 14px !important;
   color: #f9f9f9 !important;
   z-index: 3;
@@ -362,7 +371,7 @@ html, body, #map, #map-controls, #list-panel, #list, #list *, .feature-card, .ma
   background: none !important;
   border: none;
   box-shadow: none;
-  letter-spacing: 0.8px !important;
+  letter-spacing: 0.6px;
 }
 .marker-price-cheapest {
   color: #21ea00 !important;
