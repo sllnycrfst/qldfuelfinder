@@ -155,7 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
         className: "fuel-marker",
         html: `
           <div class="marker-stack" style="position:relative;width:80px;height:80px;">
-            <img src="images/${s.brand}.png" class="marker-brand-img" style="position:absolute;top:25px;left:25px;width:30px;height:30px;z-index:1;opacity:0.85;pointer-events:none;" onerror="this.onerror=null;this.src='images/default.png';"/>
+            <img src="images/${s.brand ? s.brand : 'default'}.png" class="marker-brand-img" style="position:absolute;top:25px;left:25px;width:30px;height:30px;z-index:1;opacity:0.85;pointer-events:none;" onerror="this.onerror=null;this.src='images/default.png';"/>
             <img src="images/mymarker.png" class="custom-marker-img" style="width:80px;height:80px;position:relative;z-index:2;pointer-events:none;"/>
             <div class="${priceClass}" style="position:absolute;bottom:2px;left:0;width:100%;text-align:center;font-weight:bold;font-size:18px;font-family:'Roboto',Arial,sans-serif!important;color:#2296f3;">
               ${s.price.toFixed(1)}
@@ -167,21 +167,19 @@ document.addEventListener("DOMContentLoaded", () => {
         popupAnchor: [0, -80]
       });
 
-      const marker = L.marker([s.lat, s.lng], {
-        icon,
-        zIndexOffset: isCheapest ? 1000 : 0,
-        rawPrice: s.rawPrice,
-        price: s.price
-      });
-
-      marker.on("click", () => {
-        forcedFeaturedSiteId = String(s.siteId);
-        listPanel.classList.add("visible");
-        listPanel.classList.remove("hidden");
-        updateStationList();
-      });
-
-      markerLayer.addLayer(marker);
+      markerLayer.addLayer(
+        L.marker([s.lat, s.lng], {
+          icon,
+          zIndexOffset: isCheapest ? 1000 : 0,
+          rawPrice: s.rawPrice,
+          price: s.price
+        }).on("click", () => {
+          forcedFeaturedSiteId = String(s.siteId);
+          listPanel.classList.add("visible");
+          listPanel.classList.remove("hidden");
+          updateStationList();
+        })
+      );
     });
   }
 
@@ -250,11 +248,16 @@ document.addEventListener("DOMContentLoaded", () => {
         return `<div class="price-row"><span class="fuel-type">${fuel}:</span> <span class="fuel-price">${(price/10).toFixed(1)}</span></div>`;
       })
       .join('');
-    console.log("FEATURED:", featured);
+
+    // Fallback to station-default.png if BrandId missing/undefined/empty
+    const featuredImgSrc = featured.BrandId
+      ? `images/station-${featured.BrandId}.png`
+      : 'images/station-default.png';
+
     let featuredHTML = `
       <li class="featured-station glass-card" id="featured-station">
         <img 
-          src="images/station-${featured.BrandId}.png"
+          src="${featuredImgSrc}"
           onerror="this.onerror=null;this.src='images/station-default.png';"
           class="featurestation-img"
           alt="Station"
@@ -262,9 +265,9 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="featured-details">
           <div class="featured-name">${featured.name}</div>
           <div class="featured-address">
-          <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(featured.lat + ',' + featured.lng)}"
-            target="_blank">${featured.address}, ${featured.suburb}</a>
-        </div>
+            <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(featured.lat + ',' + featured.lng)}"
+              target="_blank">${featured.address}${featured.suburb ? ', ' + featured.suburb : ''}</a>
+          </div>
           <div class="featured-prices">
             ${priceHTML}
           </div>
@@ -272,20 +275,26 @@ document.addEventListener("DOMContentLoaded", () => {
       </li>
     `;
 
-    let othersHTML = others.map(site => `
-      <li class="list-station" data-siteid="${String(site.siteId)}">
-        <span class="list-logo">
-          <img 
-            src="images/${site.brand || 'default'}.png"
-            alt="${site.name}" 
-            onerror="this.onerror=null;this.src='images/default.png';"
-            style="height:32px;width:32px;border-radius:50%;background:#fff;object-fit:contain;box-shadow:0 1px 2px rgba(0,0,0,0.07);"
-          />
-        </span>
-        <span class="list-name">${site.name}</span>
-        <span class="list-price">${site.price.toFixed(1)}</span>
-      </li>
-    `).join('');
+    // Fallback to station-default.png for other stations if BrandId missing
+    let othersHTML = others.map(site => {
+      const siteImgSrc = site.BrandId
+        ? `images/station-${site.BrandId}.png`
+        : 'images/station-default.png';
+      return `
+        <li class="list-station" data-siteid="${String(site.siteId)}">
+          <span class="list-logo">
+            <img 
+              src="${siteImgSrc}"
+              alt="${site.name}" 
+              onerror="this.onerror=null;this.src='images/station-default.png';"
+              style="height:32px;width:32px;border-radius:50%;background:#fff;object-fit:contain;box-shadow:0 1px 2px rgba(0,0,0,0.07);"
+            />
+          </span>
+          <span class="list-name">${site.name}</span>
+          <span class="list-price">${site.price.toFixed(1)}</span>
+        </li>
+      `;
+    }).join('');
 
     listUl.innerHTML = featuredHTML + othersHTML;
 
