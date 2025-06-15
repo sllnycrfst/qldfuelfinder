@@ -96,8 +96,8 @@ html, body {
   position: absolute;
   top: 29px !important;
   left: 25px;
-  width: 36px !important;
-  height: 36px !important;
+  width: 35px !important;
+  height: 35px !important;
   z-index: 1;
   opacity: 1 !important;
   pointer-events: none;
@@ -106,8 +106,8 @@ html, body {
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 .custom-marker-img {
-  width: 81px !important;
-  height: 81px !important;
+  width: 80px !important;
+  height: 80px !important;
   display: block;
   position: relative;
   z-index: 2;
@@ -116,7 +116,7 @@ html, body {
 .marker-price {
   position: absolute;
   top: 0px !important;
-  left: 3px !important;
+  left: 4px !important;
   width: 90% !important;
   font-family: 'Roboto', Arial, sans-serif !important;
   text-align: center;
@@ -233,7 +233,7 @@ html, body {
 
 .featurestation-img {
   flex: 0 0 50%;
-  width: 50%;
+  width: 35%;
   max-width: 200px !important;
   min-width: 100px !important;
   height: 100%;
