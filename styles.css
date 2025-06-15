@@ -313,7 +313,7 @@ html, body, #map, #map-controls, #list-panel, #list, #list *, .feature-card, .ma
 .marker-brand-img {
   position: absolute;
   top: 29px !important;
-  left: 25px;
+  left: 26px;
   width: 36px;
   height: 36px;
   z-index: 1;
