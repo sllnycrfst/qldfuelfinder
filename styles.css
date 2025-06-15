@@ -373,9 +373,9 @@ html, body, #map, #map-controls, #list-panel, #list, #list *, .feature-card, .ma
 .marker-brand-img {
   position: absolute;
   top: 29px !important;
-  left: 26px !important;
-  width: 36px;
-  height: 36px;
+  left: 25px !important;
+  width: 37px;
+  height: 37px;
   z-index: 1;
   opacity: 1 !important;
   pointer-events: none;
