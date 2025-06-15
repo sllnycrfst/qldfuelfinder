@@ -82,6 +82,56 @@ html, body {
 #fuel-select:focus {
   background: rgba(255,255,255,0.75);
 }
+/* Marker styles */
+.fuel-marker .marker-stack {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: block;
+  font-family: 'Roboto', Arial, sans-serif !important;
+}
+.marker-brand-img {
+  position: absolute;
+  top: 29px !important;
+  left: 25px;
+  width: 36px;
+  height: 36px;
+  z-index: 1;
+  opacity: 1 !important;
+  pointer-events: none;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.custom-marker-img {
+  width: 80px;
+  height: 80px;
+  display: block;
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
+.marker-price {
+  position: absolute;
+  top: 0px !important;
+  left: 2px !important;
+  width: 100%;
+  font-family: 'Roboto', Arial, sans-serif !important;
+  text-align: center;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  color: #f9f9f9 !important;
+  z-index: 3;
+  padding: 4px 0 4px 0;
+  line-height: 1.3;
+  background: none !important;
+  border: none;
+  box-shadow: none;
+  letter-spacing: 0.6px;
+}
+.marker-price-cheapest {
+  color: #21ea00 !important;
+}
 
 .glass-btn {
   background: rgba(255,255,255,0.55) !important;
