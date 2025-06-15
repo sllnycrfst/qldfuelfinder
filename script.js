@@ -249,18 +249,18 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .join('');
 
-    // Fallback to station-default.png if BrandId missing/undefined/empty
-    const featuredImgSrc = featured.BrandId
-      ? `images/station-${featured.BrandId}.png`
-      : 'images/station-default.png';
+    // Always use brand logo for both featured and list stations
+    const featuredImgSrc = featured.brand
+      ? `images/${featured.brand}.png`
+      : 'images/default.png';
 
     let featuredHTML = `
       <li class="featured-station glass-card" id="featured-station">
         <img 
           src="${featuredImgSrc}"
-          onerror="this.onerror=null;this.src='images/station-default.png';"
+          onerror="this.onerror=null;this.src='images/default.png';"
           class="featurestation-img"
-          alt="Station"
+          alt="${featured.name}"
         />
         <div class="featured-details">
           <div class="featured-name">${featured.name}</div>
@@ -275,18 +275,17 @@ document.addEventListener("DOMContentLoaded", () => {
       </li>
     `;
 
-    // Fallback to station-default.png for other stations if BrandId missing
     let othersHTML = others.map(site => {
-      const siteImgSrc = site.BrandId
-        ? `images/station-${site.BrandId}.png`
-        : 'images/station-default.png';
+      const siteImgSrc = site.brand
+        ? `images/${site.brand}.png`
+        : 'images/default.png';
       return `
         <li class="list-station" data-siteid="${String(site.siteId)}">
           <span class="list-logo">
             <img 
               src="${siteImgSrc}"
               alt="${site.name}" 
-              onerror="this.onerror=null;this.src='images/station-default.png';"
+              onerror="this.onerror=null;this.src='images/default.png';"
               style="height:32px;width:32px;border-radius:50%;background:#fff;object-fit:contain;box-shadow:0 1px 2px rgba(0,0,0,0.07);"
             />
           </span>
@@ -298,7 +297,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     listUl.innerHTML = featuredHTML + othersHTML;
 
-    // Make other stations clickable to become featured
     Array.from(listUl.querySelectorAll('.list-station')).forEach(item => {
       item.addEventListener('click', function() {
         const siteId = this.getAttribute('data-siteid');
@@ -313,7 +311,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    // AUTOSCROLL the featured element into view if the panel is open
     if (listPanel && listPanel.classList.contains("visible")) {
       setTimeout(() => {
         const featuredEl = document.getElementById("featured-station");
