@@ -171,79 +171,79 @@ html, body {
 /* --- Featured station card layout --- */
 .featured-station {
   display: flex;
-  align-items: flex-start;
-  width: 100%;
-  min-height: 170px;
+  align-items: stretch;
   padding: 0;
-  background: none;
-  box-shadow: none;
-  border: none;
-  gap: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.55);
+  margin-bottom: 0;
 }
 
-/* Left: The station image, in a soft rounded box */
 .featurestation-image-wrap {
-  .featurestation-image-wrap {
   flex: 0 0 240px;           /* fixed width on desktop */
   min-width: 180px;          /* don't shrink too small */
   max-width: 340px;          /* don't grow too wide */
   display: flex;
-  border-radius: 26px;
-  align-items: flex-start;
-  justify-content: flex-end;
-  padding: 32px 0 24px 32px;
-  box-sizing: border-box;
+  align-items: stretch;
+  background: #f5f5f5;
 }
 
-/* The white box for the station image */
-.featurestation-img-box {
-  width: 95%;
-  aspect-ratio: 1.7/1;
-  border-radius: 26px;
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(46,54,80,0.08);
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-/* The petrol station image fits the box, NOT a circle */
 .featurestation-img {
   width: 100%;
   height: 100%;
-  border-radius: 18px;
-  object-fit: cover;
-  border-radius: 26px;
+  object-fit: contain;       /* show whole image, keep aspect */
+  border-radius: 18px 0 0 18px;
   display: block;
+  background: #f5f5f5;
 }
 
-/* Brand logo is a circle, below the image, with spacing */
-.featurestation-logo-on-sign {
-  margin-top: 14px;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(46,54,80,0.08);
-  background: #fff;
-  object-fit: contain;
-  border: 2px solid rgba(255,255,255,0.8);
-  z-index: 2;
-  pointer-events: none;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* Right: details */
 .featured-details {
   flex: 1 1 0;
   min-width: 0;
-  padding: 32px 32px 32px 28px;
+  padding: 28px 32px 20px 32px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+.featured-name {
+  font-size: 1.18em;
+  font-weight: bold;
+  margin-bottom: 0.2em;
+}
+
+.featured-address {
+  font-size: 0.97em;
+  color: #666;
+  margin-bottom: 0.7em;
+}
+
+.featured-address a {
+  color: #387cc2;
+  text-decoration: none;
+}
+.featured-address a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 700px) {
+  .featured-station {
+    flex-direction: column;
+  }
+  .featurestation-image-wrap {
+    flex: 0 0 auto;
+    max-width: 100%;
+    min-width: 0;
+  }
+  .featurestation-img {
+    border-radius: 18px 18px 0 0;
+    max-height: 180px;
+    width: 100%;
+    object-fit: contain;
+  }
+  .featured-details {
+    padding: 16px 10px 14px 10px;
+  }
 }
 
 .featured-name {
