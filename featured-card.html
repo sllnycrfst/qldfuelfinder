@@ -3,17 +3,20 @@
     <div class="featurestation-img-box">
       <img src="images/featurestation.png" class="featurestation-img" alt="Station" />
     </div>
+    <img src="images/caltex.png" class="featurestation-logo-on-sign" alt="Logo" />
   </div>
   <div class="featured-details">
     <div class="featured-name">Caltex Mango Hill</div>
     <div class="featured-address">
-      <a href="https://www.google.com/maps/dir/?api=1&destination=1977 Anzac Av, 4509"
-         target="_blank">1977 Anzac Av, 4509</a>
+      <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(featured.lat + ',' + featured.lng)}"
+         target="_blank">${featured.address}, ${featured.suburb}</a>
     </div>
     <div class="featured-prices">
-      <div class="price-row"><span class="fuel-type">91:</span> <span class="fuel-price">175.5</span></div>
-      <div class="price-row"><span class="fuel-type">98:</span> <span class="fuel-price">198.5</span></div>
       <div class="price-row"><span class="fuel-type">E10:</span> <span class="fuel-price">173.5</span></div>
+      <div class="price-row"><span class="fuel-type">91:</span> <span class="fuel-price">175.5</span></div>
+      <div class="price-row"><span class="fuel-type">95:</span> <span class="fuel-price">191.5</span></div>
+      <div class="price-row"><span class="fuel-type">98:</span> <span class="fuel-price">198.5</span></div>
+      <div class="price-row"><span class="fuel-type">Diesel:</span> <span class="fuel-price">196.5</span></div>
     </div>
   </div>
 </li>
