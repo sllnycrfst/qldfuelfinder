@@ -262,9 +262,9 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="featured-details">
           <div class="featured-name">${featured.name}</div>
           <div class="featured-address">
-            <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(featured.lat + ',' + featured.lng)}"
-               target="_blank">${featured.address}, ${featured.suburb}</a>
-          </div>
+          <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(featured.lat + ',' + featured.lng)}"
+            target="_blank">${featured.address}, ${featured.suburb}</a>
+        </div>
           <div class="featured-prices">
             ${priceHTML}
           </div>
