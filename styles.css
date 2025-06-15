@@ -6,7 +6,6 @@ html, body {
   font-family: 'Roboto', Arial, sans-serif !important;
   background: #f5f5f5;
 }
-
 #map {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -15,24 +14,29 @@ html, body {
   font-family: 'Roboto', Arial, sans-serif !important;
 }
 
-/* Standalone glassmorphism for pills */
 #map-controls {
   position: absolute;
   top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
   z-index: 1002;
   display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
   gap: 18px;
   background: transparent !important;
   box-shadow: none !important;
-  padding: 0;
+  padding: 0 16px;
   border-radius: 0;
   font-family: 'Roboto', Arial, sans-serif !important;
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto;
 }
 
-#map-controls input,
-#map-controls select {
+#search {
+  flex: 1 1 0;
   font-size: 1em;
   padding: 10px 18px;
   border-radius: 999px !important;
@@ -45,27 +49,40 @@ html, body {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   color: #387cc2 !important;
-  margin: 0;
+  margin-right: 10px;
+  min-width: 200px;
+  max-width: 350px;
 }
 
-#map-controls input {
-  width: 210px;
-}
-#map-controls select {
-  width: 130px;
-}
-
-#map-controls input:focus,
-#map-controls select:focus {
-  background: rgba(255,255,255,0.75);
-}
-
-#map-controls input::placeholder {
+#search::placeholder {
   color: #b4b4b4;
   opacity: 1;
 }
 
-/* Glassmorphism for circular buttons and zoom controls, no border */
+#fuel-select {
+  flex: none;
+  font-size: 1em;
+  padding: 10px 18px;
+  border-radius: 999px !important;
+  border: none !important;
+  background: rgba(255,255,255,0.55);
+  box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
+  outline: none;
+  font-family: 'Roboto', Arial, sans-serif !important;
+  transition: background 0.18s;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #387cc2 !important;
+  margin-left: 10px;
+  min-width: 120px;
+  max-width: 170px;
+}
+
+#search:focus,
+#fuel-select:focus {
+  background: rgba(255,255,255,0.75);
+}
+
 .glass-btn {
   background: rgba(255,255,255,0.55) !important;
   backdrop-filter: blur(16px);
@@ -81,8 +98,7 @@ html, body {
   outline: none;
 }
 
-.list-btn,
-.recenter-btn {
+.list-btn, .recenter-btn {
   width: 48px;
   height: 48px;
   font-size: 28px;
@@ -92,58 +108,13 @@ html, body {
   padding: 0;
   font-family: 'Roboto', Arial, sans-serif !important;
 }
+.list-btn { left: 20px; bottom: 20px; }
+.recenter-btn { right: 20px; bottom: 20px; }
 
-.list-btn {
-  left: 20px;
-  bottom: 20px;
-}
-
-.recenter-btn {
-  right: 20px;
-  bottom: 20px;
-}
-
-.list-btn:hover,
-.recenter-btn:hover {
+.list-btn:hover, .recenter-btn:hover {
   background: rgba(232, 247, 255, 0.8) !important;
 }
 
-.leaflet-control-zoom {
-  top: 40px !important;
-  right: 20px !important;
-  left: unset !important;
-  bottom: unset !important;
-  z-index: 1002;
-  font-family: 'Roboto', Arial, sans-serif !important;
-  background: none !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-.leaflet-control-zoom-in,
-.leaflet-control-zoom-out {
-  background: rgba(255,255,255,0.55) !important;
-  color: #387cc2 !important;
-  border: none !important;
-  border-radius: 50% !important;
-  width: 36px !important;
-  height: 36px !important;
-  font-size: 22px !important;
-  margin: 2px 0 !important;
-  box-shadow: 0 2px 8px rgba(46,54,80,0.07);
-  transition: background 0.18s;
-  outline: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-}
-.leaflet-control-zoom-in:hover,
-.leaflet-control-zoom-out:hover {
-  background: rgba(232, 247, 255, 0.8) !important;
-}
-
-/* Slide-up panel glassmorphism */
 #list-panel {
   position: fixed;
   left: 0; right: 0; bottom: 0;
@@ -161,44 +132,74 @@ html, body {
   flex-direction: column;
   font-family: 'Roboto', Arial, sans-serif !important;
 }
-#list-panel.visible {
-  transform: translateY(0);
-}
-#list-panel.hidden {
-  transform: translateY(100%);
+#list-panel.visible { transform: translateY(0); }
+#list-panel.hidden { transform: translateY(100%); }
+
+#close-list-btn {
+  align-self: flex-end;
+  background: none;
+  border: none;
+  font-size: 2em;
+  color: #387cc2;
+  margin: 8px 18px 0 0;
+  cursor: pointer;
+  z-index: 1;
+  font-family: 'Roboto', Arial, sans-serif !important;
 }
 
-.featured-station {
-  display: block;
-  border-radius: 18px;
-  overflow: hidden;
-  background: rgba(255,255,255,0.55);
+#list {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 12px 0;
+  background: transparent;
+  overflow-y: auto;
+  font-family: 'Roboto', Arial, sans-serif !important;
 }
 
-.featurestation-image-wrap {
-  width: 100%;
-  background: #f5f5f5;
-  border-radius: 18px 18px 0 0;
-  min-height: 120px;
-  display: block;
+#list li {
+  padding: 12px 20px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.05em;
+  background: transparent;
+  font-family: 'Roboto', Arial, sans-serif !important;
+}
+
+#list li.featured-station {
+  background: none;
+  font-weight: bold;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  border-bottom: none;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0;
 }
 
 .featurestation-img {
-  width: 100%;
-  height: 180px;
+  flex: 0 0 50%;
+  width: 50%;
+  max-width: 300px;
+  min-width: 120px;
+  height: 100%;
+  min-height: 160px;
   object-fit: contain;
-  border-radius: 18px 18px 0 0;
-  display: block;
   background: #f5f5f5;
+  display: block;
+  align-self: stretch;
+  border-radius: 0;
 }
 
 .featured-details {
-  flex: 1 1 0;
-  min-width: 0;
-  padding: 24px 24px 18px 24px;
+  flex: 1 1 50%;
+  padding: 28px 32px 20px 32px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  min-width: 0;
 }
 
 .featured-name {
@@ -213,6 +214,7 @@ html, body {
   margin-bottom: 0.7em;
   word-break: break-word;
 }
+
 .featured-address a {
   color: #387cc2;
   text-decoration: none;
@@ -220,17 +222,19 @@ html, body {
 .featured-address a:hover {
   text-decoration: underline;
 }
+
 .featured-prices {
   margin-top: 8px;
 }
+
 .featured-prices .price-row {
   font-size: 1em;
-  margin-top: 0;
-  margin-bottom: 1px;
+  margin-bottom: 2px;
   line-height: 1.18;
   font-weight: 400;
   font-family: 'Roboto', Arial, sans-serif !important;
 }
+
 .featured-prices .fuel-type {
   color: #888;
   min-width: 3.5em;
@@ -250,67 +254,7 @@ html, body {
   font-weight: 500;
   padding-left: 8px;
 }
-/* Responsive: Side-by-side, but both shrink on mobile */
-@media (max-width: 700px) {
-  .featured-station {
-    max-width: 100%;
-  }
-  .featurestation-image-wrap {
-    max-width: 50vw;
-    min-width: 90px;
-  }
-  .featured-details {
-    padding: 13px 9px 10px 9px;
-  }
-  .featured-name {
-    font-size: 1em;
-  }
-}
 
-/* --- REST OF YOUR CSS UNCHANGED (list, prices, featured, etc) --- */
-#close-list-btn {
-  align-self: flex-end;
-  background: none;
-  border: none;
-  font-size: 2em;
-  color: #387cc2;
-  margin: 8px 18px 0 0;
-  cursor: pointer;
-  z-index: 1;
-  font-family: 'Roboto', Arial, sans-serif !important;
-}
-#list {
-  list-style: none;
-  margin: 0;
-  padding: 0 0 12px 0;
-  background: transparent;
-  overflow-y: auto;
-  font-family: 'Roboto', Arial, sans-serif !important;
-}
-#list li {
-  padding: 12px 20px;
-  border-bottom: 1px solid #eee;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 1.05em;
-  background: transparent;
-  font-family: 'Roboto', Arial, sans-serif !important;
-}
-#list li.featured-station {
-  background: none;
-  font-weight: bold;
-  padding-top: 20px;
-  padding-bottom: 20px;
-}
-#list img {
-  height: 32px;
-  width: 32px;
-  border-radius: 50%;
-  background: #fff;
-  object-fit: contain;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.07);
-}
 .list-logo { margin-right: 10px; }
 .list-name { flex: 1; }
 .list-price {
@@ -318,73 +262,11 @@ html, body {
   font-family: 'Roboto', Arial, sans-serif !important;
   color: #387cc2;
 }
-.featured-details .featured-name {
-  font-size: 1.1em;
-  margin-bottom: 2px;
-}
-.featured-address a:hover {
-  text-decoration: underline;
-}
-.featured-prices .price-row {
-  font-size: 0.98em;
-  margin-top: 2px;
-  font-family: 'Roboto', Arial, sans-serif !important;
-}
-.fuel-type { color: #888; }
-.fuel-price { color: #222; font-weight: 500; font-family: 'Roboto', Arial, sans-serif !important; }
 
-/* All fonts Roboto for any missed elements */
-html, body, #map, #map-controls, #list-panel, #list, #list *, .feature-card, .marker-price, .leaflet-control-zoom, .list-btn, .recenter-btn {
-  font-family: 'Roboto', Arial, sans-serif !important;
+#list li.list-station {
+  cursor: pointer;
+  transition: background 0.15s;
 }
-
-/* Marker styles */
-.fuel-marker .marker-stack {
-  position: relative;
-  width: 80px;
-  height: 80px;
-  display: block;
-  font-family: 'Roboto', Arial, sans-serif !important;
-}
-.marker-brand-img {
-  position: absolute;
-  top: 29px !important;
-  left: 25px !important;
-  width: 36px;
-  height: 36px;
-  z-index: 1;
-  opacity: 1 !important;
-  pointer-events: none;
-  border-radius: 10%;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-}
-.custom-marker-img {
-  width: 80px;
-  height: 80px;
-  display: block;
-  position: relative;
-  z-index: 2;
-  pointer-events: none;
-}
-.marker-price {
-  position: absolute;
-  top: 0px !important;
-  left: 2px !important;
-  width: 100%;
-  font-family: 'Roboto', Arial, sans-serif !important;
-  text-align: center;
-  font-weight: 600 !important;
-  font-size: 14px !important;
-  color: #f9f9f9 !important;
-  z-index: 3;
-  padding: 4px 0 4px 0;
-  line-height: 1.3;
-  background: none !important;
-  border: none;
-  box-shadow: none;
-  letter-spacing: 0.6px;
-}
-.marker-price-cheapest {
-  color: #21ea00 !important;
+#list li.list-station:hover {
+  background: rgba(232, 247, 255, 0.27);
 }
