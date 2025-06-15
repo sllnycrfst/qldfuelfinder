@@ -117,10 +117,10 @@ html, body {
   position: absolute;
   top: 0px !important;
   left: 2px !important;
-  width: 95% !important;
+  width: 90% !important;
   font-family: 'Roboto', Arial, sans-serif !important;
   text-align: center;
-  font-weight: 600 !important;
+  font-weight: 500 !important;
   font-size: 14px !important;
   color: #f9f9f9 !important;
   z-index: 3;
@@ -129,7 +129,7 @@ html, body {
   background: none !important;
   border: none;
   box-shadow: none;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.6px !important;
 }
 .marker-price-cheapest {
   color: #21ea00 !important;
