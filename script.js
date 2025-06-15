@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
             suburb: site.P,
             lat: site.Lat,
             lng: site.Lng,
-            siteId: site.S,
+            siteId: String(site.S),
           };
         }
         return null;
@@ -175,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       marker.on("click", () => {
-        forcedFeaturedSiteId = s.siteId;
+        forcedFeaturedSiteId = String(s.siteId);
         listPanel.classList.add("visible");
         listPanel.classList.remove("hidden");
         updateStationList();
@@ -217,7 +217,7 @@ document.addEventListener("DOMContentLoaded", () => {
             lat: site.Lat,
             lng: site.Lng,
             distance: userLat != null ? getDistance(userLat, userLng, site.Lat, site.Lng) : null,
-            siteId: site.S,
+            siteId: String(site.S)
           };
         }
         return null;
@@ -233,10 +233,10 @@ document.addEventListener("DOMContentLoaded", () => {
     let featured, others;
     if (
       forcedFeaturedSiteId &&
-      stations.some(s => s.siteId === forcedFeaturedSiteId)
+      stations.some(s => String(s.siteId) === String(forcedFeaturedSiteId))
     ) {
-      featured = stations.find(s => s.siteId === forcedFeaturedSiteId);
-      others = stations.filter(s => s.siteId !== forcedFeaturedSiteId);
+      featured = stations.find(s => String(s.siteId) === String(forcedFeaturedSiteId));
+      others = stations.filter(s => String(s.siteId) !== String(forcedFeaturedSiteId));
     } else {
       featured = stations[0];
       others = stations.slice(1);
@@ -273,7 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
 
     let othersHTML = others.map(site => `
-      <li class="list-station" data-siteid="${site.siteId}">
+      <li class="list-station" data-siteid="${String(site.siteId)}">
         <span class="list-logo">
           <img 
             src="images/${site.brand || 'default'}.png"
@@ -293,10 +293,9 @@ document.addEventListener("DOMContentLoaded", () => {
     Array.from(listUl.querySelectorAll('.list-station')).forEach(item => {
       item.addEventListener('click', function() {
         const siteId = this.getAttribute('data-siteid');
-        if (siteId !== featured.siteId) {
-          forcedFeaturedSiteId = siteId;
+        if (String(siteId) !== String(featured.siteId)) {
+          forcedFeaturedSiteId = String(siteId);
           updateStationList();
-          // Smooth scroll featured station to top
           setTimeout(() => {
             const feat = document.getElementById("featured-station");
             if (feat) feat.scrollIntoView({ behavior: "smooth", block: "start" });
