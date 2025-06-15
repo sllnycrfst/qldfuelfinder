@@ -305,7 +305,7 @@ html, body {
 }
 .featured-prices .fuel-price {
   color: #222;
-  font-weight: 500;
+  font-weight: 500 !important;
   padding-left: 8px;
 }
 
