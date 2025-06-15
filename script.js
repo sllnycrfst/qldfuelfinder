@@ -243,34 +243,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // FEATURED STATION: station image (not in a circle), 1/3 width, rest is details
     let featuredHTML = `
-      <li class="featured-station glass-card" id="featured-station" style="display: flex; align-items: stretch;">
-        <div class="featurestation-image-wrap" style="flex: 0 0 33%; max-width: 33%; min-width: 0; display: flex; align-items: stretch; justify-content: stretch; padding: 0;">
-          <img 
-            src="images/station-${featured.BrandId}.png"
-            onerror="this.onerror=null;this.src='images/station-default.png';"
-            class="featurestation-img"
-            alt="Station"
-            style="width: 100%; height: 100%; object-fit: cover; border-radius: 0; display: block;"
-          />
-        </div>
-        <div class="featured-details" style="flex: 1 1 0; min-width: 0; padding: 32px;">
-          <div class="featured-name">${featured.name}</div>
-          <div class="featured-address">
-            <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(featured.lat + ',' + featured.lng)}"
-               target="_blank">${featured.address}, ${featured.suburb}</a>
-          </div>
-          <div class="featured-prices">
-            ${
-              Object.entries(featured.allPrices || {})
-                .map(([fid, price]) => {
-                  const fuelName = Object.keys(fuelIdMap).find(fn => fuelIdMap[fn] == fid) || fid;
-                  return `<div class="price-row"><span class="fuel-type">${fuelName}:</span> <span class="fuel-price">${(price/10).toFixed(1)}</span></div>`;
-                }).join('')
-            }
-          </div>
-        </div>
-      </li>
-    `;
+  <li class="featured-station glass-card" id="featured-station">
+    <div class="featurestation-image-wrap">
+      <img 
+        src="images/station-${featured.BrandId}.png"
+        onerror="this.onerror=null;this.src='images/station-default.png';"
+        class="featurestation-img"
+        alt="Station"
+      />
+    </div>
+    <div class="featured-details">
+      <div class="featured-name">${featured.name}</div>
+      <div class="featured-address">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(featured.lat + ',' + featured.lng)}"
+           target="_blank">${featured.address}, ${featured.suburb}</a>
+      </div>
+      <div class="featured-prices">
+        ${
+          Object.entries(featured.allPrices || {})
+            .map(([fid, price]) => {
+              const fuelName = Object.keys(fuelIdMap).find(fn => fuelIdMap[fn] == fid) || fid;
+              return `<div class="price-row"><span class="fuel-type">${fuelName}:</span> <span class="fuel-price">${(price/10).toFixed(1)}</span></div>`;
+            }).join('')
+        }
+      </div>
+    </div>
+  </li>
+`;
 
     // OTHER STATIONS: regular brand logo (circle)
     let othersHTML = others.map(site => `
