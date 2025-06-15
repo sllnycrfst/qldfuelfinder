@@ -374,12 +374,12 @@ html, body, #map, #map-controls, #list-panel, #list, #list *, .feature-card, .ma
   position: absolute;
   top: 29px !important;
   left: 25px !important;
-  width: 37px;
-  height: 37px;
+  width: 36px;
+  height: 36px;
   z-index: 1;
   opacity: 1 !important;
   pointer-events: none;
-  border-radius: 50%;
+  border-radius: 10%;
   background: #fff;
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
