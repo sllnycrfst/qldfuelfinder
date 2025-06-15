@@ -156,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="marker-stack" style="position:relative;width:80px;height:80px;">
             <img src="images/${s.brand}.png" class="marker-brand-img" style="position:absolute;top:25px;left:25px;width:30px;height:30px;z-index:1;opacity:0.85;pointer-events:none;" onerror="this.onerror=null;this.src='images/default.png';"/>
             <img src="images/mymarker.png" class="custom-marker-img" style="width:80px;height:80px;position:relative;z-index:2;pointer-events:none;"/>
-            <div class="${priceClass}" style="position:absolute;bottom:2px;left:0;width:100%;text-align:center;font-weight:bold;font-size:18px;font-family:'Roboto',Arial,sans-serif!important;color:#222;background:rgba(255,255,255,0.85);border-radius:7px;padding:6px 0;">
+            <div class="${priceClass}" style="position:absolute;bottom:2px;left:0;width:100%;text-align:center;font-weight:bold;font-size:18px;font-family:'Roboto',Arial,sans-serif!important;color:#2296f3;">
               ${s.price.toFixed(1)}
             </div>
           </div>
@@ -242,11 +242,14 @@ document.addEventListener("DOMContentLoaded", () => {
       others = stations.slice(1);
     }
 
+    // FEATURE CARD: includes new featurestation image with logo on sign
     let featuredHTML = `
       <li class="featured-station glass-card" id="featured-station">
-        <div class="featured-img">
-          <img src="images/${featured.brand || 'default'}.png" alt="${featured.name}" 
-               onerror="this.onerror=null;this.src='images/default.png';" />
+        <div class="featurestation-image-wrap">
+          <div class="featurestation-sign-wrap">
+            <img src="images/featurestation.png" class="featurestation-img" alt="Station" />
+            <img src="images/${featured.brand || 'default'}.png" class="featurestation-logo-on-sign" alt="Logo" onerror="this.onerror=null;this.src='images/default.png';" />
+          </div>
         </div>
         <div class="featured-details">
           <div class="featured-name">${featured.name}</div>
