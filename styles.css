@@ -96,8 +96,8 @@ html, body {
   position: absolute;
   top: 29px !important;
   left: 25px;
-  width: 36px;
-  height: 36px;
+  width: 36px !important;
+  height: 36px !important;
   z-index: 1;
   opacity: 1 !important;
   pointer-events: none;
@@ -106,8 +106,8 @@ html, body {
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 .custom-marker-img {
-  width: 80px;
-  height: 80px;
+  width: 81px !important;
+  height: 81px !important;
   display: block;
   position: relative;
   z-index: 2;
@@ -283,7 +283,7 @@ html, body {
   font-size: 1em;
   margin-bottom: 2px;
   line-height: 1.18;
-  font-weight: 400;
+  font-weight: 600;
   font-family: 'Roboto', Arial, sans-serif !important;
 }
 
