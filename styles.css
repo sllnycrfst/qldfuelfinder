@@ -338,7 +338,7 @@ html, body, #map, #map-controls, #list-panel, #list, #list *, .feature-card, .ma
   width: 100%;
   font-family: 'Roboto', Arial, sans-serif !important;
   text-align: center;
-  font-weight: 600 !important;
+  font-weight: 500 !important;
   font-size: 14px !important;
   color: #f9f9f9 !important;
   z-index: 3;
@@ -347,7 +347,7 @@ html, body, #map, #map-controls, #list-panel, #list, #list *, .feature-card, .ma
   background: none !important;
   border: none;
   box-shadow: none;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.8px !important;
 }
 .marker-price-cheapest {
   color: #21ea00 !important;
