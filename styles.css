@@ -187,6 +187,7 @@ html, body {
   max-width: 44%;
   min-width: 0;
   display: flex;
+  border-radius: 26px;
   align-items: flex-start;
   justify-content: flex-end;
   padding: 32px 0 24px 32px;
