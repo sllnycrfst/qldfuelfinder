@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const listUl = document.getElementById("list");
   const searchInput = document.getElementById("search");
   const fuelSelect = document.getElementById("fuel-select");
+  const priceOrder = ['E10', '91', '95', '98', 'Diesel'];
 
   let map, markerLayer, userMarker;
   const defaultCenter = [-27.4698, 153.0251];
