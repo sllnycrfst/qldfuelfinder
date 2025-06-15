@@ -12,8 +12,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const defaultCenter = [-27.4698, 153.0251];
   const defaultZoom = 14;
 
+  // Use the desired fuel order: E10, 91, 95, 98, Diesel
+  const fuelOrder = ["E10", "91", "95", "98", "Diesel"];
   const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3, "Premium Diesel": 10 };
-  let currentFuel = "91";
+  let currentFuel = "E10";
   let allSites = [];
   let allPrices = [];
   let priceMap = {};
@@ -149,7 +151,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const isCheapest = minPrice !== null && s.rawPrice === minPrice;
       const priceClass = isCheapest ? "marker-price marker-price-cheapest" : "marker-price";
 
-      // Shows the station brand marker and price
       const icon = L.divIcon({
         className: "fuel-marker",
         html: `
@@ -241,8 +242,7 @@ document.addEventListener("DOMContentLoaded", () => {
       others = stations.slice(1);
     }
 
-    // Ensure price rows are ordered like the fuel selector
-    const fuelOrder = ['91', '95', '98', 'E10', 'Diesel', 'Premium Diesel'];
+    // Fuel prices in E10, 91, 95, 98, Diesel order
     let priceHTML = fuelOrder
       .filter(fuel => fuelIdMap[fuel] && featured.allPrices && featured.allPrices[fuelIdMap[fuel]])
       .map(fuel => {
@@ -253,14 +253,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let featuredHTML = `
       <li class="featured-station glass-card" id="featured-station">
-        <div class="featurestation-image-wrap">
-          <img 
-            src="images/station-${featured.BrandId}.png"
-            onerror="this.onerror=null;this.src='images/station-default.png';"
-            class="featurestation-img"
-            alt="Station"
-          />
-        </div>
+        <img 
+          src="images/station-${featured.BrandId}.png"
+          onerror="this.onerror=null;this.src='images/station-default.png';"
+          class="featurestation-img"
+          alt="Station"
+        />
         <div class="featured-details">
           <div class="featured-name">${featured.name}</div>
           <div class="featured-address">
@@ -274,9 +272,8 @@ document.addEventListener("DOMContentLoaded", () => {
       </li>
     `;
 
-    // OTHER STATIONS: regular brand logo (circle)
     let othersHTML = others.map(site => `
-      <li class="list-station">
+      <li class="list-station" data-siteid="${site.siteId}">
         <span class="list-logo">
           <img 
             src="images/${site.brand || 'default'}.png"
@@ -291,6 +288,22 @@ document.addEventListener("DOMContentLoaded", () => {
     `).join('');
 
     listUl.innerHTML = featuredHTML + othersHTML;
+
+    // Make other stations clickable to become featured
+    Array.from(listUl.querySelectorAll('.list-station')).forEach(item => {
+      item.addEventListener('click', function() {
+        const siteId = this.getAttribute('data-siteid');
+        if (siteId !== featured.siteId) {
+          forcedFeaturedSiteId = siteId;
+          updateStationList();
+          // Smooth scroll featured station to top
+          setTimeout(() => {
+            const feat = document.getElementById("featured-station");
+            if (feat) feat.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 10);
+        }
+      });
+    });
 
     // AUTOSCROLL the featured element into view if the panel is open
     if (listPanel && listPanel.classList.contains("visible")) {
@@ -324,6 +337,9 @@ document.addEventListener("DOMContentLoaded", () => {
     updateVisibleStations();
     updateStationList();
   });
+  // Default to E10 on load
+  fuelSelect.value = "E10";
+  currentFuel = "E10";
 
   // Search suburb/station
   searchInput && searchInput.addEventListener("input", function (e) {
