@@ -257,9 +257,6 @@ document.addEventListener("DOMContentLoaded", () => {
             <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(featured.lat + ',' + featured.lng)}"
                target="_blank">${featured.address}, ${featured.suburb}</a>
           </div>
-          <div class="featured-distance">
-            ${featured.distance != null ? featured.distance.toFixed(1) + ' km' : ''}
-          </div>
           <div class="featured-prices">
             ${
               Object.entries(featured.allPrices || {})
