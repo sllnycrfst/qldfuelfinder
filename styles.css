@@ -111,13 +111,12 @@ html, body {
 
 /* Restore your original zoom control styling and position */
 .leaflet-control-zoom {
-  top: 60px !important;
+  top: 20px !important;
   right: 20px !important;
   left: unset !important;
   bottom: unset !important;
   z-index: 1002;
   font-family: 'Roboto', Arial, sans-serif !important;
-  /* Remove custom background, border, etc */
   background: none !important;
   border: none !important;
   box-shadow: none !important;
@@ -169,6 +168,54 @@ html, body {
 }
 #list-panel.hidden {
   transform: translateY(100%);
+}
+
+/* --- Featured station card image and logo overlay --- */
+.featured-station {
+  display: flex;
+  align-items: center;
+}
+
+.featurestation-image-wrap {
+  flex: 0 0 140px;
+  display: flex;
+  align-items: center;
+  margin-right: 18px;
+}
+
+.featurestation-sign-wrap {
+  position: relative;
+  width: 140px;
+  height: 93px;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(46,54,80,0.13);
+  background: #fff;
+}
+
+.featurestation-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 18px;
+  object-fit: cover;
+}
+
+/* This positions and warps the logo over the sign (tweak as needed) */
+.featurestation-logo-on-sign {
+  position: absolute;
+  left: 81px;
+  top: 18px;
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  transform: rotate(-14deg) skewY(-17deg) skewX(-8deg) scale(1.05, 0.78);
+  box-shadow: 0 2px 8px rgba(46,54,80,0.08);
+  background: #fff;
+  object-fit: contain;
+  border: 2px solid rgba(255,255,255,0.7);
+  z-index: 2;
+  pointer-events: none;
 }
 
 /* --- REST OF YOUR CSS UNCHANGED (list, prices, featured, etc) --- */
@@ -263,7 +310,7 @@ html, body, #map, #map-controls, #list-panel, #list, #list *, .feature-card, .ma
 .marker-brand-img {
   position: absolute;
   top: 29px !important;
-  left: 25px !important;
+  left: 25px;
   width: 36px;
   height: 36px;
   z-index: 1;
@@ -289,7 +336,7 @@ html, body, #map, #map-controls, #list-panel, #list, #list *, .feature-card, .ma
   font-family: 'Roboto', Arial, sans-serif !important;
   text-align: center;
   font-weight: 600 !important;
-  font-size: 12px !important;
+  font-size: 14px !important;
   color: #f9f9f9 !important;
   z-index: 3;
   padding: 4px 0 4px 0;
@@ -297,7 +344,7 @@ html, body, #map, #map-controls, #list-panel, #list, #list *, .feature-card, .ma
   background: none !important;
   border: none;
   box-shadow: none;
-  letter-spacing: 0.6px !important;
+  letter-spacing: 0.6px;
 }
 .marker-price-cheapest {
   color: #21ea00 !important;
