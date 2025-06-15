@@ -262,11 +262,6 @@ html, body {
   font-weight: 700;
 }
 
-.featured-prices .fuel-type.E10,
-.featured-prices .fuel-type["E10"] {
-  color: #888;
-}
-
 .featured-prices .fuel-type.selected {
   color: #387cc2;
   font-weight: 600;
@@ -333,18 +328,8 @@ html, body {
   font-size: 1.1em;
   margin-bottom: 2px;
 }
-.featured-address a {
-  color: #387cc2;
-  text-decoration: none;
-  font-family: 'Roboto', Arial, sans-serif !important;
-}
 .featured-address a:hover {
   text-decoration: underline;
-}
-.featured-distance {
-  color: #555;
-  font-size: 0.95em;
-  font-family: 'Roboto', Arial, sans-serif !important;
 }
 .featured-prices .price-row {
   font-size: 0.98em;
