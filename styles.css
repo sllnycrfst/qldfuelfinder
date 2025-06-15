@@ -232,8 +232,8 @@ html, body {
 }
 
 .featurestation-img {
-  flex: 0 0 50%;
-  transform: scale(0.7);
+  flex: 0 0 75%;
+  transform: scale(0.5);
   transform-origin: left center;
   max-width: 200px !important;
   min-width: 100px !important;
@@ -247,7 +247,7 @@ html, body {
 }
 
 .featured-details {
-  flex: 1 1 50%;
+  flex: 1 1 25%;
   padding: 28px 32px 20px 32px;
   display: flex;
   flex-direction: column;
