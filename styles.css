@@ -183,9 +183,10 @@ html, body {
 
 /* Left: The station image, in a soft rounded box */
 .featurestation-image-wrap {
-  flex: 0 0 44%;
-  max-width: 44%;
-  min-width: 0;
+  .featurestation-image-wrap {
+  flex: 0 0 240px;           /* fixed width on desktop */
+  min-width: 180px;          /* don't shrink too small */
+  max-width: 340px;          /* don't grow too wide */
   display: flex;
   border-radius: 26px;
   align-items: flex-start;
