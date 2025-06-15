@@ -116,7 +116,7 @@ html, body {
 .marker-price {
   position: absolute;
   top: 0px !important;
-  left: 2px !important;
+  left: 3px !important;
   width: 90% !important;
   font-family: 'Roboto', Arial, sans-serif !important;
   text-align: center;
