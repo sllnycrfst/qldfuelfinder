@@ -31,18 +31,18 @@ html, body {
   font-family: 'Roboto', Arial, sans-serif !important;
 }
 
-/* Each input/select is a standalone glass pill */
+/* Each input/select is a standalone glass pill, no border */
 #map-controls input,
 #map-controls select {
   font-size: 1em;
   padding: 10px 18px;
   border-radius: 999px !important;
-  border: 2px solid #387cc2 !important;
+  border: none !important;
   background: rgba(255,255,255,0.55);
   box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
   outline: none;
   font-family: 'Roboto', Arial, sans-serif !important;
-  transition: border 0.18s, background 0.18s;
+  transition: background 0.18s;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   color: #387cc2 !important;
@@ -58,7 +58,6 @@ html, body {
 
 #map-controls input:focus,
 #map-controls select:focus {
-  border: 2px solid #225699 !important;
   background: rgba(255,255,255,0.75);
 }
 
@@ -67,19 +66,19 @@ html, body {
   opacity: 1;
 }
 
-/* Glassmorphism for circular buttons and zoom controls */
+/* Glassmorphism for circular buttons and zoom controls, no border */
 .glass-btn {
   background: rgba(255,255,255,0.55) !important;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-radius: 50% !important;
-  border: 2px solid #387cc2 !important;
+  border: none !important;
   box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
   color: #387cc2 !important;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s, border 0.15s;
+  transition: background 0.15s;
   outline: none;
 }
 
@@ -110,35 +109,32 @@ html, body {
   background: rgba(232, 247, 255, 0.8) !important;
 }
 
-/* Move zoom control to the bottom right, above recenter, and style as glass */
+/* Restore your original zoom control styling and position */
 .leaflet-control-zoom {
-  position: absolute !important;
+  top: 20px !important;
   right: 20px !important;
-  bottom: 80px !important; /* 48px btn + gap */
   left: unset !important;
-  top: unset !important;
+  bottom: unset !important;
   z-index: 1002;
-  border: none !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
   font-family: 'Roboto', Arial, sans-serif !important;
+  /* Remove custom background, border, etc */
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .leaflet-control-zoom-in,
 .leaflet-control-zoom-out {
-  width: 48px !important;
-  height: 48px !important;
-  font-size: 28px !important;
-  border: 2px solid #387cc2 !important;
-  border-radius: 50% !important;
   background: rgba(255,255,255,0.55) !important;
   color: #387cc2 !important;
-  margin: 0 !important;
-  box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
-  transition: background 0.18s, border 0.18s;
+  border: none !important;
+  border-radius: 50% !important;
+  width: 36px !important;
+  height: 36px !important;
+  font-size: 22px !important;
+  margin: 2px 0 !important;
+  box-shadow: 0 2px 8px rgba(46,54,80,0.07);
+  transition: background 0.18s;
   outline: none;
   display: flex;
   align-items: center;
