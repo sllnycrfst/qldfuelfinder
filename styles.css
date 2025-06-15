@@ -120,13 +120,14 @@ html, body {
   align-items: center;
   justify-content: center;
   transition: background 0.15s;
+  padding: 0;
 }
 .recenter-btn:hover {
   background: #e9f3ff;
 }
 
 .leaflet-control-zoom {
-  top: 20px !important;
+  top: 90px !important;  /* Move the zoom control further down below the search controls */
   right: 20px !important;
   left: unset !important;
   bottom: unset !important;
