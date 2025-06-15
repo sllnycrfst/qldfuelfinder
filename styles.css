@@ -117,7 +117,7 @@ html, body {
   position: absolute;
   top: 0px !important;
   left: 2px !important;
-  width: 95%;
+  width: 95% !important;
   font-family: 'Roboto', Arial, sans-serif !important;
   text-align: center;
   font-weight: 600 !important;
