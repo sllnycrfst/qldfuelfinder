@@ -51,8 +51,8 @@ html, body {
   -webkit-backdrop-filter: blur(10px);
   color: #387cc2 !important;
   margin-right: 10px;
-  min-width: 200px;
-  max-width: 350px;
+  min-width: 160px;
+  max-width: 300px;
 }
 
 #search::placeholder {
