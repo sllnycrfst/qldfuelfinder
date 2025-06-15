@@ -193,6 +193,7 @@ html, body {
   box-sizing: border-box;
 }
 
+/* The white box for the station image */
 .featurestation-img-box {
   width: 95%;
   aspect-ratio: 1.7/1;
@@ -203,14 +204,33 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
+/* The petrol station image fits the box, NOT a circle */
 .featurestation-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   border-radius: 26px;
   display: block;
+}
+
+/* Brand logo is a circle, below the image, with spacing */
+.featurestation-logo-on-sign {
+  margin-top: 14px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(46,54,80,0.08);
+  background: #fff;
+  object-fit: contain;
+  border: 2px solid rgba(255,255,255,0.8);
+  z-index: 2;
+  pointer-events: none;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Right: details */
@@ -261,12 +281,10 @@ html, body {
   color: #888;
   font-weight: 700;
 }
-
 .featured-prices .fuel-type.selected {
   color: #387cc2;
   font-weight: 600;
 }
-
 .featured-prices .fuel-price {
   color: #222;
   font-weight: 500;
