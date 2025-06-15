@@ -94,7 +94,7 @@ html, body {
 }
 .marker-brand-img {
   position: absolute;
-  top: 29px !important;
+  top: 26px !important;
   left: 25px !important;
   width: 34px !important;
   height: 34px !important;
@@ -106,8 +106,8 @@ html, body {
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 .custom-marker-img {
-  width: 80px !important;
-  height: 80px !important;
+  width: 78px !important;
+  height: 78px !important;
   display: block;
   position: relative;
   z-index: 2;
