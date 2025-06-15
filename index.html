@@ -12,7 +12,7 @@
   <link rel="icon" type="image/png" href="images/favicon.png">
 </head>
 <body>
-  <!-- Floating controls -->
+  <!-- Map Controls -->
   <div id="map-controls">
     <input type="text" id="search" placeholder="Search suburb or station..." autocomplete="off" />
     <select id="fuel-select">
@@ -20,13 +20,18 @@
       <option value="91">Unleaded 91</option>
       <option value="95">Premium 95</option>
       <option value="98">Premium 98</option>
+      <option value="Diesel">Diesel</option>
     </select>
   </div>
 
+  <!-- Map Container -->
   <div id="map"></div>
 
-  <button id="list-btn" title="Show station list" class="list-btn glass-btn">☰</button>
-  <button id="recenter-btn" title="Go to my location" class="recenter-btn glass-btn">
+  <!-- Floating Action Buttons -->
+  <button id="list-btn" title="Show station list" class="list-btn glass-btn" aria-label="Show station list">
+    <span aria-hidden="true">☰</span>
+  </button>
+  <button id="recenter-btn" title="Go to my location" class="recenter-btn glass-btn" aria-label="Go to my location">
     <svg width="26" height="26" viewBox="0 0 26 26" fill="none" style="display:block" xmlns="http://www.w3.org/2000/svg">
       <circle cx="13" cy="13" r="7" stroke="#387cc2" stroke-width="2"/>
       <line x1="13" y1="3" x2="13" y2="7" stroke="#387cc2" stroke-width="2"/>
@@ -36,12 +41,13 @@
     </svg>
   </button>
 
-  <!-- Slide-up list panel -->
-  <div id="list-panel" class="hidden">
-    <button id="close-list-btn" title="Close list">&times;</button>
+  <!-- Slide-up List Panel -->
+  <div id="list-panel" class="hidden" aria-modal="true" role="dialog">
+    <button id="close-list-btn" title="Close list" aria-label="Close list">&times;</button>
     <ul id="list"></ul>
   </div>
 
+  <!-- Scripts -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="script.js"></script>
 </body>
