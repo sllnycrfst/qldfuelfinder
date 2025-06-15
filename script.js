@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const listUl = document.getElementById("list");
   const searchInput = document.getElementById("search");
   const fuelSelect = document.getElementById("fuel-select");
-  const priceOrder = ['E10', '91', '95', '98', 'Diesel'];
 
   let map, markerLayer, userMarker;
   const defaultCenter = [-27.4698, 153.0251];
@@ -19,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let allPrices = [];
   let priceMap = {};
 
-  // This will store the SiteId (s.S) of the marker that should be featured
+  // Store the SiteId of the marker that should be featured
   let forcedFeaturedSiteId = null;
 
   const bannedStations = [
@@ -132,6 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
             price: price / 10,
             rawPrice: price,
             brand: site.B,
+            BrandId: site.BrandId, // ensure BrandId is present
             address: site.A,
             name: site.N,
             suburb: site.P,
@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const isCheapest = minPrice !== null && s.rawPrice === minPrice;
       const priceClass = isCheapest ? "marker-price marker-price-cheapest" : "marker-price";
 
-      // -- DO NOT TOUCH THIS MARKER HTML!
+      // Shows the station brand marker and price
       const icon = L.divIcon({
         className: "fuel-marker",
         html: `
@@ -211,6 +211,7 @@ document.addEventListener("DOMContentLoaded", () => {
             rawPrice: price,
             allPrices: priceMap[site.S],
             brand: site.B,
+            BrandId: site.BrandId, // ensure BrandId is present
             address: site.A,
             name: site.N,
             suburb: site.P,
@@ -243,14 +244,16 @@ document.addEventListener("DOMContentLoaded", () => {
       others = stations.slice(1);
     }
 
-    // FEATURE CARD: includes new featurestation image with logo on sign
+    // Featured Station card with station image by BrandId
     let featuredHTML = `
       <li class="featured-station glass-card" id="featured-station">
         <div class="featurestation-image-wrap">
-          <div class="featurestation-sign-wrap">
-            <img src="images/featurestation.png" class="featurestation-img" alt="Station" />
-            <img src="images/${featured.brand || 'default'}.png" class="featurestation-logo-on-sign" alt="Logo" onerror="this.onerror=null;this.src='images/default.png';" />
-          </div>
+          <img 
+            src="images/station-${featured.BrandId}.png"
+            onerror="this.onerror=null;this.src='images/station-default.png';"
+            class="featurestation-img"
+            alt="Station"
+          />
         </div>
         <div class="featured-details">
           <div class="featured-name">${featured.name}</div>
@@ -271,10 +274,17 @@ document.addEventListener("DOMContentLoaded", () => {
       </li>
     `;
 
+    // Other stations list
     let othersHTML = others.map(site => `
       <li class="list-station">
-        <span class="list-logo"><img src="images/${site.brand || 'default'}.png" 
-          alt="${site.name}" onerror="this.onerror=null;this.src='images/default.png';"/></span>
+        <span class="list-logo">
+          <img 
+            src="images/station-${site.BrandId}.png"
+            onerror="this.onerror=null;this.src='images/station-default.png';"
+            alt="${site.name}" 
+            class="featurestation-img"
+          />
+        </span>
         <span class="list-name">${site.name}</span>
         <span class="list-price">${site.price.toFixed(1)}</span>
       </li>
