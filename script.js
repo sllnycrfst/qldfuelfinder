@@ -18,7 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let allPrices = [];
   let priceMap = {};
 
-  // Store the SiteId of the marker that should be featured
   let forcedFeaturedSiteId = null;
 
   const bannedStations = [
@@ -131,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
             price: price / 10,
             rawPrice: price,
             brand: site.B,
-            BrandId: site.BrandId, // ensure BrandId is present
+            BrandId: site.BrandId,
             address: site.A,
             name: site.N,
             suburb: site.P,
@@ -174,7 +173,6 @@ document.addEventListener("DOMContentLoaded", () => {
         price: s.price
       });
 
-      // Marker click triggers list panel slide up, featuring this station
       marker.on("click", () => {
         forcedFeaturedSiteId = s.siteId;
         listPanel.classList.add("visible");
@@ -211,7 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
             rawPrice: price,
             allPrices: priceMap[site.S],
             brand: site.B,
-            BrandId: site.BrandId, // ensure BrandId is present
+            BrandId: site.BrandId,
             address: site.A,
             name: site.N,
             suburb: site.P,
@@ -231,7 +229,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // FEATURED logic: if forcedFeaturedSiteId is set and visible, use that as featured
     let featured, others;
     if (
       forcedFeaturedSiteId &&
@@ -244,18 +241,19 @@ document.addEventListener("DOMContentLoaded", () => {
       others = stations.slice(1);
     }
 
-    // Featured Station card with station image by BrandId
+    // FEATURED STATION: station image (not in a circle), 1/3 width, rest is details
     let featuredHTML = `
-      <li class="featured-station glass-card" id="featured-station">
-        <div class="featurestation-image-wrap">
+      <li class="featured-station glass-card" id="featured-station" style="display: flex; align-items: stretch;">
+        <div class="featurestation-image-wrap" style="flex: 0 0 33%; max-width: 33%; min-width: 0; display: flex; align-items: stretch; justify-content: stretch; padding: 0;">
           <img 
             src="images/station-${featured.BrandId}.png"
             onerror="this.onerror=null;this.src='images/station-default.png';"
             class="featurestation-img"
             alt="Station"
+            style="width: 100%; height: 100%; object-fit: cover; border-radius: 0; display: block;"
           />
         </div>
-        <div class="featured-details">
+        <div class="featured-details" style="flex: 1 1 0; min-width: 0; padding: 32px;">
           <div class="featured-name">${featured.name}</div>
           <div class="featured-address">
             <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(featured.lat + ',' + featured.lng)}"
@@ -274,15 +272,15 @@ document.addEventListener("DOMContentLoaded", () => {
       </li>
     `;
 
-    // Other stations list
+    // OTHER STATIONS: regular brand logo (circle)
     let othersHTML = others.map(site => `
       <li class="list-station">
         <span class="list-logo">
           <img 
-            src="images/station-${site.BrandId}.png"
-            onerror="this.onerror=null;this.src='images/station-default.png';"
+            src="images/${site.brand || 'default'}.png"
             alt="${site.name}" 
-            class="featurestation-img"
+            onerror="this.onerror=null;this.src='images/default.png';"
+            style="height:32px;width:32px;border-radius:50%;background:#fff;object-fit:contain;box-shadow:0 1px 2px rgba(0,0,0,0.07);"
           />
         </span>
         <span class="list-name">${site.name}</span>
