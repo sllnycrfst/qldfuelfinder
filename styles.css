@@ -96,8 +96,8 @@ html, body {
   position: absolute;
   top: 29px !important;
   left: 25px !important;
-  width: 35px !important;
-  height: 35px !important;
+  width: 34px !important;
+  height: 34px !important;
   z-index: 1;
   opacity: 1 !important;
   pointer-events: none;
@@ -116,7 +116,7 @@ html, body {
 .marker-price {
   position: absolute;
   top: 0px !important;
-  left: 4px !important;
+  left: 2px !important;
   width: 90% !important;
   font-family: 'Roboto', Arial, sans-serif !important;
   text-align: center;
