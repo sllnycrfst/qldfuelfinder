@@ -234,8 +234,8 @@ html, body {
 .featurestation-img {
   flex: 0 0 50%;
   width: 50%;
-  max-width: 300px;
-  min-width: 120px;
+  max-width: 200px !important;
+  min-width: 100px !important;
   height: 100%;
   min-height: 160px;
   object-fit: contain;
@@ -277,6 +277,8 @@ html, body {
 
 .featured-prices {
   margin-top: 8px;
+  font-weight: 600;
+  font-family: 'Roboto', Arial, sans-serif !important;
 }
 
 .featured-prices .price-row {
