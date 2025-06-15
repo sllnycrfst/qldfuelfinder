@@ -15,21 +15,7 @@ html, body {
   font-family: 'Roboto', Arial, sans-serif !important;
 }
 
-/* Glassmorphism utility */
-.glass-card,
-#list-panel,
-#map-controls {
-  background: rgba(255,255,255,0.55) !important;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: 20px !important;
-  box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
-  border: 1.5px solid rgba(200,200,200,0.20);
-  font-family: 'Roboto', Arial, sans-serif !important;
-  position: relative;
-  z-index: 1;
-}
-
+/* Standalone glassmorphism for pills */
 #map-controls {
   position: absolute;
   top: 20px;
@@ -37,111 +23,143 @@ html, body {
   transform: translateX(-50%);
   z-index: 1002;
   display: flex;
-  gap: 12px;
-  padding: 10px 18px;
-  border-radius: 20px !important;
+  gap: 18px;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0;
+  border-radius: 0;
   font-family: 'Roboto', Arial, sans-serif !important;
-  /* Glass effect is now inherited from .glass-card above */
 }
 
-/* Pill-shaped, glassy inputs */
+/* Each input/select is a standalone glass pill */
 #map-controls input,
 #map-controls select {
   font-size: 1em;
   padding: 10px 18px;
   border-radius: 999px !important;
-  border: 1.5px solid rgba(130, 156, 210, 0.18);
+  border: 2px solid #387cc2 !important;
   background: rgba(255,255,255,0.55);
-  box-shadow: 0 2px 8px rgba(46,54,80,0.07);
+  box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
   outline: none;
   font-family: 'Roboto', Arial, sans-serif !important;
   transition: border 0.18s, background 0.18s;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  color: #387cc2 !important;
+  margin: 0;
+}
+
+#map-controls input {
+  width: 210px;
+}
+#map-controls select {
+  width: 130px;
 }
 
 #map-controls input:focus,
 #map-controls select:focus {
-  border: 1.5px solid #387cc2;
+  border: 2px solid #225699 !important;
   background: rgba(255,255,255,0.75);
 }
 
-/* Placeholder for input */
 #map-controls input::placeholder {
   color: #b4b4b4;
   opacity: 1;
 }
 
-/* Adapt width for aesthetics */
-#map-controls input {
-  width: 210px;
+/* Glassmorphism for circular buttons and zoom controls */
+.glass-btn {
+  background: rgba(255,255,255,0.55) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 50% !important;
+  border: 2px solid #387cc2 !important;
+  box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
+  color: #387cc2 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border 0.15s;
+  outline: none;
 }
 
-.list-btn, .recenter-btn {
+.list-btn,
+.recenter-btn {
+  width: 48px;
+  height: 48px;
+  font-size: 28px;
+  cursor: pointer;
+  position: absolute;
+  z-index: 1003;
+  padding: 0;
   font-family: 'Roboto', Arial, sans-serif !important;
 }
 
 .list-btn {
-  position: absolute;
   left: 20px;
   bottom: 20px;
-  z-index: 1003;
-  background: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  font-size: 28px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.13);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s;
-}
-.list-btn:hover {
-  background: #e9f3ff;
 }
 
 .recenter-btn {
-  position: absolute;
   right: 20px;
   bottom: 20px;
-  z-index: 1003;
-  background: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  font-size: 28px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.13);
-  cursor: pointer;
+}
+
+.list-btn:hover,
+.recenter-btn:hover {
+  background: rgba(232, 247, 255, 0.8) !important;
+}
+
+/* Move zoom control to the bottom right, above recenter, and style as glass */
+.leaflet-control-zoom {
+  position: absolute !important;
+  right: 20px !important;
+  bottom: 80px !important; /* 48px btn + gap */
+  left: unset !important;
+  top: unset !important;
+  z-index: 1002;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: 'Roboto', Arial, sans-serif !important;
+}
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+  width: 48px !important;
+  height: 48px !important;
+  font-size: 28px !important;
+  border: 2px solid #387cc2 !important;
+  border-radius: 50% !important;
+  background: rgba(255,255,255,0.55) !important;
+  color: #387cc2 !important;
+  margin: 0 !important;
+  box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
+  transition: background 0.18s, border 0.18s;
+  outline: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s;
-  padding: 0;
+  font-weight: bold;
 }
-.recenter-btn:hover {
-  background: #e9f3ff;
-}
-
-.leaflet-control-zoom {
-  top: 90px !important;  /* Move the zoom control further down below the search controls */
-  right: 20px !important;
-  left: unset !important;
-  bottom: unset !important;
-  z-index: 1002;
-  font-family: 'Roboto', Arial, sans-serif !important;
+.leaflet-control-zoom-in:hover,
+.leaflet-control-zoom-out:hover {
+  background: rgba(232, 247, 255, 0.8) !important;
 }
 
 /* Slide-up panel glassmorphism */
 #list-panel {
   position: fixed;
   left: 0; right: 0; bottom: 0;
-  /* Glass effect is now inherited from .glass-card above */
+  background: rgba(255,255,255,0.55) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-radius: 20px 20px 0 0 !important;
   box-shadow: 0 -4px 24px rgba(46,54,80,0.12);
+  border: 1.5px solid rgba(200,200,200,0.20);
   max-height: 70vh;
   z-index: 2000;
   transition: transform 0.3s cubic-bezier(.4,0,.2,1);
@@ -157,6 +175,7 @@ html, body {
   transform: translateY(100%);
 }
 
+/* --- REST OF YOUR CSS UNCHANGED (list, prices, featured, etc) --- */
 #close-list-btn {
   align-self: flex-end;
   background: none;
