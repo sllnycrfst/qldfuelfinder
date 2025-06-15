@@ -250,7 +250,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return `<div class="price-row"><span class="fuel-type">${fuel}:</span> <span class="fuel-price">${(price/10).toFixed(1)}</span></div>`;
       })
       .join('');
-
+    console.log("FEATURED:", featured);
     let featuredHTML = `
       <li class="featured-station glass-card" id="featured-station">
         <img 
