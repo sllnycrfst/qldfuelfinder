@@ -283,7 +283,7 @@ html, body, #map, #map-controls, #list-panel, #list, #list *, .feature-card, .ma
 }
 .marker-price {
   position: absolute;
-  top: 0px !important;
+  top: 1px !important;
   left: 2px !important;
   width: 100%;
   font-family: 'Roboto', Arial, sans-serif !important;
@@ -297,7 +297,7 @@ html, body, #map, #map-controls, #list-panel, #list, #list *, .feature-card, .ma
   background: none !important;
   border: none;
   box-shadow: none;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.6px !important;
 }
 .marker-price-cheapest {
   color: #21ea00 !important;
