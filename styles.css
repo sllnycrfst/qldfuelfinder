@@ -178,7 +178,6 @@ html, body {
   background: rgba(255,255,255,0.55);
   margin-bottom: 0;
 }
-
 .featurestation-image-wrap {
   flex: 0 0 240px;           /* fixed width on desktop */
   min-width: 180px;          /* don't shrink too small */
@@ -187,7 +186,6 @@ html, body {
   align-items: stretch;
   background: #f5f5f5;
 }
-
 .featurestation-img {
   width: 100%;
   height: 100%;
@@ -196,7 +194,6 @@ html, body {
   display: block;
   background: #f5f5f5;
 }
-
 .featured-details {
   flex: 1 1 0;
   min-width: 0;
@@ -205,55 +202,12 @@ html, body {
   flex-direction: column;
   justify-content: center;
 }
-
 .featured-name {
   font-size: 1.18em;
   font-weight: bold;
   margin-bottom: 0.2em;
 }
-
 .featured-address {
-  font-size: 0.97em;
-  color: #666;
-  margin-bottom: 0.7em;
-}
-
-.featured-address a {
-  color: #387cc2;
-  text-decoration: none;
-}
-.featured-address a:hover {
-  text-decoration: underline;
-}
-
-@media (max-width: 800px) {
-  .featured-station {
-    flex-direction: column;
-  }
-  .featurestation-image-wrap {
-    flex: 0 0 auto;
-    max-width: 100%;
-    min-width: 0;
-  }
-  .featurestation-img {
-    border-radius: 18px 18px 0 0;
-    max-height: 180px;
-    width: 100%;
-    object-fit: contain;
-  }
-  .featured-details {
-    padding: 16px 10px 14px 10px;
-  }
-}
-
-.featured-name {
-  font-size: 1.18em;
-  font-weight: bold;
-  margin-bottom: 0;
-  line-height: 1.17;
-}
-
-.featured-address a {
   color: #387cc2;
   font-weight: 500;
   text-decoration: none;
@@ -261,6 +215,9 @@ html, body {
   margin-bottom: 4px;
   display: inline-block;
   font-family: 'Roboto', Arial, sans-serif !important;
+}
+.featured-address :hover {
+  text-decoration: underline;
 }
 
 .featured-prices {
