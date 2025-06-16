@@ -160,8 +160,8 @@ body {
 }
 
 .leaflet-top.leaflet-right {
-  top: 92px; /* move it down from the top, adjust as needed */
-  bottom: auto;
+  top: auto; /* move it down from the top, adjust as needed */
+  bottom: 60px;
 }
 
 /* Marker styles */
