@@ -148,7 +148,7 @@ html, body {
 }
 
 .fuel-marker {
-  filter: drop-shadow(-10px 8px 16px rgba(30,49,80,0.19));
+  filter: drop-shadow(-20px 8px 6px rgba(30,49,80,0.19));
 }
 
 .marker-brand-img {
