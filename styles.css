@@ -62,11 +62,11 @@ html, body {
 }
 
 #fuel-select {
-  flex: none;
-  max-width: 100%;
-  width: 100%;
+  flex: 0, 0, auto;
+  width: auto;
   box-sizing: border-box;
-  min-width: 80px; /* optional, set to your design */
+  min-width: 100px; /* optional, set to your design */
+  max-width: 160px;
   margin: 0 auto;   /* center horizontally if inside a block */
   display: block;
   align: right;
