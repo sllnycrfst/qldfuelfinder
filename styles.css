@@ -153,8 +153,8 @@ html, body {
   position: absolute;
   top: 26px !important;
   left: 23px !important;
-  width: 33px !important;
-  height: 33px !important;
+  width: 29px !important;
+  height: 29px !important;
   z-index: 1;
   opacity: 1 !important;
   pointer-events: none;
@@ -178,7 +178,7 @@ html, body {
   font-family: 'Roboto', Arial, sans-serif !important;
   text-align: center;
   font-weight: 600 !important;
-  font-size: 13px !important;
+  font-size: 12px !important;
   color: #f9f9f9 !important;
   z-index: 3;
   padding: 4px 0 4px 0;
