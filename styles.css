@@ -141,6 +141,16 @@ html, body {
   display: block;
   font-family: 'Roboto', Arial, sans-serif !important;
 }
+
+.fuel-marker {
+  filter: drop-shadow(0 4px 16px rgba(30,49,80,0.19));
+}
+
+.marker-stack {
+  box-shadow: 0 3px 18px 0 rgba(30,49,80,0.14);
+  border-radius: 13px;
+}
+
 .marker-brand-img {
   position: absolute;
   top: 26px !important;
@@ -159,8 +169,6 @@ html, body {
   height: 78px !important;
   display: block;
   position: relative;
-  box-shadow: 0 4px 16px 0 rgba(30,49,80,0.15);
-  border-radius: 16px; /* optional, for softer edges */
   z-index: 2;
   pointer-events: none;
 }
