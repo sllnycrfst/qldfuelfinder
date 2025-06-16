@@ -154,10 +154,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const icon = L.divIcon({
         className: "fuel-marker",
         html: `
-          <div class="marker-stack" style="position:relative;width:80px;height:80px;">
-            <img src="images/${s.brand ? s.brand : 'default'}.png" class="marker-brand-img" style="position:absolute;top:25px;left:25px;width:30px;height:30px;z-index:1;opacity:0.85;pointer-events:none;" onerror="this.onerror=null;this.src='images/default.png';"/>
-            <img src="images/mymarker.png" class="custom-marker-img" style="width:80px;height:80px;position:relative;z-index:2;pointer-events:none;"/>
-            <div class="${priceClass}" style="position:absolute;bottom:2px;left:0;width:100%;text-align:center;font-weight:bold;font-size:18px;font-family:'Roboto',Arial,sans-serif!important;color:#2296f3;">
+          <div class="marker-stack" style="position:relative;width:72px;height:72px;">
+            <img src="images/${s.brand ? s.brand : 'default'}.png" 
+                class="marker-brand-img" 
+                style="position:absolute;top:26px;left:23px;width:29px;height:29px;z-index:1;opacity:1;pointer-events:none;"
+                onerror="this.onerror=null;this.src='images/default.png';"/>
+            <img src="images/mymarker.png" class="custom-marker-img" style="width:69px;height:69px;position:relative;z-index:2;pointer-events:none;"/>
+            <div class="${priceClass}" style="position:absolute;top:0px;left:6px;width:80%;font-weight:600;font-size:12px;color:#f9f9f9;z-index:3;">
               ${s.price.toFixed(1)}
             </div>
           </div>
@@ -166,7 +169,6 @@ document.addEventListener("DOMContentLoaded", () => {
         iconAnchor: [36, 72],
         popupAnchor: [0, -72]
       });
-
       markerLayer.addLayer(
         L.marker([s.lat, s.lng], {
           icon,
