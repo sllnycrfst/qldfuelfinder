@@ -153,7 +153,7 @@ html, body {
 .marker-brand-img {
   position: absolute !important;
   top: 25px;    /* adjust as needed */
-  left: 21px;   /* adjust as needed */
+  left: 22px;   /* adjust as needed */
   width: 26px;  /* adjust as needed */
   height: 26px; /* adjust as needed */
   z-index: 1 !important;
@@ -179,7 +179,7 @@ html, body {
   font-family: 'Roboto', Arial, sans-serif !important;
   text-align: center;
   font-weight: 600 !important;
-  font-size: 12px !important;
+  font-size: 11px !important;
   color: #f9f9f9 !important;
   z-index: 3 !important;
   padding: 4px 0 4px 0;
