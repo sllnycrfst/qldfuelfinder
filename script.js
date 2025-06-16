@@ -154,20 +154,20 @@ document.addEventListener("DOMContentLoaded", () => {
       const icon = L.divIcon({
         className: "fuel-marker",
         html: `
-          <div class="marker-stack" style="position:relative;width:72px;height:72px;">
-            <img src="images/mymarker.png" class="custom-marker-img" style="width:69px;height:69px;position:relative;z-index:2;pointer-events:none;"/>
-            <div class="${priceClass}" style="position:absolute;top:0px;left:6px;width:80%;font-weight:600;font-size:12px;color:#f9f9f9;z-index:3;">
-              ${s.price.toFixed(1)}
+          <div class="marker-stack">
             <img src="images/${s.brand ? s.brand : 'default'}.png"
               class="marker-brand-img"
-              onerror="this.onerror=null;this.src='images/default.png';"/>
-            </div>
+               onerror="this.onerror=null;this.src='images/default.png';"/>
+            <img src="images/mymarker.png" class="custom-marker-img"/>
+            <div class="${priceClass} marker-price">
+              ${s.price.toFixed(1)}
           </div>
-        `,
-        iconSize: [72, 72],
-        iconAnchor: [36, 72],
-        popupAnchor: [0, -72]
-      });
+        </div>
+      `,
+      iconSize: [72, 72],
+      iconAnchor: [36, 72],
+      popupAnchor: [0, -72]
+    });
       markerLayer.addLayer(
         L.marker([s.lat, s.lng], {
           icon,
