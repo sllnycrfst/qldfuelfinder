@@ -158,6 +158,9 @@ document.addEventListener("DOMContentLoaded", () => {
             <img src="images/mymarker.png" class="custom-marker-img" style="width:69px;height:69px;position:relative;z-index:2;pointer-events:none;"/>
             <div class="${priceClass}" style="position:absolute;top:0px;left:6px;width:80%;font-weight:600;font-size:12px;color:#f9f9f9;z-index:3;">
               ${s.price.toFixed(1)}
+            <img src="images/${s.brand ? s.brand : 'default'}.png"
+              class="marker-brand-img"
+              onerror="this.onerror=null;this.src='images/default.png';"/>
             </div>
           </div>
         `,
