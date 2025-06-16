@@ -36,12 +36,13 @@ html, body {
 }
 
 #search {
-  flex: 1 1 0;
-  align: left !important;
+  #search {
+  flex: 1 1 auto;
   font-size: 1em;
-  padding: 10px 18px;
-  border-radius: 18px !important;
-  border: none !important;
+  padding: 12px 20px;
+  border-radius: 20px;
+  min-width: 160px !important;
+  max-width: none; /* remove cap so it can grow */
   background: rgba(255,255,255,0.55);
   box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
   outline: none;
@@ -61,12 +62,12 @@ html, body {
 }
 
 #fuel-select {
-  flex: none;
-  max-width: 100%;
-  width: 100%;
+  flex: 0 0 auto; /* Don’t shrink or grow */
+  width: auto;
+  min-width: 100px; /* Give it room to breathe */
+  max-width: 160px;
+  margin: 0;
   box-sizing: border-box;
-  min-width: 80px; /* optional, set to your design */
-  margin: 0 auto;   /* center horizontally if inside a block */
   display: block;
   align: right;
   font-size: 1em;
