@@ -5,21 +5,33 @@ html, body {
   box-sizing: border-box;
   font-family: 'Roboto', Arial, sans-serif !important;
   background: #f5f5f5;
+  width: 100vw;
+  overflow: hidden; /* prevents scrollbars */
+}
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
 }
 
 #map {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  width: 100vw; height: 100vh;
+  flex: 1 1 0;
+  width: 100vw;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  position: relative;
   z-index: 0;
-  font-family: 'Roboto', Arial, sans-serif !important;
 }
+
 
 /* Search Bar Glass Effect */
 .search-bar-glass {
   width: 100%;
   max-width: 700px;
-  margin: 24px auto 16px auto;
+  margin: 32px auto 0 auto;  /* top margin for spacing down */
   display: flex;
   align-items: center;
   background: rgba(255,255,255,0.55);
@@ -27,7 +39,7 @@ html, body {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: 18px;
-  padding: 0 12px;
+  padding: 0 16px;
   z-index: 999;
   position: relative;
 }
@@ -83,23 +95,17 @@ html, body {
   background: rgba(255,255,255,0.75);
 }
 
-@media (max-width: 900px) {
-  .search-bar-glass {
-    max-width: 98vw;
-    margin: 14px 1vw;
-  }
-  #map {
-    height: 55vh;
-    min-height: 270px;
-    border-radius: 10px;
-  }
+
+#search:focus,
+#fuel-select:focus {
+  background: rgba(255,255,255,0.75);
 }
 
 @media (max-width: 600px) {
   .search-bar-glass {
-    padding: 0 4px;
-    max-width: 99vw;
-    margin: 8px 0;
+    max-width: 98vw;
+    padding: 0 4vw;
+    margin: 14px auto 0 auto;
   }
   #search, #fuel-select {
     font-size: 0.95em;
@@ -109,12 +115,7 @@ html, body {
     font-size: 1.2em;
     margin: 0 5px;
   }
-  #map {
-    min-height: 200px;
-    border-radius: 6px;
-  }
 }
-
 /* Map Zoom Buttons */
 .leaflet-control-zoom {
   background: rgba(255, 255, 255, 0.38);
