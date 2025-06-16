@@ -143,8 +143,8 @@ html, body {
 }
 .marker-brand-img {
   position: absolute;
-  top: 26px !important;
-  left: 24px !important;
+  top: 27px !important;
+  left: 23px !important;
   width: 32px !important;
   height: 32px !important;
   z-index: 1;
@@ -165,7 +165,7 @@ html, body {
 .marker-price {
   position: absolute;
   top: 0px !important;
-  left: 4px !important;
+  left: 6px !important;
   width: 85% !important;
   font-family: 'Roboto', Arial, sans-serif !important;
   text-align: center;
