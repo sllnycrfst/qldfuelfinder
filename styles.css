@@ -6,34 +6,20 @@ html, body {
   font-family: 'Roboto', Arial, sans-serif !important;
   background: #f5f5f5;
 }
+
 #map {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   width: 100vw; height: 100vh;
-  
   z-index: 0;
   font-family: 'Roboto', Arial, sans-serif !important;
 }
 
-#map-controls input,
-#map-controls select {
-  font-size: 1em;
-  padding: 10px 18px;
-  border-radius: 999px !important;
-  border: none !important;
-  background: rgba(255,255,255,0.55);
-  box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
-  outline: none;
-  font-family: 'Roboto', Arial, sans-serif !important;
-  transition: background 0.18s;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: #387cc2 !important;
-  margin: 0;
-}
-
+/* Search Bar Glass Effect */
 .search-bar-glass {
   width: 100%;
+  max-width: 700px;
+  margin: 24px auto 16px auto;
   display: flex;
   align-items: center;
   background: rgba(255,255,255,0.55);
@@ -42,7 +28,8 @@ html, body {
   -webkit-backdrop-filter: blur(10px);
   border-radius: 18px;
   padding: 0 12px;
-  margin: 20px 0;
+  z-index: 999;
+  position: relative;
 }
 
 #search {
@@ -96,17 +83,35 @@ html, body {
   background: rgba(255,255,255,0.75);
 }
 
+@media (max-width: 900px) {
+  .search-bar-glass {
+    max-width: 98vw;
+    margin: 14px 1vw;
+  }
+  #map {
+    height: 55vh;
+    min-height: 270px;
+    border-radius: 10px;
+  }
+}
+
 @media (max-width: 600px) {
   .search-bar-glass {
     padding: 0 4px;
+    max-width: 99vw;
+    margin: 8px 0;
   }
-  #search,
-  #fuel-select {
+  #search, #fuel-select {
     font-size: 0.95em;
     padding: 8px 0;
   }
   .divider {
     font-size: 1.2em;
+    margin: 0 5px;
+  }
+  #map {
+    min-height: 200px;
+    border-radius: 6px;
   }
 }
 
