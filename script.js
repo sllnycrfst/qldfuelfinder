@@ -162,9 +162,9 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
           </div>
         `,
-        iconSize: [80, 80],
-        iconAnchor: [40, 80],
-        popupAnchor: [0, -80]
+        iconSize: [72, 72],
+        iconAnchor: [36, 72],
+        popupAnchor: [0, -72]
       });
 
       markerLayer.addLayer(
