@@ -139,8 +139,8 @@ html, body {
 /* Marker styles */
 .fuel-marker .marker-stack {
   position: relative;
-  width: 80px;
-  height: 80px;
+  width: 72px !important;
+  height: 72px !important;
   display: block;
   font-family: 'Roboto', Arial, sans-serif !important;
 }
@@ -163,8 +163,8 @@ html, body {
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 .custom-marker-img {
-  width: 78px !important;
-  height: 78px !important;
+  width: 72px !important;
+  height: 72px !important;
   display: block;
   position: relative;
   z-index: 2;
