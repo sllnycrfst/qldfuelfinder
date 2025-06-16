@@ -145,8 +145,8 @@ html, body {
   position: absolute;
   top: 27px !important;
   left: 23px !important;
-  width: 32px !important;
-  height: 32px !important;
+  width: 33px !important;
+  height: 33px !important;
   z-index: 1;
   opacity: 1 !important;
   pointer-events: none;
