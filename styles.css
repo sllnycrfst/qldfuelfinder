@@ -138,7 +138,7 @@ html, body {
 
 /* Marker styles */
 .fuel-marker .marker-stack {
-  position: relative;
+  position: absolute;
   width: 72px !important;
   height: 72px !important;
   display: block;
