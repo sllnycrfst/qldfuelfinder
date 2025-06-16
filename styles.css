@@ -15,45 +15,34 @@ html, body {
   font-family: 'Roboto', Arial, sans-serif !important;
 }
 
-#map-controls {
-  position: absolute;
-  top: 20px;
-  left: 0;
-  right: 0;
-  z-index: 1002;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  gap: 18px;
-  background: transparent !important;
-  box-shadow: none !important;
-  padding: 0 16px;
-  border-radius: 0;
-  font-family: 'Roboto', Arial, sans-serif !important;
+.search-bar-glass {
   width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,0.55);
+  box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 18px;
+  padding: 0 12px;
+  margin: 20px 0;
 }
 
 #search {
   flex: 1 1 0;
-  align: left !important;
+  border: none;
+  background: transparent;
   font-size: 1em;
-  padding: 10px 18px;
-  border-radius: 18px !important;
-  border: none !important;
-  background: rgba(255,255,255,0.55);
-  box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
+  padding: 10px 0 10px 8px;
   outline: none;
+  color: #387cc2 !important;
   font-family: 'Roboto', Arial, sans-serif !important;
   transition: background 0.18s;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: #387cc2 !important;
-  margin-right: 10px;
-  min-width: 120px !important;
-  max-width: 160px !important;
+  min-width: 120px;
+  max-width: none;
+  box-shadow: none;
+  border-radius: 0;
+  margin-right: 0;
 }
 
 #search::placeholder {
@@ -61,32 +50,47 @@ html, body {
   opacity: 1;
 }
 
+.divider {
+  margin: 0 10px;
+  color: #b4b4b4;
+  font-size: 1.5em;
+  user-select: none;
+}
+
 #fuel-select {
-  flex: 0, 0, auto;
-  width: auto;
-  box-sizing: border-box;
-  min-width: 100px; /* optional, set to your design */
-  max-width: 160px;
-  margin: 0 auto;   /* center horizontally if inside a block */
-  display: block;
-  align: right;
+  border: none;
+  background: transparent;
   font-size: 1em;
-  padding: 10px 18px !important;
-  border-radius: 18px !important;
-  border: none !important;
-  background: rgba(255,255,255,0.55);
-  box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
-  outline: none;
-  font-family: 'Roboto', Arial, sans-serif !important;
-  transition: background 0.18s;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  padding: 10px 8px 10px 0;
+  border-radius: 0;
   color: #387cc2 !important;
+  font-family: 'Roboto', Arial, sans-serif !important;
+  outline: none;
+  box-shadow: none;
+  min-width: 70px;
+  max-width: 120px;
+  transition: background 0.18s;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 #search:focus,
 #fuel-select:focus {
   background: rgba(255,255,255,0.75);
+}
+
+@media (max-width: 600px) {
+  .search-bar-glass {
+    padding: 0 4px;
+  }
+  #search,
+  #fuel-select {
+    font-size: 0.95em;
+    padding: 8px 0;
+  }
+  .divider {
+    font-size: 1.2em;
+  }
 }
 
 /* Map Zoom Buttons */
