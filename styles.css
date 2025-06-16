@@ -139,11 +139,13 @@ html, body {
   width: 80px;
   height: 80px;
   display: block;
+  box-shadow: 0 4px 16px 0 rgba(30,49,80,0.15);
+  border-radius: 16px; /* optional, for softer edges */
   font-family: 'Roboto', Arial, sans-serif !important;
 }
 .marker-brand-img {
   position: absolute;
-  top: 27px !important;
+  top: 26px !important;
   left: 23px !important;
   width: 33px !important;
   height: 33px !important;
