@@ -143,6 +143,7 @@ html, body {
   height: 72px !important;
   display: block;
   font-family: 'Roboto', Arial, sans-serif !important;
+  filter: drop-shadow(0 4px 16px rgba(30,49,80,0.19));
 }
 
 .fuel-marker {
@@ -150,7 +151,7 @@ html, body {
 }
 
 .marker-brand-img {
-  position: absolute;
+  position: absolute !important;
   top: 22px;    /* adjust as needed */
   left: 22px;   /* adjust as needed */
   width: 26px;  /* adjust as needed */
@@ -163,15 +164,15 @@ html, body {
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 .custom-marker-img {
+  position: absolute !important;
   width: 69px !important;
   height: 69px !important;
   display: block;
-  pposition: absolute;
   z-index: 2 !important;
   pointer-events: none;
 }
 .marker-price {
-  position: absolute;
+  position: absolute !important;;
   top: 0px !important;
   left: 6px !important;
   width: 80% !important;
