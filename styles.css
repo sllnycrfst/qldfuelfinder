@@ -10,6 +10,7 @@ html, body {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   width: 100vw; height: 100vh;
+  
   z-index: 0;
   font-family: 'Roboto', Arial, sans-serif !important;
 }
@@ -31,7 +32,7 @@ html, body {
   border-radius: 0;
   font-family: 'Roboto', Arial, sans-serif !important;
   width: 100%;
-  max-width: 400px;
+  max-width: 600px;
   margin: 0 auto;
 }
 
