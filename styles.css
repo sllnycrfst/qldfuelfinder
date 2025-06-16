@@ -150,7 +150,7 @@ html, body {
 }
 
 .marker-brand-img {
-  position: absolute;
+  position: relative;
   top: 26px !important;
   left: 23px !important;
   width: 29px !important;
