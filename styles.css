@@ -155,7 +155,7 @@ html, body {
   left: 22px;   /* adjust as needed */
   width: 26px;  /* adjust as needed */
   height: 26px; /* adjust as needed */
-  z-index: 1;
+  z-index: 1 !important;
   opacity: 1;
   pointer-events: none;
   border-radius: 10%;
