@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
     map = L.map("map", { zoomControl: true, attributionControl: false }).setView(center, defaultZoom);
     map.zoomControl.setPosition("topright");
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a> | &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
+      attribution: '&copy; <a href="https:www.sellanycarfast.com.au">Sell Any Car Fast</a> | '&copy; <a href="https://carto.com/attributions">CARTO</a> | &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
       subdomains: 'abcd',
       maxZoom: 18
     }).addTo(map);
