@@ -1,6 +1,6 @@
-import { suburbs } from './suburbs.js';
 document.addEventListener("DOMContentLoaded", () => {
   // UI controls
+  import { suburbs } from './suburbs.js';
   const recenterBtn = document.getElementById("recenter-btn");
   const listBtn = document.getElementById("list-btn");
   const listPanel = document.getElementById("list-panel");
@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const listUl = document.getElementById("list");
   const searchInput = document.getElementById("search");
   const fuelSelect = document.getElementById("fuel-select");
-
   let map, markerLayer, userMarker;
   const defaultCenter = [-27.4698, 153.0251];
   const defaultZoom = 14;
