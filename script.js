@@ -1,4 +1,59 @@
+import { suburbs } from "./suburbs.js";
+
 document.addEventListener("DOMContentLoaded", () => {
+  const searchInput = document.getElementById("search");
+  const suggestionsBox = document.getElementById("suggestions");
+
+  function showSuggestions(suggestions) {
+    if (!suggestions.length) {
+      suggestionsBox.innerHTML = '';
+      suggestionsBox.style.display = 'none';
+      return;
+    }
+    suggestionsBox.innerHTML = suggestions
+      .map(suburb => `<div class="suggestion-item">${suburb}</div>`)
+      .join('');
+    suggestionsBox.style.display = 'block';
+  }
+
+  function hideSuggestions() {
+    suggestionsBox.innerHTML = '';
+    suggestionsBox.style.display = 'none';
+  }
+
+  searchInput.addEventListener("input", e => {
+    const query = e.target.value.toLowerCase().trim();
+    if (query.length < 2) {
+      hideSuggestions();
+      return;
+    }
+    const matches = suburbs
+      .filter(suburb => suburb.toLowerCase().startsWith(query))
+      .slice(0, 10);
+    showSuggestions(matches);
+  });
+
+  suggestionsBox.addEventListener("mousedown", e => {
+    if (e.target.classList.contains("suggestion-item")) {
+      searchInput.value = e.target.textContent;
+      hideSuggestions();
+    }
+  });
+
+  searchInput.addEventListener("blur", () => {
+    setTimeout(hideSuggestions, 100); // let click register first
+  });
+
+  searchInput.addEventListener("focus", () => {
+    const query = searchInput.value.toLowerCase().trim();
+    if (query.length >= 2) {
+      const matches = suburbs
+        .filter(suburb => suburb.toLowerCase().startsWith(query))
+        .slice(0, 10);
+      showSuggestions(matches);
+    }
+  });
+});
   // UI controls
   const recenterBtn = document.getElementById("recenter-btn");
   const listBtn = document.getElementById("list-btn");
