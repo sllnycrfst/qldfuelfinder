@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
     mapkit.init({
       authorizationCallback: function(done) {
         // Replace with your real JWT token below:
-        done("YOUR_MAPKIT_JS_JWT_TOKEN_HERE");
+        done("eyJraWQiOiI4Wk44NTZHUjI0IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUwMTQ2NDkyLCJvcmlnaW4iOiJzbGxueWNyZnN0LmdpdGh1Yi5pbyJ9.ylKRmHZvXgB5qbDr_6niDFpT4wAlGItM7TsNDUHqQOOyKoxGMNbYbgI5cv2cW0iyh6BlnazJ_cYTCef1VNnr2g");
       }
     });
     map = new mapkit.Map("map", {
