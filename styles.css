@@ -34,7 +34,7 @@ body {
   margin: 32px auto 20px auto;  /* top margin for spacing down */
   display: flex;
   align-items: center;
-  background: rgba(255,255,255,0.55);
+  background: none;
   box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -161,7 +161,8 @@ body {
 
 .leaflet-top.leaflet-right {
   top: auto; /* move it down from the top, adjust as needed */
-  bottom: 60px;
+  bottom: 90px;
+  right: 40px;
 }
 
 /* Marker styles */
