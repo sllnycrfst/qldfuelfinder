@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>QLD Fuel Finder</title>
-  <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Quantico:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
@@ -21,12 +22,11 @@
       <option value="95">95</option>
       <option value="98">98</option>
       <option value="Diesel">Diesel</option>
-      <option value="Premium Diesel">Premium Diesel</option>
     </select>
   </div>
 
   <!-- Map Container -->
-  <div id="map" style="width:100vw; height:100vh;"></div>
+  <div id="map"></div>
 
   <!-- Floating Action Buttons -->
   <button id="list-btn" title="Show station list" class="list-btn glass-btn" aria-label="Show station list">
@@ -48,7 +48,8 @@
     <ul id="list"></ul>
   </div>
 
-  <!-- Your main JS script last -->
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
