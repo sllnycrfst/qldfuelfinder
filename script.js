@@ -192,7 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .filter(Boolean);
 
     for (const s of visibleStations) {
-      const brandImgUrl = s.BrandId ? `images/${s.BrandId}.png` : 'images/default.png';
+      const brandImgUrl = s.BrandId ? `images/${s.BrandId}.png` : 'images/12.png';
       const myMarkerUrl = "images/my-marker.png";
       const priceVal = s.price;
 
@@ -298,13 +298,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // Always use brand logo for both featured and list stations
     const featuredImgSrc = featured.brand
       ? `images/${featured.brand}.png`
-      : 'images/default.png';
+      : 'images/12.png';
 
     let featuredHTML = `
       <li class="featured-station glass-card" id="featured-station">
         <img 
           src="${featuredImgSrc}"
-          onerror="this.onerror=null;this.src='images/default.png';"
+          onerror="this.onerror=null;this.src='images/12.png';"
           class="featurestation-img"
           alt="${featured.name}"
         />
@@ -324,14 +324,14 @@ document.addEventListener("DOMContentLoaded", () => {
     let othersHTML = others.map(site => {
       const siteImgSrc = site.brand
         ? `images/${site.brand}.png`
-        : 'images/default.png';
+        : 'images/12.png';
       return `
         <li class="list-station" data-siteid="${String(site.siteId)}">
           <span class="list-logo">
             <img 
               src="${siteImgSrc}"
               alt="${site.name}" 
-              onerror="this.onerror=null;this.src='images/default.png';"
+              onerror="this.onerror=null;this.src='images/12.png';"
               style="height:32px;width:32px;border-radius:50%;background:#fff;object-fit:contain;box-shadow:0 1px 2px rgba(0,0,0,0.07);"
             />
           </span>
