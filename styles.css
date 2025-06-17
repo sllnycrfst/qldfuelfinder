@@ -4,7 +4,7 @@ html, body {
   padding: 0;
   box-sizing: border-box;
   font-family: 'Roboto', Arial, sans-serif !important;
-  background: transparent !important;
+  background: transparent !important; /* <-- make this transparent */
   width: 100vw;
   overflow: hidden; /* prevents scrollbars */
 }
@@ -130,7 +130,7 @@ body {
 .leaflet-control-zoom-in,
 .leaflet-control-zoom-out {
   background: transparent !important;
-  color: #1976d2 !important;
+  color: #3378c1 !important;
   border: none;
   font-size: 1.6em;
   font-weight: bold;
