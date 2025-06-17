@@ -166,7 +166,7 @@ body {
 
 .leaflet-top.leaflet-right {
   top: auto; /* move it down from the top, adjust as needed */
-  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  bottom: 100px;
   right: 20px;
 }
 
@@ -251,7 +251,7 @@ body {
   z-index: 1003;
   padding: 0;
   font-family: 'Roboto', Arial, sans-serif !important;
-  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  bottom: 40px;
 }
 .list-btn { left: 20px; bottom: 20px; }
 .recenter-btn { right: 20px; bottom: 20px; }
