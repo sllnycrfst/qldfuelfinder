@@ -1,3 +1,4 @@
+import { suburbs } from './suburbs.js';
 document.addEventListener("DOMContentLoaded", () => {
   // UI controls
   const recenterBtn = document.getElementById("recenter-btn");
@@ -11,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let map, markerLayer, userMarker;
   const defaultCenter = [-27.4698, 153.0251];
   const defaultZoom = 14;
-
+  
   // Use the desired fuel order: E10, 91, 95, 98, Diesel
   const fuelOrder = ["E10", "91", "95", "98", "Diesel"];
   const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3, "Premium Diesel": 10 };
@@ -348,15 +349,26 @@ document.addEventListener("DOMContentLoaded", () => {
   currentFuel = "E10";
 
   // Search suburb/station
-  searchInput && searchInput.addEventListener("input", function (e) {
-    const query = e.target.value.toLowerCase().trim();
-    if (query.length < 2) return;
-    const match = allSites.find(s =>
-      (s.P && s.P.toLowerCase().includes(query)) ||
-      (s.N && s.N.toLowerCase().includes(query))
-    );
-    if (match && map) map.setView([match.Lat, match.Lng], 15);
-  });
+searchInput && searchInput.addEventListener("input", function (e) {
+  const query = e.target.value.toLowerCase().trim();
+  if (query.length < 2) return;
+
+  // Filter sites for station matching
+  const match = allSites.find(s =>
+    (s.P && s.P.toLowerCase().includes(query)) ||
+    (s.N && s.N.toLowerCase().includes(query))
+  );
+  if (match && map) map.setView([match.Lat, match.Lng], 15);
+
+  // Filter suburbs for suggestions
+  const suggestions = suburbs.filter(suburb =>
+    suburb.toLowerCase().startsWith(query)
+  );
+
+  // TODO: Display suggestions in your UI!
+  console.log(suggestions); // For now, just log it
+});
+
 
   // Start app with user location if possible
   if (navigator.geolocation) {
