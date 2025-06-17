@@ -19,7 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let forcedFeaturedSiteId = null;
   let stationAnnotations = [];
 
-  // --- Apple MapKit JS Setup ---
   function initMapKit(center) {
     mapkit.init({
       authorizationCallback: function(done) {
@@ -38,7 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- Show user location ---
   function showUserLocation(recenter) {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
@@ -63,7 +61,6 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  // --- Fetch data ---
   async function fetchSitesAndPrices() {
     try {
       const [siteRes, priceRes] = await Promise.all([
@@ -85,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- Compose marker image (matches your mockup) ---
+  // --- Compose marker image ---
   function makeStationMarker(brandUrl, markerUrl, price) {
     return new Promise((resolve) => {
       const canvas = document.createElement('canvas');
@@ -116,9 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
             fallback();
             return;
           }
-          // marker base
           ctx.drawImage(markerImg, 0, 28, 90, 82);
-          // brand logo
           ctx.save();
           ctx.beginPath();
           ctx.arc(45, 69, 28, 0, 2 * Math.PI);
@@ -126,7 +121,6 @@ document.addEventListener("DOMContentLoaded", () => {
           ctx.clip();
           ctx.drawImage(brandImg, 17, 41, 56, 56);
           ctx.restore();
-          // price panel
           ctx.save();
           ctx.fillStyle = "#222";
           ctx.strokeStyle = "#196b2a";
@@ -140,7 +134,6 @@ document.addEventListener("DOMContentLoaded", () => {
           ctx.fill();
           ctx.stroke();
           ctx.restore();
-          // price text
           ctx.font = "bold 32px monospace";
           ctx.fillStyle = "#7fff50";
           ctx.textAlign = "center";
@@ -158,7 +151,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- Add/Update fuel station markers ---
   async function updateVisibleStations() {
     if (!allSites.length || !allPrices.length || !map) return;
     if (stationAnnotations.length) map.removeAnnotations(stationAnnotations);
@@ -288,7 +280,6 @@ document.addEventListener("DOMContentLoaded", () => {
       others = stations.slice(1);
     }
 
-    // Fuel prices in E10, 91, 95, 98, Diesel order
     let priceHTML = fuelOrder
       .filter(fuel => fuelIdMap[fuel] && featured.allPrices && featured.allPrices[fuelIdMap[fuel]])
       .map(fuel => {
@@ -297,7 +288,6 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .join('');
 
-    // Always use brand logo for both featured and list stations
     const featuredImgSrc = featured.BrandId
       ? `images/${featured.BrandId}.png`
       : 'images/default.png';
@@ -367,7 +357,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- Distance helper ---
   function getDistance(lat1, lon1, lat2, lon2) {
     if (lat1 == null || lon1 == null) return null;
     const R = 6371;
@@ -379,9 +368,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
 
-  // --- UI event hooks ---
   recenterBtn && recenterBtn.addEventListener("click", () => showUserLocation(true));
-
   listBtn && listBtn.addEventListener("click", () => {
     forcedFeaturedSiteId = null;
     listPanel.classList.add("visible");
@@ -416,7 +403,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // --- App bootstrap ---
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       pos => {
