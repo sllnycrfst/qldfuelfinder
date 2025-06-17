@@ -4,7 +4,7 @@ html, body {
   padding: 0;
   box-sizing: border-box;
   font-family: 'Roboto', Arial, sans-serif !important;
-  background: none;
+  background: transparent;
   width: 100vw;
   overflow: hidden; /* prevents scrollbars */
 }
