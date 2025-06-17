@@ -46,10 +46,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }).addTo(map);
 
     // Define and add your custom control HERE, after map is created
-    const customControl = L.control({ position: 'bottomright' });
+    const customControl = L.control({ position: 'bottomleft' });
     customControl.onAdd = function(map) {
       const div = L.DomUtil.create('div', 'custom-control');
-      div.innerHTML = '<a href="https://yourwebsite.com" target="_blank">Your Link Text</a>';
+      div.innerHTML = '<a href="https://www.sellanycarfast.com.au" target="_blank">Sell Any Car Fast</a>';
       return div;
     };
     customControl.addTo(map);
