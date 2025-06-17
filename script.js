@@ -1,5 +1,3 @@
-import { suburbs } from './suburbs.js';
-
 document.addEventListener("DOMContentLoaded", () => {
   // UI controls
   const recenterBtn = document.getElementById("recenter-btn");
@@ -8,8 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeListBtn = document.getElementById("close-list-btn");
   const listUl = document.getElementById("list");
   const searchInput = document.getElementById("search");
-  const suggestionsBox = document.getElementById("suggestions"); // You need <div id="suggestions"></div> in your HTML!
   const fuelSelect = document.getElementById("fuel-select");
+
   let map, markerLayer, userMarker;
   const defaultCenter = [-27.4698, 153.0251];
   const defaultZoom = 14;
@@ -37,67 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
     "Hope Vale Service Station", "Miallo Fuel Station", "Roadhouse Service Station",
     "Mareeba Service Station", "Port Douglas Service Station"
   ];
-
-  // --- AUTOCOMPLETE LOGIC FOR SUBURBS ---
-  function showSuggestions(suggestions) {
-    if (!suggestionsBox) return;
-    if (!suggestions.length) {
-      suggestionsBox.innerHTML = '';
-      suggestionsBox.style.display = 'none';
-      return;
-    }
-    suggestionsBox.innerHTML = suggestions
-      .map(suburb => `<div class="suggestion-item">${suburb}</div>`)
-      .join('');
-    suggestionsBox.style.display = 'block';
-  }
-
-  function hideSuggestions() {
-    if (!suggestionsBox) return;
-    suggestionsBox.innerHTML = '';
-    suggestionsBox.style.display = 'none';
-  }
-
-  searchInput && searchInput.addEventListener('input', e => {
-    const query = e.target.value.toLowerCase().trim();
-    if (query.length < 2) {
-      hideSuggestions();
-      return;
-    }
-    const matches = suburbs
-      .filter(suburb => suburb.toLowerCase().startsWith(query))
-      .slice(0, 10);
-    showSuggestions(matches);
-  });
-
-  suggestionsBox && suggestionsBox.addEventListener('mousedown', e => {
-    if (e.target.classList.contains('suggestion-item')) {
-      searchInput.value = e.target.textContent;
-      hideSuggestions();
-      // Jump to that suburb if it exists in allSites
-      const match = allSites.find(s =>
-        s.P && s.P.toLowerCase() === e.target.textContent.toLowerCase()
-      );
-      if (match && map) map.setView([match.Lat, match.Lng], 15);
-      updateStationList();
-    }
-  });
-
-  searchInput && searchInput.addEventListener('blur', () => {
-    setTimeout(hideSuggestions, 100);
-  });
-
-  searchInput && searchInput.addEventListener('focus', () => {
-    const query = searchInput.value.toLowerCase().trim();
-    if (query.length >= 2) {
-      const matches = suburbs
-        .filter(suburb => suburb.toLowerCase().startsWith(query))
-        .slice(0, 10);
-      showSuggestions(matches);
-    }
-  });
-
-  // --- END AUTOCOMPLETE LOGIC ---
 
   function startApp(center) {
     map = L.map("map", { zoomControl: true, attributionControl: false }).setView(center, defaultZoom);
@@ -409,6 +346,17 @@ document.addEventListener("DOMContentLoaded", () => {
   // Default to E10 on load
   fuelSelect.value = "E10";
   currentFuel = "E10";
+
+  // Search suburb/station
+  searchInput && searchInput.addEventListener("input", function (e) {
+    const query = e.target.value.toLowerCase().trim();
+    if (query.length < 2) return;
+    const match = allSites.find(s =>
+      (s.P && s.P.toLowerCase().includes(query)) ||
+      (s.N && s.N.toLowerCase().includes(query))
+    );
+    if (match && map) map.setView([match.Lat, match.Lng], 15);
+  });
 
   // Start app with user location if possible
   if (navigator.geolocation) {
