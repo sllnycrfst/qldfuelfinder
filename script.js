@@ -204,7 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
         {
           url: markerDataUrl,
           size: { width: 48, height: 58 },
-          anchorOffset: new DOMPoint(0, -29)
+          anchorOffset: new DOMPoint(0, -29),
           title: s.name,
           subtitle: s.address + (s.suburb ? ", " + s.suburb : ""),
         }
