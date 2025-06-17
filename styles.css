@@ -166,8 +166,8 @@ body {
 
 .leaflet-top.leaflet-right {
   top: auto; /* move it down from the top, adjust as needed */
-  bottom: 80px;
-  right: 20px;
+  bottom: 90px;
+  right: 25px;
 }
 
 /* Marker styles */
@@ -243,18 +243,17 @@ body {
 }
 
 .list-btn, .recenter-btn {
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   font-size: 24px;
   cursor: pointer;
   position: absolute;
   z-index: 1003;
   padding: 0;
   font-family: 'Roboto', Arial, sans-serif !important;
-  bottom: calc(30px + env(safe-area-inset-bottom, 0px));
 }
-.list-btn { left: 20px; bottom: calc(30px + env(safe-area-inset-bottom, 0px)); }
-.recenter-btn { right: 20px; bottom: calc(30px + env(safe-area-inset-bottom, 0px)); }
+.list-btn { left: 25px; bottom: 30px }
+.recenter-btn { right: 25px; bottom: 30px }
 
 .list-btn:hover, .recenter-btn:hover {
   background: rgba(232, 247, 255, 0.8) !important;
