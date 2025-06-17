@@ -40,17 +40,12 @@ document.addEventListener("DOMContentLoaded", () => {
     map = L.map("map", { zoomControl: true, attributionControl: true }).setView(center, defaultZoom);
     map.zoomControl.setPosition("topright");
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a> | &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
+      attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a> | &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> | <a href="https://www.sellanycarfast.com.au">Sell Any Car Fast</a>',
       subdomains: 'abcd',
       maxZoom: 16
-    }).addTo(map);
+  }).addTo(map);
 
-    const customControl = L.control({ position: 'bottomleft' });
-    customControl.onAdd = function(map) {
-    const div = L.DomUtil.create('div', 'custom-control');
-    div.innerHTML = '<a href="https://yourwebsite.com" target="_blank">My Site</a>';
-      return div;
-  };
+    
 customControl.addTo(map);
 
     markerLayer = L.layerGroup();
