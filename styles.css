@@ -27,6 +27,10 @@ body {
 
 /* Search Bar Glass Effect */
 .search-bar-glass {
+  position: absolute; 
+  top: 32px; 
+  left: 50%; 
+  transform: translateX(-50%);
   width: 100%;
   max-width: 700px;
   margin: 32px auto 20px auto;  /* top margin for spacing down */
@@ -39,7 +43,6 @@ body {
   border-radius: 18px;
   padding: 0 16px;
   z-index: 999;
-  position: relative;
 }
 
 #search {
