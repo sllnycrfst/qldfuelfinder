@@ -166,7 +166,7 @@ body {
 
 .leaflet-top.leaflet-right {
   top: auto; /* move it down from the top, adjust as needed */
-  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  bottom: 80px;
   right: 20px;
 }
 
