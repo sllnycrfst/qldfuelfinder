@@ -1,9 +1,6 @@
 // NOTE: Before using this script, you must:
-// 1. Add MapKit JS to your HTML's <head> (see below)
-// 2. Replace 'YOUR_MAPKIT_JS_JWT_TOKEN' with your real MapKit JS JWT token
-
-// In your <head>:
-// <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
+// 1. Add MapKit JS to your HTML's <head>
+// 2. Replace the JWT token with your real MapKit JS JWT token
 
 document.addEventListener("DOMContentLoaded", () => {
   // UI controls
@@ -17,7 +14,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let map, userMarker;
   const defaultCenter = { latitude: -27.4698, longitude: 153.0251 };
-  const defaultZoom = 14;
 
   // Use the desired fuel order: E10, 91, 95, 98, Diesel
   const fuelOrder = ["E10", "91", "95", "98", "Diesel"];
@@ -56,10 +52,9 @@ document.addEventListener("DOMContentLoaded", () => {
     map = new mapkit.Map("map", {
       center: new mapkit.Coordinate(center.latitude, center.longitude),
       showsUserLocationControl: true,
-      cameraDistance: 5000 // Example, in meters. Adjust as needed.
+      cameraDistance: 5000
     });
 
-    // Listen to camera change for updating visible stations/list
     map.addEventListener("region-change-end", () => {
       updateVisibleStations();
       updateStationList();
@@ -76,7 +71,6 @@ document.addEventListener("DOMContentLoaded", () => {
           map.setCenterAnimated(new mapkit.Coordinate(userLat, userLng));
           map.setCameraDistance(5000);
         }
-        // Remove old marker
         if (userMarker && map) map.removeAnnotation(userMarker);
         if (map) {
           userMarker = new mapkit.MarkerAnnotation(
@@ -132,12 +126,10 @@ document.addEventListener("DOMContentLoaded", () => {
   let stationAnnotations = [];
   function updateVisibleStations() {
     if (!allSites.length || !allPrices.length || !map) return;
-    // Remove old
     if (stationAnnotations.length) map.removeAnnotations(stationAnnotations);
     stationAnnotations = [];
 
     const region = map.region;
-    // MapKit JS region is a center/latdelta/londelta
     function isInRegion(lat, lng) {
       const minLat = region.center.latitude - region.span.latitudeDelta / 2;
       const maxLat = region.center.latitude + region.span.latitudeDelta / 2;
@@ -172,18 +164,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
     visibleStations.forEach(s => {
       const isCheapest = minPrice !== null && s.rawPrice === minPrice;
-      const color = isCheapest ? "#21ea00" : "#387cc2";
+      // Custom HTML marker: brand logo at back, price at top, your marker icon in front
+      // We'll use a custom HTML string as glyphText (SVG/HTML markup)
+      const priceStr = `<div style="font-size:14px;font-weight:bold;color:#222;text-shadow:0 1px 4px #fff;line-height:1;margin-bottom:2px;">${s.price.toFixed(1)}</div>`;
+      const brandImg = `<img src="images/${s.BrandId || 'default'}.png" style="width:48px;height:48px;border-radius:50%;position:absolute;left:0;top:0;z-index:1;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.08);">`;
+      const myMarkerImg = `<img src="images/my-marker.png" style="width:44px;height:44px;position:absolute;left:2px;top:10px;z-index:2;">`;
+
+      const html = `
+        <div style="position:relative;width:48px;height:58px;display:flex;flex-direction:column;align-items:center;">
+          ${priceStr}
+          <div style="position:relative;width:48px;height:48px;">
+            ${brandImg}
+            ${myMarkerImg}
+          </div>
+        </div>
+      `;
+
+      // Use MarkerAnnotation with glyphText as HTML
       const annotation = new mapkit.MarkerAnnotation(
         new mapkit.Coordinate(s.lat, s.lng),
         {
-          color,
-          title: `${s.name} (${s.price.toFixed(1)})`,
-          subtitle: s.address + (s.suburb ? ", " + s.suburb : ""),
-          glyphImage: {
-            1: "images/my-marker.png"
-            2: "images/my-marker@2x.png"
-          color: null
-          }
+          glyphText: html,
+          color: null,
+          title: s.name,
+          subtitle: s.address + (s.suburb ? ", " + s.suburb : "")
         }
       );
       annotation.data = { siteId: s.siteId };
@@ -212,7 +216,6 @@ document.addEventListener("DOMContentLoaded", () => {
       userLng = userMarker.coordinate.longitude;
     }
 
-    // MapKit JS: get center/region
     const region = map.region;
     function isInRegion(lat, lng) {
       const minLat = region.center.latitude - region.span.latitudeDelta / 2;
@@ -366,7 +369,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updateVisibleStations();
     updateStationList();
   });
-  // Default to E10 on load
   fuelSelect.value = "E10";
   currentFuel = "E10";
 
@@ -384,7 +386,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Start app with user location if possible
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       pos => {
