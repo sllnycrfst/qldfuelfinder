@@ -1,6 +1,7 @@
+import { suburbs } from './suburbs.js';
+
 document.addEventListener("DOMContentLoaded", () => {
   // UI controls
-  import { suburbs } from './suburbs.js';
   const recenterBtn = document.getElementById("recenter-btn");
   const listBtn = document.getElementById("list-btn");
   const listPanel = document.getElementById("list-panel");
