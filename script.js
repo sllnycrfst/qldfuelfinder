@@ -1,3 +1,10 @@
+// NOTE: Before using this script, you must:
+// 1. Add MapKit JS to your HTML's <head> (see below)
+// 2. Replace 'YOUR_MAPKIT_JS_JWT_TOKEN' with your real MapKit JS JWT token
+
+// In your <head>:
+// <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
+
 document.addEventListener("DOMContentLoaded", () => {
   // UI controls
   const recenterBtn = document.getElementById("recenter-btn");
@@ -8,8 +15,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("search");
   const fuelSelect = document.getElementById("fuel-select");
 
-  let map, markerLayer, userMarker;
-  const defaultCenter = [-27.4698, 153.0251];
+  let map, userMarker;
+  const defaultCenter = { latitude: -27.4698, longitude: 153.0251 };
   const defaultZoom = 14;
 
   // Use the desired fuel order: E10, 91, 95, 98, Diesel
@@ -36,46 +43,47 @@ document.addEventListener("DOMContentLoaded", () => {
     "Mareeba Service Station", "Port Douglas Service Station"
   ];
 
-  function startApp(center) {
-    map = L.map("map", { zoomControl: true, attributionControl: false }).setView(center, defaultZoom);
-    map.zoomControl.setPosition("topright");
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a> | &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
-      subdomains: 'abcd',
-      maxZoom: 18
-    }).addTo(map);
-
-    markerLayer = L.layerGroup();
-    map.addLayer(markerLayer);
-
-    showUserLocation(false);
-    fetchSitesAndPrices();
-
-    map.on("moveend", () => {
-      updateVisibleStations();
-      updateStationList();
+  // --- Apple MapKit JS Setup ---
+  function initMapKit(center) {
+    // Initialize MapKit JS
+    mapkit.init({
+      authorizationCallback: function(done) {
+        // Replace with your real JWT token below:
+        done("eyJraWQiOiJITjU3RDk2VVM2IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzQ5Mjk3NTc1LCJvcmlnaW4iOiIqLnNsbG55Y3Jmc3QuZ2l0aHViLmlvIn0.jQhOmgBdgRkR6RU6Ewe9YEgRjk0IzabAzkJYb-_ePHoqhOgWp-xDFL_qSrGEbfrPY1hyOQmhrCEpYUEIpdaycQ");
+      }
     });
-    map.on("zoomend", () => {
+    // Create the map
+    map = new mapkit.Map("map", {
+      center: new mapkit.Coordinate(center.latitude, center.longitude),
+      showsUserLocationControl: true,
+      zoom: defaultZoom
+    });
+
+    // Listen to camera change for updating visible stations/list
+    map.addEventListener("region-change-end", () => {
       updateVisibleStations();
       updateStationList();
     });
   }
 
-  function showUserLocation(setView) {
+  // --- Show user location ---
+  function showUserLocation(recenter) {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
       pos => {
-        const userLatLng = [pos.coords.latitude, pos.coords.longitude];
-        if (setView && map) map.setView(userLatLng, map.getZoom());
-        if (userMarker && map) map.removeLayer(userMarker);
+        const userLat = pos.coords.latitude, userLng = pos.coords.longitude;
+        if (recenter && map) {
+          map.setCenterAnimated(new mapkit.Coordinate(userLat, userLng));
+          map.setCameraDistance(5000);
+        }
+        // Remove old marker
+        if (userMarker && map) map.removeAnnotation(userMarker);
         if (map) {
-          userMarker = L.circleMarker(userLatLng, {
-            radius: 10,
-            color: "#2196f3",
-            fillColor: "#2196f3",
-            fillOpacity: 0.85,
-            weight: 3,
-          }).addTo(map);
+          userMarker = new mapkit.MarkerAnnotation(
+            new mapkit.Coordinate(userLat, userLng),
+            { color: "#2196f3", glyphText: "●" }
+          );
+          map.addAnnotation(userMarker);
         }
       },
       err => {
@@ -84,6 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
+  // --- Fetch data ---
   async function fetchSitesAndPrices() {
     try {
       const [siteRes, priceRes] = await Promise.all([
@@ -107,6 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // --- Distance helper ---
   function getDistance(lat1, lon1, lat2, lon2) {
     if (lat1 == null || lon1 == null) return null;
     const R = 6371;
@@ -118,15 +128,28 @@ document.addEventListener("DOMContentLoaded", () => {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
 
+  // --- Add/Update fuel station markers ---
+  let stationAnnotations = [];
   function updateVisibleStations() {
-    if (!allSites.length || !allPrices.length || !markerLayer || !map) return;
-    markerLayer.clearLayers();
-    const bounds = map.getBounds();
+    if (!allSites.length || !allPrices.length || !map) return;
+    // Remove old
+    if (stationAnnotations.length) map.removeAnnotations(stationAnnotations);
+    stationAnnotations = [];
+
+    const region = map.region;
+    // MapKit JS region is a center/latdelta/londelta
+    function isInRegion(lat, lng) {
+      const minLat = region.center.latitude - region.span.latitudeDelta / 2;
+      const maxLat = region.center.latitude + region.span.latitudeDelta / 2;
+      const minLng = region.center.longitude - region.span.longitudeDelta / 2;
+      const maxLng = region.center.longitude + region.span.longitudeDelta / 2;
+      return lat >= minLat && lat <= maxLat && lng >= minLng && lng <= maxLng;
+    }
 
     const visibleStations = allSites
       .map(site => {
         const price = priceMap[site.S]?.[fuelIdMap[currentFuel]];
-        if (price && bounds.contains([site.Lat, site.Lng])) {
+        if (price && isInRegion(site.Lat, site.Lng)) {
           return {
             ...site,
             price: price / 10,
@@ -149,41 +172,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
     visibleStations.forEach(s => {
       const isCheapest = minPrice !== null && s.rawPrice === minPrice;
-      const priceClass = isCheapest ? "marker-price marker-price-cheapest" : "marker-price";
-
-      const icon = L.divIcon({
-        className: "fuel-marker",
-        html: `
-          <div class="marker-stack">
-            <img src="images/${s.brand ? s.brand : 'default'}.png"
-              class="marker-brand-img"
-               onerror="this.onerror=null;this.src='images/default.png';"/>
-            <img src="images/mymarker.png" class="custom-marker-img"/>
-            <div class="${priceClass} marker-price">
-              ${s.price.toFixed(1)}
-          </div>
-        </div>
-      `,
-      iconSize: [72, 72],
-      iconAnchor: [36, 72],
-      popupAnchor: [0, -72]
-    });
-      markerLayer.addLayer(
-        L.marker([s.lat, s.lng], {
-          icon,
-          zIndexOffset: isCheapest ? 1000 : 0,
-          rawPrice: s.rawPrice,
-          price: s.price
-        }).on("click", () => {
-          forcedFeaturedSiteId = String(s.siteId);
-          listPanel.classList.add("visible");
-          listPanel.classList.remove("hidden");
-          updateStationList();
-        })
+      const color = isCheapest ? "#21ea00" : "#387cc2";
+      const annotation = new mapkit.MarkerAnnotation(
+        new mapkit.Coordinate(s.lat, s.lng),
+        {
+          color,
+          title: `${s.name} (${s.price.toFixed(1)})`,
+          subtitle: s.address + (s.suburb ? ", " + s.suburb : ""),
+          glyphImage: {
+            1: `images/${s.brand ? s.brand : 'default'}.png`,
+            2: `images/${s.brand ? s.brand : 'default'}.png`
+          }
+        }
       );
+      annotation.data = { siteId: s.siteId };
+      annotation.addEventListener("select", () => {
+        forcedFeaturedSiteId = String(s.siteId);
+        listPanel.classList.add("visible");
+        listPanel.classList.remove("hidden");
+        updateStationList();
+      });
+      stationAnnotations.push(annotation);
     });
+    map.addAnnotations(stationAnnotations);
   }
 
+  // --- Station list (unchanged) ---
   function updateStationList() {
     if (!listUl) return;
     if (!allSites.length || !allPrices.length) {
@@ -192,17 +206,25 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     let userLat = null, userLng = null;
-    if (userMarker && userMarker.getLatLng) {
-      const pos = userMarker.getLatLng();
-      userLat = pos.lat;
-      userLng = pos.lng;
+    if (userMarker && userMarker.coordinate) {
+      userLat = userMarker.coordinate.latitude;
+      userLng = userMarker.coordinate.longitude;
     }
 
-    const bounds = map.getBounds();
+    // MapKit JS: get center/region
+    const region = map.region;
+    function isInRegion(lat, lng) {
+      const minLat = region.center.latitude - region.span.latitudeDelta / 2;
+      const maxLat = region.center.latitude + region.span.latitudeDelta / 2;
+      const minLng = region.center.longitude - region.span.longitudeDelta / 2;
+      const maxLng = region.center.longitude + region.span.longitudeDelta / 2;
+      return lat >= minLat && lat <= maxLat && lng >= minLng && lng <= maxLng;
+    }
+
     let stations = allSites
       .map(site => {
         const price = priceMap[site.S]?.[fuelIdMap[currentFuel]];
-        if (price && bounds.contains([site.Lat, site.Lng])) {
+        if (price && isInRegion(site.Lat, site.Lng)) {
           return {
             ...site,
             price: price / 10,
@@ -355,17 +377,28 @@ document.addEventListener("DOMContentLoaded", () => {
       (s.P && s.P.toLowerCase().includes(query)) ||
       (s.N && s.N.toLowerCase().includes(query))
     );
-    if (match && map) map.setView([match.Lat, match.Lng], 15);
+    if (match && map) {
+      map.setCenterAnimated(new mapkit.Coordinate(match.Lat, match.Lng));
+      map.setCameraDistance(5000);
+    }
   });
 
   // Start app with user location if possible
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
-      pos => startApp([pos.coords.latitude, pos.coords.longitude]),
-      () => startApp(defaultCenter),
+      pos => {
+        initMapKit({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
+        showUserLocation(false);
+        fetchSitesAndPrices();
+      },
+      () => {
+        initMapKit(defaultCenter);
+        fetchSitesAndPrices();
+      },
       { timeout: 7000 }
     );
   } else {
-    startApp(defaultCenter);
+    initMapKit(defaultCenter);
+    fetchSitesAndPrices();
   }
 });
