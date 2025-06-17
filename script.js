@@ -8,51 +8,74 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("search");
   const fuelSelect = document.getElementById("fuel-select");
 
-  let map, userMarker;
-  const defaultCenter = { latitude: -27.4698, longitude: 153.0251 };
-  const fuelOrder = ["E10", "91", "95", "98", "Diesel", "Premium Diesel"];
+  let map, markerLayer, userMarker;
+  const defaultCenter = [-27.4698, 153.0251];
+  const defaultZoom = 14;
+
+  // Use the desired fuel order: E10, 91, 95, 98, Diesel
+  const fuelOrder = ["E10", "91", "95", "98", "Diesel"];
   const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3, "Premium Diesel": 10 };
   let currentFuel = "E10";
   let allSites = [];
   let allPrices = [];
   let priceMap = {};
-  let forcedFeaturedSiteId = null;
-  let stationAnnotations = [];
 
-  function initMapKit(center) {
-    mapkit.init({
-      authorizationCallback: function(done) {
-        // Replace with your real JWT token below:
-        done("eyJraWQiOiI4Wk44NTZHUjI0IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUwMTQ2NDkyLCJvcmlnaW4iOiJzbGxueWNyZnN0LmdpdGh1Yi5pbyJ9.ylKRmHZvXgB5qbDr_6niDFpT4wAlGItM7TsNDUHqQOOyKoxGMNbYbgI5cv2cW0iyh6BlnazJ_cYTCef1VNnr2g");
-      }
+  let forcedFeaturedSiteId = null;
+
+  const bannedStations = [
+    "BARA FUELS FOREST HILL", "Sommer Petroleum", "Wandoan Fuels", "Karumba Point Service Station",
+    "Cam's Corner Servo & Mini Mart", "CEQ Kowanyama Supermarket", "Coen Store", "Aurukun Bowsers",
+    "Independent Musgrave Roadhouse", "Ibis Thursday Island Service Station", "Badu Express",
+    "Astron Mount Isa", "IOR Petroleum Injune", "Mobil Norton's Store & Mechanical", "Fuel Central Isisford Unmanned",
+    "Astron Hughenden", "Winton Roadhouse", "The Old Empire Café", "The White Bull Roadhouse", "IOR Eromanga",
+    "Boulia Roadhouse", "Barcoo Shire Council Depot", "Birdsville Fuel Service", "Birdsville Roadhouse",
+    "Flinders Star", "Doomadgee Roadhouse", "Tirranna Springs Road House",
+    "IBIS Fuel St. Pauls", "Ibis Fuel Kubin", "IBIS Fuel Warraber Island", "IBIS Fuel Yam Island",
+    "IBIS Fuel Yorke Island", "Wujal Wujal Service Station", "Bloomfield Middle Shop",
+    "Hope Vale Service Station", "Miallo Fuel Station", "Roadhouse Service Station",
+    "Mareeba Service Station", "Port Douglas Service Station"
+  ];
+
+  function startApp(center) {
+    map = L.map("map", { zoomControl: true, attributionControl: false }).setView(center, defaultZoom);
+    map.zoomControl.setPosition("topright");
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a> | &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
+      subdomains: 'abcd',
+      maxZoom: 18
+    }).addTo(map);
+
+    markerLayer = L.layerGroup();
+    map.addLayer(markerLayer);
+
+    showUserLocation(false);
+    fetchSitesAndPrices();
+
+    map.on("moveend", () => {
+      updateVisibleStations();
+      updateStationList();
     });
-    map = new mapkit.Map("map", {
-      center: new mapkit.Coordinate(center.latitude, center.longitude),
-      showsUserLocationControl: true,
-      cameraDistance: 5000
-    });
-    map.addEventListener("region-change-end", () => {
+    map.on("zoomend", () => {
       updateVisibleStations();
       updateStationList();
     });
   }
 
-  function showUserLocation(recenter) {
+  function showUserLocation(setView) {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
       pos => {
-        const userLat = pos.coords.latitude, userLng = pos.coords.longitude;
-        if (recenter && map) {
-          map.setCenterAnimated(new mapkit.Coordinate(userLat, userLng));
-          map.setCameraDistance(5000);
-        }
-        if (userMarker && map) map.removeAnnotation(userMarker);
+        const userLatLng = [pos.coords.latitude, pos.coords.longitude];
+        if (setView && map) map.setView(userLatLng, map.getZoom());
+        if (userMarker && map) map.removeLayer(userMarker);
         if (map) {
-          userMarker = new mapkit.MarkerAnnotation(
-            new mapkit.Coordinate(userLat, userLng),
-            { color: "#2196f3", glyphText: "●" }
-          );
-          map.addAnnotation(userMarker);
+          userMarker = L.circleMarker(userLatLng, {
+            radius: 10,
+            color: "#2196f3",
+            fillColor: "#2196f3",
+            fillOpacity: 0.85,
+            weight: 3,
+          }).addTo(map);
         }
       },
       err => {
@@ -67,7 +90,9 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("data/sites.json").then(r => r.json()),
         fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
       ]);
-      allSites = Array.isArray(siteRes) ? siteRes : siteRes.S;
+      allSites = (Array.isArray(siteRes) ? siteRes : siteRes.S).filter(site => {
+        return !bannedStations.some(b => site.N && site.N.includes(b));
+      });
       allPrices = priceRes.SitePrices.filter(p => Object.values(fuelIdMap).includes(p.FuelId));
       priceMap = {};
       allPrices.forEach(p => {
@@ -75,106 +100,33 @@ document.addEventListener("DOMContentLoaded", () => {
         priceMap[p.SiteId][p.FuelId] = p.Price;
       });
 
-      await updateVisibleStations();
+      updateVisibleStations();
       updateStationList();
     } catch (err) {
       console.error("Failed to fetch site/price data:", err);
     }
   }
 
-  // --- Compose marker image ---
-  function makeStationMarker(brandUrl, markerUrl, price) {
-    return new Promise((resolve) => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 90;
-      canvas.height = 110;
-      const ctx = canvas.getContext('2d');
-      let loaded = 0;
-      let brandLoaded = false;
-      let markerLoaded = false;
-      let errored = false;
-
-      function finish() {
-        if (brandLoaded && markerLoaded) {
-          // marker base
-          ctx.drawImage(markerImg, 0, 28, 90, 82);
-          // brand logo
-          ctx.save();
-          ctx.beginPath();
-          ctx.arc(45, 69, 28, 0, 2 * Math.PI);
-          ctx.closePath();
-          ctx.clip();
-          ctx.drawImage(brandImg, 17, 41, 56, 56);
-          ctx.restore();
-          // price panel
-          ctx.save();
-          ctx.fillStyle = "#222";
-          ctx.strokeStyle = "#196b2a";
-          ctx.lineWidth = 3;
-          ctx.beginPath();
-          ctx.moveTo(10, 10);
-          ctx.lineTo(80, 10);
-          ctx.lineTo(80, 33);
-          ctx.lineTo(10, 33);
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
-          ctx.restore();
-          // price text
-          ctx.font = "bold 32px monospace";
-          ctx.fillStyle = "#7fff50";
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          ctx.fillText(price ? price.toFixed(1) : "?", 45, 22);
-          resolve(canvas.toDataURL());
-        } else {
-          // fallback: draw a white box with price
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          ctx.fillStyle = "#fff";
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          ctx.strokeStyle = "#bbb";
-          ctx.strokeRect(0, 0, canvas.width, canvas.height);
-          ctx.font = "bold 32px sans-serif";
-          ctx.fillStyle = "#222";
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          ctx.fillText(price ? price.toFixed(1) : "?", canvas.width / 2, canvas.height / 2);
-          resolve(canvas.toDataURL());
-        }
-      }
-      
-      const brandImg = new Image();
-      const markerImg = new Image();
-
-      brandImg.onload = () => { brandLoaded = true; loaded++; if (loaded === 2) finish(); };
-      markerImg.onload = () => { markerLoaded = true; loaded++; if (loaded === 2) finish(); };
-      brandImg.onerror = () => { loaded++; if (loaded === 2) finish(); };
-      markerImg.onerror = () => { loaded++; if (loaded === 2) finish(); };
-  
-      // Start loading
-      brandImg.src = brandUrl;
-      markerImg.src = markerUrl;
-    });
+  function getDistance(lat1, lon1, lat2, lon2) {
+    if (lat1 == null || lon1 == null) return null;
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) ** 2 +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
-     
-  async function updateVisibleStations() {
-    if (!allSites.length || !allPrices.length || !map) return;
-    if (stationAnnotations.length) map.removeAnnotations(stationAnnotations);
-    stationAnnotations = [];
 
-    const region = map.region;
-    function isInRegion(lat, lng) {
-      const minLat = region.center.latitude - region.span.latitudeDelta / 2;
-      const maxLat = region.center.latitude + region.span.latitudeDelta / 2;
-      const minLng = region.center.longitude - region.span.longitudeDelta / 2;
-      const maxLng = region.center.longitude + region.span.longitudeDelta / 2;
-      return lat >= minLat && lat <= maxLat && lng >= minLng && lng <= maxLng;
-    }
+  function updateVisibleStations() {
+    if (!allSites.length || !allPrices.length || !markerLayer || !map) return;
+    markerLayer.clearLayers();
+    const bounds = map.getBounds();
 
     const visibleStations = allSites
       .map(site => {
         const price = priceMap[site.S]?.[fuelIdMap[currentFuel]];
-        if (price && isInRegion(site.Lat, site.Lng)) {
+        if (price && bounds.contains([site.Lat, site.Lng])) {
           return {
             ...site,
             price: price / 10,
@@ -193,35 +145,45 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .filter(Boolean);
 
-    for (const s of visibleStations) {
-      const brandImgUrl = s.BrandId ? `images/${s.BrandId}.png` : 'images/default.png';
-      const myMarkerUrl = "images/my-marker.png";
-      const priceVal = s.price;
-      const markerDataUrl = await makeStationMarker(brandImgUrl, myMarkerUrl, priceVal);
+    const minPrice = visibleStations.length ? Math.min(...visibleStations.map(s => s.rawPrice)) : null;
 
-      const annotation = new mapkit.ImageAnnotation(
-        new mapkit.Coordinate(s.lat, s.lng),
-        {
-          url: markerDataUrl,
-          size: { width: 90, height: 110 },
-          anchorOffset: new DOMPoint(0, -55),
-          title: s.name,
-          subtitle: s.address + (s.suburb ? ", " + s.suburb : ""),
-        }
+    visibleStations.forEach(s => {
+      const isCheapest = minPrice !== null && s.rawPrice === minPrice;
+      const priceClass = isCheapest ? "marker-price marker-price-cheapest" : "marker-price";
+
+      const icon = L.divIcon({
+        className: "fuel-marker",
+        html: `
+          <div class="marker-stack">
+            <img src="images/${s.brand ? s.brand : 'default'}.png"
+              class="marker-brand-img"
+               onerror="this.onerror=null;this.src='images/default.png';"/>
+            <img src="images/mymarker.png" class="custom-marker-img"/>
+            <div class="${priceClass} marker-price">
+              ${s.price.toFixed(1)}
+          </div>
+        </div>
+      `,
+      iconSize: [72, 72],
+      iconAnchor: [36, 72],
+      popupAnchor: [0, -72]
+    });
+      markerLayer.addLayer(
+        L.marker([s.lat, s.lng], {
+          icon,
+          zIndexOffset: isCheapest ? 1000 : 0,
+          rawPrice: s.rawPrice,
+          price: s.price
+        }).on("click", () => {
+          forcedFeaturedSiteId = String(s.siteId);
+          listPanel.classList.add("visible");
+          listPanel.classList.remove("hidden");
+          updateStationList();
+        })
       );
-      annotation.data = { siteId: s.siteId };
-      annotation.addEventListener("select", () => {
-        forcedFeaturedSiteId = String(s.siteId);
-        listPanel.classList.add("visible");
-        listPanel.classList.remove("hidden");
-        updateStationList();
-      });
-      stationAnnotations.push(annotation);
-    }
-    map.addAnnotations(stationAnnotations);
+    });
   }
 
-  // --- Station list ---
   function updateStationList() {
     if (!listUl) return;
     if (!allSites.length || !allPrices.length) {
@@ -230,24 +192,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     let userLat = null, userLng = null;
-    if (userMarker && userMarker.coordinate) {
-      userLat = userMarker.coordinate.latitude;
-      userLng = userMarker.coordinate.longitude;
+    if (userMarker && userMarker.getLatLng) {
+      const pos = userMarker.getLatLng();
+      userLat = pos.lat;
+      userLng = pos.lng;
     }
 
-    const region = map.region;
-    function isInRegion(lat, lng) {
-      const minLat = region.center.latitude - region.span.latitudeDelta / 2;
-      const maxLat = region.center.latitude + region.span.latitudeDelta / 2;
-      const minLng = region.center.longitude - region.span.longitudeDelta / 2;
-      const maxLng = region.center.longitude + region.span.longitudeDelta / 2;
-      return lat >= minLat && lat <= maxLat && lng >= minLng && lng <= maxLng;
-    }
-
+    const bounds = map.getBounds();
     let stations = allSites
       .map(site => {
         const price = priceMap[site.S]?.[fuelIdMap[currentFuel]];
-        if (price && isInRegion(site.Lat, site.Lng)) {
+        if (price && bounds.contains([site.Lat, site.Lng])) {
           return {
             ...site,
             price: price / 10,
@@ -286,6 +241,7 @@ document.addEventListener("DOMContentLoaded", () => {
       others = stations.slice(1);
     }
 
+    // Fuel prices in E10, 91, 95, 98, Diesel order
     let priceHTML = fuelOrder
       .filter(fuel => fuelIdMap[fuel] && featured.allPrices && featured.allPrices[fuelIdMap[fuel]])
       .map(fuel => {
@@ -294,8 +250,9 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .join('');
 
-    const featuredImgSrc = featured.BrandId
-      ? `images/${featured.BrandId}.png`
+    // Always use brand logo for both featured and list stations
+    const featuredImgSrc = featured.brand
+      ? `images/${featured.brand}.png`
       : 'images/default.png';
 
     let featuredHTML = `
@@ -320,8 +277,8 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
 
     let othersHTML = others.map(site => {
-      const siteImgSrc = site.BrandId
-        ? `images/${site.BrandId}.png`
+      const siteImgSrc = site.brand
+        ? `images/${site.brand}.png`
         : 'images/default.png';
       return `
         <li class="list-station" data-siteid="${String(site.siteId)}">
@@ -363,18 +320,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function getDistance(lat1, lon1, lat2, lon2) {
-    if (lat1 == null || lon1 == null) return null;
-    const R = 6371;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat / 2) ** 2 +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-      Math.sin(dLon / 2) ** 2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  }
-
+  // Recenter button
   recenterBtn && recenterBtn.addEventListener("click", () => showUserLocation(true));
+
+  // List button open/close
   listBtn && listBtn.addEventListener("click", () => {
     forcedFeaturedSiteId = null;
     listPanel.classList.add("visible");
@@ -387,15 +336,18 @@ document.addEventListener("DOMContentLoaded", () => {
     forcedFeaturedSiteId = null;
   });
 
+  // Fuel selector
   fuelSelect && fuelSelect.addEventListener("change", e => {
     currentFuel = e.target.value;
     forcedFeaturedSiteId = null;
     updateVisibleStations();
     updateStationList();
   });
+  // Default to E10 on load
   fuelSelect.value = "E10";
   currentFuel = "E10";
 
+  // Search suburb/station
   searchInput && searchInput.addEventListener("input", function (e) {
     const query = e.target.value.toLowerCase().trim();
     if (query.length < 2) return;
@@ -403,27 +355,17 @@ document.addEventListener("DOMContentLoaded", () => {
       (s.P && s.P.toLowerCase().includes(query)) ||
       (s.N && s.N.toLowerCase().includes(query))
     );
-    if (match && map) {
-      map.setCenterAnimated(new mapkit.Coordinate(match.Lat, match.Lng));
-      map.setCameraDistance(5000);
-    }
+    if (match && map) map.setView([match.Lat, match.Lng], 15);
   });
 
+  // Start app with user location if possible
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
-      pos => {
-        initMapKit({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
-        showUserLocation(false);
-        fetchSitesAndPrices();
-      },
-      () => {
-        initMapKit(defaultCenter);
-        fetchSitesAndPrices();
-      },
+      pos => startApp([pos.coords.latitude, pos.coords.longitude]),
+      () => startApp(defaultCenter),
       { timeout: 7000 }
     );
   } else {
-    initMapKit(defaultCenter);
-    fetchSitesAndPrices();
+    startApp(defaultCenter);
   }
 });
