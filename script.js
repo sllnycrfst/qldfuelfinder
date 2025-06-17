@@ -1,7 +1,3 @@
-// QLD Fuel Finder MapKit JS App with Custom Brand, Price, and Marker Pins
-// Your HTML <head> must include:
-// <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
-
 document.addEventListener("DOMContentLoaded", () => {
   // UI controls
   const recenterBtn = document.getElementById("recenter-btn");
@@ -227,7 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
     map.addAnnotations(stationAnnotations);
   }
 
-  // --- Station list (unchanged) ---
+  // --- Station list ---
   function updateStationList() {
     if (!listUl) return;
     if (!allSites.length || !allPrices.length) {
@@ -302,8 +298,8 @@ document.addEventListener("DOMContentLoaded", () => {
       .join('');
 
     // Always use brand logo for both featured and list stations
-    const featuredImgSrc = featured.brand
-      ? `images/${featured.brand}.png`
+    const featuredImgSrc = featured.BrandId
+      ? `images/${featured.BrandId}.png`
       : 'images/default.png';
 
     let featuredHTML = `
@@ -328,8 +324,8 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
 
     let othersHTML = others.map(site => {
-      const siteImgSrc = site.brand
-        ? `images/${site.brand}.png`
+      const siteImgSrc = site.BrandId
+        ? `images/${site.BrandId}.png`
         : 'images/default.png';
       return `
         <li class="list-station" data-siteid="${String(site.siteId)}">
