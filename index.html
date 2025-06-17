@@ -14,11 +14,16 @@
 <body>
   <!-- Map Controls / Search Bar -->
   <div class="search-bar-glass">
-    <input id="search" type="text" placeholder="Search suburb">
-    <div id="suggestions" class="autocomplete-list"></div>
-    <select id="fuel-select"> ... </select>
-    <ul id="list"></ul>
-
+    <input id="search" type="text" placeholder="Search suburb or postcode" autocomplete="on" />
+    <span class="divider">|</span>
+    <select id="fuel-select">
+      <option value="E10">E10</option>
+      <option value="91">91</option>
+      <option value="95">95</option>
+      <option value="98">98</option>
+      <option value="Diesel">Diesel</option>
+    </select>
+  </div>
 
   <!-- Map Container -->
   <div id="map"></div>
@@ -45,6 +50,6 @@
 
   <!-- Scripts -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script type="module" src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
