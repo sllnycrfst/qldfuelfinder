@@ -168,7 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // We'll use a custom HTML string as glyphText (SVG/HTML markup)
       const priceStr = `<div style="font-size:14px;font-weight:bold;color:#222;text-shadow:0 1px 4px #fff;line-height:1;margin-bottom:2px;">${s.price.toFixed(1)}</div>`;
       const brandImg = `<img src="images/${s.BrandId || 'default'}.png" style="width:48px;height:48px;border-radius:50%;position:absolute;left:0;top:0;z-index:1;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.08);">`;
-      const myMarkerImg = `<img src="images/my-marker.png" style="width:44px;height:44px;position:absolute;left:2px;top:10px;z-index:2;">`;
+      const myMarkerImg = `<img src="images/mymarker.png" style="width:44px;height:44px;position:absolute;left:2px;top:10px;z-index:2;">`;
 
       const html = `
         <div style="position:relative;width:48px;height:58px;display:flex;flex-direction:column;align-items:center;">
