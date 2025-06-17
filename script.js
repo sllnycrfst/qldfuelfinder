@@ -1,4 +1,4 @@
-// QLD Fuel Finder MapKit JS App with Custom Markers
+// QLD Fuel Finder MapKit JS App with Custom Brand, Price, and Marker Pins
 // Your HTML <head> must include:
 // <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
 
@@ -89,24 +89,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- Distance helper ---
-  function getDistance(lat1, lon1, lat2, lon2) {
-    if (lat1 == null || lon1 == null) return null;
-    const R = 6371;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat / 2) ** 2 +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-      Math.sin(dLon / 2) ** 2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  }
-
-  // --- Canvas marker composer ---
+  // --- Compose marker image (matches your mockup) ---
   function makeStationMarker(brandUrl, markerUrl, price) {
     return new Promise((resolve) => {
       const canvas = document.createElement('canvas');
-      canvas.width = 48;
-      canvas.height = 58;
+      canvas.width = 90;
+      canvas.height = 110;
       const ctx = canvas.getContext('2d');
       const brandImg = new Image();
       const myMarkerImg = new Image();
@@ -116,10 +104,13 @@ document.addEventListener("DOMContentLoaded", () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "#fff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.font = "bold 14px sans-serif";
+        ctx.strokeStyle = "#bbb";
+        ctx.strokeRect(0, 0, canvas.width, canvas.height);
+        ctx.font = "bold 24px sans-serif";
         ctx.fillStyle = "#222";
         ctx.textAlign = "center";
-        ctx.fillText(price ? price.toFixed(1) : "?", 24, 29);
+        ctx.textBaseline = "middle";
+        ctx.fillText(price ? price.toFixed(1) : "?", canvas.width / 2, canvas.height / 2);
         resolve(canvas.toDataURL());
       }
 
@@ -130,33 +121,40 @@ document.addEventListener("DOMContentLoaded", () => {
             finishFallback();
             return;
           }
-          // Draw brand at back
+
+          // draw the marker base (my-marker.png)
+          ctx.drawImage(myMarkerImg, 0, 28, 90, 82);
+
+          // draw the brand logo in the center of the circle
           ctx.save();
           ctx.beginPath();
-          ctx.arc(24, 34, 24, 0, 2 * Math.PI);
+          ctx.arc(45, 69, 28, 0, 2 * Math.PI);
           ctx.closePath();
           ctx.clip();
-          ctx.drawImage(brandImg, 0, 10, 48, 48);
+          ctx.drawImage(brandImg, 17, 41, 56, 56);
           ctx.restore();
 
-          // Draw price at top
+          // draw the price panel top
           ctx.save();
-          ctx.globalAlpha = 0.8;
+          ctx.fillStyle = "#222";
+          ctx.strokeStyle = "#196b2a";
+          ctx.lineWidth = 3;
           ctx.beginPath();
-          ctx.arc(24, 13, 17, 0, 2 * Math.PI);
+          ctx.moveTo(10, 10);
+          ctx.lineTo(80, 10);
+          ctx.lineTo(80, 33);
+          ctx.lineTo(10, 33);
           ctx.closePath();
-          ctx.fillStyle = "#fff";
           ctx.fill();
+          ctx.stroke();
           ctx.restore();
 
-          ctx.font = "bold 16px sans-serif";
-          ctx.fillStyle = "#222";
+          // draw the price text
+          ctx.font = "bold 32px monospace";
+          ctx.fillStyle = "#7fff50";
           ctx.textAlign = "center";
-          ctx.textBaseline = "top";
-          ctx.fillText(price.toFixed(1), 24, 7);
-
-          // Draw your marker on top, slightly lower
-          ctx.drawImage(myMarkerImg, 2, 14, 44, 44);
+          ctx.textBaseline = "middle";
+          ctx.fillText(price ? price.toFixed(1) : "?", 45, 22);
 
           resolve(canvas.toDataURL());
         }
@@ -208,20 +206,20 @@ document.addEventListener("DOMContentLoaded", () => {
       .filter(Boolean);
 
     for (const s of visibleStations) {
-      // fallback to 'images/default.png' if brand image doesn't exist
+      // Use images/BrandId.png for brand, fallback to images/default.png if not found
       const brandImgUrl = s.BrandId ? `images/${s.BrandId}.png` : 'images/default.png';
       const myMarkerUrl = "images/my-marker.png";
       const priceVal = s.price;
 
-      // Compose the marker image dynamically
+      // Compose the marker image dynamically to look like your mockup
       const markerDataUrl = await makeStationMarker(brandImgUrl, myMarkerUrl, priceVal);
 
       const annotation = new mapkit.ImageAnnotation(
         new mapkit.Coordinate(s.lat, s.lng),
         {
           url: markerDataUrl,
-          size: { width: 48, height: 58 },
-          anchorOffset: new DOMPoint(0, -29),
+          size: { width: 90, height: 110 },
+          anchorOffset: new DOMPoint(0, -55), // tip at coordinate
           title: s.name,
           subtitle: s.address + (s.suburb ? ", " + s.suburb : ""),
         }
