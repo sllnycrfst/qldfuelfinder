@@ -181,14 +181,13 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
 
       // Use MarkerAnnotation with glyphText as HTML
-      const annotation = new mapkit.MarkerAnnotation(
+      const annotation = new mapkit.ImageAnnotation(
         new mapkit.Coordinate(s.lat, s.lng),
         {
-          glyphText: html,
-          color: null,
-          title: s.name,
-          subtitle: s.address + (s.suburb ? ", " + s.suburb : "")
-        }
+          url: "images/my-marker-composite.png", // Should be a PNG you generate for each station
+          size: { width: 48, height: 58 },
+          anchorOffset: { x: 0, y: -29 } // Pointy tip at coordinate
+         }
       );
       annotation.data = { siteId: s.siteId };
       annotation.addEventListener("select", () => {
