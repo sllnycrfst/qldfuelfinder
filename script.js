@@ -73,9 +73,6 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("data/sites.json").then(r => r.json()),
         fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
       ]);
-      allSites = (Array.isArray(siteRes) ? siteRes : siteRes.S).filter(site => {
-        return !bannedStations.some(b => site.N && site.N.includes(b));
-      });
       allPrices = priceRes.SitePrices.filter(p => Object.values(fuelIdMap).includes(p.FuelId));
       priceMap = {};
       allPrices.forEach(p => {
