@@ -253,8 +253,8 @@ body {
   font-family: 'Roboto', Arial, sans-serif !important;
   bottom: calc(30px + env(safe-area-inset-bottom, 0px));
 }
-.list-btn { left: 20px; bottom: 20px; }
-.recenter-btn { right: 20px; bottom: 20px; }
+.list-btn { left: 20px; bottom: 30px; }
+.recenter-btn { right: 20px; bottom: 25px; }
 
 .list-btn:hover, .recenter-btn:hover {
   background: rgba(232, 247, 255, 0.8) !important;
