@@ -1,6 +1,6 @@
-// NOTE: Before using this script, you must:
-// 1. Add MapKit JS to your HTML's <head>
-// 2. Replace the JWT token with your real MapKit JS JWT token
+// QLD Fuel Finder MapKit JS App with Custom Markers
+// Your HTML <head> must include:
+// <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
 
 document.addEventListener("DOMContentLoaded", () => {
   // UI controls
@@ -14,16 +14,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let map, userMarker;
   const defaultCenter = { latitude: -27.4698, longitude: 153.0251 };
-
-  // Use the desired fuel order: E10, 91, 95, 98, Diesel
   const fuelOrder = ["E10", "91", "95", "98", "Diesel"];
   const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3, "Premium Diesel": 10 };
   let currentFuel = "E10";
   let allSites = [];
   let allPrices = [];
   let priceMap = {};
-
   let forcedFeaturedSiteId = null;
+  let stationAnnotations = [];
 
   const bannedStations = [
     "BARA FUELS FOREST HILL", "Sommer Petroleum", "Wandoan Fuels", "Karumba Point Service Station",
@@ -41,20 +39,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Apple MapKit JS Setup ---
   function initMapKit(center) {
-    // Initialize MapKit JS
     mapkit.init({
       authorizationCallback: function(done) {
         // Replace with your real JWT token below:
-        done("eyJraWQiOiI4Wk44NTZHUjI0IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUwMTQ2NDkyLCJvcmlnaW4iOiJzbGxueWNyZnN0LmdpdGh1Yi5pbyJ9.ylKRmHZvXgB5qbDr_6niDFpT4wAlGItM7TsNDUHqQOOyKoxGMNbYbgI5cv2cW0iyh6BlnazJ_cYTCef1VNnr2g");
+        done("YOUR_MAPKIT_JS_JWT_TOKEN_HERE");
       }
     });
-    // Create the map
     map = new mapkit.Map("map", {
       center: new mapkit.Coordinate(center.latitude, center.longitude),
       showsUserLocationControl: true,
       cameraDistance: 5000
     });
-
     map.addEventListener("region-change-end", () => {
       updateVisibleStations();
       updateStationList();
@@ -122,9 +117,62 @@ document.addEventListener("DOMContentLoaded", () => {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
 
+  // --- Canvas marker composer ---
+  function makeStationMarker(brandUrl, markerUrl, price) {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 48;
+      canvas.height = 58;
+      const ctx = canvas.getContext('2d');
+      const brandImg = new Image();
+      const myMarkerImg = new Image();
+      let loaded = 0;
+
+      function tryFinish() {
+        loaded++;
+        if (loaded === 2) {
+          // Draw brand at back
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(24, 34, 24, 0, 2 * Math.PI);
+          ctx.closePath();
+          ctx.clip();
+          ctx.drawImage(brandImg, 0, 10, 48, 48);
+          ctx.restore();
+
+          // Draw price at top
+          ctx.font = "bold 16px sans-serif";
+          ctx.fillStyle = "#222";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "top";
+          // White background for price
+          ctx.save();
+          ctx.globalAlpha = 0.8;
+          ctx.beginPath();
+          ctx.arc(24, 13, 17, 0, 2 * Math.PI);
+          ctx.closePath();
+          ctx.fillStyle = "#fff";
+          ctx.fill();
+          ctx.restore();
+          ctx.fillStyle = "#222";
+          ctx.fillText(price.toFixed(1), 24, 7);
+
+          // Draw your marker on top, slightly lower
+          ctx.drawImage(myMarkerImg, 2, 14, 44, 44);
+
+          resolve(canvas.toDataURL());
+        }
+      }
+      brandImg.onload = tryFinish;
+      myMarkerImg.onload = tryFinish;
+      brandImg.onerror = myMarkerImg.onerror = () => resolve(markerUrl); // fallback
+      brandImg.src = brandUrl;
+      myMarkerImg.src = markerUrl;
+    });
+  }
+
   // --- Add/Update fuel station markers ---
-  let stationAnnotations = [];
-  function updateVisibleStations() {
+  async function updateVisibleStations() {
     if (!allSites.length || !allPrices.length || !map) return;
     if (stationAnnotations.length) map.removeAnnotations(stationAnnotations);
     stationAnnotations = [];
@@ -162,32 +210,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const minPrice = visibleStations.length ? Math.min(...visibleStations.map(s => s.rawPrice)) : null;
 
-    visibleStations.forEach(s => {
-      const isCheapest = minPrice !== null && s.rawPrice === minPrice;
-      // Custom HTML marker: brand logo at back, price at top, your marker icon in front
-      // We'll use a custom HTML string as glyphText (SVG/HTML markup)
-      const priceStr = `<div style="font-size:14px;font-weight:bold;color:#222;text-shadow:0 1px 4px #fff;line-height:1;margin-bottom:2px;">${s.price.toFixed(1)}</div>`;
-      const brandImg = `<img src="images/${s.BrandId || 'default'}.png" style="width:48px;height:48px;border-radius:50%;position:absolute;left:0;top:0;z-index:1;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.08);">`;
-      const myMarkerImg = `<img src="images/mymarker.png" style="width:44px;height:44px;position:absolute;left:2px;top:10px;z-index:2;">`;
+    for (const s of visibleStations) {
+      const brandImgUrl = s.BrandId ? `images/${s.BrandId}.png` : 'images/default.png';
+      const myMarkerUrl = "images/mymarker.png";
+      const priceVal = s.price;
 
-      const html = `
-        <div style="position:relative;width:48px;height:58px;display:flex;flex-direction:column;align-items:center;">
-          ${priceStr}
-          <div style="position:relative;width:48px;height:48px;">
-            ${brandImg}
-            ${myMarkerImg}
-          </div>
-        </div>
-      `;
+      // Compose the marker image dynamically
+      const markerDataUrl = await makeStationMarker(brandImgUrl, myMarkerUrl, priceVal);
 
-      // Use MarkerAnnotation with glyphText as HTML
       const annotation = new mapkit.ImageAnnotation(
         new mapkit.Coordinate(s.lat, s.lng),
         {
-          url: "images/my-marker-composite.png", // Should be a PNG you generate for each station
+          url: markerDataUrl,
           size: { width: 48, height: 58 },
-          anchorOffset: { x: 0, y: -29 } // Pointy tip at coordinate
-         }
+          anchorOffset: { x: 0, y: -29 }, // tip at coordinate
+          title: s.name,
+          subtitle: s.address + (s.suburb ? ", " + s.suburb : ""),
+        }
       );
       annotation.data = { siteId: s.siteId };
       annotation.addEventListener("select", () => {
@@ -197,7 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
         updateStationList();
       });
       stationAnnotations.push(annotation);
-    });
+    }
     map.addAnnotations(stationAnnotations);
   }
 
@@ -385,6 +424,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Start app with user location if possible
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       pos => {
