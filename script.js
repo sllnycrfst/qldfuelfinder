@@ -49,14 +49,14 @@ document.addEventListener("DOMContentLoaded", () => {
     mapkit.init({
       authorizationCallback: function(done) {
         // Replace with your real JWT token below:
-        done("eyJraWQiOiJITjU3RDk2VVM2IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzQ5Mjk3NTc1LCJvcmlnaW4iOiIqLnNsbG55Y3Jmc3QuZ2l0aHViLmlvIn0.jQhOmgBdgRkR6RU6Ewe9YEgRjk0IzabAzkJYb-_ePHoqhOgWp-xDFL_qSrGEbfrPY1hyOQmhrCEpYUEIpdaycQ");
+        done("eyJraWQiOiI4Wk44NTZHUjI0IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUwMTQ2NDkyLCJvcmlnaW4iOiJzbGxueWNyZnN0LmdpdGh1Yi5pbyJ9.ylKRmHZvXgB5qbDr_6niDFpT4wAlGItM7TsNDUHqQOOyKoxGMNbYbgI5cv2cW0iyh6BlnazJ_cYTCef1VNnr2g");
       }
     });
     // Create the map
     map = new mapkit.Map("map", {
       center: new mapkit.Coordinate(center.latitude, center.longitude),
       showsUserLocationControl: true,
-      zoom: defaultZoom
+      cameraDistance: 5000 // Example, in meters. Adjust as needed.
     });
 
     // Listen to camera change for updating visible stations/list
