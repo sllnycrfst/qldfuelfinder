@@ -124,7 +124,7 @@ body {
   box-shadow: 0 2px 12px rgba(30, 49, 80, 0.09), 0 1.5px 8px rgba(30, 49, 80, 0.16);
   border-radius: 13px;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.3);
+  border: none;
 }
 
 .leaflet-control-zoom-in,
