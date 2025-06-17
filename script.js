@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   function startApp(center) {
-    map = L.map("map", { zoomControl: true, attributionControl: tru }).setView(center, defaultZoom);
+    map = L.map("map", { zoomControl: true, attributionControl: true }).setView(center, defaultZoom);
     map.zoomControl.setPosition("topright");
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a> | &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
