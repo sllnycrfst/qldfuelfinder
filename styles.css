@@ -103,9 +103,14 @@ body {
 
 @media (max-width: 600px) {
   .search-bar-glass {
-    max-width: 98vw;
+    left: 2vw;
+    right: 2vw;
+    top: 10px;
+    width: unset;
+    min-width: 0;
+    max-width: unset;
     padding: 0 4vw;
-    margin: 14px auto 0 auto;
+    transform: none;
   }
   #search, #fuel-select {
     font-size: 0.95em;
