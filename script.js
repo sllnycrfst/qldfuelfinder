@@ -110,11 +110,26 @@ document.addEventListener("DOMContentLoaded", () => {
       const ctx = canvas.getContext('2d');
       const brandImg = new Image();
       const myMarkerImg = new Image();
-      let loaded = 0;
+      let loaded = 0, errored = false;
+
+      function finishFallback() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.font = "bold 14px sans-serif";
+        ctx.fillStyle = "#222";
+        ctx.textAlign = "center";
+        ctx.fillText(price ? price.toFixed(1) : "?", 24, 29);
+        resolve(canvas.toDataURL());
+      }
 
       function tryFinish() {
         loaded++;
         if (loaded === 2) {
+          if (!brandImg.complete || !myMarkerImg.complete || errored) {
+            finishFallback();
+            return;
+          }
           // Draw brand at back
           ctx.save();
           ctx.beginPath();
@@ -148,7 +163,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       brandImg.onload = tryFinish;
       myMarkerImg.onload = tryFinish;
-      brandImg.onerror = myMarkerImg.onerror = () => resolve(markerUrl); // fallback
+      brandImg.onerror = () => { errored = true; tryFinish(); };
+      myMarkerImg.onerror = () => { errored = true; tryFinish(); };
       brandImg.src = brandUrl;
       myMarkerImg.src = markerUrl;
     });
@@ -192,7 +208,8 @@ document.addEventListener("DOMContentLoaded", () => {
       .filter(Boolean);
 
     for (const s of visibleStations) {
-      const brandImgUrl = s.BrandId ? `images/${s.BrandId}.png` : 'images/12.png';
+      // fallback to 'images/default.png' if brand image doesn't exist
+      const brandImgUrl = s.BrandId ? `images/${s.BrandId}.png` : 'images/default.png';
       const myMarkerUrl = "images/my-marker.png";
       const priceVal = s.price;
 
@@ -298,13 +315,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // Always use brand logo for both featured and list stations
     const featuredImgSrc = featured.brand
       ? `images/${featured.brand}.png`
-      : 'images/12.png';
+      : 'images/default.png';
 
     let featuredHTML = `
       <li class="featured-station glass-card" id="featured-station">
         <img 
           src="${featuredImgSrc}"
-          onerror="this.onerror=null;this.src='images/12.png';"
+          onerror="this.onerror=null;this.src='images/default.png';"
           class="featurestation-img"
           alt="${featured.name}"
         />
@@ -324,14 +341,14 @@ document.addEventListener("DOMContentLoaded", () => {
     let othersHTML = others.map(site => {
       const siteImgSrc = site.brand
         ? `images/${site.brand}.png`
-        : 'images/12.png';
+        : 'images/default.png';
       return `
         <li class="list-station" data-siteid="${String(site.siteId)}">
           <span class="list-logo">
             <img 
               src="${siteImgSrc}"
               alt="${site.name}" 
-              onerror="this.onerror=null;this.src='images/12.png';"
+              onerror="this.onerror=null;this.src='images/default.png';"
               style="height:32px;width:32px;border-radius:50%;background:#fff;object-fit:contain;box-shadow:0 1px 2px rgba(0,0,0,0.07);"
             />
           </span>
