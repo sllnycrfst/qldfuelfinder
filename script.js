@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let map, userMarker;
   const defaultCenter = { latitude: -27.4698, longitude: 153.0251 };
-  const fuelOrder = ["E10", "91", "95", "98", "Diesel"];
+  const fuelOrder = ["E10", "91", "95", "98", "Diesel", "Premium Diesel"];
   const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3, "Premium Diesel": 10 };
   let currentFuel = "E10";
   let allSites = [];
@@ -22,21 +22,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let priceMap = {};
   let forcedFeaturedSiteId = null;
   let stationAnnotations = [];
-
-  const bannedStations = [
-    "BARA FUELS FOREST HILL", "Sommer Petroleum", "Wandoan Fuels", "Karumba Point Service Station",
-    "Cam's Corner Servo & Mini Mart", "CEQ Kowanyama Supermarket", "Coen Store", "Aurukun Bowsers",
-    "Independent Musgrave Roadhouse", "Ibis Thursday Island Service Station", "Badu Express",
-    "Astron Mount Isa", "IOR Petroleum Injune", "Mobil Norton's Store & Mechanical", "Fuel Central Isisford Unmanned",
-    "Astron Hughenden", "Winton Roadhouse", "The Old Empire Café", "The White Bull Roadhouse", "IOR Eromanga",
-    "Boulia Roadhouse", "Barcoo Shire Council Depot", "Birdsville Fuel Service", "Birdsville Roadhouse",
-    "Flinders Star", "Doomadgee Roadhouse", "Tirranna Springs Road House",
-    "IBIS Fuel St. Pauls", "Ibis Fuel Kubin", "IBIS Fuel Warraber Island", "IBIS Fuel Yam Island",
-    "IBIS Fuel Yorke Island", "Wujal Wujal Service Station", "Bloomfield Middle Shop",
-    "Hope Vale Service Station", "Miallo Fuel Station", "Roadhouse Service Station",
-    "Mareeba Service Station", "Port Douglas Service Station"
-  ];
-
   // --- Apple MapKit JS Setup ---
   function initMapKit(center) {
     mapkit.init({
