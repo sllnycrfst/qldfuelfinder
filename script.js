@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
       maxZoom: 16
     }).addTo(map);
 
-    // Define and add your custom control HERE, after map is created
+    // Custom control for your link
     const customControl = L.control({ position: 'bottomleft' });
     customControl.onAdd = function(map) {
       const div = L.DomUtil.create('div', 'custom-control');
@@ -53,25 +53,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return div;
     };
     customControl.addTo(map);
-
-    markerLayer = L.layerGroup();
-    map.addLayer(markerLayer);
-
-    showUserLocation(false);
-    fetchSitesAndPrices();
-
-    map.on("moveend", () => {
-      updateVisibleStations();
-      updateStationList();
-    });
-    map.on("zoomend", () => {
-      updateVisibleStations();
-      updateStationList();
-    });
-}
-
-    
-customControl.addTo(map);
 
     markerLayer = L.layerGroup();
     map.addLayer(markerLayer);
