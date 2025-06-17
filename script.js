@@ -89,31 +89,16 @@ document.addEventListener("DOMContentLoaded", () => {
       canvas.width = 90;
       canvas.height = 110;
       const ctx = canvas.getContext('2d');
-      let loaded = 0, errored = false;
-      const brandImg = new Image();
-      const markerImg = new Image();
+      let loaded = 0;
+      let brandLoaded = false;
+      let markerLoaded = false;
+      let errored = false;
 
-      function fallback() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "#fff";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = "#bbb";
-        ctx.strokeRect(0, 0, canvas.width, canvas.height);
-        ctx.font = "bold 24px sans-serif";
-        ctx.fillStyle = "#222";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(price ? price.toFixed(1) : "?", canvas.width / 2, canvas.height / 2);
-        resolve(canvas.toDataURL());
-      }
-      function tryFinish() {
-        loaded++;
-        if (loaded === 2) {
-          if (!brandImg.complete || !markerImg.complete || errored) {
-            fallback();
-            return;
-          }
+      function finish() {
+        if (brandLoaded && markerLoaded) {
+          // marker base
           ctx.drawImage(markerImg, 0, 28, 90, 82);
+          // brand logo
           ctx.save();
           ctx.beginPath();
           ctx.arc(45, 69, 28, 0, 2 * Math.PI);
@@ -121,6 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
           ctx.clip();
           ctx.drawImage(brandImg, 17, 41, 56, 56);
           ctx.restore();
+          // price panel
           ctx.save();
           ctx.fillStyle = "#222";
           ctx.strokeStyle = "#196b2a";
@@ -134,23 +120,43 @@ document.addEventListener("DOMContentLoaded", () => {
           ctx.fill();
           ctx.stroke();
           ctx.restore();
+          // price text
           ctx.font = "bold 32px monospace";
           ctx.fillStyle = "#7fff50";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
           ctx.fillText(price ? price.toFixed(1) : "?", 45, 22);
           resolve(canvas.toDataURL());
+        } else {
+          // fallback: draw a white box with price
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "#fff";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.strokeStyle = "#bbb";
+          ctx.strokeRect(0, 0, canvas.width, canvas.height);
+          ctx.font = "bold 32px sans-serif";
+          ctx.fillStyle = "#222";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(price ? price.toFixed(1) : "?", canvas.width / 2, canvas.height / 2);
+          resolve(canvas.toDataURL());
         }
       }
-      brandImg.onload = tryFinish;
-      markerImg.onload = tryFinish;
-      brandImg.onerror = () => { errored = true; tryFinish(); };
-      markerImg.onerror = () => { errored = true; tryFinish(); };
+      
+      const brandImg = new Image();
+      const markerImg = new Image();
+
+      brandImg.onload = () => { brandLoaded = true; loaded++; if (loaded === 2) finish(); };
+      markerImg.onload = () => { markerLoaded = true; loaded++; if (loaded === 2) finish(); };
+      brandImg.onerror = () => { loaded++; if (loaded === 2) finish(); };
+      markerImg.onerror = () => { loaded++; if (loaded === 2) finish(); };
+  
+      // Start loading
       brandImg.src = brandUrl;
       markerImg.src = markerUrl;
     });
   }
-
+     
   async function updateVisibleStations() {
     if (!allSites.length || !allPrices.length || !map) return;
     if (stationAnnotations.length) map.removeAnnotations(stationAnnotations);
