@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let priceMap = {};
   let forcedFeaturedSiteId = null;
   let stationAnnotations = [];
+
   // --- Apple MapKit JS Setup ---
   function initMapKit(center) {
     mapkit.init({
@@ -81,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
         priceMap[p.SiteId][p.FuelId] = p.Price;
       });
 
-      updateVisibleStations();
+      await updateVisibleStations();
       updateStationList();
     } catch (err) {
       console.error("Failed to fetch site/price data:", err);
@@ -124,11 +125,6 @@ document.addEventListener("DOMContentLoaded", () => {
           ctx.restore();
 
           // Draw price at top
-          ctx.font = "bold 16px sans-serif";
-          ctx.fillStyle = "#222";
-          ctx.textAlign = "center";
-          ctx.textBaseline = "top";
-          // White background for price
           ctx.save();
           ctx.globalAlpha = 0.8;
           ctx.beginPath();
@@ -137,7 +133,11 @@ document.addEventListener("DOMContentLoaded", () => {
           ctx.fillStyle = "#fff";
           ctx.fill();
           ctx.restore();
+
+          ctx.font = "bold 16px sans-serif";
           ctx.fillStyle = "#222";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "top";
           ctx.fillText(price.toFixed(1), 24, 7);
 
           // Draw your marker on top, slightly lower
@@ -191,11 +191,9 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .filter(Boolean);
 
-    const minPrice = visibleStations.length ? Math.min(...visibleStations.map(s => s.rawPrice)) : null;
-
     for (const s of visibleStations) {
       const brandImgUrl = s.BrandId ? `images/${s.BrandId}.png` : 'images/default.png';
-      const myMarkerUrl = "images/mymarker.png";
+      const myMarkerUrl = "images/my-marker.png";
       const priceVal = s.price;
 
       // Compose the marker image dynamically
