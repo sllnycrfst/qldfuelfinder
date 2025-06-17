@@ -180,8 +180,9 @@ document.addEventListener("DOMContentLoaded", () => {
           title: `${s.name} (${s.price.toFixed(1)})`,
           subtitle: s.address + (s.suburb ? ", " + s.suburb : ""),
           glyphImage: {
-            1: `images/${s.brand ? s.brand : 'default'}.png`,
-            2: `images/${s.brand ? s.brand : 'default'}.png`
+            1: "images/my-marker.png"
+            2: "images/my-marker@2x.png"
+          color: null
           }
         }
       );
