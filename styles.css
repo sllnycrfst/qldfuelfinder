@@ -25,22 +25,6 @@ body {
   z-index: 0;
 }
 
-.autocomplete-list {
-  border: 1px solid #ccc;
-  background: #fff;
-  max-height: 200px;
-  overflow-y: auto;
-  position: relative;
-  width: 100%;
-  z-index: 10;
-}
-.suggestion-item {
-  padding: 8px 12px;
-  cursor: pointer;
-}
-.suggestion-item:hover {
-  background: #f0f0f0;
-}
 .search-bar-glass {
   position: absolute;
   top: 32px; /* or your desired distance from top */
