@@ -1,5 +1,4 @@
 import { suburbs } from './suburbs.js';
-
 document.addEventListener("DOMContentLoaded", () => {
   // UI controls
   const recenterBtn = document.getElementById("recenter-btn");
