@@ -96,11 +96,11 @@ document.addEventListener("DOMContentLoaded", () => {
       canvas.width = 90;
       canvas.height = 110;
       const ctx = canvas.getContext('2d');
-      const brandImg = new Image();
-      const myMarkerImg = new Image();
       let loaded = 0, errored = false;
+      const brandImg = new Image();
+      const markerImg = new Image();
 
-      function finishFallback() {
+      function fallback() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "#fff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -113,19 +113,16 @@ document.addEventListener("DOMContentLoaded", () => {
         ctx.fillText(price ? price.toFixed(1) : "?", canvas.width / 2, canvas.height / 2);
         resolve(canvas.toDataURL());
       }
-
       function tryFinish() {
         loaded++;
         if (loaded === 2) {
-          if (!brandImg.complete || !myMarkerImg.complete || errored) {
-            finishFallback();
+          if (!brandImg.complete || !markerImg.complete || errored) {
+            fallback();
             return;
           }
-
-          // draw the marker base (my-marker.png)
-          ctx.drawImage(myMarkerImg, 0, 28, 90, 82);
-
-          // draw the brand logo in the center of the circle
+          // marker base
+          ctx.drawImage(markerImg, 0, 28, 90, 82);
+          // brand logo
           ctx.save();
           ctx.beginPath();
           ctx.arc(45, 69, 28, 0, 2 * Math.PI);
@@ -133,8 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
           ctx.clip();
           ctx.drawImage(brandImg, 17, 41, 56, 56);
           ctx.restore();
-
-          // draw the price panel top
+          // price panel
           ctx.save();
           ctx.fillStyle = "#222";
           ctx.strokeStyle = "#196b2a";
@@ -148,23 +144,21 @@ document.addEventListener("DOMContentLoaded", () => {
           ctx.fill();
           ctx.stroke();
           ctx.restore();
-
-          // draw the price text
+          // price text
           ctx.font = "bold 32px monospace";
           ctx.fillStyle = "#7fff50";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
           ctx.fillText(price ? price.toFixed(1) : "?", 45, 22);
-
           resolve(canvas.toDataURL());
         }
       }
       brandImg.onload = tryFinish;
-      myMarkerImg.onload = tryFinish;
+      markerImg.onload = tryFinish;
       brandImg.onerror = () => { errored = true; tryFinish(); };
-      myMarkerImg.onerror = () => { errored = true; tryFinish(); };
+      markerImg.onerror = () => { errored = true; tryFinish(); };
       brandImg.src = brandUrl;
-      myMarkerImg.src = markerUrl;
+      markerImg.src = markerUrl;
     });
   }
 
@@ -206,12 +200,9 @@ document.addEventListener("DOMContentLoaded", () => {
       .filter(Boolean);
 
     for (const s of visibleStations) {
-      // Use images/BrandId.png for brand, fallback to images/default.png if not found
       const brandImgUrl = s.BrandId ? `images/${s.BrandId}.png` : 'images/default.png';
       const myMarkerUrl = "images/my-marker.png";
       const priceVal = s.price;
-
-      // Compose the marker image dynamically to look like your mockup
       const markerDataUrl = await makeStationMarker(brandImgUrl, myMarkerUrl, priceVal);
 
       const annotation = new mapkit.ImageAnnotation(
@@ -219,7 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
         {
           url: markerDataUrl,
           size: { width: 90, height: 110 },
-          anchorOffset: new DOMPoint(0, -55), // tip at coordinate
+          anchorOffset: new DOMPoint(0, -55),
           title: s.name,
           subtitle: s.address + (s.suburb ? ", " + s.suburb : ""),
         }
