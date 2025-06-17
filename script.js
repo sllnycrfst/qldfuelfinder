@@ -380,10 +380,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Recenter button
+  // --- Distance helper ---
+  function getDistance(lat1, lon1, lat2, lon2) {
+    if (lat1 == null || lon1 == null) return null;
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) ** 2 +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  // --- UI event hooks ---
   recenterBtn && recenterBtn.addEventListener("click", () => showUserLocation(true));
 
-  // List button open/close
   listBtn && listBtn.addEventListener("click", () => {
     forcedFeaturedSiteId = null;
     listPanel.classList.add("visible");
@@ -396,7 +407,6 @@ document.addEventListener("DOMContentLoaded", () => {
     forcedFeaturedSiteId = null;
   });
 
-  // Fuel selector
   fuelSelect && fuelSelect.addEventListener("change", e => {
     currentFuel = e.target.value;
     forcedFeaturedSiteId = null;
@@ -406,7 +416,6 @@ document.addEventListener("DOMContentLoaded", () => {
   fuelSelect.value = "E10";
   currentFuel = "E10";
 
-  // Search suburb/station
   searchInput && searchInput.addEventListener("input", function (e) {
     const query = e.target.value.toLowerCase().trim();
     if (query.length < 2) return;
@@ -420,7 +429,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Start app with user location if possible
+  // --- App bootstrap ---
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       pos => {
