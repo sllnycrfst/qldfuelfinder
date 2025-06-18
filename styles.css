@@ -41,6 +41,7 @@ body {
   box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  filter: drop-shadow(4px 4px 10px rgba(30,49,80,0.19));
   border-radius: 18px;
   padding: 0 16px;
   z-index: 999;
@@ -84,13 +85,13 @@ body {
 }
 
 #search::placeholder {
-  color: #b4b4b4;
+  color: #387cc2 !important;
   opacity: 1;
 }
 
 .divider {
   margin: 10px 10px;
-  color: #b4b4b4;
+  color: #387cc2 !important;
   font-size: 1.5em;
   user-select: none;
 }
