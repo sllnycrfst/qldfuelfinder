@@ -166,7 +166,7 @@ body {
 
 .leaflet-top.leaflet-right {
   top: auto; /* move it down from the top, adjust as needed */
-  bottom: 240px;
+  bottom: 200px;
   right: 20px;
 }
 
@@ -252,8 +252,8 @@ body {
   padding: 0;
   font-family: 'Roboto', Arial, sans-serif !important;
 }
-.list-btn { left: 25px; bottom: 150px }
-.recenter-btn { right: 25px; bottom: 150px }
+.list-btn { left: 25px; bottom: 120px }
+.recenter-btn { right: 25px; bottom: 120px }
 
 .list-btn:hover, .recenter-btn:hover {
   background: rgba(232, 247, 255, 0.8) !important;
