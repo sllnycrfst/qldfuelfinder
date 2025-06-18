@@ -18,14 +18,7 @@ body {
   position: relative;
 }
 
-#map {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 0;
-}
-
+/* --- Search Bar and Icons --- */
 .search-bar-glass {
   position: absolute;
   top: 32px;
@@ -35,6 +28,7 @@ body {
   max-width: 700px;
   display: flex;
   align-items: center;
+  gap: 0.5em;
   background: rgba(255,255,255,0.55);
   box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
   backdrop-filter: blur(10px);
@@ -44,12 +38,27 @@ body {
   z-index: 999;
 }
 
+.search-icon {
+  display: flex;
+  align-items: center;
+  margin-right: 7px;
+  margin-left: 4px;
+  height: 24px;
+}
+.fuel-icon {
+  display: flex;
+  align-items: center;
+  margin-right: 6px;
+  margin-left: 4px;
+  height: 22px;
+}
+
 #search {
   flex: 1 1 0;
   border: none;
   background: transparent;
   font-size: 1em;
-  padding: 10px 0 10px 8px;
+  padding: 10px 0 10px 0;
   outline: none;
   color: #387cc2 !important;
   font-family: 'Roboto', Arial, sans-serif !important;
@@ -59,6 +68,7 @@ body {
   box-shadow: none;
   border-radius: 0;
   margin-right: 0;
+  padding-left: 0;
 }
 
 #search::placeholder {
@@ -114,6 +124,9 @@ body {
     font-size: 1.2em;
     margin: 5px 5px;
   }
+  .search-icon, .fuel-icon {
+    height: 16px;
+  }
 }
 
 /* Map Zoom Buttons */
@@ -162,7 +175,7 @@ body {
 /* PATCH: Keep controls visually at the bottom everywhere, but above iOS Safari bar if present */
 .leaflet-top.leaflet-right {
   top: auto;
-  bottom: calc(105px + env(safe-area-inset-bottom, 0));
+  bottom: calc(170px + env(safe-area-inset-bottom, 0));
   right: 20px;
 }
 
@@ -244,7 +257,7 @@ body {
   height: 38px;
   font-size: 24px;
   cursor: pointer;
-  position: fixed; /* <- CHANGED from absolute to fixed */
+  position: fixed;
   z-index: 1003;
   padding: 0;
   font-family: 'Roboto', Arial, sans-serif !important;
