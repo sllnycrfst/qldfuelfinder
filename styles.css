@@ -4,10 +4,11 @@ html, body {
   padding: 0;
   box-sizing: border-box;
   font-family: 'Roboto', Arial, sans-serif !important;
-  background: transparent !important; /* <-- make this transparent */
+  background: transparent !important;
   width: 100vw;
-  overflow: hidden; /* prevents scrollbars */
+  overflow: hidden;
 }
+
 body {
   margin: 0;
   padding: 0;
@@ -27,7 +28,7 @@ body {
 
 .search-bar-glass {
   position: absolute;
-  top: 32px; /* or your desired distance from top */
+  top: 32px;
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
@@ -41,7 +42,6 @@ body {
   border-radius: 18px;
   padding: 0 16px;
   z-index: 999;
-  /* Remove margin */
 }
 
 #search {
@@ -95,11 +95,6 @@ body {
   background: rgba(255,255,255,0.75);
 }
 
-#search:focus,
-#fuel-select:focus {
-  background: rgba(255,255,255,0.75);
-}
-
 @media (max-width: 600px) {
   .search-bar-glass {
     left: 2vw;
@@ -120,6 +115,7 @@ body {
     margin: 5px 5px;
   }
 }
+
 /* Map Zoom Buttons */
 .leaflet-control-zoom {
   background: rgba(255, 255, 255, 0.38);
@@ -186,10 +182,10 @@ body {
 
 .marker-brand-img {
   position: absolute !important;
-  top: 25px;    /* adjust as needed */
-  left: 22px;   /* adjust as needed */
-  width: 26px;  /* adjust as needed */
-  height: 26px; /* adjust as needed */
+  top: 25px;
+  left: 22px;
+  width: 26px;
+  height: 26px;
   z-index: 1 !important;
   opacity: 1;
   pointer-events: none;
@@ -248,7 +244,7 @@ body {
   height: 38px;
   font-size: 24px;
   cursor: pointer;
-  position: absolute;
+  position: fixed; /* <- CHANGED from absolute to fixed */
   z-index: 1003;
   padding: 0;
   font-family: 'Roboto', Arial, sans-serif !important;
