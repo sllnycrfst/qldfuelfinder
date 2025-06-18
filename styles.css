@@ -41,7 +41,7 @@ body {
   box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  filter: drop-shadow(4px 4px 10px rgba(30,49,80,0.19));
+  filter: drop-shadow(2px 2px 6px rgba(30,49,80,0.19));
   border-radius: 18px;
   padding: 0 16px;
   z-index: 999;
@@ -166,7 +166,7 @@ body {
   line-height: 42px;
   text-align: center;
   outline: none;
-  box-shadow: none !important;
+  filter: drop-shadow(2px 2px 6px rgba(30,49,80,0.19));
   transition: background 0.13s, color 0.13s;
   cursor: pointer;
 }
@@ -275,6 +275,7 @@ body {
   z-index: 1003;
   padding: 0;
   font-family: 'Roboto', Arial, sans-serif !important;
+  filter: drop-shadow(2px 2px 6px rgba(30,49,80,0.19));
 }
 .list-btn { left: 25px; bottom: calc(25px + env(safe-area-inset-bottom, 0)); }
 .recenter-btn { right: 25px; bottom: calc(25px + env(safe-area-inset-bottom, 0)); }
