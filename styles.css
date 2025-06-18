@@ -97,8 +97,8 @@ body {
 
 @media (max-width: 600px) {
   .search-bar-glass {
-    left: 4vw;
-    right: 4vw;
+    left: 2vw;
+    right: 2vw;
     top: 20px;
     width: unset;
     min-width: 0;
@@ -162,7 +162,7 @@ body {
 /* PATCH: Keep controls visually at the bottom everywhere, but above iOS Safari bar if present */
 .leaflet-top.leaflet-right {
   top: auto;
-  bottom: calc(170px + env(safe-area-inset-bottom, 0));
+  bottom: calc(105px + env(safe-area-inset-bottom, 0));
   right: 20px;
 }
 
