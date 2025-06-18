@@ -43,6 +43,8 @@ body {
   align-items: center;
   margin-right: 7px;
   margin-left: 4px;
+  font-size: 1.3em;
+  color: #387cc2;
   height: 24px;
 }
 .fuel-icon {
@@ -50,6 +52,8 @@ body {
   align-items: center;
   margin-right: 6px;
   margin-left: 4px;
+  font-size: 1.2em;
+  color: #387cc2;
   height: 22px;
 }
 
@@ -126,6 +130,7 @@ body {
   }
   .search-icon, .fuel-icon {
     height: 16px;
+    font-size: 1em;
   }
 }
 
