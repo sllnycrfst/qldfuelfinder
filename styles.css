@@ -52,7 +52,7 @@ body {
   flex: 1 1 0;
   border: none;
   background: transparent;
-  font-size: 1em;
+  font-size: 1.05em;
   padding: 10px 0 10px 8px;
   outline: none;
   color: #387cc2 !important;
@@ -80,7 +80,7 @@ body {
 #fuel-select {
   border: none;
   background: transparent;
-  font-size: 1em;
+  font-size: 1.05em;
   padding: 10px 8px 10px 0;
   border-radius: 0;
   color: #387cc2 !important;
@@ -171,7 +171,7 @@ body {
 /* PATCH: use safe-area-inset-bottom for iOS Safari, so controls are never covered by browser chrome */
 .leaflet-top.leaflet-right {
   top: auto;
-  bottom: calc(200px + env(safe-area-inset-bottom, 0));
+  bottom: calc(80px + env(safe-area-inset-bottom, 0));
   right: 20px;
 }
 
@@ -258,8 +258,8 @@ body {
   padding: 0;
   font-family: 'Roboto', Arial, sans-serif !important;
 }
-.list-btn { left: 25px; bottom: calc(120px + env(safe-area-inset-bottom, 0)); }
-.recenter-btn { right: 25px; bottom: calc(120px + env(safe-area-inset-bottom, 0)); }
+.list-btn { left: 25px; bottom: calc(40px + env(safe-area-inset-bottom, 0)); }
+.recenter-btn { right: 25px; bottom: calc(40px + env(safe-area-inset-bottom, 0)); }
 
 .list-btn:hover, .recenter-btn:hover {
   background: rgba(232, 247, 255, 0.8) !important;
