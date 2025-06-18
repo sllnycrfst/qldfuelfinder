@@ -45,15 +45,6 @@ document.addEventListener("DOMContentLoaded", () => {
       maxZoom: 16
     }).addTo(map);
 
-    // Custom control for your link
-    const customControl = L.control({ position: 'bottomleft' });
-    customControl.onAdd = function(map) {
-      const div = L.DomUtil.create('div', 'custom-control');
-      div.innerHTML = '<a href="https://www.sellanycarfast.com.au" target="_blank">Sell Any Car Fast</a>';
-      return div;
-    };
-    customControl.addTo(map);
-
     markerLayer = L.layerGroup();
     map.addLayer(markerLayer);
 
