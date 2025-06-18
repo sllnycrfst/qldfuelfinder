@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const defaultZoom = 14;
 
   // Use the desired fuel order: E10, 91, 95, 98, Diesel
-  const fuelOrder = ["E10", "91", "95", "98", "Diesel"];
+  const fuelOrder = ["E10", "91", "95", "98", "Diesel", "Premium Diesel"];
   const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3, "Premium Diesel": 10 };
   let currentFuel = "E10";
   let allSites = [];
@@ -45,13 +45,6 @@ document.addEventListener("DOMContentLoaded", () => {
       maxZoom: 16
     }).addTo(map);
 
-    // Custom control for your link
-    const customControl = L.control({ position: 'bottomleft' });
-    customControl.onAdd = function(map) {
-      const div = L.DomUtil.create('div', 'custom-control');
-      div.innerHTML = '<a href="https://www.sellanycarfast.com.au" target="_blank">Sell Any Car Fast</a>';
-      return div;
-    };
     customControl.addTo(map);
 
     markerLayer = L.layerGroup();
@@ -250,7 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
       others = stations.slice(1);
     }
 
-    // Fuel prices in E10, 91, 95, 98, Diesel order
+    // Fuel prices in E10, 91, 95, 98, Diesel, Premium Diesel order
     let priceHTML = fuelOrder
       .filter(fuel => fuelIdMap[fuel] && featured.allPrices && featured.allPrices[fuelIdMap[fuel]])
       .map(fuel => {
