@@ -67,7 +67,7 @@ body {
 }
 
 .divider {
-  margin: 0 10px;
+  margin: 10px 10px;
   color: #b4b4b4;
   font-size: 1.5em;
   user-select: none;
@@ -118,14 +118,14 @@ body {
   }
   .divider {
     font-size: 1.2em;
-    margin: 0 5px;
+    margin: 5px 5px;
   }
 }
 /* Map Zoom Buttons */
 .leaflet-control-zoom {
   background: rgba(255, 255, 255, 0.38);
-  backdrop-filter: blur(8px) saturate(120%);
-  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
   box-shadow: 0 2px 12px rgba(30, 49, 80, 0.09), 0 1.5px 8px rgba(30, 49, 80, 0.16);
   border-radius: 13px;
   overflow: hidden;
@@ -166,8 +166,8 @@ body {
 
 .leaflet-top.leaflet-right {
   top: auto; /* move it down from the top, adjust as needed */
-  bottom: 140px;
-  right: 25px;
+  bottom: 240px;
+  right: 20px;
 }
 
 /* Marker styles */
@@ -229,7 +229,7 @@ body {
 
 .glass-btn {
   background: rgba(255,255,255,0.55) !important;
-  backdrop-filter: blur(16px);
+  backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: 50% !important;
   border: none !important;
@@ -252,8 +252,8 @@ body {
   padding: 0;
   font-family: 'Roboto', Arial, sans-serif !important;
 }
-.list-btn { left: 25px; bottom: 50px }
-.recenter-btn { right: 25px; bottom: 50px }
+.list-btn { left: 25px; bottom: 150px }
+.recenter-btn { right: 25px; bottom: 150px }
 
 .list-btn:hover, .recenter-btn:hover {
   background: rgba(232, 247, 255, 0.8) !important;
@@ -263,7 +263,7 @@ body {
   position: fixed;
   left: 0; right: 0; bottom: 0;
   background: rgba(255,255,255,0.55) !important;
-  backdrop-filter: blur(16px);
+  backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: 20px 20px 0 0 !important;
   box-shadow: 0 -4px 24px rgba(46,54,80,0.12);
