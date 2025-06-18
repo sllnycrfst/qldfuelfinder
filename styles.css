@@ -7,8 +7,6 @@ html, body {
   background: transparent !important; /* <-- make this transparent */
   width: 100vw;
   overflow: hidden; /* prevents scrollbars */
-  /* Add safe-area inset for iOS Safari */
-  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 body {
   margin: 0;
@@ -17,8 +15,6 @@ body {
   width: 100vw;
   overflow: hidden;
   position: relative;
-  /* Add safe-area inset for iOS Safari */
-  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
 #map {
@@ -52,7 +48,7 @@ body {
   flex: 1 1 0;
   border: none;
   background: transparent;
-  font-size: 1.05em;
+  font-size: 1em;
   padding: 10px 0 10px 8px;
   outline: none;
   color: #387cc2 !important;
@@ -80,7 +76,7 @@ body {
 #fuel-select {
   border: none;
   background: transparent;
-  font-size: 1.05em;
+  font-size: 1em;
   padding: 10px 8px 10px 0;
   border-radius: 0;
   color: #387cc2 !important;
@@ -99,7 +95,6 @@ body {
   background: rgba(255,255,255,0.75);
 }
 
-
 #search:focus,
 #fuel-select:focus {
   background: rgba(255,255,255,0.75);
@@ -107,8 +102,8 @@ body {
 
 @media (max-width: 600px) {
   .search-bar-glass {
-    left: 5vw;
-    right: 5vw;
+    left: 2vw;
+    right: 2vw;
     top: 20px;
     width: unset;
     min-width: 0;
@@ -117,7 +112,7 @@ body {
     transform: none;
   }
   #search, #fuel-select {
-    font-size: 1em;
+    font-size: 0.95em;
     padding: 8px 0;
   }
   .divider {
@@ -168,10 +163,10 @@ body {
   box-shadow: none !important;
 }
 
-/* PATCH: use safe-area-inset-bottom for iOS Safari, so controls are never covered by browser chrome */
+/* PATCH: Keep controls visually at the bottom everywhere, but above iOS Safari bar if present */
 .leaflet-top.leaflet-right {
   top: auto;
-  bottom: calc(80px + env(safe-area-inset-bottom, 0));
+  bottom: calc(105px + env(safe-area-inset-bottom, 0));
   right: 20px;
 }
 
@@ -258,8 +253,8 @@ body {
   padding: 0;
   font-family: 'Roboto', Arial, sans-serif !important;
 }
-.list-btn { left: 25px; bottom: calc(40px + env(safe-area-inset-bottom, 0)); }
-.recenter-btn { right: 25px; bottom: calc(40px + env(safe-area-inset-bottom, 0)); }
+.list-btn { left: 25px; bottom: calc(25px + env(safe-area-inset-bottom, 0)); }
+.recenter-btn { right: 25px; bottom: calc(25px + env(safe-area-inset-bottom, 0)); }
 
 .list-btn:hover, .recenter-btn:hover {
   background: rgba(232, 247, 255, 0.8) !important;
@@ -282,7 +277,6 @@ body {
   display: flex;
   flex-direction: column;
   font-family: 'Roboto', Arial, sans-serif !important;
-  /* This will push the panel content up above the safe area if needed */
   margin-bottom: env(safe-area-inset-bottom, 0);
 }
 #list-panel.visible { transform: translateY(0); }
