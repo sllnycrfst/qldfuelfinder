@@ -119,9 +119,9 @@ body {
 
 @media (max-width: 600px) {
   .search-bar-glass {
-    left: 2vw;
-    right: 2vw;
-    top: 20px;
+    left: 5vw;
+    right: 5vw;
+    top: 16px;
     width: unset;
     min-width: 0;
     max-width: unset;
@@ -129,7 +129,7 @@ body {
     transform: none;
   }
   #search, #fuel-select {
-    font-size: 1.1em;
+    font-size: 1.1em !important;
     padding: 8px 0;
   }
   .divider {
