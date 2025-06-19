@@ -13,9 +13,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const defaultZoom = 14;
 
   // Use the desired fuel order: E10, 91, 95, 98, Diesel
-  const fuelOrder = ["E10", "91", "95", "98", "Diesel", "Premium Diesel"];
-  const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3, "Premium Diesel": 14 };
-  let currentFuel = "E10";
+  const fuelOrder = ["E10", "91", "95", "98", "Diesel"];
+  const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3};
+  let currentFuel = "91";
   let allSites = [];
   let allPrices = [];
   let priceMap = {};
