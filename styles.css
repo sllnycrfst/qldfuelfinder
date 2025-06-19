@@ -189,9 +189,9 @@ body {
 
 /* PATCH: Keep controls visually at the bottom everywhere, but above iOS Safari bar if present */
 .leaflet-top.leaflet-right {
-  top: 60px;
+  top: 70px;
   bottom: 0;
-  right: 20px;
+  right: 16px;
 }
 
 /* Marker styles */
