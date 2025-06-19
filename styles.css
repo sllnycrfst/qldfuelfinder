@@ -189,8 +189,8 @@ body {
 
 /* PATCH: Keep controls visually at the bottom everywhere, but above iOS Safari bar if present */
 .leaflet-top.leaflet-right {
-  top: auto;
-  bottom: calc(170px + env(safe-area-inset-bottom, 0));
+  top: 40px;
+  bottom: 0;
   right: 20px;
 }
 
