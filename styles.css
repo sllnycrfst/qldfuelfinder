@@ -130,7 +130,7 @@ body {
     transform: none;
   }
   #search, #fuel-select {
-    font-size: 1.1em !important;
+    font-size: 1.0em !important;
     padding: 8px 0;
   }
   .divider {
@@ -189,7 +189,7 @@ body {
 
 /* PATCH: Keep controls visually at the bottom everywhere, but above iOS Safari bar if present */
 .leaflet-top.leaflet-right {
-  top: 40px;
+  top: 60px;
   bottom: 0;
   right: 20px;
 }
@@ -268,9 +268,9 @@ body {
 
 /* PATCH: Move buttons back down, but ensure they're safe on iOS Safari */
 .list-btn, .recenter-btn {
-  width: 38px;
-  height: 38px;
-  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  font-size: 26px;
   cursor: pointer;
   position: fixed;
   z-index: 1003;
