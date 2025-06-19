@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     map = L.map("map", { zoomControl: true, attributionControl: true }).setView(center, defaultZoom);
     map.zoomControl.setPosition("topright");
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '<a href="https://www.sellanycarfast.com.au" target="_blank" rel="noopener" title="Sell Any Car Fast">SACF</a> | &copy; <a href="https://carto.com/attributions">CARTO</a> | &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
+      attribution: '<a href="https://www.sellanycarfast.com.au" target="_blank" rel="noopener" title="Sell Any Car Fast">SACF</a> | &copy; <a href="https://carto.com/attributions">CARTO</a>',
       subdomains: 'abcd',
       maxZoom: 16
     }).addTo(map);
@@ -174,10 +174,40 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  function renderFeaturedFuelCard(featured) {
+    const card = document.getElementById("featured-fuel-card");
+    if (!card || !featured || !featured.allPrices) {
+      if (card) card.innerHTML = "";
+      return;
+    }
+
+    // Map fuel types to their icon color
+    const cardData = [
+      {fuel: "E10",    class: "fuelcard-e10",    svg: `<svg class="fuelcard-icon fuelcard-e10" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="10" r="10"/></svg>`},
+      {fuel: "91",     class: "fuelcard-91",     svg: `<svg class="fuelcard-icon fuelcard-91" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="10" r="10"/></svg>`},
+      {fuel: "95",     class: "fuelcard-95",     svg: `<svg class="fuelcard-icon fuelcard-95" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="10" r="10"/></svg>`},
+      {fuel: "98",     class: "fuelcard-98",     svg: `<svg class="fuelcard-icon fuelcard-98" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="10" r="10"/></svg>`},
+      {fuel: "Diesel", class: "fuelcard-diesel", svg: `<svg class="fuelcard-icon fuelcard-diesel" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="10" r="10"/></svg>`},
+    ];
+
+    card.innerHTML = cardData
+      .filter(cd => fuelIdMap[cd.fuel] && featured.allPrices[fuelIdMap[cd.fuel]])
+      .map(cd => {
+        const price = featured.allPrices[fuelIdMap[cd.fuel]];
+        return `
+          <div class="fuelcard-row">
+            <span class="fuelcard-label ${cd.class}">${cd.svg}<span>${cd.fuel}</span></span>
+            <span class="fuelcard-price">${(price/10).toFixed(1)}</span>
+          </div>
+        `;
+      }).join("");
+  }
+
   function updateStationList() {
     if (!listUl) return;
     if (!allSites.length || !allPrices.length) {
       listUl.innerHTML = "<li>Loading…</li>";
+      renderFeaturedFuelCard(null);
       return;
     }
 
@@ -216,6 +246,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (stations.length === 0) {
       listUl.innerHTML = "<li>No stations found for this fuel type.</li>";
+      renderFeaturedFuelCard(null);
       return;
     }
 
@@ -230,6 +261,9 @@ document.addEventListener("DOMContentLoaded", () => {
       featured = stations[0];
       others = stations.slice(1);
     }
+
+    // --- Render the modern price card ---
+    renderFeaturedFuelCard(featured);
 
     // Fuel prices in E10, 91, 95, 98, Diesel order
     let priceHTML = fuelOrder
