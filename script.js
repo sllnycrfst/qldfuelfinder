@@ -308,7 +308,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (featuredEl) featuredEl.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 10);
     }
-
     // Optionally: show the card for the featured station (or keep only for marker/list click)
     // showFeatureCard(featured);
   }
