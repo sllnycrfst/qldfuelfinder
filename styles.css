@@ -444,3 +444,115 @@ body {
 #list li.list-station:hover {
   background: rgba(232, 247, 255, 0.27);
 }
+
+/* --- Add to the end of your styles.css --- */
+
+.featured-price-board {
+  position: fixed;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255,255,255,0.96);
+  border-radius: 18px;
+  box-shadow: 0 8px 48px rgba(30,49,80,0.19);
+  z-index: 3000;
+  padding: 30px 30px 20px 30px;
+  display: flex;
+  gap: 36px;
+  align-items: flex-start;
+  min-width: 340px;
+  max-width: 96vw;
+  transition: opacity 0.2s;
+  opacity: 1;
+  font-family: 'Roboto', Arial, sans-serif;
+}
+.featured-price-board.hidden {
+  display: none;
+}
+.close-price-board {
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 1.8em;
+  color: #387cc2;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.priceboard-img-wrap {
+  position: relative;
+  width: 120px;
+  height: 225px;
+}
+.priceboard-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+}
+
+.price-slot {
+  position: absolute;
+  width: 68px;
+  height: 25px;
+  left: 24px;
+  background: transparent;
+  color: #21ea00;
+  font-family: 'Quantico', 'Roboto', monospace;
+  font-weight: bold;
+  font-size: 1.14em;
+  letter-spacing: 1.5px;
+  text-align: right;
+  line-height: 25px;
+  text-shadow: 0 0 2px #000, 0 0 8px #111;
+  pointer-events: none;
+  user-select: none;
+}
+.price-e10            { top: 41px;  }
+.price-91             { top: 68px;  }
+.price-95             { top: 95px;  }
+.price-98             { top: 122px; }
+.price-diesel         { top: 149px; }
+.price-premiumdiesel  { top: 176px; }
+
+.featured-station-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-width: 180px;
+  max-width: 340px;
+  margin-left: 10px;
+  margin-top: 12px;
+}
+.featured-station-name {
+  font-family: 'Quantico', sans-serif;
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 2px;
+  color: #387cc2;
+}
+.featured-station-address {
+  font-size: 1em;
+  color: #444;
+  margin-bottom: 8px;
+  word-break: break-word;
+}
+
+@media (max-width: 600px) {
+  .featured-price-board {
+    flex-direction: column;
+    align-items: center;
+    padding: 18px 2vw 10px 2vw;
+    min-width: 0;
+    gap: 14px;
+  }
+  .featured-station-info {
+    min-width: 0; max-width: 99vw;
+    margin-left: 0; margin-top: 8px;
+    align-items: center;
+    text-align: center;
+  }
+}
