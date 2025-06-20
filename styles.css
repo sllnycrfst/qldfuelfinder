@@ -443,3 +443,47 @@ body {
 #list li.list-station:hover {
   background: rgba(232, 247, 255, 0.27);
 }
+.feature-card {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  padding: 20px 32px 16px 20px;
+  z-index: 1002;
+  min-width: 280px;
+  max-width: 90vw;
+  transition: opacity 0.2s;
+  opacity: 1;
+}
+.feature-card.hidden {
+  display: none;
+}
+.close-feature-card {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+  color: #888;
+}
+.feature-card-content .feature-station-name {
+  font-family: 'Quantico', sans-serif;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+.feature-card-content .feature-station-address {
+  font-size: 1rem;
+  color: #444;
+  margin-bottom: 8px;
+}
+.feature-card-content .feature-fuel-type {
+  font-size: 1.1rem;
+  color: #387cc2;
+  font-weight: bold;
+}
