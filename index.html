@@ -57,10 +57,14 @@
     <ul id="list"></ul>
   </div>
 
-  <!-- FEATURE CARD with Price Board (only visible when a station is selected) -->
+  <!-- Feature Card (as a popup/modal or panel, not always visible) -->
   <div id="feature-card" class="feature-card hidden" role="dialog" aria-modal="true">
     <button id="close-feature-card" class="close-feature-card" title="Close" aria-label="Close">&times;</button>
     <div class="feature-card-inner">
+      <div class="feature-meta">
+        <div class="feature-station-name"></div>
+        <div class="feature-station-address"></div>
+      </div>
       <div class="priceboard-stack">
         <div class="priceboard-logo-wrap">
           <img class="priceboard-logo" src="images/default.png" alt="Station logo" />
@@ -75,13 +79,8 @@
           <div class="price-slot price-premiumdiesel"></div>
         </div>
       </div>
-      <div class="feature-meta">
-        <div class="feature-station-name"></div>
-        <div class="feature-station-address"></div>
-      </div>
     </div>
   </div>
-
   <!-- Scripts -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="script.js"></script>
