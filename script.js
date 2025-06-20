@@ -8,13 +8,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("search");
   const fuelSelect = document.getElementById("fuel-select");
 
+  // Price board controls
+  const priceBoard = document.getElementById("featured-price-board");
+  const closePriceBoardBtn = document.getElementById("close-price-board");
+
   let map, markerLayer, userMarker;
   const defaultCenter = [-27.4698, 153.0251];
   const defaultZoom = 14;
 
-  // Use the desired fuel order: E10, 91, 95, 98, Diesel
-  const fuelOrder = ["E10", "91", "95", "98", "Diesel"];
-  const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3};
+  // Use the desired fuel order: E10, 91, 95, 98, Diesel, Premium Diesel
+  const fuelOrder = ["E10", "91", "95", "98", "Diesel", "Premium Diesel"];
+  const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3, "Premium Diesel": 14 };
   let currentFuel = "91";
   let allSites = [];
   let allPrices = [];
@@ -83,7 +87,9 @@ document.addEventListener("DOMContentLoaded", () => {
       allSites = (Array.isArray(siteRes) ? siteRes : siteRes.S).filter(site => {
         return !bannedStations.some(b => site.N && site.N.includes(b));
       });
-      allPrices = priceRes.SitePrices.filter(p => Object.values(fuelIdMap).includes(p.FuelId));
+      allPrices = priceRes.SitePrices.filter(
+        p => Object.values(fuelIdMap).includes(p.FuelId)
+      );
       priceMap = {};
       allPrices.forEach(p => {
         if (!priceMap[p.SiteId]) priceMap[p.SiteId] = {};
@@ -129,6 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
             lat: site.Lat,
             lng: site.Lng,
             siteId: String(site.S),
+            allPrices: priceMap[site.S],
           };
         }
         return null;
@@ -154,10 +161,10 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         </div>
       `,
-      iconSize: [72, 72],
-      iconAnchor: [36, 72],
-      popupAnchor: [0, -72]
-    });
+        iconSize: [72, 72],
+        iconAnchor: [36, 72],
+        popupAnchor: [0, -72]
+      });
       markerLayer.addLayer(
         L.marker([s.lat, s.lng], {
           icon,
@@ -169,45 +176,17 @@ document.addEventListener("DOMContentLoaded", () => {
           listPanel.classList.add("visible");
           listPanel.classList.remove("hidden");
           updateStationList();
+          showFeaturedPriceBoard(s); // Show the price board for marker click
         })
       );
     });
-  }
-
-  function renderFeaturedFuelCard(featured) {
-    const card = document.getElementById("featured-fuel-card");
-    if (!card || !featured || !featured.allPrices) {
-      if (card) card.innerHTML = "";
-      return;
-    }
-
-    // Map fuel types to their icon color
-    const cardData = [
-      {fuel: "E10",    class: "fuelcard-e10",    svg: `<svg class="fuelcard-icon fuelcard-e10" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="10" r="10"/></svg>`},
-      {fuel: "91",     class: "fuelcard-91",     svg: `<svg class="fuelcard-icon fuelcard-91" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="10" r="10"/></svg>`},
-      {fuel: "95",     class: "fuelcard-95",     svg: `<svg class="fuelcard-icon fuelcard-95" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="10" r="10"/></svg>`},
-      {fuel: "98",     class: "fuelcard-98",     svg: `<svg class="fuelcard-icon fuelcard-98" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="10" r="10"/></svg>`},
-      {fuel: "Diesel", class: "fuelcard-diesel", svg: `<svg class="fuelcard-icon fuelcard-diesel" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="10" r="10"/></svg>`},
-    ];
-
-    card.innerHTML = cardData
-      .filter(cd => fuelIdMap[cd.fuel] && featured.allPrices[fuelIdMap[cd.fuel]])
-      .map(cd => {
-        const price = featured.allPrices[fuelIdMap[cd.fuel]];
-        return `
-          <div class="fuelcard-row">
-            <span class="fuelcard-label ${cd.class}">${cd.svg}<span>${cd.fuel}</span></span>
-            <span class="fuelcard-price">${(price/10).toFixed(1)}</span>
-          </div>
-        `;
-      }).join("");
   }
 
   function updateStationList() {
     if (!listUl) return;
     if (!allSites.length || !allPrices.length) {
       listUl.innerHTML = "<li>Loading…</li>";
-      renderFeaturedFuelCard(null);
+      showFeaturedPriceBoard(null);
       return;
     }
 
@@ -246,7 +225,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (stations.length === 0) {
       listUl.innerHTML = "<li>No stations found for this fuel type.</li>";
-      renderFeaturedFuelCard(null);
+      showFeaturedPriceBoard(null);
       return;
     }
 
@@ -262,12 +241,9 @@ document.addEventListener("DOMContentLoaded", () => {
       others = stations.slice(1);
     }
 
-    // --- Render the modern price card ---
-    renderFeaturedFuelCard(featured);
-
     // Fuel prices in E10, 91, 95, 98, Diesel order
     let priceHTML = fuelOrder
-      .filter(fuel => fuelIdMap[fuel] && featured.allPrices && featured.allPrices[fuelIdMap[fuel]])
+      .filter(fuel => fuelIdMap[fuel] && featured.allPrices && typeof featured.allPrices[fuelIdMap[fuel]] !== "undefined")
       .map(fuel => {
         const price = featured.allPrices[fuelIdMap[fuel]];
         return `<div class="price-row"><span class="fuel-type">${fuel}:</span> <span class="fuel-price">${(price/10).toFixed(1)}</span></div>`;
@@ -333,6 +309,9 @@ document.addEventListener("DOMContentLoaded", () => {
             if (feat) feat.scrollIntoView({ behavior: "smooth", block: "start" });
           }, 10);
         }
+        // Show the price board for selected station in list
+        const selected = stations.find(s => String(s.siteId) === String(siteId));
+        if (selected) showFeaturedPriceBoard(selected);
       });
     });
 
@@ -342,7 +321,52 @@ document.addEventListener("DOMContentLoaded", () => {
         if (featuredEl) featuredEl.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 10);
     }
+
+    // Show the price board for the current featured station
+    showFeaturedPriceBoard(featured);
   }
+
+  /*** New: Featured Price Board logic ***/
+  function showFeaturedPriceBoard(station) {
+    if (!priceBoard) return;
+    if (!station) {
+      priceBoard.classList.add("hidden");
+      return;
+    }
+    const fuelSlots = [
+      { slot: "price-e10",            id: 12 },
+      { slot: "price-91",             id: 2 },
+      { slot: "price-95",             id: 5 },
+      { slot: "price-98",             id: 8 },
+      { slot: "price-diesel",         id: 3 },
+      { slot: "price-premiumdiesel",  id: 14 }
+    ];
+    // Fill price slots
+    for (const { slot, id } of fuelSlots) {
+      const priceDiv = priceBoard.querySelector("." + slot);
+      let priceVal = null;
+      if (
+        station.allPrices &&
+        typeof station.allPrices[id] !== "undefined" &&
+        station.allPrices[id] !== null
+      ) {
+        priceVal = station.allPrices[id];
+        priceDiv.textContent = (priceVal / 10).toFixed(1);
+      } else {
+        priceDiv.textContent = "N/A";
+      }
+    }
+    // Fill station info
+    priceBoard.querySelector(".featured-station-name").textContent = station.name ?? "";
+    priceBoard.querySelector(".featured-station-address").textContent =
+      (station.address ?? "") + (station.suburb ? ", " + station.suburb : "");
+    priceBoard.classList.remove("hidden");
+  }
+
+  // Close button for price board
+  closePriceBoardBtn && closePriceBoardBtn.addEventListener("click", () => {
+    priceBoard.classList.add("hidden");
+  });
 
   // Recenter button
   recenterBtn && recenterBtn.addEventListener("click", () => showUserLocation(true));
@@ -358,6 +382,7 @@ document.addEventListener("DOMContentLoaded", () => {
     listPanel.classList.remove("visible");
     listPanel.classList.add("hidden");
     forcedFeaturedSiteId = null;
+    priceBoard.classList.add("hidden"); // Hide price board when closing list
   });
 
   // Fuel selector
