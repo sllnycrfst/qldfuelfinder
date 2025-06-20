@@ -57,21 +57,28 @@
     <ul id="list"></ul>
   </div>
 
-  <!-- Featured Station Price Board -->
-  <div id="featured-price-board" class="featured-price-board hidden" role="dialog" aria-modal="true">
-    <button id="close-price-board" class="close-price-board" title="Close" aria-label="Close">&times;</button>
-    <div class="priceboard-img-wrap">
-      <img src="images/priceboard.png" alt="Price Board" class="priceboard-img"/>
-      <div class="price-slot price-e10"></div>
-      <div class="price-slot price-91"></div>
-      <div class="price-slot price-95"></div>
-      <div class="price-slot price-98"></div>
-      <div class="price-slot price-diesel"></div>
-      <div class="price-slot price-premiumdiesel"></div>
-    </div>
-    <div class="featured-station-info">
-      <div class="featured-station-name"></div>
-      <div class="featured-station-address"></div>
+  <!-- FEATURE CARD with Price Board (only visible when a station is selected) -->
+  <div id="feature-card" class="feature-card hidden" role="dialog" aria-modal="true">
+    <button id="close-feature-card" class="close-feature-card" title="Close" aria-label="Close">&times;</button>
+    <div class="feature-card-inner">
+      <div class="priceboard-stack">
+        <div class="priceboard-logo-wrap">
+          <img class="priceboard-logo" src="images/default.png" alt="Station logo" />
+        </div>
+        <div class="priceboard-img-wrap">
+          <img src="images/priceboard.png" alt="Price Board" class="priceboard-img"/>
+          <div class="price-slot price-e10"></div>
+          <div class="price-slot price-91"></div>
+          <div class="price-slot price-95"></div>
+          <div class="price-slot price-98"></div>
+          <div class="price-slot price-diesel"></div>
+          <div class="price-slot price-premiumdiesel"></div>
+        </div>
+      </div>
+      <div class="feature-meta">
+        <div class="feature-station-name"></div>
+        <div class="feature-station-address"></div>
+      </div>
     </div>
   </div>
 
