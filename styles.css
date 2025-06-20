@@ -445,7 +445,7 @@ body {
   background: rgba(232, 247, 255, 0.27);
 }
 
-/* --- FEATURE CARD & PRICE BOARD --- */
+/* ---- FEATURE CARD & PRICE BOARD - Horizontal Layout ---- */
 .feature-card {
   position: fixed;
   left: 50%;
@@ -455,8 +455,8 @@ body {
   border-radius: 24px;
   box-shadow: 0 8px 48px rgba(30,49,80,0.13);
   z-index: 4000;
-  min-width: 340px;
-  max-width: 92vw;
+  min-width: 440px;
+  max-width: 720px;
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -480,13 +480,36 @@ body {
   flex-direction: row;
   align-items: flex-start;
   padding: 38px 38px 32px 38px;
-  gap: 32px;
+  gap: 36px;
   min-width: 320px;
+}
+.feature-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-width: 220px;
+  max-width: 340px;
+  margin-right: 32px;
+}
+.feature-station-name {
+  font-family: 'Quantico', sans-serif;
+  font-size: 1.26em;
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: #387cc2;
+}
+.feature-station-address {
+  font-size: 1.05em;
+  color: #444;
+  margin-bottom: 4px;
+  word-break: break-word;
 }
 .priceboard-stack {
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-width: 140px;
 }
 .priceboard-logo-wrap {
   width: 120px;
@@ -539,29 +562,6 @@ body {
 .price-98             { top: 122px; }
 .price-diesel         { top: 149px; }
 .price-premiumdiesel  { top: 176px; }
-.feature-meta {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  min-width: 180px;
-  max-width: 340px;
-  margin-left: 22px;
-  margin-top: 14px;
-}
-.feature-station-name {
-  font-family: 'Quantico', sans-serif;
-  font-size: 1.26em;
-  font-weight: bold;
-  margin-bottom: 4px;
-  color: #387cc2;
-}
-.feature-station-address {
-  font-size: 1.05em;
-  color: #444;
-  margin-bottom: 4px;
-  word-break: break-word;
-}
 @media (max-width: 700px) {
   .feature-card-inner {
     flex-direction: column;
@@ -572,6 +572,7 @@ body {
   }
   .feature-meta {
     min-width: 0; max-width: 99vw;
-    margin-left: 0; margin-top: 6px; align-items: center; text-align: center;
+    margin-right: 0; margin-bottom: 10px;
+    align-items: center; text-align: center;
   }
 }
