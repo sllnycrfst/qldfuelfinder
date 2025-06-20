@@ -445,42 +445,65 @@ body {
   background: rgba(232, 247, 255, 0.27);
 }
 
-/* --- Add to the end of your styles.css --- */
-
-.featured-price-board {
+/* --- FEATURE CARD & PRICE BOARD --- */
+.feature-card {
   position: fixed;
-  bottom: 36px;
   left: 50%;
+  bottom: 40px;
   transform: translateX(-50%);
-  background: rgba(255,255,255,0.96);
-  border-radius: 18px;
-  box-shadow: 0 8px 48px rgba(30,49,80,0.19);
-  z-index: 3000;
-  padding: 30px 30px 20px 30px;
-  display: flex;
-  gap: 36px;
-  align-items: flex-start;
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 8px 48px rgba(30,49,80,0.13);
+  z-index: 4000;
   min-width: 340px;
-  max-width: 96vw;
-  transition: opacity 0.2s;
+  max-width: 92vw;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
   opacity: 1;
-  font-family: 'Roboto', Arial, sans-serif;
+  transition: opacity 0.18s;
 }
-.featured-price-board.hidden {
-  display: none;
-}
-.close-price-board {
+.feature-card.hidden { display: none; }
+.close-feature-card {
   position: absolute;
-  top: 10px;
-  right: 16px;
+  top: 16px;
+  right: 24px;
   background: none;
   border: none;
-  font-size: 1.8em;
+  font-size: 2em;
   color: #387cc2;
   cursor: pointer;
-  z-index: 1;
+  z-index: 2;
 }
-
+.feature-card-inner {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 38px 38px 32px 38px;
+  gap: 32px;
+  min-width: 320px;
+}
+.priceboard-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.priceboard-logo-wrap {
+  width: 120px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+.priceboard-logo {
+  max-width: 100px;
+  max-height: 36px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+}
 .priceboard-img-wrap {
   position: relative;
   width: 120px;
@@ -493,14 +516,13 @@ body {
   user-select: none;
   pointer-events: none;
 }
-
 .price-slot {
   position: absolute;
   width: 68px;
   height: 25px;
   left: 24px;
   background: transparent;
-  color: #21ea00;
+  color: #36ff66;
   font-family: 'Quantico', 'Roboto', monospace;
   font-weight: bold;
   font-size: 1.14em;
@@ -517,42 +539,39 @@ body {
 .price-98             { top: 122px; }
 .price-diesel         { top: 149px; }
 .price-premiumdiesel  { top: 176px; }
-
-.featured-station-info {
+.feature-meta {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  align-items: flex-start;
+  justify-content: center;
   min-width: 180px;
   max-width: 340px;
-  margin-left: 10px;
-  margin-top: 12px;
+  margin-left: 22px;
+  margin-top: 14px;
 }
-.featured-station-name {
+.feature-station-name {
   font-family: 'Quantico', sans-serif;
-  font-size: 1.2em;
+  font-size: 1.26em;
   font-weight: bold;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
   color: #387cc2;
 }
-.featured-station-address {
-  font-size: 1em;
+.feature-station-address {
+  font-size: 1.05em;
   color: #444;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   word-break: break-word;
 }
-
-@media (max-width: 600px) {
-  .featured-price-board {
+@media (max-width: 700px) {
+  .feature-card-inner {
     flex-direction: column;
     align-items: center;
-    padding: 18px 2vw 10px 2vw;
+    padding: 24px 2vw 18px 2vw;
+    gap: 12px;
     min-width: 0;
-    gap: 14px;
   }
-  .featured-station-info {
+  .feature-meta {
     min-width: 0; max-width: 99vw;
-    margin-left: 0; margin-top: 8px;
-    align-items: center;
-    text-align: center;
+    margin-left: 0; margin-top: 6px; align-items: center; text-align: center;
   }
 }
