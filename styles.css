@@ -580,8 +580,7 @@ body {
 .price-91             { top: 71px;  }
 .price-95             { top: 99px;  }
 .price-98             { top: 126px; }
-.price-diesel         { top: 154px; } 
-.price-premiumdiesel  { top: 182px; }
+.price-diesel-combined         { top: 154px; }
 
 /* === RESPONSIVE TWEAKS === */
 @media (max-width: 700px) {
