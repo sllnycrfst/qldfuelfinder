@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Fuel order and IDs for board
   const fuelOrder = ["E10", "91", "95", "98", "Diesel/Premium Diesel"];
+  // Map for select values to fuel IDs. 3 = Diesel, 14 = Premium Diesel. 1000 is not used for lookup.
   const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, "Diesel/Premium Diesel": 1000 };
   let currentFuel = "E10";
   let allSites = [];
@@ -84,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return !bannedStations.some(b => site.N && site.N.includes(b));
       });
       allPrices = priceRes.SitePrices.filter(
-        p => Object.values(fuelIdMap).includes(p.FuelId)
+        p => [12, 2, 5, 8, 3, 14].includes(p.FuelId)
       );
       priceMap = {};
       allPrices.forEach(p => {
@@ -110,19 +111,41 @@ document.addEventListener("DOMContentLoaded", () => {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
 
+  function getCombinedDieselPrice(prices) {
+    // returns { price: value, raw: value, which: 14|3 } or null
+    if (prices && typeof prices[14] !== "undefined" && prices[14] !== null) {
+      return { price: prices[14] / 10, raw: prices[14], which: 14 };
+    }
+    if (prices && typeof prices[3] !== "undefined" && prices[3] !== null) {
+      return { price: prices[3] / 10, raw: prices[3], which: 3 };
+    }
+    return null;
+  }
+
   function updateVisibleStations() {
     if (!allSites.length || !allPrices.length || !markerLayer || !map) return;
     markerLayer.clearLayers();
     const bounds = map.getBounds();
 
+    const isCombinedDiesel = currentFuel === "Diesel/Premium Diesel";
+
     const visibleStations = allSites
       .map(site => {
-        const price = priceMap[site.S]?.[fuelIdMap[currentFuel]];
-        if (price && bounds.contains([site.Lat, site.Lng])) {
+        let price, rawPrice;
+        if (isCombinedDiesel) {
+          const dieselResult = getCombinedDieselPrice(priceMap[site.S]);
+          price = dieselResult ? dieselResult.price : undefined;
+          rawPrice = dieselResult ? dieselResult.raw : undefined;
+        } else {
+          price = priceMap[site.S]?.[fuelIdMap[currentFuel]];
+          rawPrice = priceMap[site.S]?.[fuelIdMap[currentFuel]];
+          if (typeof price !== "undefined" && price !== null) price = price / 10;
+        }
+        if (typeof price !== "undefined" && price !== null && bounds.contains([site.Lat, site.Lng])) {
           return {
             ...site,
-            price: price / 10,
-            rawPrice: price,
+            price,
+            rawPrice,
             brand: site.B,
             BrandId: site.BrandId,
             address: site.A,
@@ -192,14 +215,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const bounds = map.getBounds();
+    const isCombinedDiesel = currentFuel === "Diesel/Premium Diesel";
     let stations = allSites
       .map(site => {
-        const price = priceMap[site.S]?.[fuelIdMap[currentFuel]];
-        if (price && bounds.contains([site.Lat, site.Lng])) {
+        let price, rawPrice;
+        if (isCombinedDiesel) {
+          const dieselResult = getCombinedDieselPrice(priceMap[site.S]);
+          price = dieselResult ? dieselResult.price : undefined;
+          rawPrice = dieselResult ? dieselResult.raw : undefined;
+        } else {
+          price = priceMap[site.S]?.[fuelIdMap[currentFuel]];
+          rawPrice = priceMap[site.S]?.[fuelIdMap[currentFuel]];
+          if (typeof price !== "undefined" && price !== null) price = price / 10;
+        }
+        if (typeof price !== "undefined" && price !== null && bounds.contains([site.Lat, site.Lng])) {
           return {
             ...site,
-            price: price / 10,
-            rawPrice: price,
+            price,
+            rawPrice,
             allPrices: priceMap[site.S],
             brand: site.B,
             BrandId: site.BrandId,
