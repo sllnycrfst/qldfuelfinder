@@ -486,8 +486,8 @@ body {
   min-width: 320px;
 }
 .feature-meta {
-  align-items: flex-start;
-  text-align: left;
+  align-items: flex-start !important;
+  text-align: left !important;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -588,13 +588,13 @@ body {
   .feature-card-inner {
     flex-direction: column;
     align-items: center;
-    padding: 24px 2vw 18px 2vw;
+    padding: 18px 2vw 18px 2vw;
     gap: 12px;
     min-width: 0;
   }
   .feature-meta {
-    align-items: flex-start;
-    text-align: left;
+    align-items: flex-start !important;
+    text-align: left !important;
     min-width: 0;
     max-width: 99vw;
     margin-right: 0;
