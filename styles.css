@@ -39,8 +39,8 @@ body {
   gap: 0.5em;
   background: rgba(255,255,255,0.55);
   box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   filter: drop-shadow(2px 2px 6px rgba(30,49,80,0.19));
   border-radius: 18px;
   padding: 0 16px;
@@ -146,8 +146,8 @@ body {
 /* Map Zoom Buttons */
 .leaflet-control-zoom {
   background: rgba(255, 255, 255, 0.38);
-  backdrop-filter: blur(10px) saturate(120%);
-  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  backdrop-filter: blur(6px) saturate(120%);
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
   box-shadow: 0 2px 12px rgba(30, 49, 80, 0.09), 0 1.5px 8px rgba(30, 49, 80, 0.16);
   border-radius: 13px;
   overflow: hidden;
@@ -210,8 +210,8 @@ body {
 
 .marker-brand-img {
   position: absolute !important;
-  top: 24px;
-  left: 21px;
+  top: 25px;
+  left: 22px;
   width: 26px;
   height: 26px;
   z-index: 1 !important;
@@ -236,7 +236,7 @@ body {
   width: 80% !important;
   font-family: 'Quantico', 'Roboto', monospace;
   text-align: center;
-  font-weight: 600 !important;
+  font-weight: 500 !important;
   font-size: 11px !important;
   color: #f9f9f9 !important;
   z-index: 3 !important;
@@ -253,8 +253,8 @@ body {
 
 .glass-btn {
   background: rgba(255,255,255,0.55) !important;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   border-radius: 50% !important;
   border: none !important;
   box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
@@ -290,8 +290,8 @@ body {
   position: fixed;
   top: 100px; left: 10px; right: 10px; bottom: 0;
   background: rgba(255,255,255,0.55) !important;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   border-radius: 20px 20px 0 0 !important;
   box-shadow: 0 -4px 24px rgba(46,54,80,0.12);
   border: 1.5px solid rgba(200,200,200,0.20);
