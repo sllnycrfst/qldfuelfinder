@@ -245,7 +245,7 @@ body {
   background: none !important;
   border: none;
   box-shadow: none;
-  letter-spacing: 0.6px !important;
+  letter-spacing: 0.5px !important;
 }
 .marker-price-cheapest {
   color: #21ea00 !important;
