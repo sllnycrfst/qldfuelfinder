@@ -576,3 +576,106 @@ body {
     align-items: center; text-align: center;
   }
 }
+/* --- FEATURED STATION WITH PRICE BOARD --- */
+#list li.featured-station {
+  background: none;
+  font-weight: bold;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  border-bottom: none;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0;
+}
+
+.feature-meta {
+  flex: 1 1 65%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding: 16px 0 16px 32px;
+}
+
+.feature-station-name {
+  font-family: 'Quantico', sans-serif;
+  font-size: 1.25em;
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: #387cc2;
+}
+
+.feature-station-address {
+  font-size: 1.07em;
+  color: #444;
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+.priceboard-stack {
+  flex: 0 0 185px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: 140px;
+  padding-right: 32px;
+}
+
+.priceboard-logo-wrap {
+  width: 120px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.priceboard-logo {
+  max-width: 100px;
+  max-height: 36px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+}
+
+.priceboard-img-wrap {
+  position: relative;
+  width: 120px;
+  height: 225px;
+}
+
+.priceboard-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+}
+
+.price-slot {
+  position: absolute;
+  width: 68px;
+  height: 25px;
+  left: 24px;
+  background: transparent;
+  color: #36ff66;
+  font-family: 'Quantico', 'Roboto', monospace;
+  font-weight: bold;
+  font-size: 1.14em;
+  letter-spacing: 1.5px;
+  text-align: right;
+  line-height: 25px;
+  text-shadow: 0 0 2px #000, 0 0 8px #111;
+  pointer-events: none;
+  user-select: none;
+}
+.price-e10            { top: 41px;  }
+.price-91             { top: 68px;  }
+.price-95             { top: 95px;  }
+.price-98             { top: 122px; }
+.price-diesel         { top: 149px; }
+.price-premiumdiesel  { top: 176px; }
+}
