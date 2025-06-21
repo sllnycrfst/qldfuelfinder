@@ -640,3 +640,26 @@ body {
   margin-bottom: 24px;
   word-break: break-word;
 }
+.price-diesel-combined {
+  position: absolute;
+  width: 68px;
+  height: 26px;
+  left: 66px;
+  top: 154px; /* aligns with old Diesel slot */
+  background: transparent;
+  color: #36ff66;
+  font-family: 'Quantico', 'Roboto', monospace;
+  font-weight: 500;
+  font-size: 1.2em;
+  letter-spacing: 1px;
+  text-align: right;
+  line-height: 42px;
+  text-shadow: 0 0 2px #000, 0 0 8px #111;
+  pointer-events: none;
+  user-select: none;
+  letter-spacing: -0.3px;
+}
+.price-diesel,
+.price-premiumdiesel {
+  display: none !important;
+}
