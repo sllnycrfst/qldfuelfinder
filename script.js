@@ -14,8 +14,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Fuel order and IDs for board
   const fuelOrder = ["E10", "91", "95", "98", "Diesel/Premium Diesel"];
-  const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, "Diesel/Premium Diesel": 1000, "Diesel": 3, "Premium Diesel": 14 };
-  let currentFuel = "91";
+  const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, "Diesel/Premium Diesel": 1000 };
+  let currentFuel = "E10";
   let allSites = [];
   let allPrices = [];
   let priceMap = {};
