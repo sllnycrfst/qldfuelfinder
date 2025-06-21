@@ -481,7 +481,7 @@ body {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  padding: 20px 20px 20px 20px;
+  padding: 2px 2px 2px 2px;
   gap: 3px;
   min-width: 320px;
 }
@@ -492,7 +492,8 @@ body {
   flex-direction: column;
   justify-content: center;
   min-width: 220px;
-  max-width: 340px;
+  max-width: 400px;
+  padding: 12px 20px;
 }
 .feature-station-name {
   font-family: 'Roboto', sans-serif !important;
@@ -587,7 +588,7 @@ body {
   .feature-card-inner {
     flex-direction: column;
     align-items: center;
-    padding: 18px 2vw 18px 2vw;
+    padding: 10px 2vw 10px 2vw;
     gap: 12px;
     min-width: 0;
   }
