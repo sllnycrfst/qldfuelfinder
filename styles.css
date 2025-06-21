@@ -288,14 +288,14 @@ body {
 /* PATCH: Raise the list panel above the iOS bottom bar */
 #list-panel {
   position: fixed;
-  left: 0; right: 0; bottom: 0;
+  top: 100px; left: 5px; right: 5px; bottom: 0;
   background: rgba(255,255,255,0.55) !important;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: 20px 20px 0 0 !important;
   box-shadow: 0 -4px 24px rgba(46,54,80,0.12);
   border: 1.5px solid rgba(200,200,200,0.20);
-  max-height: 70vh;
+  max-height: 100vh;
   z-index: 2000;
   transition: transform 0.3s cubic-bezier(.4,0,.2,1);
   transform: translateY(100%);
@@ -378,6 +378,7 @@ body {
   font-size: 1.18em;
   font-weight: bold;
   margin-bottom: 0.2em;
+  font-family: 'Roboto', Arial, sans-serif !important;
 }
 
 .featured-address {
@@ -385,6 +386,7 @@ body {
   color: #666;
   margin-bottom: 0.7em;
   word-break: break-word;
+  font-family: 'Roboto', Arial, sans-serif !important;
 }
 
 .featured-address a {
@@ -479,58 +481,69 @@ body {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  padding: 38px 38px 32px 38px;
-  gap: 36px;
+  padding: 20px 20px 20px 20px;
+  gap: 3px;
   min-width: 320px;
 }
 .feature-meta {
+  align-items: flex-start;
+  text-align: left;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
   justify-content: center;
   min-width: 220px;
   max-width: 340px;
-  margin-right: 32px;
 }
 .feature-station-name {
-  font-family: 'Quantico', sans-serif;
-  font-size: 1.26em;
-  font-weight: bold;
-  margin-bottom: 4px;
+  font-family: 'Roboto', sans-serif !important;
+  font-size: 1.2em !important;
+  font-weight: 600 !important;
+  margin-top: 4px;
   color: #387cc2;
 }
 .feature-station-address {
   font-size: 1.05em;
   color: #444;
-  margin-bottom: 4px;
+  margin-top: 4px;
   word-break: break-word;
 }
+/* === PRICE BOARD CONTAINER === */
 .priceboard-stack {
+  transform: scale(0.7);
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
   min-width: 140px;
+  flex: 0 0 185px;
 }
+
+/* === STATION LOGO - NO BACKGROUND OR SHADOW === */
 .priceboard-logo-wrap {
-  width: 120px;
-  height: 44px;
+  width: 60px;
+  height: 60px; /* fill the top white panel */
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 6px;
+  margin-top: -100px; 
+  margin-bottom: 0; /* remove gap below */
 }
 .priceboard-logo {
-  max-width: 100px;
-  max-height: 36px;
+  max-width: 90%;
+  max-height: 90%;
   object-fit: contain;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+  background: none;
+  border-radius: 0;
+  margin-top: 90px; 
+  box-shadow: none;
+  z-index: 5;
 }
+
+/* === PRICEBOARD IMAGE WRAPPER === */
 .priceboard-img-wrap {
   position: relative;
-  width: 120px;
-  height: 225px;
+  width: 176px;
+  height: 360px;
 }
 .priceboard-img {
   width: 100%;
@@ -538,30 +551,39 @@ body {
   display: block;
   user-select: none;
   pointer-events: none;
+  margin-top: -30px;
 }
+
+/* === GREEN PRICE TEXT STYLES === */
 .price-slot {
   position: absolute;
   width: 68px;
-  height: 25px;
-  left: 24px;
+  height: 26px;
+  left: 66px;
+  top: 30px;
   background: transparent;
   color: #36ff66;
   font-family: 'Quantico', 'Roboto', monospace;
-  font-weight: bold;
-  font-size: 1.14em;
-  letter-spacing: 1.5px;
+  font-weight: 500;
+  font-size: 1.2em;
+  letter-spacing: 1px;
   text-align: right;
-  line-height: 25px;
+  line-height: 42px;
   text-shadow: 0 0 2px #000, 0 0 8px #111;
   pointer-events: none;
   user-select: none;
+  letter-spacing: -0.3px;
 }
-.price-e10            { top: 41px;  }
-.price-91             { top: 68px;  }
-.price-95             { top: 95px;  }
-.price-98             { top: 122px; }
-.price-diesel         { top: 149px; }
-.price-premiumdiesel  { top: 176px; }
+
+/* === PRICE POSITIONING (visually aligned to black boxes) === */
+.price-e10            { top: 43px;  }
+.price-91             { top: 71px;  }
+.price-95             { top: 99px;  }
+.price-98             { top: 126px; }
+.price-diesel         { top: 154px; } 
+.price-premiumdiesel  { top: 182px; }
+
+/* === RESPONSIVE TWEAKS === */
 @media (max-width: 700px) {
   .feature-card-inner {
     flex-direction: column;
@@ -571,12 +593,18 @@ body {
     min-width: 0;
   }
   .feature-meta {
-    min-width: 0; max-width: 99vw;
-    margin-right: 0; margin-bottom: 10px;
-    align-items: center; text-align: center;
+    align-items: flex-start;
+    text-align: left;
+    min-width: 0;
+    max-width: 99vw;
+    margin-right: 0;
+    margin-bottom: 10px;
+    align-items: center;
+    text-align: center;
   }
 }
-/* --- FEATURED STATION WITH PRICE BOARD --- */
+
+/* === FEATURED LIST ITEM === */
 #list li.featured-station {
   background: none;
   font-weight: bold;
@@ -595,87 +623,20 @@ body {
   flex-direction: column;
   justify-content: center;
   min-width: 0;
-  padding: 16px 0 16px 32px;
+  padding: 4px 0 4px 32px !important;
 }
 
 .feature-station-name {
   font-family: 'Quantico', sans-serif;
   font-size: 1.25em;
   font-weight: bold;
-  margin-bottom: 4px;
-  color: #387cc2;
+  margin-top: -120px;  /* 👈 pull name upward */
+  color: #111;
 }
 
 .feature-station-address {
-  font-size: 1.07em;
+  font-size: 0.8em;
   color: #444;
-  margin-bottom: 4px;
+  margin-bottom: 24px;
   word-break: break-word;
-}
-
-.priceboard-stack {
-  flex: 0 0 185px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  min-width: 140px;
-  padding-right: 32px;
-}
-
-.priceboard-logo-wrap {
-  width: 120px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 6px;
-}
-
-.priceboard-logo {
-  max-width: 100px;
-  max-height: 36px;
-  object-fit: contain;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.10);
-}
-
-.priceboard-img-wrap {
-  position: relative;
-  width: 120px;
-  height: 225px;
-}
-
-.priceboard-img {
-  width: 100%;
-  height: auto;
-  display: block;
-  user-select: none;
-  pointer-events: none;
-}
-
-.price-slot {
-  position: absolute;
-  width: 68px;
-  height: 25px;
-  left: 24px;
-  background: transparent;
-  color: #36ff66;
-  font-family: 'Quantico', 'Roboto', monospace;
-  font-weight: bold;
-  font-size: 1.14em;
-  letter-spacing: 1.5px;
-  text-align: right;
-  line-height: 25px;
-  text-shadow: 0 0 2px #000, 0 0 8px #111;
-  pointer-events: none;
-  user-select: none;
-}
-.price-e10            { top: 41px;  }
-.price-91             { top: 68px;  }
-.price-95             { top: 95px;  }
-.price-98             { top: 122px; }
-.price-diesel         { top: 149px; }
-.price-premiumdiesel  { top: 176px; }
 }
