@@ -234,7 +234,7 @@ body {
   top: 0px !important;
   left: 7px !important;
   width: 80% !important;
-  font-family: 'Roboto', Arial, sans-serif !important;
+  font-family: 'Quantico', 'Roboto', monospace;
   text-align: center;
   font-weight: 600 !important;
   font-size: 11px !important;
@@ -627,7 +627,7 @@ body {
 }
 
 .feature-station-name {
-  font-family: 'Quantico', sans-serif;
+  font-family: 'Roboto', sans-serif;
   font-size: 1.25em;
   font-weight: bold;
   margin-top: -120px;  /* 👈 pull name upward */
