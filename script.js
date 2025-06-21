@@ -13,8 +13,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const defaultZoom = 14;
 
   // Fuel order and IDs for board
-  const fuelOrder = ["E10", "91", "95", "98", "Diesel/Premium Diesel", "Premium Diesel"];
-  const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, "Diesel/Premium Diesel": 1000 , "Premium Diesel": 14 };
+  const fuelOrder = ["E10", "91", "95", "98", "Diesel/Premium Diesel"];
+  const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, "Diesel/Premium Diesel": 1000, "Diesel": 3, "Premium Diesel": 14 };
   let currentFuel = "91";
   let allSites = [];
   let allPrices = [];
@@ -309,12 +309,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // Helper to render the price board slots for all fuels plus the Diesel/Premium Diesel box
   function renderPriceSlots(allPrices) {
     const fuelSlots = [
-      { slot: "price-e10",            id: 12 },
-      { slot: "price-91",             id: 2 },
-      { slot: "price-95",             id: 5 },
-      { slot: "price-98",             id: 8 },
-      { slot: "price-diesel",         id: 3 },
-      { slot: "price-premiumdiesel",  id: 14 }
+      { slot: "price-e10", id: 12 },
+      { slot: "price-91", id: 2 },
+      { slot: "price-95", id: 5 },
+      { slot: "price-98", id: 8 }
     ];
 
     // Render standard slots
@@ -325,7 +323,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return `<div class="price-slot ${slot}">${value}</div>`;
     }).join('');
 
-    // Render Diesel/Premium Diesel combined slot (ID 1000, but logic is: show Premium Diesel [14] if present, else Diesel [3])
+    // Render Diesel/Premium Diesel combined slot
     html += renderDieselCombinedSlot(allPrices);
 
     return html;
@@ -333,21 +331,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Diesel/Premium Diesel combined price logic
   function renderDieselCombinedSlot(allPrices) {
-    // allPrices is a map: { 3: price, 14: price, ... }
-    let label = "";
     let priceValue = null;
     if (allPrices && typeof allPrices[14] !== "undefined" && allPrices[14] !== null) {
-      label = "Prem Diesel";
       priceValue = (allPrices[14] / 10).toFixed(1);
     } else if (allPrices && typeof allPrices[3] !== "undefined" && allPrices[3] !== null) {
-      label = "Diesel";
       priceValue = (allPrices[3] / 10).toFixed(1);
     }
-    if (priceValue !== null) {
-      return `<div class="price-slot price-diesel-combined"><span class="fuel-type">${label}</span> <span class="fuel-price">${priceValue}</span></div>`;
-    } else {
-      return `<div class="price-slot price-diesel-combined"></div>`;
-    }
+    // Output only the price, not the label
+    return `<div class="price-slot price-diesel-combined">${priceValue !== null ? priceValue : ''}</div>`;
   }
 
   // Recenter button
