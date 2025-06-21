@@ -332,12 +332,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // Diesel/Premium Diesel combined price logic
   function renderDieselCombinedSlot(allPrices) {
     let priceValue = null;
+    // Show Premium Diesel if available, else Diesel
     if (allPrices && typeof allPrices[14] !== "undefined" && allPrices[14] !== null) {
       priceValue = (allPrices[14] / 10).toFixed(1);
     } else if (allPrices && typeof allPrices[3] !== "undefined" && allPrices[3] !== null) {
       priceValue = (allPrices[3] / 10).toFixed(1);
     }
-    // Output only the price, not the label
+    // Only output the price value, not the label
     return `<div class="price-slot price-diesel-combined">${priceValue !== null ? priceValue : ''}</div>`;
   }
 
