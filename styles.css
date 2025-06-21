@@ -502,7 +502,7 @@ body {
   text-align: left !important;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: left;
   min-width: 0;
   max-width: 340px;
   padding: 4px 8px 4px 8px; /* Reduce side padding */
