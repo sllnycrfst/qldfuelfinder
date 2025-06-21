@@ -595,8 +595,8 @@ body {
   .feature-meta {
     align-items: flex-start !important;
     text-align: left !important;
-    min-width: 0;
-    max-width: 99vw;
+    min-width: 220px !important;
+    max-width: 400px !important;
     margin-right: 0;
     margin-bottom: 10px;
     align-items: center;
