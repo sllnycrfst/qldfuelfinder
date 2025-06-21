@@ -13,8 +13,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const defaultZoom = 14;
 
   // Fuel order and IDs for board
-  const fuelOrder = ["E10", "91", "95", "98", "Diesel", "Premium Diesel"];
-  const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3, "Premium Diesel": 14 };
+  const fuelOrder = ["E10", "91", "95", "98", "Diesel/Premium Diesel", "Premium Diesel"];
+  const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, "Diesel/Premium Diesel": 1000 , "Premium Diesel": 14 };
   let currentFuel = "91";
   let allSites = [];
   let allPrices = [];
