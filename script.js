@@ -7,15 +7,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const listUl = document.getElementById("list");
   const searchInput = document.getElementById("search");
   const fuelSelect = document.getElementById("fuel-select");
-  // Feature card controls
-  const featureCard = document.getElementById("feature-card");
-  const closeFeatureCardBtn = document.getElementById("close-feature-card");
 
   let map, markerLayer, userMarker;
   const defaultCenter = [-27.4698, 153.0251];
   const defaultZoom = 14;
 
-  // Fuel order and IDs
+  // Fuel order and IDs for board
   const fuelOrder = ["E10", "91", "95", "98", "Diesel", "Premium Diesel"];
   const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, Diesel: 3, "Premium Diesel": 14 };
   let currentFuel = "91";
@@ -175,7 +172,6 @@ document.addEventListener("DOMContentLoaded", () => {
           listPanel.classList.add("visible");
           listPanel.classList.remove("hidden");
           updateStationList();
-          showFeatureCard(s);
         })
       );
     });
@@ -185,7 +181,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!listUl) return;
     if (!allSites.length || !allPrices.length) {
       listUl.innerHTML = "<li>Loading…</li>";
-      showFeatureCard(null);
       return;
     }
 
@@ -224,7 +219,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (stations.length === 0) {
       listUl.innerHTML = "<li>No stations found for this fuel type.</li>";
-      showFeatureCard(null);
       return;
     }
 
@@ -240,29 +234,33 @@ document.addEventListener("DOMContentLoaded", () => {
       others = stations.slice(1);
     }
 
-    // Render the featured station (no price details, just name/address)
-    const featuredImgSrc = featured.brand
-      ? `images/${featured.brand}.png`
-      : 'images/default.png';
-
+    // --- FEATURED STATION: Price Board + Meta Info (horizontal layout) ---
     let featuredHTML = `
       <li class="featured-station glass-card" id="featured-station">
-        <img 
-          src="${featuredImgSrc}"
-          onerror="this.onerror=null;this.src='images/default.png';"
-          class="featurestation-img"
-          alt="${featured.name}"
-        />
-        <div class="featured-details">
-          <div class="featured-name">${featured.name}</div>
-          <div class="featured-address">
+        <div class="feature-meta">
+          <div class="feature-station-name">${featured.name}</div>
+          <div class="feature-station-address">
             <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(featured.lat + ',' + featured.lng)}"
               target="_blank">${featured.address}${featured.suburb ? ', ' + featured.suburb : ''}</a>
+          </div>
+        </div>
+        <div class="priceboard-stack">
+          <div class="priceboard-logo-wrap">
+            <img class="priceboard-logo"
+              src="${featured.brand ? `images/${featured.brand}.png` : 'images/default.png'}"
+              alt="${featured.brand || "Station logo"}"
+              onerror="this.onerror=null;this.src='images/default.png';"
+            />
+          </div>
+          <div class="priceboard-img-wrap">
+            <img src="images/priceboard.png" alt="Price Board" class="priceboard-img"/>
+            ${renderPriceSlots(featured.allPrices)}
           </div>
         </div>
       </li>
     `;
 
+    // --- Other stations as before ---
     let othersHTML = others.map(site => {
       const siteImgSrc = site.brand
         ? `images/${site.brand}.png`
@@ -296,9 +294,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (feat) feat.scrollIntoView({ behavior: "smooth", block: "start" });
           }, 10);
         }
-        // Show the feature card for selected station in list
-        const selected = stations.find(s => String(s.siteId) === String(siteId));
-        if (selected) showFeatureCard(selected);
       });
     });
 
@@ -308,27 +303,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (featuredEl) featuredEl.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 10);
     }
-    // Optionally: show the card for the featured station (or keep only for marker/list click)
-    // showFeatureCard(featured);
   }
 
-  // --- FEATURE CARD LOGIC ---
-  function showFeatureCard(station) {
-    if (!featureCard) return;
-    if (!station) {
-      featureCard.classList.add("hidden");
-      return;
-    }
-
-    // Set logo
-    const logo = featureCard.querySelector(".priceboard-logo");
-    if (logo) {
-      logo.src = station.brand ? `images/${station.brand}.png` : 'images/default.png';
-      logo.alt = station.brand || "Station logo";
-      logo.onerror = function() { this.onerror = null; this.src = 'images/default.png'; };
-    }
-
-    // Fill price slots
+  // Helper to render the price board slots for all fuels
+  function renderPriceSlots(allPrices) {
     const fuelSlots = [
       { slot: "price-e10",            id: 12 },
       { slot: "price-91",             id: 2 },
@@ -337,31 +315,13 @@ document.addEventListener("DOMContentLoaded", () => {
       { slot: "price-diesel",         id: 3 },
       { slot: "price-premiumdiesel",  id: 14 }
     ];
-    for (const { slot, id } of fuelSlots) {
-      const priceDiv = featureCard.querySelector("." + slot);
-      let priceVal = null;
-      if (
-        station.allPrices &&
-        typeof station.allPrices[id] !== "undefined" &&
-        station.allPrices[id] !== null
-      ) {
-        priceVal = station.allPrices[id];
-        priceDiv.textContent = (priceVal / 10).toFixed(1);
-      } else {
-        priceDiv.textContent = "N/A";
-      }
-    }
-
-    // Station name and address
-    featureCard.querySelector(".feature-station-name").textContent = station.name ?? "";
-    featureCard.querySelector(".feature-station-address").textContent =
-      (station.address ?? "") + (station.suburb ? ", " + station.suburb : "");
-
-    featureCard.classList.remove("hidden");
+    return fuelSlots.map(({slot, id}) => {
+      let value = (allPrices && typeof allPrices[id] !== "undefined" && allPrices[id] !== null)
+        ? (allPrices[id] / 10).toFixed(1)
+        : "N/A";
+      return `<div class="price-slot ${slot}">${value}</div>`;
+    }).join('');
   }
-  closeFeatureCardBtn && closeFeatureCardBtn.addEventListener("click", () => {
-    featureCard.classList.add("hidden");
-  });
 
   // Recenter button
   recenterBtn && recenterBtn.addEventListener("click", () => showUserLocation(true));
@@ -372,13 +332,11 @@ document.addEventListener("DOMContentLoaded", () => {
     listPanel.classList.add("visible");
     listPanel.classList.remove("hidden");
     updateStationList();
-    featureCard.classList.add("hidden");
   });
   closeListBtn && closeListBtn.addEventListener("click", () => {
     listPanel.classList.remove("visible");
     listPanel.classList.add("hidden");
     forcedFeaturedSiteId = null;
-    featureCard.classList.add("hidden");
   });
 
   // Fuel selector
@@ -387,7 +345,6 @@ document.addEventListener("DOMContentLoaded", () => {
     forcedFeaturedSiteId = null;
     updateVisibleStations();
     updateStationList();
-    featureCard.classList.add("hidden");
   });
   // Default to E10 on load
   fuelSelect.value = "E10";
