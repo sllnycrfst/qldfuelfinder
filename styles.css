@@ -523,17 +523,17 @@ body {
   font-size: 1.2em;
   font-weight: bold;
   color: #387cc2;
-  margin-bottom: 4px;
+  margin-top: 4px;
 }
 
 .feature-station-address {
-  font-size: 1em;
+  font-size: 0.9em;
   color: #444;
   word-break: break-word;
 }
 
 .priceboard-stack {
-  top: 20px;
+  top: -20px;
   width: 160px !important;
   max-width: 160px !important;
   flex: 0 0 160px !important;
@@ -570,7 +570,7 @@ body {
   object-fit: contain;
   background: none;
   border-radius: 0;
-  margin-top: 50px;
+  margin-top: 30px;
   box-shadow: none;
   z-index: 5;
 } /* <-- this bracket was missing before! */
