@@ -502,7 +502,7 @@ body {
 .feature-meta-box {
   background: rgba(56, 124, 194, 0.13);
   border-radius: 13px;
-  padding: 12px 16px;
+  padding: 4px 8px 8px 8px;
   box-sizing: border-box;
   width: 100%;
 }
