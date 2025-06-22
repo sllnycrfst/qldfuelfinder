@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let forcedFeaturedSiteId = null;
 
   const bannedStations = [
-    "BARA FUELS FOREST HILL", "Sommer Petroleum"
+    "Stargazers Yarraman"
   ];
 
   function startApp(center) {
@@ -271,10 +271,12 @@ document.addEventListener("DOMContentLoaded", () => {
     let featuredHTML = `
       <li class="featured-station glass-card" id="featured-station">
         <div class="feature-meta">
-          <div class="feature-station-name">${featured.name}</div>
-          <div class="feature-station-address">
-            <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(featured.lat + ',' + featured.lng)}"
-              target="_blank">${featured.address}${featured.suburb ? ', ' + featured.suburb : ''}</a>
+          <div class="feature-meta-box">
+            <div class="feature-station-name">${featured.name}</div>
+            <div class="feature-station-address">
+              <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(featured.lat + ',' + featured.lng)}"
+                target="_blank">${featured.address}${featured.suburb ? ', ' + featured.suburb : ''}</a>
+            </div>
           </div>
         </div>
         <div class="priceboard-stack">
