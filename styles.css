@@ -296,16 +296,23 @@ body {
 
 /* PATCH: Raise the list panel above the iOS bottom bar */
 #list-panel {
+  display: flex;
+  flex-direction: column;
   position: fixed;
-  top: 180px; left: 10px; right: 10px; bottom: 0;
+  top: 180px;
+  left: 10px;
+  right: 10px;
+  bottom: 0;
+  max-height: 70vh;
+  min-height: 0;
   background: rgba(255,255,255,0.55) !important;
+  max-height: 70vh;   /* make the panel shorter */
+  min-height: 0;
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   border-radius: 20px 20px 0 0 !important;
   box-shadow: 0 -4px 24px rgba(46,54,80,0.12);
   border: 1.5px solid rgba(200,200,200,0.20);
-  max-height: 70vh;   /* make the panel shorter */
-  min-height: 0;
   z-index: 2000;
   transition: transform 0.3s cubic-bezier(.4,0,.2,1);
   transform: translateX(-50%) translateY(100%);
@@ -328,6 +335,9 @@ body {
 }
 
 #list {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
   list-style: none;
   margin: 0;
   padding: 0 0 12px 0;
@@ -468,6 +478,9 @@ body {
   box-sizing: border-box;
 }
 .feature-card {
+  flex: 0 0 1;
+  margin-top: -40px !important;
+  margin-bottom: 0 !important;
   position: fixed;
   left: 50%;
   bottom: 40px;
@@ -498,7 +511,7 @@ body {
   z-index: 2;
 }
 .feature-card-inner {
-  display: flex;
+  display: block;
   flex-direction: column;
   align-items: center;
   padding: 0 8px 8px 8px !important;
@@ -521,17 +534,17 @@ body {
   font-size: 1.2em;
   font-weight: bold;
   color: #387cc2;
-  margin-top: 4px;
+  margin-top: 5px ;
 }
 
 .feature-station-address {
   font-size: 0.9em;
-  color: #444;
+  color: #387cc2;
   word-break: break-word;
 }
 
 .priceboard-stack {
-  top: -80px;
+  top: -70px !important;
   width: 160px !important;
   max-width: 160px !important;
   flex: 0 0 160px !important;
@@ -542,6 +555,7 @@ body {
 
 .priceboard-img-wrap,
 .priceboard-img {
+  top: -70px !important;
   width: 160px !important;
   max-width: 160px !important;
   height: auto;
@@ -568,7 +582,7 @@ body {
   object-fit: contain;
   background: none;
   border-radius: 0;
-  margin-top: 30px;
+  top: 50px;
   box-shadow: none;
   z-index: 5;
 } /* <-- this bracket was missing before! */
@@ -577,16 +591,15 @@ body {
   position: absolute;
   width: 60px;
   height: 24px;
-  right: 36px !important;
+  right: 38px !important;
   background: transparent;
-  color: #fff;
+  color: #ffaa78;
   font-family: 'Quantico', 'Roboto', monospace;
   font-weight: 500;
   font-size: 0.9em;
   letter-spacing: 0.5px;
   text-align: right;
   line-height: 90px;
-  text-shadow: 0 0 2px #000, 0 0 8px #111;
   pointer-events: none;
   user-select: none;
   letter-spacing: 1px;
@@ -597,8 +610,8 @@ body {
   color: #21ea00 !important;
 }
 
-.price-e10            { top: 52px;  }
-.price-91             { top: 82px;  }
-.price-95             { top: 111px;  }
-.price-98             { top: 139px; }
-.price-diesel-combined{ top: 167px; }
+.price-e10            { top: 41px;  }
+.price-91             { top: 67px;  }
+.price-95             { top: 92px;  }
+.price-98             { top: 117px;  }
+.price-diesel-combined{ top: 142px; }
