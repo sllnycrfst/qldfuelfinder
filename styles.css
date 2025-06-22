@@ -561,6 +561,7 @@ body {
   margin-bottom: 0;
   padding: 0;
 }
+
 .priceboard-logo {
   max-width: 90%;
   max-height: 90%;
@@ -633,7 +634,7 @@ body {
   margin-top: 150px;
   box-shadow: none;
   z-index: 5;
-
+}
 .price-slot {
   position: absolute;
   width: 60px;
