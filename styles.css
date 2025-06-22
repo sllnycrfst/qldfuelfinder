@@ -571,15 +571,6 @@ body {
   box-shadow: none;
   z-index: 5;
 }
-.price-slot {
-  position: absolute;
-  width: 60px;
-  height: 24px;
-  right: 64px;
-@@ -628,58 +633,63 @@ html, body {
-  width: 100vw;
-  overflow-x: hidden;
-}
 
 body {
   margin: 0;
