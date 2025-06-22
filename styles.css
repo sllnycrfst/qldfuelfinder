@@ -232,11 +232,11 @@ body {
 .marker-price {
   position: absolute !important;;
   top: 0px !important;
-  left: 7px !important;
+  left: 8px !important;
   width: 80% !important;
   font-family: 'Roboto', monospace !important;
   text-align: center;
-  font-weight: 500 !important;
+  font-weight: 600 !important;
   font-size: 11px !important;
   color: #f9f9f9 !important;
   z-index: 3 !important;
