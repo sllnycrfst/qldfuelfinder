@@ -847,3 +847,10 @@ body {
 #list li.list-station:hover {
   background: rgba(232, 247, 255, 0.27);
 }
+
+.priceboard-stack,
+.priceboard-img-wrap,
+.priceboard-img {
+  width: 160px !important;
+  max-width: 160px !important;
+}
