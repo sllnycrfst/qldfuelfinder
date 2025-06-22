@@ -234,7 +234,7 @@ body {
   top: 0px !important;
   left: 7px !important;
   width: 80% !important;
-  font-family: 'Roboto', monospace;
+  font-family: 'Roboto', monospace !important;
   text-align: center;
   font-weight: 500 !important;
   font-size: 11px !important;
@@ -639,7 +639,7 @@ body {
   position: absolute;
   width: 60px;
   height: 24px;
-  right: 50px;
+  right: 30px !important;
   background: transparent;
   color: #fff;
   font-family: 'Quantico', 'Roboto', monospace;
