@@ -402,6 +402,7 @@ body {
   color: #387cc2;
   text-decoration: none;
 }
+
 .featured-address a:hover {
   text-decoration: underline;
 }
@@ -531,10 +532,9 @@ body {
 }
 
 .priceboard-stack {
-  width: 100%;
-  width: 180px;
-  max-width: 180px;
-  flex: 0 0 180px;
+  width: 160px !important;
+  max-width: 160px !important;
+  flex: 0 0 160px !important;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -542,77 +542,13 @@ body {
 
 .priceboard-img-wrap,
 .priceboard-img {
-  width: 100%;
-  width: 180px;
-  max-width: 180px;
+  width: 160px !important;
+  max-width: 160px !important;
   height: auto;
 }
 
 .priceboard-img-wrap {
   position: relative;
-}
-
-.priceboard-logo-wrap {
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: -80px;
-  margin-bottom: 0;
-  padding: 0;
-}
-
-.priceboard-logo {
-  max-width: 90%;
-  max-height: 90%;
-  object-fit: contain;
-  background: none;
-  border-radius: 0;
-  margin-top: 150px;
-  box-shadow: none;
-  z-index: 5;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  height: 100vh;
-  width: 100vw;
-  overflow-x: hidden;
-  position: relative;
-}
-
-#map {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 0;
-}
-
-/* --- Price Board --- */
-.priceboard-img-wrap,
-.priceboard-img {
-  width: 100%;
-  width: 220px;
-  max-width: 220px;
-  height: auto;
-}
-
-.priceboard-img-wrap {
-  position: relative;
-}
-
-.priceboard-stack {
-  width: 100%;
-  width: 220px;
-  max-width: 220px;
-  flex: 0 0 220px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
 .priceboard-logo-wrap {
@@ -635,7 +571,8 @@ body {
   margin-top: 150px;
   box-shadow: none;
   z-index: 5;
-}
+} /* <-- this bracket was missing before! */
+
 .price-slot {
   position: absolute;
   width: 60px;
@@ -665,193 +602,3 @@ body {
 .price-95             { top: 161px;  }
 .price-98             { top: 189px; }
 .price-diesel-combined{ top: 217px; }
-
-/* --- Slide-up List Panel --- */
-#list-panel {
-  position: fixed;
-  top: 100px;
-  left: 50%;
-  transform: translateX(-50%) translateY(100%);
-  background: rgba(255,255,255,0.55) !important;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  border-radius: 20px 20px 0 0 !important;
-  box-shadow: 0 -4px 24px rgba(46,54,80,0.12);
-  border: 1.5px solid rgba(200,200,200,0.20);
-  max-height: 100vh;
-  z-index: 2000;
-  transition: transform 0.3s cubic-bezier(.4,0,.2,1);
-  display: flex;
-  flex-direction: column;
-  font-family: 'Roboto', Arial, sans-serif !important;
-  margin-bottom: env(safe-area-inset-bottom, 0);
-  width: 100%;
-  max-width: 700px;
-}
-
-#list-panel.visible {
-  transform: translateX(-50%) translateY(0);
-}
-
-#list-panel.hidden {
-  transform: translateX(-50%) translateY(100%);
-}
-
-#close-list-btn {
-  align-self: flex-end;
-  background: none;
-  border: none;
-  font-size: 2em;
-  color: #387cc2;
-  margin: 8px 18px 0 0;
-  cursor: pointer;
-  z-index: 1;
-  font-family: 'Roboto', Arial, sans-serif !important;
-}
-
-#list {
-  list-style: none;
-  margin: 0;
-  padding: 0 0 12px 0;
-  background: transparent;
-  overflow-y: auto;
-  font-family: 'Roboto', Arial, sans-serif !important;
-  flex: 1;
-}
-
-#list li {
-  padding: 12px 20px;
-  border-bottom: 1px solid #eee;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 1.05em;
-  background: transparent;
-  font-family: 'Roboto', Arial, sans-serif !important;
-}
-
-#list li.featured-station {
-  background: none;
-  font-weight: bold;
-  padding-top: 20px;
-  padding-bottom: 20px;
-  border-bottom: none;
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  gap: 0;
-}
-
-.featurestation-img {
-  flex: 0 0 30%;
-  transform: scale(0.5);
-  transform-origin: left center;
-  max-width: 200px !important;
-  min-width: 100px !important;
-  height: 100%;
-  min-height: 160px;
-  object-fit: contain;
-  display: block;
-  align-self: stretch;
-  border-radius: 20px;
-}
-
-.featured-details {
-  flex: 1 1 75%;
-  padding: 28px 32px 20px 32px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-width: 0;
-}
-
-.featured-name {
-  font-size: 1.18em;
-  font-weight: bold;
-  margin-bottom: 0.2em;
-  font-family: 'Roboto', Arial, sans-serif !important;
-}
-
-.featured-address {
-  font-size: 0.97em;
-  color: #666;
-  margin-bottom: 0.7em;
-  word-break: break-word;
-  font-family: 'Roboto', Arial, sans-serif !important;
-}
-
-.featured-address a {
-  color: #387cc2;
-  text-decoration: none;
-}
-
-.featured-address a:hover {
-  text-decoration: underline;
-}
-
-.featured-prices {
-  margin-top: 8px;
-  font-weight: 500;
-  font-family: 'Roboto', Arial, sans-serif !important;
-}
-
-.featured-prices .price-row {
-  font-size: 1em;
-  margin-bottom: 2px;
-  line-height: 1.18;
-  font-weight: 600;
-  font-family: 'Roboto', Arial, sans-serif !important;
-}
-
-.featured-prices .fuel-type {
-  color: #888;
-  min-width: 3.5em;
-  display: inline-block;
-  font-weight: 500;
-}
-
-.featured-prices .fuel-type.Diesel {
-  color: #888;
-  font-weight: 700;
-}
-
-.featured-prices .fuel-type.selected {
-  color: #387cc2;
-  font-weight: 600;
-}
-
-.featured-prices .fuel-price {
-  color: #222;
-  font-weight: 700 !important;
-  padding-left: 8px;
-}
-
-.list-logo {
-  margin-right: 10px;
-}
-
-.list-name {
-  flex: 1;
-}
-
-.list-price {
-  font-weight: bold;
-  font-family: 'Roboto', Arial, sans-serif !important;
-  color: #387cc2;
-}
-
-#list li.list-station {
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-#list li.list-station:hover {
-  background: rgba(232, 247, 255, 0.27);
-}
-
-.priceboard-stack,
-.priceboard-img-wrap,
-.priceboard-img {
-  width: 160px !important;
-  max-width: 160px !important;
-}
