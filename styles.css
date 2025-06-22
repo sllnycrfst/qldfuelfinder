@@ -505,8 +505,6 @@ body {
   box-sizing: border-box;
   width: 100%;
 }
-
-
 .feature-meta {
   display: flex;
   flex-direction: column;
@@ -533,7 +531,9 @@ body {
 
 .priceboard-stack {
   width: 100%;
+  width: 220px;
   max-width: 220px;
+  flex: 0 0 220px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -542,8 +542,13 @@ body {
 .priceboard-img-wrap,
 .priceboard-img {
   width: 100%;
+  width: 220px;
   max-width: 220px;
   height: auto;
+}
+
+.priceboard-img-wrap {
+  position: relative;
 }
 
 .priceboard-logo-wrap {
@@ -571,60 +576,7 @@ body {
   width: 60px;
   height: 24px;
   right: 64px;
-  background: transparent;
-  color: #fff;
-  font-family: 'Quantico', 'Roboto', monospace;
-  font-weight: 500;
-  font-size: 1.2em;
-  letter-spacing: 1px;
-  text-align: right;
-  line-height: 82px;
-  text-shadow: 0 0 2px #000, 0 0 8px #111;
-  pointer-events: none;
-  user-select: none;
-  letter-spacing: -0.3px;
-  transition: color 0.2s;
-}
-
-.price-e10            { top: 102px;  }
-.price-91             { top: 132px;  }
-.price-95             { top: 161px;  }
-.price-98             { top: 189px; }
-.price-diesel-combined{ top: 217px; }
-
-/* === FEATURED LIST ITEM === */
-#list li.featured-station {
-  background: none;
-  font-weight: bold;
-  padding-top: 20px;
-  padding-bottom: 20px;
-  border-bottom: none;
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  gap: 0;
-}
-
-.feature-station-name {
-  font-family: 'Roboto', sans-serif;
-  font-size: 1.25em;
-  font-weight: bold;
-  color: #111;
-}
-
-.feature-station-address {
-  font-size: 0.8em;
-  color: #444;
-  margin-bottom: 24px;
-  word-break: break-word;
-}
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Roboto', Arial, sans-serif !important;
-  background: transparent !important;
+@@ -628,58 +633,63 @@ html, body {
   width: 100vw;
   overflow-x: hidden;
 }
@@ -651,13 +603,20 @@ body {
 .priceboard-img-wrap,
 .priceboard-img {
   width: 100%;
+  width: 220px;
   max-width: 220px;
   height: auto;
 }
 
+.priceboard-img-wrap {
+  position: relative;
+}
+
 .priceboard-stack {
   width: 100%;
+  width: 220px;
   max-width: 220px;
+  flex: 0 0 220px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -683,7 +642,6 @@ body {
   margin-top: 150px;
   box-shadow: none;
   z-index: 5;
-}
 
 .price-slot {
   position: absolute;
