@@ -406,6 +406,7 @@ body {
 .featured-prices .price-row {
   font-size: 1em;
   margin-bottom: 2px;
+  margin-right: 4px;
   line-height: 1.18;
   font-weight: 600;
   font-family: 'Roboto', Arial, sans-serif !important;
