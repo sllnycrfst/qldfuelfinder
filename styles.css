@@ -7,13 +7,22 @@ html, body {
   overflow: hidden;
   width: 100%;
   max-width: 1090px;       /* limits width */
-  max-height: 620px;       /* limits height */
+  max-height: 800px;       /* limits height */
 }
 
 body {
   height: 100vh;
   position: relative;
   overflow: hidden;
+}
+
+.map-wrapper {
+  width: 100%;
+  max-width: 1090px;
+  max-height: 800px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden; /* ensures content stays within bounds */
 }
 
 #map {
