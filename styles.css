@@ -20,6 +20,7 @@ body {
   width: 100%;
   max-width: 1090px;
   max-height: 800px;
+  height: 100%;
   margin: 0 auto;
   position: relative;
   overflow: hidden; /* ensures content stays within bounds */
