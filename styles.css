@@ -234,7 +234,7 @@ body {
   top: 0px !important;
   left: 7px !important;
   width: 80% !important;
-  font-family: 'Quantico', 'Roboto', monospace;
+  font-family: 'Roboto', monospace;
   text-align: center;
   font-weight: 500 !important;
   font-size: 11px !important;
@@ -620,7 +620,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: -80px;
+  margin-top: 0px;
   margin-bottom: 0;
   padding: 0;
 }
@@ -639,7 +639,7 @@ body {
   position: absolute;
   width: 60px;
   height: 24px;
-  right: 64px;
+  right: 50px;
   background: transparent;
   color: #fff;
   font-family: 'Quantico', 'Roboto', monospace;
@@ -651,7 +651,7 @@ body {
   text-shadow: 0 0 2px #000, 0 0 8px #111;
   pointer-events: none;
   user-select: none;
-  letter-spacing: -0.3px;
+  letter-spacing: 1px;
   transition: color 0.2s;
 }
 
