@@ -533,7 +533,7 @@ body {
 }
 
 .priceboard-stack {
-  top: 50px;
+  top: 20px;
   width: 160px !important;
   max-width: 160px !important;
   flex: 0 0 160px !important;
@@ -599,8 +599,8 @@ body {
   color: #21ea00 !important;
 }
 
-.price-e10            { top: 102px;  }
-.price-91             { top: 132px;  }
-.price-95             { top: 161px;  }
-.price-98             { top: 189px; }
-.price-diesel-combined{ top: 217px; }
+.price-e10            { top: 52px;  }
+.price-91             { top: 82px;  }
+.price-95             { top: 111px;  }
+.price-98             { top: 139px; }
+.price-diesel-combined{ top: 167px; }
