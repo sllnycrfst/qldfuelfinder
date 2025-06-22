@@ -531,7 +531,7 @@ body {
 }
 
 .priceboard-stack {
-  top: -20px;
+  top: -80px;
   width: 160px !important;
   max-width: 160px !important;
   flex: 0 0 160px !important;
