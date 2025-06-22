@@ -640,7 +640,7 @@ body {
   position: absolute;
   width: 60px;
   height: 24px;
-  right: 30px !important;
+  right: 36px !important;
   background: transparent;
   color: #fff;
   font-family: 'Quantico', 'Roboto', monospace;
@@ -648,7 +648,7 @@ body {
   font-size: 0.9em;
   letter-spacing: 0.5px;
   text-align: right;
-  line-height: 82px;
+  line-height: 90px;
   text-shadow: 0 0 2px #000, 0 0 8px #111;
   pointer-events: none;
   user-select: none;
