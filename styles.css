@@ -26,6 +26,10 @@ body {
   z-index: 0;
 }
 
+.custom-zoom-rect {
+  touch-action: manipulation;
+}
+
 /* --- Search Bar and Icons --- */
 .search-bar-glass {
   position: absolute;
