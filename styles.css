@@ -283,7 +283,7 @@ body {
 /* Marker styles */
 .fuel-marker .marker-stack {
   position: relative;
-  width: 72px !important;
+  width: 60px !important;
   height: 72px !important;
   display: block;
   font-family: 'Roboto', Arial, sans-serif !important;
@@ -296,8 +296,8 @@ body {
 
 .marker-brand-img {
   position: absolute !important;
-  top: 25px;
-  left: 22px;
+  top: 26px;
+  left: 17px;
   width: 26px;
   height: 26px;
   z-index: 1 !important;
@@ -306,17 +306,20 @@ body {
   border-radius: 10%;
   background: #fff;
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  object-fit: contain;
 }
 .custom-marker-img {
   position: absolute !important;
-  width: 69px !important;
-  height: 69px !important;
+  width: 60px !important;
+  height: 72px !important;
   display: block;
   z-index: 2 !important;
   pointer-events: none;
+  object-fit: contain;
 }
+
 .marker-price {
-  position: absolute !important;;
+  position: absolute !important;
   top: 0px !important;
   left: 7px !important;
   width: 80% !important;
@@ -333,6 +336,7 @@ body {
   box-shadow: none;
   letter-spacing: 0.3px !important;
 }
+
 .marker-price-cheapest {
   color: #21ea00 !important;
 }
