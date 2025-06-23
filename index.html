@@ -38,29 +38,38 @@
   <div class="map-wrapper">
     <div id="map"></div>
 
-    <!-- Floating Action Buttons -->
-    <button id="list-btn" title="Show station list" class="list-btn glass-btn" aria-label="Show station list">
-      <span aria-hidden="true">☰</span>
-    </button>
-    
-    <button id="recenter-btn" title="Go to my location" class="recenter-btn glass-btn" aria-label="Go to my location">
-      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" style="display:block" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="13" cy="13" r="7" stroke="#387cc2" stroke-width="2"/>
-        <line x1="13" y1="3" x2="13" y2="7" stroke="#387cc2" stroke-width="2"/>
-        <line x1="13" y1="19" x2="13" y2="23" stroke="#387cc2" stroke-width="2"/>
-        <line x1="3" y1="13" x2="7" y2="13" stroke="#387cc2" stroke-width="2"/>
-        <line x1="19" y1="13" x2="23" y2="13" stroke="#387cc2" stroke-width="2"/>
-      </svg>
-    </button>
+    <!-- Side Controls -->
+    <div class="side-controls">
+      <button id="list-btn" title="Show station list" class="list-btn glass-btn" aria-label="Show station list">
+        <span aria-hidden="true">☰</span>
+      </button>
+      <div id="zoom-controls" class="zoom-controls glass-btn">
+        <button id="zoom-in" aria-label="Zoom in">+</button>
+        <button id="zoom-out" aria-label="Zoom out">−</button>
+      </div>
+      <button id="recenter-btn" title="Go to my location" class="recenter-btn glass-btn" aria-label="Go to my location">
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none" style="display:block" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="13" cy="13" r="7" stroke="#387cc2" stroke-width="2"/>
+          <line x1="13" y1="3" x2="13" y2="7" stroke="#387cc2" stroke-width="2"/>
+          <line x1="13" y1="19" x2="13" y2="23" stroke="#387cc2" stroke-width="2"/>
+          <line x1="3" y1="13" x2="7" y2="13" stroke="#387cc2" stroke-width="2"/>
+          <line x1="19" y1="13" x2="23" y2="13" stroke="#387cc2" stroke-width="2"/>
+        </svg>
+      </button>
+    </div>
   <!-- Slide-up List Panel (Outside wrapper if sliding up over whole screen) -->
   </div>
 
   <!-- Slide-up List Panel -->
   <div id="list-panel" class="hidden" aria-modal="true" role="dialog">
     <button id="close-list-btn" title="Close list" aria-label="Close list">&times;</button>
+    <div id="sort-toggle" class="sort-toggle">
+      <button data-sort="price" class="active">Price</button>
+      <button data-sort="distance">Distance</button>
+    </div>
     <ul id="list"></ul>
   </div>
-  
+
   <div class="feature-meta">
     <div class="feature-meta-box">
       <div class="feature-station-name"> ... </div>
