@@ -6,8 +6,6 @@ html, body {
   font-family: 'Roboto', Arial, sans-serif !important;
   background: transparent !important;
   width: 100vw;
-  max-width: 1090px;
-  max-height: 620px;
   overflow-x: hidden;  /* Prevent horizontal scroll */
 }
 
