@@ -243,7 +243,7 @@ body {
   right: 16px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
   z-index: 1003;
 }
 
@@ -338,15 +338,20 @@ body {
 
 /* Sort toggle pill */
 .sort-toggle {
-  display: flex;
-  align-self: center;
-  background: rgba(255,255,255,0.55);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  border-radius: 20px;
-  overflow: hidden;
-  margin-bottom: 8px;
+  min-width: 64px;       /* or whatever “normal” is */
+  height: 24px;
+  font-size: 1.07em;
+  padding: 0 14px;
+  border-radius: 14px;
+  transition: background 0.13s;
+  /* Add these to lock font and spacing */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  box-sizing: border-box;
 }
+
 .sort-toggle button {
   flex: 1 1 50%;
   border: none;
