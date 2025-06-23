@@ -311,10 +311,11 @@ body {
   left: 10px;
   right: 10px;
   bottom: 0;
+  align: center;
   min-height: 0;
   background: rgba(255,255,255,0.55) !important;
   max-height: 70vh;   /* make the panel shorter */
-  max-width: 1090px;
+  max-width: px;
   min-height: 0;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
