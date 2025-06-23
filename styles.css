@@ -158,6 +158,11 @@ body {
     width: 100%;
     box-sizing: border-box;
   }
+  @media (min-width: 601px) {
+  .feature-card, #list-panel {
+    left: 50%;
+    transform: translateX(-50%);
+  }
 }
 
 /* Map Zoom Buttons */
