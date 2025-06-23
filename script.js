@@ -1,9 +1,3 @@
- (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
-diff --git a/script.js b/script.js
-index 32554ecacd32473d8860d8063f6e5c3a0a3ad2d3..5271a44c38fbad080d5195a8beeae5d478dc0de4 100644
---- a/script.js
-+++ b/script.js
-@@ -1,57 +1,60 @@
  document.addEventListener("DOMContentLoaded", () => {
    // UI controls
    const recenterBtn = document.getElementById("recenter-btn");
@@ -385,6 +379,3 @@ index 32554ecacd32473d8860d8063f6e5c3a0a3ad2d3..5271a44c38fbad080d5195a8beeae5d4
        () => startApp(defaultCenter),
        { timeout: 7000 }
      );
- 
-EOF
-)
