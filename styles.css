@@ -251,17 +251,19 @@ body {
 
 .custom-zoom-rect {
   position: absolute;         /* or fixed */
-  top: 40px;                  /* adjust as needed */
-  right: 24px;                /* adjust as needed */
+  top: 60%;
+  right: 16px;
+  transform: translateY(-50%);          /* adjust as needed */
   display: flex;
   flex-direction: column;
+  gap: 12px;
   align-items: stretch;
   background: rgba(255,255,255,0.78);
   box-shadow: 0 2px 12px rgba(56,124,194,0.12);
   border-radius: 18px;        /* rounded corners */
   overflow: hidden;
   width: 56px;                /* wider than tall for that “pill” look */
-  z-index: 2001;
+  z-index: 1003;
   border: 1.5px solid rgba(56,124,194,0.08);
   backdrop-filter: blur(8px);
 }
@@ -270,7 +272,7 @@ body {
   background: none;
   border: none;
   color: #387cc2;
-  font-size: 2em;
+  font-size: 1em;
   font-weight: bold;
   width: 100%;
   height: 48px;
