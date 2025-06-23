@@ -234,7 +234,8 @@ body {
   cursor: pointer;
   padding: 0;
   font-family: 'Roboto', Arial, sans-serif !important;
-  filter: drop-shadow(2px 2px 6px rgba(30,49,80,0.19));
+  box-shadow: 0 2px 12px rgba(56,124,194,0.12);
+  border: 1.5px solid rgba(56,124,194,0.08);
 }
 
 .list-btn:hover, .recenter-btn:hover {
@@ -260,7 +261,7 @@ body {
   box-shadow: 0 2px 12px rgba(56,124,194,0.12);
   border-radius: 14px;
   overflow: hidden;
-  width: 40px;
+  width: 34px;
   border: 1.5px solid rgba(56,124,194,0.08);
   backdrop-filter: blur(8px);
   padding: 0;
@@ -273,8 +274,8 @@ body {
   color: #387cc2;
   font-size: 1.2em;
   font-weight: bold;
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   cursor: pointer;
   outline: none;
   transition: background 0.13s, color 0.13s;
@@ -285,7 +286,6 @@ body {
   padding: 0;
 }
 
-.custom-zoom-rect button:active,
 .custom-zoom-rect button:focus {
   background: rgba(56,124,194,0.13);
 }
