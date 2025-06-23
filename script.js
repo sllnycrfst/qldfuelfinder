@@ -54,6 +54,8 @@ document.addEventListener("DOMContentLoaded", () => {
       updateStationList();
     });
   }
+  document.getElementById('zoom-in').onclick = () => map.zoomIn();
+  document.getElementById('zoom-out').onclick = () => map.zoomOut();
 
   function showUserLocation(setView) {
     if (!navigator.geolocation) return;
