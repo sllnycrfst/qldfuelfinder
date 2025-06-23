@@ -320,7 +320,7 @@ body {
   margin-bottom: env(safe-area-inset-bottom, 0);
 }
 #list-panel.visible { transform: translateY(0); }
-#list-panel.hidden { transform: translateY(100%); }
+#list-panel.hidden { transform: translateY(120%); }
 
 #close-list-btn {
   align-self: flex-end;
