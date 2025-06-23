@@ -214,8 +214,8 @@ body {
 
 .glass-btn {
   background: rgba(255,255,255,0.55) !important;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   border-radius: 50% !important;
   border: none !important;
   box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
@@ -234,8 +234,8 @@ body {
   cursor: pointer;
   padding: 0;
   font-family: 'Roboto', Arial, sans-serif !important;
-  box-shadow: 0 2px 12px rgba(56,124,194,0.12);
-  border: 1.5px solid rgba(56,124,194,0.08);
+  box-shadow: 0 2px 12px rgba(56,124,194,0.12) !important;
+  border: 1.5px solid rgba(56,124,194,0.08) !important;
 }
 
 .list-btn:hover, .recenter-btn:hover {
@@ -257,13 +257,13 @@ body {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  background: rgba(255,255,255,0.88);
   box-shadow: 0 2px 12px rgba(56,124,194,0.12);
   border-radius: 14px;
   overflow: hidden;
   width: 34px;
   border: 1.5px solid rgba(56,124,194,0.08);
-  backdrop-filter: blur(8px);
+  background: rgba(255,255,255,0.55) !important;
+  backdrop-filter: blur(6px) !important;
   padding: 0;
   margin: 0;
 }
@@ -309,7 +309,7 @@ body {
   display: flex;
   flex-direction: column;
   position: fixed;
-  top: 0;
+  top: 100px;
   bottom: 0;
   right: 0;
   width: 320px;
@@ -326,7 +326,7 @@ body {
   font-family: 'Roboto', Arial, sans-serif !important;
 }
 #list-panel.visible { transform: translateX(0); }
-#list-panel.hidden { transform: translateX(120%); }
+#list-panel.hidden { transform: translateX(100%); }
 
 #close-list-btn {
   align-self: flex-end;
