@@ -239,7 +239,7 @@ body {
 
 .side-controls {
   position: fixed;
-  top: 44px;          /* Top right! */
+  top: 80px;          /* Top right! */
   right: 16px;
   display: flex;
   flex-direction: column;
