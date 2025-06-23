@@ -436,15 +436,7 @@ body {
 }
 
 #list li.featured-station {
-  background: none;
-  font-weight: bold;
-  padding-top: 20px;
-  padding-bottom: 20px;
-  border-bottom: none;
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  gap: 0;
+  display: none !important;
 }
 
 .featurestation-img {
@@ -471,6 +463,7 @@ body {
 }
 
 .featured-name {
+  padding: 28px 32px 20px 32px;
   font-size: 1.18em;
   font-weight: bold;
   margin-bottom: 0.2em;
