@@ -1,101 +1,31 @@
 html, body {
+  height: 100%;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  width: 100%;
-  height: 100%;
   font-family: 'Roboto', Arial, sans-serif !important;
   background: transparent !important;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  width: 100vw;
+  max-width: 1090px;
+  max-height: 620px;
+  overflow-x: hidden;  /* Prevent horizontal scroll */
 }
 
 body {
-  position: relative;
-}
-
-.map-wrapper {
-  flex: 1 1 auto;
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
   margin: 0;
-  max-width: unset;
-  max-height: unset;
+  padding: 0;
+  height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;  /* Prevent horizontal scroll */
+  position: relative;
 }
 
 #map {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
   z-index: 0;
-}
-
-/* LIST PANEL */
-#list-panel {
-  left: 50%;
-  transform: translateX(-50%) translateY(100%);
-  width: calc(100% - 32px);
-  max-width: 800px;
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  background: rgba(255,255,255,0.55) !important;
-  max-height: 100vh;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 30px 30px 0 0 !important;
-  box-shadow: 0 -4px 24px rgba(46,54,80,0.12);
-  border: 1.5px solid rgba(200,200,200,0.20);
-  z-index: 2000;
-  transition: transform 0.3s cubic-bezier(.4,0,.2,1);
-  font-family: 'Roboto', Arial, sans-serif !important;
-  margin-bottom: env(safe-area-inset-bottom, 0);
-  visibility: hidden;
-}
-
-#list-panel.visible {
-  transform: translateX(-50%) translateY(0);
-  visibility: visible;
-}
-
-#list-panel.hidden {
-  transform: translateX(-50%) translateY(100%);
-  visibility: hidden;
-}
-
-/* FEATURE CARD */
-.feature-card {
-  position: fixed;
-  left: 50%;
-  bottom: 40px;
-  transform: translateX(-50%);
-  background: #fff;
-  border-radius: 24px;
-  box-shadow: 0 8px 48px rgba(30,49,80,0.13);
-  z-index: 4000;
-  min-width: 320px;
-  max-width: 800px !important;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  opacity: 1;
-  transition: opacity 0.18s;
-  overflow-x: hidden;
-  visibility: hidden;
-}
-
-.feature-card.visible {
-  visibility: visible;
-}
-
-.feature-card.hidden {
-  display: none;
-  visibility: hidden;
 }
 
 /* --- Search Bar and Icons --- */
@@ -222,11 +152,6 @@ body {
     width: 100%;
     box-sizing: border-box;
   }
-  @media (min-width: 601px) {
-  .feature-card, #list-panel {
-    left: 50%;
-    transform: translateX(-50%);
-  }
 }
 
 /* Map Zoom Buttons */
@@ -283,7 +208,7 @@ body {
 /* Marker styles */
 .fuel-marker .marker-stack {
   position: relative;
-  width: 60px !important;
+  width: 72px !important;
   height: 72px !important;
   display: block;
   font-family: 'Roboto', Arial, sans-serif !important;
@@ -296,8 +221,8 @@ body {
 
 .marker-brand-img {
   position: absolute !important;
-  top: 26px;
-  left: 17px;
+  top: 25px;
+  left: 22px;
   width: 26px;
   height: 26px;
   z-index: 1 !important;
@@ -306,20 +231,17 @@ body {
   border-radius: 10%;
   background: #fff;
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-  object-fit: contain;
 }
 .custom-marker-img {
   position: absolute !important;
-  width: 60px !important;
-  height: 72px !important;
+  width: 69px !important;
+  height: 69px !important;
   display: block;
   z-index: 2 !important;
   pointer-events: none;
-  object-fit: contain;
 }
-
 .marker-price {
-  position: absolute !important;
+  position: absolute !important;;
   top: 0px !important;
   left: 7px !important;
   width: 80% !important;
@@ -336,7 +258,6 @@ body {
   box-shadow: none;
   letter-spacing: 0.3px !important;
 }
-
 .marker-price-cheapest {
   color: #21ea00 !important;
 }
@@ -358,22 +279,50 @@ body {
 
 /* PATCH: Move buttons back down, but ensure they're safe on iOS Safari */
 .list-btn, .recenter-btn {
-  position: absolute; /* was fixed */
-  z-index: 1003;
   width: 40px;
   height: 40px;
   font-size: 26px;
+  cursor: pointer;
+  position: fixed;
+  z-index: 1003;
   padding: 0;
-  font-family: 'Roboto', Arial, sans-serif' !important;
+  font-family: 'Roboto', Arial, sans-serif !important;
   filter: drop-shadow(2px 2px 6px rgba(30,49,80,0.19));
 }
-
 .list-btn { left: 25px; bottom: calc(25px + env(safe-area-inset-bottom, 0)); }
 .recenter-btn { right: 25px; bottom: calc(25px + env(safe-area-inset-bottom, 0)); }
 
 .list-btn:hover, .recenter-btn:hover {
   background: rgba(232, 247, 255, 0.8) !important;
 }
+
+/* PATCH: Raise the list panel above the iOS bottom bar */
+#list-panel {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 180px;
+  left: 10px;
+  right: 10px;
+  bottom: 0;
+  max-height: 70vh;
+  min-height: 0;
+  background: rgba(255,255,255,0.55) !important;
+  max-height: 70vh;   /* make the panel shorter */
+  min-height: 0;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 20px 20px 0 0 !important;
+  box-shadow: 0 -4px 24px rgba(46,54,80,0.12);
+  border: 1.5px solid rgba(200,200,200,0.20);
+  z-index: 2000;
+  transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+  transform: translateX(-50%) translateY(100%);
+  font-family: 'Roboto', Arial, sans-serif !important;
+  margin-bottom: env(safe-area-inset-bottom, 0);
+}
+#list-panel.visible { transform: translateY(0); }
+#list-panel.hidden { transform: translateY(100%); }
 
 #close-list-btn {
   align-self: flex-end;
@@ -543,7 +492,7 @@ body {
   box-shadow: 0 8px 48px rgba(30,49,80,0.13);
   z-index: 4000;
   min-width: 320px;
-  max-width: 600px !important;
+  max-width: 600px;
   padding: 0;
   display: flex;
   flex-direction: column;
