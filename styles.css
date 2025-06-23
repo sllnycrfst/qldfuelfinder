@@ -251,7 +251,7 @@ body {
 
 .custom-zoom-rect {
   position: absolute;         /* or fixed */
-  top: 60%;
+  top: 20%;
   right: 16px;
   transform: translateY(-50%);          /* adjust as needed */
   display: flex;
@@ -272,10 +272,10 @@ body {
   background: none;
   border: none;
   color: #387cc2;
-  font-size: 1em;
+  font-size: 1.4em;
   font-weight: bold;
   width: 100%;
-  height: 48px;
+  height: 20px;
   cursor: pointer;
   outline: none;
   transition: background 0.13s, color 0.13s;
