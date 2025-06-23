@@ -1,99 +1,116 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>QLD Fuel Finder</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Quantico:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="icon" type="image/png" href="images/favicon.png">
-  <!-- Font Awesome CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
-  <link rel="apple-touch-icon" href="./images/home-icon.png">
-</head>
-<body>
-  <!-- Map Controls / Search Bar -->
-  <div class="search-bar-glass">
-    <span class="search-icon" aria-hidden="true">
-      <i class="fa-solid fa-magnifying-glass"></i>
-    </span>
-    <input id="search" type="text" placeholder="Search suburb" autocomplete="on" />
-    <span class="divider">|</span>
-    <span class="fuel-icon" aria-hidden="true">
-      <i class="fa-solid fa-gas-pump"></i>
-    </span>
-    <select id="fuel-select">
-      <option value="E10">E10</option>
-      <option value="91">91</option>
-      <option value="95">95</option>
-      <option value="98">98</option>
-      <option value="Diesel/Premium Diesel">Diesel</option>
-    </select>
-  </div>
-
-  <!-- Map Container -->
-  <div class="map-wrapper">
-    <div id="map"></div>
-
-    <!-- Floating Action Buttons -->
-    <button id="list-btn" title="Show station list" class="list-btn glass-btn" aria-label="Show station list">
-      <span aria-hidden="true">☰</span>
-    </button>
-    
-    <button id="recenter-btn" title="Go to my location" class="recenter-btn glass-btn" aria-label="Go to my location">
-      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" style="display:block" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="13" cy="13" r="7" stroke="#387cc2" stroke-width="2"/>
-        <line x1="13" y1="3" x2="13" y2="7" stroke="#387cc2" stroke-width="2"/>
-        <line x1="13" y1="19" x2="13" y2="23" stroke="#387cc2" stroke-width="2"/>
-        <line x1="3" y1="13" x2="7" y2="13" stroke="#387cc2" stroke-width="2"/>
-        <line x1="19" y1="13" x2="23" y2="13" stroke="#387cc2" stroke-width="2"/>
-      </svg>
-    </button>
-  <!-- Slide-up List Panel (Outside wrapper if sliding up over whole screen) -->
-  </div>
-
-  <!-- Slide-up List Panel -->
-  <div id="list-panel" class="hidden" aria-modal="true" role="dialog">
-    <button id="close-list-btn" title="Close list" aria-label="Close list">&times;</button>
-    <ul id="list"></ul>
-  </div>
-  
-  <div class="feature-meta">
-    <div class="feature-meta-box">
-      <div class="feature-station-name"> ... </div>
-      <div class="feature-station-address"> ... </div>
-    </div>
-  </div>
-
-  <!-- Feature Card (as a popup/modal or panel, not always visible) -->
-  <div id="feature-card" class="feature-card hidden" role="dialog" aria-modal="true">
-    <button id="close-feature-card" class="close-feature-card" title="Close" aria-label="Close">&times;</button>
-    <div class="feature-card-inner">
-      <div class="feature-meta">
-        <div class="feature-station-name"></div>
-        <div class="feature-station-address"></div>
-      </div>
-      <div class="priceboard-stack">
-        <div class="priceboard-logo-wrap">
-          <img class="priceboard-logo" src="images/default.png" alt="Station logo" />
-        </div>
-        <div class="priceboard-img-wrap">
-          <img src="images/priceboard.png" alt="Price Board" class="priceboard-img"/>
-          <div class="price-slot price-e10"></div>
-          <div class="price-slot price-91"></div>
-          <div class="price-slot price-95"></div>
-          <div class="price-slot price-98"></div>
-          <!-- Only the combined diesel slot, removed the old diesel and premium diesel slots -->
-          <div class="price-slot price-diesel-combined"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- Scripts -->
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="script.js"></script>
-</body>
-</html>
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/index.html b/index.html
+index 49691006c7938fce0b92d674d6facd2f8d60d6e2..e95688bf0fabf8790704c65c96c621260f8ae994 100644
+--- a/index.html
++++ b/index.html
+@@ -13,75 +13,84 @@
+   <!-- Font Awesome CSS -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+   <link rel="apple-touch-icon" href="./images/home-icon.png">
+ </head>
+ <body>
+   <!-- Map Controls / Search Bar -->
+   <div class="search-bar-glass">
+     <span class="search-icon" aria-hidden="true">
+       <i class="fa-solid fa-magnifying-glass"></i>
+     </span>
+     <input id="search" type="text" placeholder="Search suburb" autocomplete="on" />
+     <span class="divider">|</span>
+     <span class="fuel-icon" aria-hidden="true">
+       <i class="fa-solid fa-gas-pump"></i>
+     </span>
+     <select id="fuel-select">
+       <option value="E10">E10</option>
+       <option value="91">91</option>
+       <option value="95">95</option>
+       <option value="98">98</option>
+       <option value="Diesel/Premium Diesel">Diesel</option>
+     </select>
+   </div>
+ 
+   <!-- Map Container -->
+-  <div class="map-wrapper">
+-    <div id="map"></div>
+-
+-    <!-- Floating Action Buttons -->
+-    <button id="list-btn" title="Show station list" class="list-btn glass-btn" aria-label="Show station list">
+-      <span aria-hidden="true">☰</span>
+-    </button>
+-    
+-    <button id="recenter-btn" title="Go to my location" class="recenter-btn glass-btn" aria-label="Go to my location">
+-      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" style="display:block" xmlns="http://www.w3.org/2000/svg">
+-        <circle cx="13" cy="13" r="7" stroke="#387cc2" stroke-width="2"/>
+-        <line x1="13" y1="3" x2="13" y2="7" stroke="#387cc2" stroke-width="2"/>
+-        <line x1="13" y1="19" x2="13" y2="23" stroke="#387cc2" stroke-width="2"/>
+-        <line x1="3" y1="13" x2="7" y2="13" stroke="#387cc2" stroke-width="2"/>
+-        <line x1="19" y1="13" x2="23" y2="13" stroke="#387cc2" stroke-width="2"/>
+-      </svg>
+-    </button>
+-  <!-- Slide-up List Panel (Outside wrapper if sliding up over whole screen) -->
+-  </div>
++  <div class="map-wrapper">
++    <div id="map"></div>
++
++    <!-- Side Controls -->
++    <div class="side-controls">
++      <button id="list-btn" title="Show station list" class="list-btn glass-btn" aria-label="Show station list">
++        <span aria-hidden="true">☰</span>
++      </button>
++      <div id="zoom-controls" class="zoom-controls glass-btn">
++        <button id="zoom-in" aria-label="Zoom in">+</button>
++        <button id="zoom-out" aria-label="Zoom out">−</button>
++      </div>
++      <button id="recenter-btn" title="Go to my location" class="recenter-btn glass-btn" aria-label="Go to my location">
++        <svg width="26" height="26" viewBox="0 0 26 26" fill="none" style="display:block" xmlns="http://www.w3.org/2000/svg">
++          <circle cx="13" cy="13" r="7" stroke="#387cc2" stroke-width="2"/>
++          <line x1="13" y1="3" x2="13" y2="7" stroke="#387cc2" stroke-width="2"/>
++          <line x1="13" y1="19" x2="13" y2="23" stroke="#387cc2" stroke-width="2"/>
++          <line x1="3" y1="13" x2="7" y2="13" stroke="#387cc2" stroke-width="2"/>
++          <line x1="19" y1="13" x2="23" y2="13" stroke="#387cc2" stroke-width="2"/>
++        </svg>
++      </button>
++    </div>
++  <!-- Slide-up List Panel (Outside wrapper if sliding up over whole screen) -->
++  </div>
+ 
+   <!-- Slide-up List Panel -->
+-  <div id="list-panel" class="hidden" aria-modal="true" role="dialog">
+-    <button id="close-list-btn" title="Close list" aria-label="Close list">&times;</button>
+-    <ul id="list"></ul>
+-  </div>
++  <div id="list-panel" class="hidden" aria-modal="true" role="dialog">
++    <button id="close-list-btn" title="Close list" aria-label="Close list">&times;</button>
++    <div id="sort-toggle" class="sort-toggle">
++      <button data-sort="price" class="active">Price</button>
++      <button data-sort="distance">Distance</button>
++    </div>
++    <ul id="list"></ul>
++  </div>
+   
+   <div class="feature-meta">
+     <div class="feature-meta-box">
+       <div class="feature-station-name"> ... </div>
+       <div class="feature-station-address"> ... </div>
+     </div>
+   </div>
+ 
+   <!-- Feature Card (as a popup/modal or panel, not always visible) -->
+   <div id="feature-card" class="feature-card hidden" role="dialog" aria-modal="true">
+     <button id="close-feature-card" class="close-feature-card" title="Close" aria-label="Close">&times;</button>
+     <div class="feature-card-inner">
+       <div class="feature-meta">
+         <div class="feature-station-name"></div>
+         <div class="feature-station-address"></div>
+       </div>
+       <div class="priceboard-stack">
+         <div class="priceboard-logo-wrap">
+           <img class="priceboard-logo" src="images/default.png" alt="Station logo" />
+         </div>
+         <div class="priceboard-img-wrap">
+           <img src="images/priceboard.png" alt="Price Board" class="priceboard-img"/>
+           <div class="price-slot price-e10"></div>
+           <div class="price-slot price-91"></div>
+           <div class="price-slot price-95"></div>
+ 
+EOF
+)
