@@ -154,14 +154,15 @@ body {
 
 /* Map Zoom Buttons */
 .leaflet-control-zoom {
-  background: rgba(255, 255, 255, 0.38);
-  backdrop-filter: blur(6px) saturate(120%);
-  -webkit-backdrop-filter: blur(6px) saturate(120%);
-  box-shadow: 0 2px 12px rgba(30, 49, 80, 0.09), 0 1.5px 8px rgba(30, 49, 80, 0.16);
-  border-radius: 13px;
-  overflow: hidden;
+  background: rgba(255,255,255,0.52) !important;
+  backdrop-filter: blur(12px) saturate(130%);
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(56,124,194,0.09);
   border: none !important;
-  filter: drop-shadow(2px 2px 6px rgba(30,49,80,0.19));
+  overflow: hidden;
+  padding: 0;
+  width: 52px;
+  filter: none;
 }
 
 .leaflet-control-zoom-in,
@@ -193,7 +194,27 @@ body {
 }
 
 .leaflet-control-zoom a {
+  background: transparent !important;
+  color: #387cc2 !important;
+  border: none !important;
+  font-size: 2.2em;
+  width: 52px;
+  height: 52px;
+  line-height: 52px;
+  text-align: center;
+  outline: none;
   box-shadow: none !important;
+  transition: background 0.15s, color 0.15s;
+  border-radius: 0 !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: rgba(56,124,194,0.10) !important;
+  color: #145ea8 !important;
+}
+
+.leaflet-control-zoom a:active {
+  background: rgba(56,124,194,0.21) !important;
 }
 
 /* PATCH: Keep controls visually at the bottom everywhere, but above iOS Safari bar if present */
@@ -275,7 +296,6 @@ body {
   outline: none;
 }
 
-/* PATCH: Move buttons back down, but ensure they're safe on iOS Safari */
 .list-btn, .recenter-btn {
   width: 40px;
   height: 40px;
@@ -293,7 +313,7 @@ body {
 /* Side controls container */
 .side-controls {
   position: fixed;
-  top: 50%;
+  top: 60%;
   right: 16px;
   transform: translateY(-50%);
   display: flex;
