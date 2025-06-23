@@ -5,8 +5,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const listPanel = document.getElementById("list-panel");
   const closeListBtn = document.getElementById("close-list-btn");
   const listUl = document.getElementById("list");
+  const zoomInBtn = document.getElementById("zoom-in");
+  const zoomOutBtn = document.getElementById("zoom-out");
+  const sortToggle = document.getElementById("sort-toggle");
   const searchInput = document.getElementById("search");
   const fuelSelect = document.getElementById("fuel-select");
+  const featureCard = document.getElementById("feature-card");
+  const closeFeatureCardBtn = document.getElementById("close-feature-card");
 
   let map, markerLayer, userMarker;
   const defaultCenter = [-27.4698, 153.0251];
@@ -20,16 +25,14 @@ document.addEventListener("DOMContentLoaded", () => {
   let allSites = [];
   let allPrices = [];
   let priceMap = {};
-
-  let forcedFeaturedSiteId = null;
+  let sortBy = "price";
 
   const bannedStations = [
     "Stargazers Yarraman"
   ];
 
   function startApp(center) {
-    map = L.map("map", { zoomControl: true, attributionControl: true }).setView(center, defaultZoom);
-    map.zoomControl.setPosition("topright");
+    map = L.map("map", { zoomControl: false, attributionControl: true }).setView(center, defaultZoom);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       attribution: '<a href="https://www.sellanycarfast.com.au" target="_blank" rel="noopener" title="Sell Any Car Fast">SACF</a> | &copy; <a href="https://carto.com/attributions">CARTO</a>',
       subdomains: 'abcd',
@@ -191,10 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
           rawPrice: s.rawPrice,
           price: s.price
         }).on("click", () => {
-          forcedFeaturedSiteId = String(s.siteId);
-          listPanel.classList.add("visible");
-          listPanel.classList.remove("hidden");
-          updateStationList();
+          showFeatureCard(s);
         })
       );
     });
@@ -248,31 +248,29 @@ document.addEventListener("DOMContentLoaded", () => {
         return null;
       })
       .filter(Boolean)
-      .sort((a, b) => a.rawPrice - b.rawPrice);
+      .sort((a, b) => {
+        if (sortBy === "distance") {
+          if (a.distance == null) return 1;
+          if (b.distance == null) return -1;
+          return a.distance - b.distance;
+        }
+        return a.rawPrice - b.rawPrice;
+      });
 
     if (stations.length === 0) {
       listUl.innerHTML = "<li>No stations found for this fuel type.</li>";
       return;
     }
 
-    let featured, others;
-    if (
-      forcedFeaturedSiteId &&
-      stations.some(s => String(s.siteId) === String(forcedFeaturedSiteId))
-    ) {
-      featured = stations.find(s => String(s.siteId) === String(forcedFeaturedSiteId));
-      others = stations.filter(s => String(s.siteId) !== String(forcedFeaturedSiteId));
-    } else {
-      featured = stations[0];
-      others = stations.slice(1);
-    }
+    let featured = stations[0];
+    let others = stations.slice(1);
 
     // --- FEATURED STATION: Price Board + Meta Info (horizontal layout) ---
     let featuredHTML = `
       <li class="featured-station glass-card" id="featured-station">
         <div class="feature-meta">
           <div class="feature-meta-box">
-            <div class="feature-station-name">${featured.name}</div>
+            <div class="feature-station-name">${featured.name}<span class="list-distance">${featured.distance != null ? featured.distance.toFixed(1) + ' km' : ''}</span></div>
             <div class="feature-station-address">
               <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(featured.lat + ',' + featured.lng)}"
                 target="_blank">${featured.address}${featured.suburb ? ', ' + featured.suburb : ''}</a>
@@ -303,14 +301,14 @@ document.addEventListener("DOMContentLoaded", () => {
       return `
         <li class="list-station" data-siteid="${String(site.siteId)}">
           <span class="list-logo">
-            <img 
+            <img
               src="${siteImgSrc}"
-              alt="${site.name}" 
+              alt="${site.name}"
               onerror="this.onerror=null;this.src='images/default.png';"
               style="height:32px;width:32px;border-radius:50%;background:#fff;object-fit:contain;box-shadow:0 1px 2px rgba(0,0,0,0.07);"
             />
           </span>
-          <span class="list-name">${site.name}</span>
+          <span class="list-name">${site.name}<span class="list-distance">${site.distance != null ? site.distance.toFixed(1) + ' km' : ''}</span></span>
           <span class="list-price">${site.price.toFixed(1)}</span>
         </li>
       `;
@@ -321,23 +319,11 @@ document.addEventListener("DOMContentLoaded", () => {
     Array.from(listUl.querySelectorAll('.list-station')).forEach(item => {
       item.addEventListener('click', function() {
         const siteId = this.getAttribute('data-siteid');
-        if (String(siteId) !== String(featured.siteId)) {
-          forcedFeaturedSiteId = String(siteId);
-          updateStationList();
-          setTimeout(() => {
-            const feat = document.getElementById("featured-station");
-            if (feat) feat.scrollIntoView({ behavior: "smooth", block: "start" });
-          }, 10);
-        }
+        const found = stations.find(s => String(s.siteId) === String(siteId));
+        if (found) showFeatureCard(found);
       });
     });
 
-    if (listPanel && listPanel.classList.contains("visible")) {
-      setTimeout(() => {
-        const featuredEl = document.getElementById("featured-station");
-        if (featuredEl) featuredEl.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 10);
-    }
   }
 
   // ---- DIESEL COMBINED LOGIC ----
@@ -377,12 +363,48 @@ document.addEventListener("DOMContentLoaded", () => {
     return `<div class="price-slot price-diesel-combined">${priceValue !== null ? priceValue : ''}</div>`;
   }
 
+  function showFeatureCard(site) {
+    if (!featureCard) return;
+    featureCard.querySelector('.feature-station-name').innerHTML = `${site.name}<span class="list-distance">${site.distance != null ? site.distance.toFixed(1) + ' km' : ''}</span>`;
+    featureCard.querySelector('.feature-station-address').textContent = `${site.address}${site.suburb ? ', ' + site.suburb : ''}`;
+    const logoEl = featureCard.querySelector('.priceboard-logo');
+    logoEl.src = site.brand ? `images/${site.brand}.png` : 'images/default.png';
+    logoEl.onerror = function(){this.onerror=null;this.src='images/default.png';};
+    const wrap = featureCard.querySelector('.priceboard-img-wrap');
+    wrap.innerHTML = `<img src="images/priceboard.png" alt="Price Board" class="priceboard-img"/>${renderPriceSlots(site.allPrices)}`;
+    featureCard.classList.remove('hidden');
+    featureCard.style.opacity = '0';
+    setTimeout(() => { featureCard.style.opacity = '1'; }, 10);
+  }
+
   // Recenter button
   recenterBtn && recenterBtn.addEventListener("click", () => showUserLocation(true));
 
+  zoomInBtn && zoomInBtn.addEventListener("click", () => {
+    if (map) map.zoomIn();
+  });
+  zoomOutBtn && zoomOutBtn.addEventListener("click", () => {
+    if (map) map.zoomOut();
+  });
+
+  closeFeatureCardBtn && closeFeatureCardBtn.addEventListener('click', () => {
+    featureCard.classList.add('hidden');
+  });
+
+  if (sortToggle) {
+    sortToggle.addEventListener("click", e => {
+      if (e.target.tagName === "BUTTON") {
+        sortBy = e.target.getAttribute("data-sort");
+        Array.from(sortToggle.querySelectorAll("button")).forEach(btn => {
+          btn.classList.toggle("active", btn === e.target);
+        });
+        updateStationList();
+      }
+    });
+  }
+
   // List button open/close
   listBtn && listBtn.addEventListener("click", () => {
-    forcedFeaturedSiteId = null;
     listPanel.classList.add("visible");
     listPanel.classList.remove("hidden");
     updateStationList();
@@ -390,13 +412,11 @@ document.addEventListener("DOMContentLoaded", () => {
   closeListBtn && closeListBtn.addEventListener("click", () => {
     listPanel.classList.remove("visible");
     listPanel.classList.add("hidden");
-    forcedFeaturedSiteId = null;
   });
 
   // Fuel selector
   fuelSelect && fuelSelect.addEventListener("change", e => {
     currentFuel = e.target.value;
-    forcedFeaturedSiteId = null;
     updateVisibleStations();
     updateStationList();
   });
