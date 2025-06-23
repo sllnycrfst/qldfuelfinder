@@ -1,9 +1,3 @@
- (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
-diff --git a/index.html b/index.html
-index 49691006c7938fce0b92d674d6facd2f8d60d6e2..e95688bf0fabf8790704c65c96c621260f8ae994 100644
---- a/index.html
-+++ b/index.html
-@@ -13,75 +13,84 @@
    <!-- Font Awesome CSS -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
    <link rel="apple-touch-icon" href="./images/home-icon.png">
@@ -111,6 +105,3 @@ index 49691006c7938fce0b92d674d6facd2f8d60d6e2..e95688bf0fabf8790704c65c96c62126
            <div class="price-slot price-e10"></div>
            <div class="price-slot price-91"></div>
            <div class="price-slot price-95"></div>
- 
-EOF
-)
