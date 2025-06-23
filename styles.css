@@ -237,66 +237,65 @@ body {
   background: rgba(232, 247, 255, 0.8) !important;
 }
 
-/* Side controls container */
 .side-controls {
   position: fixed;
-  top: 60%;
+  top: 24px;          /* Top right! */
   right: 16px;
-  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   z-index: 1003;
 }
 
 .custom-zoom-rect {
-  position: absolute;         /* or fixed */
-  top: 20%;
-  right: 16px !important;
-  transform: translateY(-20%);          /* adjust as needed */
+  position: static;         /* static since .side-controls is already fixed */
   display: flex;
   flex-direction: column;
-  gap: 12px;
   align-items: stretch;
-  background: rgba(255,255,255,0.78);
+  background: rgba(255,255,255,0.88);
   box-shadow: 0 2px 12px rgba(56,124,194,0.12);
-  border-radius: 18px;        /* rounded corners */
+  border-radius: 14px;
   overflow: hidden;
-  width: 56px;                /* wider than tall for that “pill” look */
-  z-index: 1003;
+  width: 44px;
   border: 1.5px solid rgba(56,124,194,0.08);
   backdrop-filter: blur(8px);
+  padding: 0;
+  margin: 0;
 }
 
 .custom-zoom-rect button {
   background: none;
   border: none;
   color: #387cc2;
-  font-size: 1.4em;
+  font-size: 1.8em;
   font-weight: bold;
-  width: 20px;
-  height: 20px;
+  width: 44px;
+  height: 44px;
   cursor: pointer;
   outline: none;
   transition: background 0.13s, color 0.13s;
   border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
 }
 
 .custom-zoom-rect button:active,
 .custom-zoom-rect button:focus {
-  background: rgba(56,124,194,0.10);
+  background: rgba(56,124,194,0.13);
 }
 
 .custom-zoom-rect button:hover {
-  background: rgba(56,124,194,0.16);
+  background: rgba(56,124,194,0.17);
   color: #17486c;
 }
 
 .zoom-divider {
   width: 80%;
   margin: 0 auto;
-  height: 1.5px;
-  background: rgba(56,124,194,0.13);
+  height: 1px;
+  background: rgba(56,124,194,0.11);
   border-radius: 1px;
 }
 
