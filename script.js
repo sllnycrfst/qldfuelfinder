@@ -17,7 +17,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const defaultCenter = [-27.4698, 153.0251];
   const defaultZoom = 14;
 
+  // Fuel order and IDs for board
   const fuelOrder = ["E10", "91", "95", "98", "Diesel/Premium Diesel"];
+  // Map for select values to fuel IDs. 3 = Diesel, 14 = Premium Diesel. 1000 is not used for lookup.
   const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, "Diesel/Premium Diesel": 1000 };
   let currentFuel = "E10";
   let allSites = [];
@@ -25,7 +27,9 @@ document.addEventListener("DOMContentLoaded", () => {
   let priceMap = {};
   let sortBy = "price";
 
-  const bannedStations = ["Stargazers Yarraman"];
+  const bannedStations = [
+    "Stargazers Yarraman"
+  ];
 
   function startApp(center) {
     map = L.map("map", { zoomControl: false, attributionControl: true }).setView(center, defaultZoom);
@@ -50,6 +54,8 @@ document.addEventListener("DOMContentLoaded", () => {
       updateStationList();
     });
   }
+  document.getElementById('zoom-in').onclick = () => map.zoomIn();
+  document.getElementById('zoom-out').onclick = () => map.zoomOut();
 
   function showUserLocation(setView) {
     if (!navigator.geolocation) return;
@@ -66,8 +72,6 @@ document.addEventListener("DOMContentLoaded", () => {
             fillOpacity: 0.85,
             weight: 3,
           }).addTo(map);
-          if (setView && map) map.setView(userLatLng, map.getZoom());
-          showWeather(userLatLng[0], userLatLng[1]);
         }
       },
       err => {
@@ -75,9 +79,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     );
   }
-
-  // ... Rest of your code (unchanged) ...
-});
 
   async function fetchSitesAndPrices() {
     try {
@@ -165,21 +166,6 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .filter(Boolean);
 
-    async function showWeather(lat, lon) {
-      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
-      const data = await res.json();
-      const weather = data.current_weather;
-      if (!weather) return;
-    
-      const weatherBox = document.createElement('div');
-      weatherBox.id = 'weather-box';
-      weatherBox.innerHTML = `
-        ${Math.round(weather.temperature)}°C<br>
-        ${weather.weathercode === 0 ? "Clear" : "Cloudy"}
-      `;
-      document.body.appendChild(weatherBox);
-    }
-    
     const minPrice = visibleStations.length ? Math.min(...visibleStations.map(s => s.rawPrice)) : null;
 
     visibleStations.forEach(s => {
