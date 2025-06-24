@@ -166,6 +166,21 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .filter(Boolean);
 
+    async function showWeather(lat, lon) {
+      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+      const data = await res.json();
+      const weather = data.current_weather;
+      if (!weather) return;
+    
+      const weatherBox = document.createElement('div');
+      weatherBox.id = 'weather-box';
+      weatherBox.innerHTML = `
+        ${Math.round(weather.temperature)}°C<br>
+        ${weather.weathercode === 0 ? "Clear" : "Cloudy"}
+      `;
+      document.body.appendChild(weatherBox);
+    }
+    
     const minPrice = visibleStations.length ? Math.min(...visibleStations.map(s => s.rawPrice)) : null;
 
     visibleStations.forEach(s => {
