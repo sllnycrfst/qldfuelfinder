@@ -27,11 +27,12 @@ html, body {
 /* --- SEARCH BAR --- */
 .search-bar-glass {
   position: absolute;
-  top: 32px;
+  top: 28px;
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
   max-width: 700px;
+  min-width: 300px;
   display: flex;
   align-items: center;
   gap: 0.5em;
@@ -153,9 +154,9 @@ html, body {
 /* --- LIST PANEL & STATION LIST --- */
 #list-panel {
   position: fixed;
-  top: 100px;
+  top: 180px;
   left: 0;
-  width: 350px;
+  width: 340px;
   height: calc(100vh - 100px);
   box-shadow: 2px 0 12px rgba(0,0,0,0.15);
   transform: translateX(-100%);
@@ -165,7 +166,7 @@ html, body {
   flex-direction: column;
   max-width: 100vw;
   background: rgba(255,255,255,0.55) !important;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(14px);
   border-radius: 20px 0 0 20px !important;
   border: 2px solid rgba(56,124,194,0.08) !important;
   font-family: 'Roboto', Arial, sans-serif !important;
@@ -184,9 +185,9 @@ html, body {
 .sort-toggle {
   min-width: 64px;
   height: 24px;
-  font-size: 1.07em;
+  font-size: 1.2em;
   padding: 0 14px;
-  border-radius: 14px;
+  border-radius: 14px !important;
   transition: background 0.13s;
   display: inline-flex;
   align-items: center;
@@ -307,7 +308,7 @@ html, body {
   box-shadow: 0 2px 12px rgba(56,124,194,0.12);
   border-radius: 14px;
   overflow: hidden;
-  width: 34px;
+  width: 28px;
   border: 2px solid rgba(56,124,194,0.08) !important;
   background: rgba(255,255,255,0.55) !important;
   backdrop-filter: blur(2px) !important;
@@ -318,10 +319,10 @@ html, body {
   background: none;
   border: none;
   color: #387cc2;
-  font-size: 1.2em;
+  font-size: 1.1em;
   font-weight: bold;
-  width: 34px;
-  height: 34px;
+  width: 28px;
+  height: 28px;
   cursor: pointer;
   outline: none;
   transition: background 0.13s, color 0.13s;
@@ -408,20 +409,20 @@ html, body {
   right: 12px;
   font-family: 'Quantico', 'Roboto', monospace;
   font-weight: 500;
-  font-size: 1em;
+  font-size: 0.8em;
   letter-spacing: 0.5px;
   text-align: right;
   line-height: 26px;
-  color: #ffaa78;
+  color: #ffffff;
   background: none;
   transition: color 0.2s;
   pointer-events: none;
 }
-.price-e10            { top: 38px;  }
-.price-91             { top: 66px;  }
-.price-95             { top: 94px;  }
-.price-98             { top: 122px; }
-.price-diesel-combined{ top: 150px; }
+.price-e10            { top: 92px;  }
+.price-91             { top: 107px;  }
+.price-95             { top: 122px;  }
+.price-98             { top: 137px; }
+.price-diesel-combined{ top: 155px; }
 .price-slot.cheapest { color: #21ea00 !important; }
 
 .feature-card-overlay {
@@ -454,7 +455,7 @@ html, body {
   word-break: break-word;
 }
 .feature-station-distance {
-  font-size: 0.98em;
+  font-size: 0.92em;
   color: #5a5a5a;
   margin: 0;
   font-weight: 500;
