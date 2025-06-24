@@ -71,22 +71,16 @@
     <ul id="list"></ul>
   </div>
 
-  <div class="feature-meta">
-    <div class="feature-meta-box">
-      <div class="feature-station-name"> ... </div>
-      <div class="feature-station-address"> ... </div>
-    </div>
-  </div>
-
   <!-- Feature Card (as a popup/modal or panel, not always visible) -->
   <div id="feature-card" class="feature-card hidden" role="dialog" aria-modal="true">
     <button id="close-feature-card-btn" title="Close">&times;</button>
     <div class="feature-card-inner">
-      <div class="feature-meta">
+      <div class="feature-card-left">
         <div class="feature-station-name"></div>
         <div class="feature-station-address"></div>
+        <div class="feature-station-distance"></div>
       </div>
-      <div class="priceboard-stack">
+      <div class="feature-card-right">
         <div class="priceboard-logo-wrap">
           <img class="priceboard-logo" src="images/default.png" alt="Station logo" />
         </div>
@@ -96,7 +90,6 @@
           <div class="price-slot price-91"></div>
           <div class="price-slot price-95"></div>
           <div class="price-slot price-98"></div>
-          <!-- Only the combined diesel slot, removed the old diesel and premium diesel slots -->
           <div class="price-slot price-diesel-combined"></div>
         </div>
       </div>
