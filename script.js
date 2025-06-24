@@ -302,52 +302,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
   }
 
-  // ---- DIESEL COMBINED LOGIC ----
-  // Helper to render the price board slots for all fuels plus the Diesel/Premium Diesel box
+  // Helper for price slots (legacy, not used in new feature card layout)
   function renderPriceSlots(allPrices) {
-    const fuelSlots = [
-      { slot: "price-e10", id: 12 },
-      { slot: "price-91", id: 2 },
-      { slot: "price-95", id: 5 },
-      { slot: "price-98", id: 8 }
-    ];
-
-    // Render standard slots
-    let html = fuelSlots.map(({slot, id}) => {
-      let value = (allPrices && typeof allPrices[id] !== "undefined" && allPrices[id] !== null)
-        ? (allPrices[id] / 10).toFixed(1)
-        : "N/A";
-      return `<div class="price-slot ${slot}">${value}</div>`;
-    }).join('');
-
-    // Render Diesel/Premium Diesel combined slot
-    html += renderDieselCombinedSlot(allPrices);
-
-    return html;
-  }
-
-  // Diesel/Premium Diesel combined price logic
-  function renderDieselCombinedSlot(allPrices) {
-    let priceValue = null;
-    // Show Premium Diesel if available, else Diesel
-    if (allPrices && typeof allPrices[14] !== "undefined" && allPrices[14] !== null) {
-      priceValue = (allPrices[14] / 10).toFixed(1);
-    } else if (allPrices && typeof allPrices[3] !== "undefined" && allPrices[3] !== null) {
-      priceValue = (allPrices[3] / 10).toFixed(1);
-    }
-    // Only output the price value, not the label
-    return `<div class="price-slot price-diesel-combined">${priceValue !== null ? priceValue : ''}</div>`;
+    // Not used in new overlay layout, but keep for legacy support
+    return '';
   }
 
   function showFeatureCard(site) {
     if (!featureCard) return;
-    featureCard.querySelector('.feature-station-name').innerHTML = `${site.name}<span class="list-distance">${site.distance != null ? site.distance.toFixed(1) + ' km' : ''}</span>`;
-    featureCard.querySelector('.feature-station-address').textContent = `${site.address}${site.suburb ? ', ' + site.suburb : ''}`;
+    // Overlay info block
+    featureCard.querySelector('.feature-station-name').textContent = site.name || '';
+    featureCard.querySelector('.feature-station-address').textContent =
+      (site.address || '') + (site.suburb ? ', ' + site.suburb : '');
+    featureCard.querySelector('.feature-station-distance').textContent =
+      site.distance != null ? site.distance.toFixed(1) + ' km away' : '';
+
+    // Brand logo
     const logoEl = featureCard.querySelector('.priceboard-logo');
     logoEl.src = site.brand ? `images/${site.brand}.png` : 'images/default.png';
     logoEl.onerror = function(){this.onerror=null;this.src='images/default.png';};
-    const wrap = featureCard.querySelector('.priceboard-img-wrap');
-    wrap.innerHTML = `<img src="images/priceboard.png" alt="Price Board" class="priceboard-img"/>${renderPriceSlots(site.allPrices)}`;
+
+    // Fill price slots
+    const allPrices = site.allPrices || {};
+    featureCard.querySelector('.price-slot.price-e10').textContent =
+      typeof allPrices[12] !== 'undefined' ? (allPrices[12]/10).toFixed(1) : '';
+    featureCard.querySelector('.price-slot.price-91').textContent =
+      typeof allPrices[2] !== 'undefined' ? (allPrices[2]/10).toFixed(1) : '';
+    featureCard.querySelector('.price-slot.price-95').textContent =
+      typeof allPrices[5] !== 'undefined' ? (allPrices[5]/10).toFixed(1) : '';
+    featureCard.querySelector('.price-slot.price-98').textContent =
+      typeof allPrices[8] !== 'undefined' ? (allPrices[8]/10).toFixed(1) : '';
+    // Diesel or Premium Diesel
+    let diesel = '';
+    if (typeof allPrices[14] !== 'undefined' && allPrices[14] !== null) {
+      diesel = (allPrices[14]/10).toFixed(1);
+    } else if (typeof allPrices[3] !== 'undefined' && allPrices[3] !== null) {
+      diesel = (allPrices[3]/10).toFixed(1);
+    }
+    featureCard.querySelector('.price-slot.price-diesel-combined').textContent = diesel;
+
+    // Show card
     featureCard.classList.remove('hidden');
     featureCard.style.opacity = '0';
     setTimeout(() => { featureCard.style.opacity = '1'; }, 10);
