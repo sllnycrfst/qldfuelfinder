@@ -92,9 +92,9 @@ html, body {
 /* Brand logo in marker */
 .marker-brand-img {
   position: absolute;
-  left: 5px; top: 5px;
-  width: 26px;
-  height: 26px;
+  left: 10px; top: 20px;
+  width: 30px;
+  height: 30px;
   object-fit: contain;
   border-radius: 50%;
   background: #fff;
@@ -116,13 +116,13 @@ html, body {
 /* Price overlay in marker */
 .marker-price {
   position: absolute;
-  left: 0;
+  left: 2px;
   right: 0;
-  bottom: 10px;
+  bottom: 25px;
   text-align: center;
-  background: rgba(27,65,120,0.90);
+  background: none;
   color: #fff;
-  font-family: 'Quantico', 'Roboto', monospace;
+  font-family: 'Roboto', monospace;
   font-size: 0.85em;
   font-weight: 700;
   padding: 2px 0 1px 0;
