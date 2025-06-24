@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("search");
   const fuelSelect = document.getElementById("fuel-select");
   const featureCard = document.getElementById("feature-card");
-  const closeFeatureCardBtn = document.getElementById("close-feature-card");
+  const closeFeatureCardBtn = document.getElementById("close-feature-card-btn");
 
   let map, markerLayer, userMarker;
   const defaultCenter = [-27.4698, 153.0251];
@@ -54,8 +54,10 @@ document.addEventListener("DOMContentLoaded", () => {
       updateStationList();
     });
   }
-  document.getElementById('zoom-in').onclick = () => map.zoomIn();
-  document.getElementById('zoom-out').onclick = () => map.zoomOut();
+
+  // Zoom controls
+  zoomInBtn && (zoomInBtn.onclick = () => map && map.zoomIn());
+  zoomOutBtn && (zoomOutBtn.onclick = () => map && map.zoomOut());
 
   function showUserLocation(setView) {
     if (!navigator.geolocation) return;
@@ -354,13 +356,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Recenter button
   recenterBtn && recenterBtn.addEventListener("click", () => showUserLocation(true));
 
-  zoomInBtn && zoomInBtn.addEventListener("click", () => {
-    if (map) map.zoomIn();
-  });
-  zoomOutBtn && zoomOutBtn.addEventListener("click", () => {
-    if (map) map.zoomOut();
-  });
-
+  // Close feature card
   closeFeatureCardBtn && closeFeatureCardBtn.addEventListener('click', () => {
     featureCard.classList.add('hidden');
   });
@@ -377,7 +373,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --------- FIXED: LIST PANEL LOGIC ---------
+  // LIST PANEL LOGIC
   if (listBtn && listPanel) {
     listBtn.addEventListener("click", () => {
       const isOpen = listPanel.classList.contains("visible");
@@ -410,7 +406,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateStationList();
   });
   // Default to E10 on load
-  fuelSelect.value = "E10";
+  fuelSelect && (fuelSelect.value = "E10");
   currentFuel = "E10";
 
   // Search suburb/station
