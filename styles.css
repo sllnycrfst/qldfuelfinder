@@ -92,7 +92,7 @@ html, body {
 /* Brand logo in marker */
 .marker-brand-img {
   position: absolute;
-  left: 22px; top: 32px;
+  left: 28px; top: 28px;
   width: 30px;
   height: 30px;
   object-fit: contain;
@@ -116,7 +116,7 @@ html, body {
 /* Price overlay in marker */
 .marker-price {
   position: absolute;
-  left: 4px;
+  left: 10px;
   right: 0;
   bottom: 50px;
   text-align: center;
@@ -137,8 +137,8 @@ html, body {
   line-height: 1.1;
 }
 .marker-price-cheapest {
-  background: #21ea00 !important;
-  color: #183d09 !important;
+  background: none;
+  color: #21ea00 !important;
 }
 
 /* Hide default Leaflet marker shadow (if needed) */
