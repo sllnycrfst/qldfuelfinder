@@ -340,14 +340,15 @@ body {
 #feature-card {
   position: fixed;
   left: 50%;
-  bottom: 40px;
+  bottom: 60px;
   transform: translateX(-50%);
   background: none; /* No background, priceboard will serve as background */
   border-radius: 32px;
   box-shadow: 0 8px 48px rgba(30, 49, 80, 0.13);
-  border: 3px solid #a0522d;
+  border: 0px solid #a0522d;
   padding: 0;
   max-width: 480px;
+  height: 360px;
   width: calc(100% - 32px);
   z-index: 4000;
   display: flex;
