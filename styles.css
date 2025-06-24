@@ -85,8 +85,8 @@ html, body {
 }
 .fuel-marker .marker-stack {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 72px;
+  height: 72px;
 }
 
 /* Brand logo in marker */
@@ -107,8 +107,8 @@ html, body {
   position: absolute;
   left: 5px; top: 5px;
   bottom: 0;
-  width: 26px;
-  height: 26px;
+  width: 72px;
+  height: 72px;
   object-fit: contain;
   z-index: 3;
 }
