@@ -184,9 +184,9 @@ document.addEventListener("DOMContentLoaded", () => {
             <img src="images/mymarker.png" class="custom-marker-img"/>
             <div class="${priceClass} marker-price">
               ${s.price.toFixed(1)}
+            </div>
           </div>
-        </div>
-      `,
+        `,
         iconSize: [72, 72],
         iconAnchor: [36, 72],
         popupAnchor: [0, -72]
@@ -312,8 +312,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!featureCard) return;
     // Overlay info block
     featureCard.querySelector('.feature-station-name').textContent = site.name || '';
-    featureCard.querySelector('.feature-station-address').textContent =
-      (site.address || '') + (site.suburb ? ', ' + site.suburb : '');
+    // Address clickable to Google Maps
+    const addressText = (site.address || '') + (site.suburb ? ', ' + site.suburb : '');
+    const mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(addressText);
+    const addressEl = featureCard.querySelector('.feature-station-address');
+    if (addressEl) {
+      addressEl.textContent = addressText;
+      addressEl.href = mapsUrl;
+    }
     featureCard.querySelector('.feature-station-distance').textContent =
       site.distance != null ? site.distance.toFixed(1) + ' km away' : '';
 
