@@ -334,9 +334,6 @@ body {
   transform: translateX(0);
 }
 
-#list-panel.visible { transform: translateX(0); }
-#list-panel.hidden { transform: translateX(100%); }
-
 #close-list-btn {
   align-self: flex-end;
   background: none;
