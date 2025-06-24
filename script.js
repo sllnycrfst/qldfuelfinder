@@ -266,35 +266,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let featuredHTML = '';
     let others = stations;
-
-    // --- FEATURED STATION: Price Board + Meta Info (horizontal layout) ---
-    let featuredHTML = `
-      <li class="featured-station glass-card" id="featured-station">
-        <div class="feature-meta">
-          <div class="feature-meta-box">
-            <div class="feature-station-name">${featured.name}<span class="list-distance">${featured.distance != null ? featured.distance.toFixed(1) + ' km' : ''}</span></div>
-            <div class="feature-station-address">
-              <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(featured.lat + ',' + featured.lng)}"
-                target="_blank">${featured.address}${featured.suburb ? ', ' + featured.suburb : ''}</a>
-            </div>
-          </div>
-        </div>
-        <div class="priceboard-stack">
-          <div class="priceboard-logo-wrap">
-            <img class="priceboard-logo"
-              src="${featured.brand ? `images/${featured.brand}.png` : 'images/default.png'}"
-              alt="${featured.brand || "Station logo"}"
-              onerror="this.onerror=null;this.src='images/default.png';"
-            />
-          </div>
-          <div class="priceboard-img-wrap">
-            <img src="images/priceboard.png" alt="Price Board" class="priceboard-img"/>
-            ${renderPriceSlots(featured.allPrices)}
-          </div>
-        </div>
-      </li>
-    `;
-
+    
     // --- Other stations as before ---
     let othersHTML = others.map(site => {
       const siteImgSrc = site.brand
