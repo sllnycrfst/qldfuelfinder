@@ -377,28 +377,32 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // List button open/close
-  listBtn && listBtn.addEventListener("click", () => {
-    const isOpen = listPanel.classList.contains("visible");
-    if (isOpen) {
-      // Hide panel, un-press button
+  // --------- FIXED: LIST PANEL LOGIC ---------
+  if (listBtn && listPanel) {
+    listBtn.addEventListener("click", () => {
+      const isOpen = listPanel.classList.contains("visible");
+      if (isOpen) {
+        // Hide panel & un-press button
+        listPanel.classList.remove("visible");
+        listPanel.classList.add("hidden");
+        listBtn.classList.remove("active");
+      } else {
+        // Show panel & press button in
+        listPanel.classList.add("visible");
+        listPanel.classList.remove("hidden");
+        listBtn.classList.add("active");
+        updateStationList && updateStationList();
+      }
+    });
+  }
+  if (closeListBtn && listPanel && listBtn) {
+    closeListBtn.addEventListener("click", () => {
       listPanel.classList.remove("visible");
       listPanel.classList.add("hidden");
       listBtn.classList.remove("active");
-    } else {
-      // Show panel, press button in
-      listPanel.classList.add("visible");
-      listPanel.classList.remove("hidden");
-      listBtn.classList.add("active");
-      updateStationList();
-    }
-  });
-  closeListBtn && closeListBtn.addEventListener("click", () => {
-    listPanel.classList.remove("visible");
-    listPanel.classList.add("hidden");
-    listBtn.classList.remove("active");
-  });
-
+    });
+  }
+  
   // Fuel selector
   fuelSelect && fuelSelect.addEventListener("change", e => {
     currentFuel = e.target.value;
