@@ -405,11 +405,11 @@ html, body {
   position: absolute;
   width: 65px;
   height: 26px;
-  right: 60px;
+  right: 50px;
   font-family: 'Quantico', 'Roboto', monospace;
   font-weight: 500;
-  font-size: 0.8em;
-  letter-spacing: 0.5px;
+  font-size: 0.8em !important;
+  letter-spacing: 0.5px !important;
   text-align: right;
   line-height: 26px;
   color: #ffffff;
