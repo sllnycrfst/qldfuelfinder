@@ -116,7 +116,7 @@ html, body {
 /* Price overlay in marker */
 .marker-price {
   position: absolute;
-  left: 13px;
+  left: 15px;
   right: 0;
   bottom: 50px;
   text-align: center;
