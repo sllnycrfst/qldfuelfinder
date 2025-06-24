@@ -83,7 +83,11 @@ html, body {
 #search:focus, #fuel-select:focus {
   background: rgba(255,255,255,0.75);
 }
-
+.marker-brand-img,
+.custom-marker-img {
+  width: 26px;
+  height: 26px;
+}
 /* --- LIST PANEL & STATION LIST --- */
 #list-panel {
   position: fixed;
