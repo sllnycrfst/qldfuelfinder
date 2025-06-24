@@ -379,13 +379,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // List button open/close
   listBtn && listBtn.addEventListener("click", () => {
-    listPanel.classList.add("visible");
-    listPanel.classList.remove("hidden");
-    updateStationList();
+    const isOpen = listPanel.classList.contains("visible");
+    if (isOpen) {
+      // Hide panel, un-press button
+      listPanel.classList.remove("visible");
+      listPanel.classList.add("hidden");
+      listBtn.classList.remove("active");
+    } else {
+      // Show panel, press button in
+      listPanel.classList.add("visible");
+      listPanel.classList.remove("hidden");
+      listBtn.classList.add("active");
+      updateStationList();
+    }
   });
   closeListBtn && closeListBtn.addEventListener("click", () => {
     listPanel.classList.remove("visible");
     listPanel.classList.add("hidden");
+    listBtn.classList.remove("active");
   });
 
   // Fuel selector
