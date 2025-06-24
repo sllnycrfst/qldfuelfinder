@@ -17,9 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const defaultCenter = [-27.4698, 153.0251];
   const defaultZoom = 14;
 
-  // Fuel order and IDs for board
   const fuelOrder = ["E10", "91", "95", "98", "Diesel/Premium Diesel"];
-  // Map for select values to fuel IDs. 3 = Diesel, 14 = Premium Diesel. 1000 is not used for lookup.
   const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, "Diesel/Premium Diesel": 1000 };
   let currentFuel = "E10";
   let allSites = [];
@@ -27,9 +25,44 @@ document.addEventListener("DOMContentLoaded", () => {
   let priceMap = {};
   let sortBy = "price";
 
-  const bannedStations = [
-    "Stargazers Yarraman"
-  ];
+  const bannedStations = ["Stargazers Yarraman"];
+
+  async function showWeather(lat, lon) {
+    try {
+      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+      const data = await res.json();
+      const weather = data.current_weather;
+      if (!weather) return;
+
+      let description = "Unknown";
+      switch (weather.weathercode) {
+        case 0: description = "Clear ☀️"; break;
+        case 1:
+        case 2:
+        case 3: description = "Partly Cloudy ⛅"; break;
+        case 45:
+        case 48: description = "Foggy 🌫️"; break;
+        case 51:
+        case 53:
+        case 55: description = "Drizzle 🌦️"; break;
+        case 61:
+        case 63:
+        case 65: description = "Rain 🌧️"; break;
+        case 80:
+        case 81:
+        case 82: description = "Showers 🌧️"; break;
+        case 95: description = "Thunderstorm ⛈️"; break;
+        default: description = "Cloudy ☁️";
+      }
+
+      const weatherBox = document.getElementById('weather-box') || document.createElement('div');
+      weatherBox.id = 'weather-box';
+      weatherBox.innerHTML = `${Math.round(weather.temperature)}°C<br>${description}`;
+      document.body.appendChild(weatherBox);
+    } catch (err) {
+      console.error("Failed to fetch weather data:", err);
+    }
+  }
 
   function startApp(center) {
     map = L.map("map", { zoomControl: false, attributionControl: true }).setView(center, defaultZoom);
@@ -54,8 +87,6 @@ document.addEventListener("DOMContentLoaded", () => {
       updateStationList();
     });
   }
-  document.getElementById('zoom-in').onclick = () => map.zoomIn();
-  document.getElementById('zoom-out').onclick = () => map.zoomOut();
 
   function showUserLocation(setView) {
     if (!navigator.geolocation) return;
@@ -72,6 +103,8 @@ document.addEventListener("DOMContentLoaded", () => {
             fillOpacity: 0.85,
             weight: 3,
           }).addTo(map);
+          if (setView && map) map.setView(userLatLng, map.getZoom());
+          showWeather(userLatLng[0], userLatLng[1]);
         }
       },
       err => {
@@ -79,6 +112,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     );
   }
+
+  // ... Rest of your code (unchanged) ...
+});
 
   async function fetchSitesAndPrices() {
     try {
