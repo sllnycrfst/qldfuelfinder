@@ -361,6 +361,9 @@ html, body {
   transition: opacity 0.2s ease;
   overflow: hidden;
 }
+.hidden {
+  display: none !important;
+}
 .feature-card-inner {
   position: relative;
   width: 100%;
