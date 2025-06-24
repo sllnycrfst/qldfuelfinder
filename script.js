@@ -264,8 +264,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    let featured = stations[0];
-    let others = stations.slice(1);
+    let featuredHTML = '';
+    let others = stations;
 
     // --- FEATURED STATION: Price Board + Meta Info (horizontal layout) ---
     let featuredHTML = `
