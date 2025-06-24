@@ -92,7 +92,7 @@ html, body {
 /* Brand logo in marker */
 .marker-brand-img {
   position: absolute;
-  left: 28px; top: 28px;
+  left: 27px; top: 29px;
   width: 30px;
   height: 30px;
   object-fit: contain;
@@ -116,7 +116,7 @@ html, body {
 /* Price overlay in marker */
 .marker-price {
   position: absolute;
-  left: 10px;
+  left: 12px;
   right: 0;
   bottom: 50px;
   text-align: center;
