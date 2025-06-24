@@ -39,10 +39,10 @@
     <div id="map"></div>
 
     <!-- Side Controls -->
-      <div class="side-controls">
-        <button id="list-btn" title="Show station list" class="list-btn glass-btn" aria-label="Show station list">
-          <span aria-hidden="true">☰</span>
-        </button>
+    <div class="side-controls">
+      <button id="list-btn" title="Show station list" class="list-btn glass-btn" aria-label="Show station list">
+        <span aria-hidden="true">☰</span>
+      </button>
       <div class="custom-zoom-rect">
         <button id="zoom-in" aria-label="Zoom in">+</button>
         <div class="zoom-divider"></div>
@@ -58,7 +58,6 @@
         </svg>
       </button>
     </div>
-  <!-- Slide-up List Panel (Outside wrapper if sliding up over whole screen) -->
   </div>
 
   <!-- Slide from left Panel -->
@@ -73,24 +72,26 @@
 
   <!-- Feature Card (as a popup/modal or panel, not always visible) -->
   <div id="feature-card" class="feature-card hidden" role="dialog" aria-modal="true">
-  <button id="close-feature-card-btn" title="Close">&times;</button>
-  <div class="feature-card-inner">
-    <img src="images/priceboard.png" alt="Price Board" class="priceboard-img-bg" />
-    <div class="feature-card-overlay">
-      <div class="feature-station-name"></div>
-      <div class="feature-station-address"></div>
-      <div class="feature-station-distance"></div>
+    <button id="close-feature-card-btn" title="Close">&times;</button>
+    <div class="feature-card-inner">
+      <img src="images/priceboard.png" alt="Price Board" class="priceboard-img-bg" />
+      <div class="priceboard-absolute-wrap">
+        <div class="priceboard-logo-wrap">
+          <img class="priceboard-logo" src="images/default.png" alt="Station logo" />
+        </div>
+        <div class="price-slot price-e10"></div>
+        <div class="price-slot price-91"></div>
+        <div class="price-slot price-95"></div>
+        <div class="price-slot price-98"></div>
+        <div class="price-slot price-diesel-combined"></div>
+      </div>
+      <div class="feature-card-overlay">
+        <div class="feature-station-name"></div>
+        <div class="feature-station-address"></div>
+        <div class="feature-station-distance"></div>
+      </div>
     </div>
-    <div class="priceboard-logo-wrap">
-      <img class="priceboard-logo" src="images/default.png" alt="Station logo" />
-    </div>
-    <div class="price-slot price-e10"></div>
-    <div class="price-slot price-91"></div>
-    <div class="price-slot price-95"></div>
-    <div class="price-slot price-98"></div>
-    <div class="price-slot price-diesel-combined"></div>
   </div>
-</div>
   <!-- Scripts -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="script.js"></script>
