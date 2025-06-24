@@ -486,18 +486,18 @@ body {
     border-radius: 11px;
   }
   .priceboard-logo-wrap {
-    top: 10px;
-    right: 12px;
-    width: 36px;
-    height: 36px;
+    top: 40px;
+    right: 32px;
+    width: 40px;
+    height: 40px;
   }
   .price-slot {
-    right: 20px;
+    right: 30px;
     font-size: 0.7em;
   }
-  .price-e10            { top: 130px;  }
-  .price-91             { top: 150px;  }
-  .price-95             { top: 170px;  }
-  .price-98             { top: 190px;  }
+  .price-e10            { top: 120px;  }
+  .price-91             { top: 138px;  }
+  .price-95             { top: 156px;  }
+  .price-98             { top: 184px;  }
   .price-diesel-combined{ top: 210px; }
 }
