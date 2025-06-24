@@ -340,7 +340,7 @@ body {
 #feature-card {
   position: fixed;
   left: 50%;
-  bottom: 60px;
+  bottom: 50px;
   transform: translateX(-50%);
   background: none; /* No background, priceboard will serve as background */
   border-radius: 32px;
@@ -348,7 +348,7 @@ body {
   border: 0px solid #a0522d;
   padding: 0;
   max-width: 480px;
-  height: 360px;
+  min-height: 300px;
   width: calc(100% - 32px);
   z-index: 4000;
   display: flex;
@@ -384,6 +384,7 @@ body {
 /* The priceboard image covers the card as a background */
 .priceboard-img-bg {
   position: absolute;
+  min-height: 300px;
   top: 0; left: 0; width: 100%; height: 100%;
   object-fit: cover;
   z-index: 0;
