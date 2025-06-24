@@ -307,25 +307,33 @@ body {
 
 /* Slide in list panel from the right */
 #list-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 350px;
+  height: 100vh;
+  box-shadow: 2px 0 12px rgba(0,0,0,0.15);
+  transform: translateX(-100%);
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  z-index: 1000;
   display: flex;
   flex-direction: column;
-  position: fixed;
   top: 100px;
   bottom: 0;
   right: 0;
-  width: 320px;
   max-width: 100vw;
   background: rgba(255,255,255,0.55) !important;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border-radius: 20px 0 0 20px !important;
-  box-shadow: -4px 0 24px rgba(46,54,80,0.12);
   border: 2.0px solid rgba(56,124,194,0.08) !important;
-  z-index: 2000;
-  transition: transform 0.3s cubic-bezier(.4,0,.2,1);
-  transform: translateX(100%);
   font-family: 'Roboto', Arial, sans-serif !important;
 }
+
+#list-panel.open {
+  transform: translateX(0);
+}
+
 #list-panel.visible { transform: translateX(0); }
 #list-panel.hidden { transform: translateX(100%); }
 
