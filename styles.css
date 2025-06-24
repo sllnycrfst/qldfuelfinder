@@ -480,6 +480,18 @@ body {
   padding-left: 8px;
 }
 
+#close-feature-card-btn {
+  align-self: flex-end;
+  background: none;
+  border: none;
+  font-size: 2em;
+  color: #387cc2;
+  margin: 8px 18px 0 0;
+  cursor: pointer;
+  z-index: 1;
+  font-family: 'Roboto', Arial, sans-serif !important;
+}
+
 .list-logo { margin-right: 10px; }
 .list-name { flex: 1; }
 .list-distance {
@@ -515,17 +527,19 @@ body {
 
 #feature-card {
   position: fixed;
+  margin-left: 16px;
+  margin-right: 16px;
   left: 50%;
   bottom: 40px;
   transform: translateX(-50%);
   background: rgba(255, 255, 255, 0.55);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-radius: 24px;
+  border-radius: 40px;
   box-shadow: 0 8px 48px rgba(30, 49, 80, 0.13);
-  border: 1.5px solid rgba(200, 200, 200, 0.2);
+  border: 2.5px solid rgba(200, 200, 200, 0.2);
   padding: 20px;
-  max-width: 720px;
+  max-width: 400px;
   width: calc(100% - 32px);
   z-index: 4000;
   display: flex;
