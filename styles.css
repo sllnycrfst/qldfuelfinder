@@ -85,8 +85,8 @@ html, body {
 }
 .fuel-marker .marker-stack {
   position: relative;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
 }
 
 /* Brand logo in marker */
@@ -110,7 +110,7 @@ html, body {
   width: 26px;
   height: 26px;
   object-fit: contain;
-  z-index: 1;
+  z-index: 3;
 }
 
 /* Price overlay in marker */
@@ -128,7 +128,7 @@ html, body {
   padding: 2px 0 1px 0;
   border-radius: 4px;
   letter-spacing: 0.1em;
-  z-index: 3;
+  z-index: 4;
   pointer-events: none;
   box-shadow: 0 1px 3px rgba(30,49,80,0.11);
   min-width: 34px;
