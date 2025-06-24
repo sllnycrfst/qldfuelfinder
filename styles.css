@@ -27,12 +27,11 @@ html, body {
 /* --- SEARCH BAR --- */
 .search-bar-glass {
   position: absolute;
-  top: 28px;
+  top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  width: 100%;
+  width: 350px;
   max-width: 700px;
-  min-width: 300px;
   display: flex;
   align-items: center;
   gap: 0.5em;
