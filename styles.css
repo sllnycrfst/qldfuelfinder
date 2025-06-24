@@ -92,9 +92,9 @@ html, body {
 /* Brand logo in marker */
 .marker-brand-img {
   position: absolute;
-  left: 27px; top: 29px;
-  width: 30px;
-  height: 30px;
+  left: 26px; top: 29px;
+  width: 28px;
+  height: 28px;
   object-fit: contain;
   border-radius: 50%;
   background: #fff;
