@@ -311,7 +311,58 @@ body {
   border-radius: 1px;
 }
 
-
+#list {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 12px 0;
+  background: transparent;
+}
+#list li {
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(56,124,194,0.13); /* transparent blue line */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.05em;
+  background: transparent;
+  font-family: 'Roboto', Arial, sans-serif !important;
+}
+.list-logo img {
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  /* Remove any background */
+  background: none !important;
+  box-shadow: none !important;
+}
+.list-name {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.list-station-name {
+  font-weight: 500;
+  color: #265786;
+  line-height: 1.1;
+}
+.list-distance {
+  font-size: 0.86em;
+  color: #666;
+  margin-top: 2px;
+  display: block;
+}
+.list-price {
+  font-weight: bold;
+  color: #387cc2;
+}
+#list li.list-station {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+#list li.list-station:hover {
+  background: rgba(232,247,255,0.18);
+}
 #list-panel {
   position: fixed;
   top: 100px;
@@ -420,12 +471,12 @@ body {
 /* Brand logo as overlay (top right, above priceboard) */
 .priceboard-logo-wrap {
   position: absolute;
-  top: 18px;
-  right: 26px;
-  width: 52px;
-  height: 52px;
-  background: #fff;
-  border-radius: 50%;
+  top: 30px;
+  right: 50px;
+  width: 58px;
+  height: 58px;
+  background: none;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -492,12 +543,12 @@ body {
     height: 40px;
   }
   .price-slot {
-    right: 30px;
-    font-size: 0.7em;
+    right: 50px;
+    font-size: 0.8em;
   }
-  .price-e10            { top: 120px;  }
-  .price-91             { top: 138px;  }
-  .price-95             { top: 156px;  }
-  .price-98             { top: 184px;  }
+  .price-e10            { top: 110px;  }
+  .price-91             { top: 130px;  }
+  .price-95             { top: 153px;  }
+  .price-98             { top: 182px;  }
   .price-diesel-combined{ top: 210px; }
 }
