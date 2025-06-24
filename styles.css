@@ -312,22 +312,18 @@ body {
 }
 
 
-/* Slide in list panel from the right */
 #list-panel {
   position: fixed;
-  top: 0;
+  top: 100px;
   left: 0;
   width: 350px;
-  height: 100vh;
+  height: calc(100vh - 100px);
   box-shadow: 2px 0 12px rgba(0,0,0,0.15);
   transform: translateX(-100%);
   transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  top: 100px;
-  bottom: 0;
-  right: 0;
   max-width: 100vw;
   background: rgba(255,255,255,0.55) !important;
   backdrop-filter: blur(8px);
@@ -336,207 +332,11 @@ body {
   border: 2.0px solid rgba(56,124,194,0.08) !important;
   font-family: 'Roboto', Arial, sans-serif !important;
 }
-
-#list-panel.open {
+#list-panel.visible {
   transform: translateX(0);
 }
 
-#close-list-btn {
-  align-self: flex-end;
-  background: none;
-  border: none;
-  font-size: 2em;
-  color: #387cc2;
-  margin: 8px 18px 0 0;
-  cursor: pointer;
-  z-index: 1;
-  font-family: 'Roboto', Arial, sans-serif !important;
-}
-
-/* Sort toggle pill */
-.sort-toggle {
-  min-width: 64px;       /* or whatever “normal” is */
-  height: 24px;
-  font-size: 1.07em;
-  padding: 0 14px;
-  border-radius: 14px;
-  transition: background 0.13s;
-  /* Add these to lock font and spacing */
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 500;
-  box-sizing: border-box;
-}
-
-.sort-toggle button {
-  flex: 1 1 50%;
-  border: none;
-  background: transparent;
-  color: #387cc2;
-  padding: 6px 12px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.sort-toggle button.active {
-  background: rgba(56,124,194,0.2);
-}
-
-#list {
-  flex: 1 1 auto;
-  overflow-y: auto;
-  min-height: 0;
-  list-style: none;
-  margin: 0;
-  padding: 0 0 12px 0;
-  background: transparent;
-  overflow-y: auto;
-  font-family: 'Roboto', Arial, sans-serif !important;
-}
-
-#list li {
-  padding: 12px 20px;
-  border-bottom: 1px solid #eee;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 1.05em;
-  background: transparent;
-  font-family: 'Roboto', Arial, sans-serif !important;
-}
-
-#list li.featured-station {
-  display: none !important;
-}
-
-.featurestation-img {
-  flex: 0 0 30%;
-  transform: scale(0.5);
-  transform-origin: left center;
-  max-width: 200px !important;
-  min-width: 100px !important;
-  height: 100%;
-  min-height: 160px;
-  object-fit: contain;
-  display: block;
-  align-self: stretch;
-  border-radius: 20px;
-}
-
-.featured-details {
-  flex: 1 1 75%;
-  padding: 28px 32px 20px 32px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-width: 0;
-}
-
-.featured-name {
-  padding: 28px 32px 20px 32px;
-  font-size: 1.18em;
-  font-weight: bold;
-  margin-bottom: 0.2em;
-  font-family: 'Roboto', Arial, sans-serif !important;
-}
-
-.featured-address {
-  font-size: 0.97em;
-  color: #666;
-  margin-bottom: 0.7em;
-  word-break: break-word;
-  font-family: 'Roboto', Arial, sans-serif !important;
-}
-
-.featured-address a {
-  color: #387cc2;
-  text-decoration: none;
-}
-
-.featured-address a:hover {
-  text-decoration: underline;
-}
-
-.featured-prices {
-  margin-top: 8px;
-  font-weight: 500;
-  font-family: 'Roboto', Arial, sans-serif !important;
-}
-
-.featured-prices .price-row {
-  font-size: 1em;
-  margin-bottom: 2px;
-  margin-right: 4px;
-  line-height: 1.18;
-  font-weight: 600;
-  font-family: 'Roboto', Arial, sans-serif !important;
-}
-
-.featured-prices .fuel-type {
-  color: #888;
-  min-width: 3.5em;
-  display: inline-block;
-  font-weight: 500;
-}
-.featured-prices .fuel-type.Diesel {
-  color: #888;
-  font-weight: 700;
-}
-.featured-prices .fuel-type.selected {
-  color: #387cc2;
-  font-weight: 600;
-}
-.featured-prices .fuel-price {
-  color: #222;
-  font-weight: 700 !important;
-  padding-left: 8px;
-}
-
-#close-feature-card-btn {
-  align-self: flex-end;
-  background: none;
-  border: none;
-  font-size: 2em;
-  color: #387cc2;
-  margin: 8px 18px 0 0;
-  cursor: pointer;
-  z-index: 1;
-  font-family: 'Roboto', Arial, sans-serif !important;
-}
-
-.list-logo { margin-right: 10px; }
-.list-name { flex: 1; }
-.list-distance {
-  font-size: 0.8em;
-  color: #666;
-  display: block;
-  margin-top: 2px;
-}
-.list-price {
-  font-weight: bold;
-  font-family: 'Roboto', Arial, sans-serif !important;
-  color: #387cc2;
-}
-
-#list li.list-station {
-  cursor: pointer;
-  transition: background 0.15s;
-}
-#list li.list-station:hover {
-  background: rgba(232, 247, 255, 0.27);
-}
-
-/* ---- FEATURE CARD & PRICE BOARD - Horizontal Layout ---- */
-.feature-meta-box {
-  background: rgba(56, 124, 194, 0.13); /* semi-transparent blue */
-  border: 0px solid #387cc2 !important;
-  border-radius: 14px;
-  padding: 10px 18px 10px 18px;
-  box-shadow: 0 2px 14px rgba(56, 124, 194, 0.07);
-  width: 100%;
-  box-sizing: border-box;
-}
-
+/* ---- FEATURE CARD FLEX LAYOUT ---- */
 #feature-card {
   position: fixed;
   margin-left: 16px;
@@ -544,14 +344,14 @@ body {
   left: 50%;
   bottom: 40px;
   transform: translateX(-50%);
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.90);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-radius: 40px;
   box-shadow: 0 8px 48px rgba(30, 49, 80, 0.13);
-  border: 2.5px solid rgba(200, 200, 200, 0.2);
-  padding: 20px;
-  max-width: 400px;
+  border: 3px solid #a0522d;
+  padding: 0;
+  max-width: 480px;
   width: calc(100% - 32px);
   z-index: 4000;
   display: flex;
@@ -559,123 +359,137 @@ body {
   font-family: 'Roboto', Arial, sans-serif;
   transition: opacity 0.2s ease;
 }
-
 #feature-card.hidden {
   display: none;
 }
 
-#feature-card img {
-  max-width: 100%;
-  border-radius: 12px;
-  margin-top: 12px;
-}
-
-#feature-card h2,
-#feature-card p {
-  margin: 0;
-  padding: 0;
-  color: #1a1a1a;
-}
-
 .feature-card-inner {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
+  flex-direction: row;
+  gap: 0;
+  height: 100%;
+  min-height: 176px;
+  padding: 18px 24px 18px 24px;
 }
 
-.feature-meta {
+.feature-card-left {
+  flex: 1 1 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  text-align: left;
-  width: 100%;
-  padding: 0;
-  box-sizing: border-box;
+  min-width: 0;
+  gap: 8px;
+  padding-right: 12px;
 }
-
 .feature-station-name {
-  font-size: 1.2em;
+  font-size: 1.27em;
   font-weight: bold;
   color: #387cc2;
-  margin-top: 5px ;
+  margin: 0;
+  line-height: 1.25;
 }
-
 .feature-station-address {
-  font-size: 0.9em;
+  font-size: 1em;
   color: #387cc2;
+  margin: 0;
+  line-break: anywhere;
   word-break: break-word;
 }
+.feature-station-distance {
+  font-size: 0.98em;
+  color: #5a5a5a;
+  margin: 0;
+  margin-top: 6px;
+  font-weight: 500;
+}
 
-.priceboard-stack {
-  top: -70px !important;
-  width: 160px !important;
-  max-width: 160px !important;
-  flex: 0 0 160px !important;
+.feature-card-right {
+  flex: 0 0 160px;
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.priceboard-img-wrap,
-.priceboard-img {
-  top: -70px !important;
-  width: 160px !important;
-  max-width: 160px !important;
-  height: auto;
-}
-
-.priceboard-img-wrap {
-  position: relative;
+  justify-content: center;
+  gap: 8px;
 }
 
 .priceboard-logo-wrap {
-  width: 60px;
-  height: 60px;
+  width: 64px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 0px;
-  margin-bottom: 0;
-  padding: 0;
+  margin-bottom: 8px;
+  margin-top: 0;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 6px rgba(56,124,194,0.10);
 }
-
 .priceboard-logo {
   max-width: 90%;
   max-height: 90%;
   object-fit: contain;
-  background: none;
-  border-radius: 0;
-  top: 50px;
-  box-shadow: none;
-  z-index: 5;
-} /* <-- this bracket was missing before! */
+}
+
+.priceboard-img-wrap {
+  position: relative;
+  width: 120px;
+  height: 180px;
+}
+.priceboard-img {
+  width: 120px;
+  height: 180px;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(30,49,80,0.06);
+}
 
 .price-slot {
   position: absolute;
-  width: 60px;
-  height: 24px;
-  right: 38px !important;
-  background: transparent;
-  color: #ffaa78;
+  width: 65px;
+  height: 26px;
+  right: 14px;
   font-family: 'Quantico', 'Roboto', monospace;
   font-weight: 500;
-  font-size: 0.9em;
+  font-size: 1em;
   letter-spacing: 0.5px;
   text-align: right;
-  line-height: 90px;
+  line-height: 26px;
   pointer-events: none;
   user-select: none;
-  letter-spacing: 1px;
   transition: color 0.2s;
+  color: #ffaa78;
+  background: transparent;
 }
+.price-e10            { top: 32px;  }
+.price-91             { top: 58px;  }
+.price-95             { top: 84px;  }
+.price-98             { top: 110px; }
+.price-diesel-combined{ top: 136px; }
 
 .price-slot.cheapest {
   color: #21ea00 !important;
 }
 
-.price-e10            { top: 41px;  }
-.price-91             { top: 67px;  }
-.price-95             { top: 92px;  }
-.price-98             { top: 117px; }
-.price-diesel-combined{ top: 142px; }
+@media (max-width: 600px) {
+  #feature-card {
+    max-width: 98vw;
+    padding: 0;
+    border-radius: 18px;
+  }
+  .feature-card-inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 14px 6px 10px 10px;
+  }
+  .feature-card-left {
+    padding-right: 0;
+    padding-bottom: 8px;
+  }
+  .feature-card-right {
+    flex: 0 0 auto;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding-bottom: 8px;
+  }
+}
