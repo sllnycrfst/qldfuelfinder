@@ -447,8 +447,8 @@ body {
 .price-slot {
   position: absolute;
   width: 75px;
-  height: 28px;
-  right: 48px;
+  height: 48px;
+  right: 56px;
   font-family: 'Quantico', 'Roboto', monospace;
   font-weight: 500;
   font-size: 0.9em;
@@ -461,11 +461,11 @@ body {
   z-index: 2;
   pointer-events: none;
 }
-.price-e10            { top: 144px;  }
-.price-91             { top: 172px;  }
-.price-95             { top: 200px; }
-.price-98             { top: 228px; }
-.price-diesel-combined{ top: 256px; }
+.price-e10            { top: 120px;  }
+.price-91             { top: 135px;  }
+.price-95             { top: 150px; }
+.price-98             { top: 165px; }
+.price-diesel-combined{ top: 180px; }
 .price-slot.cheapest { color: #21ea00 !important; }
 
 /* Brand logo as overlay (top right, above priceboard) */
@@ -536,19 +536,24 @@ body {
     max-width: 88vw;
     border-radius: 11px;
   }
+  .priceboard-logo {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  }
   .priceboard-logo-wrap {
-    top: 40px;
-    right: 32px;
+    top: 50px;
+    right: 42px;
     width: 40px;
     height: 40px;
   }
   .price-slot {
-    right: 50px;
+    right: 45px;
     font-size: 0.8em;
   }
-  .price-e10            { top: 110px;  }
-  .price-91             { top: 130px;  }
-  .price-95             { top: 153px;  }
-  .price-98             { top: 182px;  }
-  .price-diesel-combined{ top: 210px; }
+  .price-e10            { top: 125px;  }
+  .price-91             { top: 146px;  }
+  .price-95             { top: 167px;  }
+  .price-98             { top: 188px;  }
+  .price-diesel-combined{ top: 209px; }
 }
