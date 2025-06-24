@@ -187,9 +187,9 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         </div>
       `,
-        iconSize: [72, 72],
-        iconAnchor: [36, 72],
-        popupAnchor: [0, -72]
+        iconSize: [36, 36],
+        iconAnchor: [18, 36],
+        popupAnchor: [0, -36]
       });
       markerLayer.addLayer(
         L.marker([s.lat, s.lng], {
