@@ -243,6 +243,13 @@ body {
   background: rgba(232, 247, 255, 0.8) !important;
 }
 
+#list-btn.active {
+  background: #e6f0fa;
+  box-shadow: inset 0 2px 8px rgba(56,124,194,0.18);
+  color: #265786;
+  border-left: 4px solid #387cc2;
+}
+
 .side-controls {
   position: fixed;
   top: 80px;          /* Top right! */
