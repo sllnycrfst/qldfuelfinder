@@ -415,6 +415,7 @@ html, body {
   z-index: 0;
   pointer-events: none;
   user-select: none;
+  border: 1px #fff !important;
 }
 .priceboard-absolute-wrap {
   position: absolute;
