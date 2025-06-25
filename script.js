@@ -361,16 +361,32 @@ document.addEventListener("DOMContentLoaded", () => {
     featureCard.classList.add('hidden');
   });
 
+  // --- SLIDING TOGGLE LOGIC ---
   if (sortToggle) {
+    const slider = sortToggle.querySelector('.sort-toggle-slider');
+    const buttons = sortToggle.querySelectorAll("button");
+
+    function moveSlider() {
+      const activeIndex = sortBy === "distance" ? 1 : 0;
+      if (slider) {
+        slider.style.transform = `translateX(${activeIndex * 100}%)`;
+      }
+    }
+
     sortToggle.addEventListener("click", e => {
       if (e.target.tagName === "BUTTON") {
         sortBy = e.target.getAttribute("data-sort");
-        Array.from(sortToggle.querySelectorAll("button")).forEach(btn => {
+        buttons.forEach(btn => {
           btn.classList.toggle("active", btn === e.target);
+          btn.setAttribute("aria-pressed", btn === e.target ? "true" : "false");
         });
-        updateStationList();
+        moveSlider();
+        updateStationList && updateStationList();
       }
     });
+
+    // On load, ensure the slider is in the correct position
+    moveSlider();
   }
 
   // LIST PANEL LOGIC
