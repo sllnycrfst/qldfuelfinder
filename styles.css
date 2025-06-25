@@ -364,8 +364,8 @@ html, body {
   color: #387cc2;
   font-size: 1.1em;
   font-weight: bold;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   cursor: pointer;
   outline: none;
   transition: background 0.13s, color 0.13s;
@@ -375,10 +375,9 @@ html, body {
   justify-content: center;
   padding: 0;
 }
-.custom-zoom-rect button:focus { background: rgba(56,124,194,0.13); }
 .custom-zoom-rect button:hover { background: rgba(56,124,194,0.17); color: #17486c; }
 .zoom-divider {
-  width: 80%;
+  width: 70%;
   margin: 0 auto;
   height: 1px;
   background: rgba(56,124,194,0.11);
