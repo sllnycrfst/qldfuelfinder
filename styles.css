@@ -417,16 +417,15 @@ html, body {
 }
 .priceboard-logo-wrap {
   position: absolute;
-  top: 36px;
-  right: 40px;
-  width: 48px;
-  height: 48px;
+  top: 42px;
+  right: 46px;
+  width: 46px;
+  height: 46px;
   background: none;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 6px rgba(56,124,194,0.10);
 }
 .priceboard-logo {
   max-width: 90%;
@@ -496,8 +495,8 @@ html, body {
 }
 #close-feature-card-btn {
   position: absolute;
-  top: 4px;
-  right: 6px;
+  top: 6px !important;
+  right: 6px !important;
   background: none;
   border: none;
   font-size: 2em;
