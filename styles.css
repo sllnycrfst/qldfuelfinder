@@ -182,20 +182,19 @@ html, body {
   z-index: 1;
 }
 .sort-toggle {
+  position: relative;
+  display: inline-flex;
+  background: #f6f6f6;
+  border-radius: 26px;
+  border: 1px solid #fff !important;
   min-width: 120px;
   height: 44px;
-  font-size: 1.25em;
-  padding: 0 8px;
-  border-radius: 22px;
-  transition: background 0.13s;
-  display: inline-flex;
+  font-size: 1.1em;
   align-items: center;
-  justify-content: center;
-  font-weight: 500;
   box-sizing: border-box;
-  background: #ededed;
-  border: none;
-  gap: 0;
+  padding: 0;
+  overflow: hidden;
+}
   /* Soft shadow for elevated effect, optional: */
   /* box-shadow: 0 2px 4px rgba(0,0,0,0.03); */
 }
@@ -203,7 +202,7 @@ html, body {
 .sort-toggle button {
   flex: 1 1 50%;
   border: none;
-  background: transparent;
+  background: none;
   color: #090909;
   padding: 0;
   margin: 0;
@@ -212,13 +211,28 @@ html, body {
   cursor: pointer;
   border-radius: 22px;
   height: 36px;
-  transition: background 0.13s, color 0.13s;
+  transition: color 0.13s;
+  position: relative;
+  z-index: 1;
 }
 
-.sort-toggle button.active {
+.sort-toggle-slider {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: calc(50% - 8px);
+  height: calc(100% - 8px);
   background: #fff;
-  color: #090909;
+  border: 1px solid #fff !important;
+  border-radius: 18px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  transition: transform 0.2s cubic-bezier(.4,0,.2,1);
+  z-index: 0;
+}
+
+.sort-toggle .active {
+  color: #090909;
+  z-index: 1;
 }
 
 #list {
