@@ -133,14 +133,14 @@ html, body {
 /* Price overlay in marker */
 .marker-price {
   position: absolute;
-  left: 14px;
+  left: 13px;
   right: 0;
-  bottom: 49px;
+  bottom: 48px;
   text-align: center;
   background: none;
   color: #fff;
   font-family: 'Quantico', 'Roboto', monospace;
-  font-size: 0.89em;
+  font-size: 0.86em;
   font-weight: 500;
   padding: 2px 0 1px 0;
   border-radius: 4px;
@@ -353,7 +353,7 @@ html, body {
   margin: 0;
 }
 .custom-zoom-rect button {
-  background: none;
+  background: rgba(255,255,255,0.55) !important;
   border: none;
   color: #090909;
   font-size: 1.1em;
