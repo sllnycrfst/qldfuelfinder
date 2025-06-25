@@ -61,14 +61,14 @@ html, body {
   font-size: 1.1em;
   padding: 10px 0 10px 0;
   outline: none;
-  color: #387cc2 !important;
+  color: #bababc !important;
   min-width: 120px;
 }
-#search::placeholder { color: #090909 !important; opacity: 1; }
+#search::placeholder { color: #bababc !important; opacity: 1; }
 .divider {
   margin: 10px 10px;
-  color: #090909 !important;
-  font-size: 1.5em;
+  color: #bababc !important;
+  font-size: 1em;
   user-select: none;
 }
 #fuel-select {
