@@ -184,8 +184,8 @@ html, body {
 .sort-toggle {
   min-width: 64px;
   height: 28px;
-  font-size: 1.3em !important;
-  padding: 0 14px;
+  font-size: 1.1em !important;
+  padding: 0 6px;
   border-radius: 14px !important;
   transition: background 0.13s;
   display: inline-flex;
