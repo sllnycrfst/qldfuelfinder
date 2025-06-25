@@ -44,16 +44,26 @@ html, body {
   z-index: 999;
 }
 
-.search-icon, .fuel-icon {
+.search-icon {
   display: flex;
   align-items: center;
-  font-size: 1.3em;
-  color: #387cc2;
+  font-size: 1.2em;
+  color: #bababc;
   height: 24px;
   margin-right: 7px;
   margin-left: 4px;
 }
-.fuel-icon { font-size: 1.2em; height: 22px; margin-right: 6px; }
+
+.fuel-icon {
+  display: flex;
+  align-items: center;
+  font-size: 1.2em;
+  color: #bababc;
+  height: 24px;
+  margin-right: 7px;
+  margin-left: 4px;
+}
+
 #search {
   flex: 1 1 0;
   border: none;
@@ -123,7 +133,7 @@ html, body {
   text-align: center;
   background: none;
   color: #fff;
-  font-family: 'Roboto', monospace;
+  font-family: 'Quantico', 'Roboto', monospace;
   font-size: 0.89em;
   font-weight: 700;
   padding: 2px 0 1px 0;
@@ -301,7 +311,7 @@ html, body {
   background: rgba(255,255,255,0.55) !important;
   backdrop-filter: blur(8px);
   border-radius: 50% !important;
-  border: none !important;
+  border: 1px #fff !important;
   box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
   color: #387cc2 !important;
   display: flex;
