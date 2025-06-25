@@ -35,7 +35,7 @@ html, body {
   display: flex;
   align-items: center;
   gap: 0.5em;
-  background: #f6f6f6;
+  background: none;
   box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
   border: 1px #fff !important;
   backdrop-filter: blur(8px);
@@ -117,9 +117,9 @@ html, body {
 /* Price overlay in marker */
 .marker-price {
   position: absolute;
-  left: 15px;
+  left: 14px;
   right: 0;
-  bottom: 50px;
+  bottom: 49px;
   text-align: center;
   background: none;
   color: #fff;
@@ -290,11 +290,11 @@ html, body {
 /* --- MAP CONTROLS & BUTTONS --- */
 .side-controls {
   position: fixed;
-  top: 120px;
+  top: 140px;
   right: 16px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 28px;
   z-index: 1003;
 }
 .glass-btn {
