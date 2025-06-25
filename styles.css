@@ -73,6 +73,7 @@ html, body {
   outline: none;
   color: #bababc !important;
   min-width: 120px;
+  border: 1px #fff !important;
 }
 #search::
   placeholder {
