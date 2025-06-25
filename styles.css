@@ -439,8 +439,8 @@ html, body {
   right: 52px;
   font-family: 'Quantico', 'Roboto', monospace;
   font-weight: 500;
-  font-size: 0.7em !important;
-  letter-spacing: 0.2px !important;
+  font-size: 0.65em !important;
+  letter-spacing: 0.1px !important;
   text-align: right;
   line-height: 26px;
   color: #ffffff;
