@@ -43,6 +43,7 @@ html, body {
   padding: 0 12px;
   z-index: 999;
 }
+
 .search-icon, .fuel-icon {
   display: flex;
   align-items: center;
@@ -319,7 +320,7 @@ html, body {
   padding: 0;
   font-family: 'Roboto', Arial, sans-serif !important;
   box-shadow: 0 2px 12px rgba(56,124,194,0.12) !important;
-  border: 2px solid rgba(56,124,194,0.08) !important;
+  border: 1px solid #fff !important;
 }
 .list-btn:hover, .recenter-btn:hover {
   background: rgba(232, 247, 255, 0.8) !important;
@@ -338,8 +339,8 @@ html, body {
   box-shadow: 0 2px 12px rgba(56,124,194,0.12);
   border-radius: 14px;
   overflow: hidden;
-  width: 28px;
-  border: 2px solid rgba(56,124,194,0.08) !important;
+  width: 40px;
+  border: 1px solid #fff !important;
   background: rgba(255,255,255,0.55) !important;
   backdrop-filter: blur(2px) !important;
   padding: 0;
