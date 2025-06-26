@@ -1,6 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
   // UI controls
   const recenterBtn = document.getElementById("recenter-btn");
+  const listBtn = document.getElementById("list-btn");
+  const listPanel = document.getElementById("list-panel");
+  const closeListBtn = document.getElementById("close-list-btn");
   const listUl = document.getElementById("list");
   const zoomInBtn = document.getElementById("zoom-in");
   const zoomOutBtn = document.getElementById("zoom-out");
@@ -8,56 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("search");
   const fuelSelect = document.getElementById("fuel-select");
   const featureCard = document.getElementById("feature-card");
-  const closeFeatureCardBtn = document.getElementById("close-feature-card-btn");
-  const listBtn = document.getElementById("list-btn");
-  const listPanel = document.getElementById("list-panel");
-  const closeListBtn = document.getElementById("close-list-btn");
-  const sortToggle = document.getElementById("sort-toggle");
-
-  // Open/close the list panel with the hamburger button
-  listBtn && listBtn.addEventListener("click", () => {
-    const isOpen = listPanel.classList.contains("visible");
-    if (isOpen) {
-      listPanel.classList.remove("visible");
-      listPanel.classList.add("hidden");
-      listBtn.classList.remove("active");
-    } else {
-      listPanel.classList.add("visible");
-      listPanel.classList.remove("hidden");
-      listBtn.classList.add("active");
-      updateStationList && updateStationList();
-    }
-  });
-
-  // Close the panel with the X button
-  closeListBtn && closeListBtn.addEventListener("click", () => {
-    listPanel.classList.remove("visible");
-    listPanel.classList.add("hidden");
-    listBtn.classList.remove("active");
-  });
-
-  // Sort toggle (inside the panel)
-  sortToggle && sortToggle.addEventListener("click", e => {
-    if (e.target.tagName === "BUTTON") {
-      sortBy = e.target.getAttribute("data-sort");
-      Array.from(sortToggle.querySelectorAll("button")).forEach(btn => {
-        btn.classList.toggle("active", btn === e.target);
-      });
-      updateStationList && updateStationList();
-    }
-  });
-
-  // ...rest of your setup
-});
-  openBtn.addEventListener("click", () => {
-    listPanel.classList.add("visible");
-    listPanel.classList.remove("hidden");
-  });
-  closeBtn.addEventListener("click", () => {
-    listPanel.classList.remove("visible");
-    listPanel.classList.add("hidden");
-  });
-
+  const closeFeatureCardBtn = document.getElementById("close-feature-card");
 
   let map, markerLayer, userMarker;
   const defaultCenter = [-27.4698, 153.0251];
@@ -65,7 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Fuel order and IDs for board
   const fuelOrder = ["E10", "91", "95", "98", "Diesel/Premium Diesel"];
-  // Map for select values to fuel IDs. 3 = Diesel, 14 = Premium Diesel. 1000 is not used for lookup.
   const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, "Diesel/Premium Diesel": 1000 };
   let currentFuel = "E10";
   let allSites = [];
@@ -100,8 +53,6 @@ document.addEventListener("DOMContentLoaded", () => {
       updateStationList();
     });
   }
-
-  // Zoom controls
   zoomInBtn && (zoomInBtn.onclick = () => map && map.zoomIn());
   zoomOutBtn && (zoomOutBtn.onclick = () => map && map.zoomOut());
 
@@ -165,7 +116,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function getCombinedDieselPrice(prices) {
-    // returns { price: value, raw: value, which: 14|3 } or null
     if (prices && typeof prices[14] !== "undefined" && prices[14] !== null) {
       return { price: prices[14] / 10, raw: prices[14], which: 14 };
     }
@@ -230,9 +180,9 @@ document.addEventListener("DOMContentLoaded", () => {
             <img src="images/mymarker.png" class="custom-marker-img"/>
             <div class="${priceClass} marker-price">
               ${s.price.toFixed(1)}
-            </div>
           </div>
-        `,
+        </div>
+      `,
         iconSize: [72, 72],
         iconAnchor: [36, 72],
         popupAnchor: [0, -72]
@@ -348,127 +298,98 @@ document.addEventListener("DOMContentLoaded", () => {
 
   }
 
-  // Helper for price slots (legacy, not used in new feature card layout)
   function renderPriceSlots(allPrices) {
-    // Not used in new overlay layout, but keep for legacy support
-    return '';
+    const fuelSlots = [
+      { slot: "price-e10", id: 12 },
+      { slot: "price-91", id: 2 },
+      { slot: "price-95", id: 5 },
+      { slot: "price-98", id: 8 }
+    ];
+
+    let html = fuelSlots.map(({slot, id}) => {
+      let value = (allPrices && typeof allPrices[id] !== "undefined" && allPrices[id] !== null)
+        ? (allPrices[id] / 10).toFixed(1)
+        : "N/A";
+      return `<div class="price-slot ${slot}">${value}</div>`;
+    }).join('');
+
+    html += renderDieselCombinedSlot(allPrices);
+
+    return html;
+  }
+
+  function renderDieselCombinedSlot(allPrices) {
+    let priceValue = null;
+    if (allPrices && typeof allPrices[14] !== "undefined" && allPrices[14] !== null) {
+      priceValue = (allPrices[14] / 10).toFixed(1);
+    } else if (allPrices && typeof allPrices[3] !== "undefined" && allPrices[3] !== null) {
+      priceValue = (allPrices[3] / 10).toFixed(1);
+    }
+    return `<div class="price-slot price-diesel-combined">${priceValue !== null ? priceValue : ''}</div>`;
   }
 
   function showFeatureCard(site) {
     if (!featureCard) return;
-    // Overlay info block
-    featureCard.querySelector('.feature-station-name').textContent = site.name || '';
-    // Address clickable to Google Maps
-    const addressText = (site.address || '') + (site.suburb ? ', ' + site.suburb : '');
-    const mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(addressText);
-    const addressEl = featureCard.querySelector('.feature-station-address');
-    if (addressEl) {
-      addressEl.textContent = addressText;
-      addressEl.href = mapsUrl;
-    }
-    featureCard.querySelector('.feature-station-distance').textContent =
-      site.distance != null ? site.distance.toFixed(1) + ' km away' : '';
-
-    // Brand logo
+    featureCard.querySelector('.feature-station-name').innerHTML = `${site.name}<span class="list-distance">${site.distance != null ? site.distance.toFixed(1) + ' km' : ''}</span>`;
+    featureCard.querySelector('.feature-station-address').textContent = `${site.address}${site.suburb ? ', ' + site.suburb : ''}`;
     const logoEl = featureCard.querySelector('.priceboard-logo');
     logoEl.src = site.brand ? `images/${site.brand}.png` : 'images/default.png';
     logoEl.onerror = function(){this.onerror=null;this.src='images/default.png';};
-
-    // Fill price slots
-    const allPrices = site.allPrices || {};
-    featureCard.querySelector('.price-slot.price-e10').textContent =
-      typeof allPrices[12] !== 'undefined' ? (allPrices[12]/10).toFixed(1) : '';
-    featureCard.querySelector('.price-slot.price-91').textContent =
-      typeof allPrices[2] !== 'undefined' ? (allPrices[2]/10).toFixed(1) : '';
-    featureCard.querySelector('.price-slot.price-95').textContent =
-      typeof allPrices[5] !== 'undefined' ? (allPrices[5]/10).toFixed(1) : '';
-    featureCard.querySelector('.price-slot.price-98').textContent =
-      typeof allPrices[8] !== 'undefined' ? (allPrices[8]/10).toFixed(1) : '';
-    // Diesel or Premium Diesel
-    let diesel = '';
-    if (typeof allPrices[14] !== 'undefined' && allPrices[14] !== null) {
-      diesel = (allPrices[14]/10).toFixed(1);
-    } else if (typeof allPrices[3] !== 'undefined' && allPrices[3] !== null) {
-      diesel = (allPrices[3]/10).toFixed(1);
-    }
-    featureCard.querySelector('.price-slot.price-diesel-combined').textContent = diesel;
-
-    // Show card
+    const wrap = featureCard.querySelector('.priceboard-img-wrap');
+    wrap.innerHTML = `<img src="images/priceboard.png" alt="Price Board" class="priceboard-img"/>${renderPriceSlots(site.allPrices)}`;
     featureCard.classList.remove('hidden');
     featureCard.style.opacity = '0';
     setTimeout(() => { featureCard.style.opacity = '1'; }, 10);
   }
 
-  // Recenter button
   recenterBtn && recenterBtn.addEventListener("click", () => showUserLocation(true));
-
-  // Close feature card
   closeFeatureCardBtn && closeFeatureCardBtn.addEventListener('click', () => {
     featureCard.classList.add('hidden');
   });
 
-  // --- SLIDING TOGGLE LOGIC ---
-  if (sortToggle) {
-    const slider = sortToggle.querySelector('.sort-toggle-slider');
-    const buttons = sortToggle.querySelectorAll("button");
-
-    function moveSlider() {
-      const activeIndex = sortBy === "distance" ? 1 : 0;
-      if (slider) {
-        slider.style.transform = `translateX(${activeIndex * 100}%)`;
-      }
-    }
-
-    sortToggle.addEventListener("click", e => {
-      if (e.target.tagName === "BUTTON") {
-        sortBy = e.target.getAttribute("data-sort");
-        buttons.forEach(btn => {
-          btn.classList.toggle("active", btn === e.target);
-          btn.setAttribute("aria-pressed", btn === e.target ? "true" : "false");
-        });
-        moveSlider();
-        updateStationList && updateStationList();
-      }
-    });
-
-    // On load, ensure the slider is in the correct position
-    moveSlider();
-  }
-
-  // LIST PANEL LOGIC
-  if (listBtn && listPanel) {
-    listBtn.addEventListener("click", () => {
-      const isOpen = listPanel.classList.contains("visible");
-      if (isOpen) {
-        // Hide panel & un-press button
-        listPanel.classList.remove("visible");
-        listPanel.classList.add("hidden");
-        listBtn.classList.remove("active");
-      } else {
-        // Show panel & press button in
-        listPanel.classList.add("visible");
-        listPanel.classList.remove("hidden");
-        listBtn.classList.add("active");
-        updateStationList && updateStationList();
-      }
-    });
-  }
-  if (closeListBtn && listPanel && listBtn) {
-    closeListBtn.addEventListener("click", () => {
+  // ==== THIS IS THE MAIN CHANGE ====
+  // List button: open/close the side panel
+  listBtn && listBtn.addEventListener("click", () => {
+    const isOpen = listPanel.classList.contains("visible");
+    if (isOpen) {
       listPanel.classList.remove("visible");
       listPanel.classList.add("hidden");
       listBtn.classList.remove("active");
+    } else {
+      listPanel.classList.add("visible");
+      listPanel.classList.remove("hidden");
+      listBtn.classList.add("active");
+      updateStationList && updateStationList();
+    }
+  });
+
+  // X close button inside the panel
+  closeListBtn && closeListBtn.addEventListener("click", () => {
+    listPanel.classList.remove("visible");
+    listPanel.classList.add("hidden");
+    listBtn.classList.remove("active");
+  });
+
+  // Sort toggle (price/distance) inside the list panel
+  if (sortToggle) {
+    sortToggle.addEventListener("click", e => {
+      if (e.target.tagName === "BUTTON") {
+        sortBy = e.target.getAttribute("data-sort");
+        Array.from(sortToggle.querySelectorAll("button")).forEach(btn => {
+          btn.classList.toggle("active", btn === e.target);
+        });
+        updateStationList && updateStationList();
+      }
     });
   }
-  
+
   // Fuel selector
   fuelSelect && fuelSelect.addEventListener("change", e => {
     currentFuel = e.target.value;
     updateVisibleStations();
     updateStationList();
   });
-  // Default to E10 on load
-  fuelSelect && (fuelSelect.value = "E10");
+  fuelSelect.value = "E10";
   currentFuel = "E10";
 
   // Search suburb/station
