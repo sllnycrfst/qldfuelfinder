@@ -74,8 +74,7 @@ html, body {
 }
 #search::
   placeholder {
-  color: #bababc !important; 
-  background: none !important;
+  color: #bababc !important;
   opacity: 1; 
 }
 .divider {
@@ -423,7 +422,7 @@ html, body {
 .priceboard-logo-wrap {
   position: absolute;
   top: 51px;
-  right: 55px;
+  right: 60px;
   width: 46px;
   height: 46px;
   background: none;
@@ -441,7 +440,7 @@ html, body {
   position: absolute;
   width: 60px;
   height: 26px;
-  right: 54px;
+  right: 59px;
   font-family: 'Quantico', 'Roboto', monospace;
   font-weight: 500;
   font-size: 0.65em !important;
