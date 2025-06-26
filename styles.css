@@ -75,6 +75,7 @@ html, body {
 #search::
   placeholder {
   color: #bababc !important; 
+  background: transparent;
   opacity: 1; 
 }
 .divider {
@@ -181,7 +182,7 @@ html, body {
   background: rgba(255,255,255,0.55) !important;
   backdrop-filter: blur(15px);
   border-radius: 0px 20px 0 20px !important;
-  border: 1px solid #fff !important;
+  border: 1px solid #ffffff !important;
   font-family: 'Roboto', Arial, sans-serif !important;
 }
 #list-panel.visible { transform: translateX(0); }
@@ -190,7 +191,7 @@ html, body {
   background: none;
   border: none;
   font-size: 2em;
-  color: #387cc2;
+  color: #090909;
   margin: 4px 12px 0 0;
   cursor: pointer;
   z-index: 1;
@@ -379,7 +380,7 @@ html, body {
 #feature-card {
   position: fixed;
   left: 50%;
-  bottom: 60px;
+  bottom: 75px;
   transform: translateX(-50%);
   background: none;
   border-radius: 24px;
@@ -388,7 +389,7 @@ html, body {
   border: 0;
   padding: 0;
   max-width: 340px;
-  width: 90vw;
+  width: 95vw;
   min-height: 230px;
   z-index: 4000;
   display: flex;
