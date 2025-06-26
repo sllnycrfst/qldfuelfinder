@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const recenterBtn = document.getElementById("recenter-btn");
   const listBtn = document.getElementById("list-btn");
   const listPanel = document.getElementById("list-panel");
+  const openBtn = document.getElementById("list-btn");
   const closeListBtn = document.getElementById("close-list-btn");
   const listUl = document.getElementById("list");
   const zoomInBtn = document.getElementById("zoom-in");
@@ -12,6 +13,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const fuelSelect = document.getElementById("fuel-select");
   const featureCard = document.getElementById("feature-card");
   const closeFeatureCardBtn = document.getElementById("close-feature-card-btn");
+
+  openBtn.addEventListener("click", () => {
+    listPanel.classList.add("visible");
+    listPanel.classList.remove("hidden");
+  });
+  closeBtn.addEventListener("click", () => {
+    listPanel.classList.remove("visible");
+    listPanel.classList.add("hidden");
+  });
+
 
   let map, markerLayer, userMarker;
   const defaultCenter = [-27.4698, 153.0251];
