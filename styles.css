@@ -70,16 +70,17 @@ html, body {
   padding: 10px 0 10px 0;
   outline: none;
   color: #090909 !important;
+  background: transparent !important;
   min-width: 120px;
 }
 #search::placeholder {
   color: #bababc !important;
-  background: transparent;
+  background: transparent !important;
   opacity: 1; 
 }
 
 .divider {
-  margin: 10px 10px;
+  margin: 0px 8px;
   color: #bababc !important;
   font-size: 1em;
   user-select: none;
