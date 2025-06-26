@@ -335,11 +335,11 @@ html, body {
 .custom-zoom-rect {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
+  align-items: center;
   box-shadow: 0 2px 12px rgba(56,124,194,0.12);
   border-radius: 14px;
   overflow: hidden;
-  width: 40px;
+  width: 32px;
   border: 1px solid #fff !important;
   color: #090909 !important;
   backdrop-filter: blur(8px) !important;
