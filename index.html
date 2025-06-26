@@ -4,18 +4,21 @@
   <meta charset="UTF-8">
   <title>QLD Fuel Finder</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Quantico:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
   <link rel="icon" type="image/png" href="images/favicon.png">
-  <!-- Font Awesome CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
   <link rel="apple-touch-icon" href="./images/home-icon.png">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
 </head>
 <body>
-  <!-- Map Controls / Search Bar -->
+
+  <!-- Search Bar -->
   <div class="search-bar-glass">
     <span class="search-icon" aria-hidden="true">
       <i class="fa-solid fa-magnifying-glass"></i>
@@ -38,13 +41,12 @@
   <div class="map-wrapper">
     <div id="map"></div>
 
-  <div id="map"></div>
-  <div class="sort-toggle">
-    <div class="sort-toggle-slider"></div>
-    <button class="active">Price</button>
-    <button>Distance</button>
-  </div>
-
+    <!-- Sort Toggle -->
+    <div class="sort-toggle">
+      <div class="sort-toggle-slider"></div>
+      <button class="active">Price</button>
+      <button>Distance</button>
+    </div>
 
     <!-- Side Controls -->
     <div class="side-controls">
@@ -67,15 +69,14 @@
       </button>
     </div>
   </div>
-  
-  <!-- Slide from left Panel -->
+
+  <!-- List Panel -->
   <div id="list-panel" class="hidden" aria-modal="true" role="dialog">
     <button id="close-list-btn" title="Close list" aria-label="Close list">&times;</button>
-    </div>
     <ul id="list"></ul>
   </div>
-  
-  <!-- Feature Card (as a popup/modal or panel, not always visible) -->
+
+  <!-- Feature Card -->
   <div id="feature-card" class="feature-card hidden" role="dialog" aria-modal="true">
     <button id="close-feature-card-btn" title="Close">&times;</button>
     <div class="feature-card-inner">
@@ -97,6 +98,7 @@
       </div>
     </div>
   </div>
+
   <!-- Scripts -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="script.js"></script>
