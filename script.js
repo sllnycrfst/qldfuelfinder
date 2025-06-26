@@ -367,6 +367,7 @@ document.addEventListener("DOMContentLoaded", () => {
   recenterBtn && recenterBtn.addEventListener("click", () => showUserLocation(true));
   closeFeatureCardBtn && closeFeatureCardBtn.addEventListener('click', () => {
     featureCard.classList.add('hidden');
+    featureCard.style.opacity = '0';
   });
 
   // ==== THIS IS THE MAIN CHANGE ====
