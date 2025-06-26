@@ -37,6 +37,7 @@ html, body {
   gap: 0.5em;
   border: 1px #fff !important;
   box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
+  background: rgba(255,255,255,0.55) !important;
   backdrop-filter: blur(15px);
   border: 1px solid #ffffff !important;
   border-radius: 50px;
@@ -116,8 +117,8 @@ html, body {
 .marker-brand-img {
   position: absolute;
   left: 27px; top: 30px;
-  width: 28px;
-  height: 28px;
+  width: 29px;
+  height: 29px;
   object-fit: contain;
   border-radius: 50%;
   background: #edefef;
@@ -145,15 +146,14 @@ html, body {
   text-align: center;
   background: none;
   color: #fff;
-  font-family: 'Roboto', monospace;
+  font-family: 'Quantico', monospace;
   font-size: 0.88em;
-  font-weight: 600;
+  font-weight: 400;
   padding: 2px 0 1px 0;
   border-radius: 4px;
   letter-spacing: 0.1em !important;
   z-index: 4;
   pointer-events: none;
-  box-shadow: 0 1px 3px rgba(30,49,80,0.11);
   min-width: 34px;
   max-width: 66px;
   margin: 0 auto;
