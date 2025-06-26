@@ -74,8 +74,10 @@ html, body {
 }
 #search::placeholder {
   color: #bababc !important;
+  background: transparent;
   opacity: 1; 
 }
+
 .divider {
   margin: 10px 10px;
   color: #bababc !important;
