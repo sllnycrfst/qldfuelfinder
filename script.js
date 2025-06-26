@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("search");
   const fuelSelect = document.getElementById("fuel-select");
   const featureCard = document.getElementById("feature-card");
-  const closeFeatureCardBtn = document.getElementById("close-feature-card");
+  const closeFeatureCardBtn = document.getElementById("close-feature-card-btn");
 
   let map, markerLayer, userMarker;
   const defaultCenter = [-27.4698, 153.0251];
