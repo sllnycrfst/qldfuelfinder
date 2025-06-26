@@ -67,13 +67,13 @@ html, body {
 #search {
   flex: 1 1 0;
   border: none;
-  background: transparent;
+  background: rgba(255,255,255,0.55) !important;
   font-size: 1.1em;
   padding: 10px 0 10px 0;
   outline: none;
   color: #bababc !important;
   min-width: 120px;
-  border: 1px #fff !important;
+  border: 1px #fff !important
 }
 #search::
   placeholder {
@@ -181,9 +181,9 @@ html, body {
   display: flex;
   flex-direction: column;
   max-width: 100vw;
-  background: none;
+  background: rgba(255,255,255,0.55) !important;
   backdrop-filter: blur(8px);
-  border-radius: 20px 20px 0 20px !important;
+  border-radius: 0px 20px 0 20px !important;
   border: 1px solid #fff !important;
   font-family: 'Roboto', Arial, sans-serif !important;
 }
