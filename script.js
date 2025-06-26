@@ -330,18 +330,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function showFeatureCard(site) {
     if (!featureCard) return;
-    featureCard.querySelector('.feature-station-name').innerHTML = `${site.name}<span class="list-distance">${site.distance != null ? site.distance.toFixed(1) + ' km' : ''}</span>`;
-    featureCard.querySelector('.feature-station-address').textContent = `${site.address}${site.suburb ? ', ' + site.suburb : ''}`;
+    // Station name
+    const nameEl = featureCard.querySelector('.feature-station-name');
+    nameEl.textContent = site.name || '';
+    // Address as a Google Maps link
+    const addressEl = featureCard.querySelector('.feature-station-address');
+    addressEl.textContent = site.address + (site.suburb ? ', ' + site.suburb : '');
+    addressEl.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.address + (site.suburb ? ', ' + site.suburb : ''))}`;
+    // Distance
+    const distanceEl = featureCard.querySelector('.feature-station-distance');
+    distanceEl.textContent = (site.distance != null) ? `${site.distance.toFixed(1)} km` : '';
+    // Logo
     const logoEl = featureCard.querySelector('.priceboard-logo');
     logoEl.src = site.brand ? `images/${site.brand}.png` : 'images/default.png';
     logoEl.onerror = function(){this.onerror=null;this.src='images/default.png';};
-    const wrap = featureCard.querySelector('.priceboard-img-wrap');
-    wrap.innerHTML = `<img src="images/priceboard.png" alt="Price Board" class="priceboard-img"/>${renderPriceSlots(site.allPrices)}`;
+    // Update price slots directly
+    const allPrices = site.allPrices || {};
+    featureCard.querySelector('.price-slot.price-e10').textContent = (typeof allPrices[12] !== 'undefined' && allPrices[12] !== null) ? (allPrices[12] / 10).toFixed(1) : 'N/A';
+    featureCard.querySelector('.price-slot.price-91').textContent = (typeof allPrices[2] !== 'undefined' && allPrices[2] !== null) ? (allPrices[2] / 10).toFixed(1) : 'N/A';
+    featureCard.querySelector('.price-slot.price-95').textContent = (typeof allPrices[5] !== 'undefined' && allPrices[5] !== null) ? (allPrices[5] / 10).toFixed(1) : 'N/A';
+    featureCard.querySelector('.price-slot.price-98').textContent = (typeof allPrices[8] !== 'undefined' && allPrices[8] !== null) ? (allPrices[8] / 10).toFixed(1) : 'N/A';
+    // Combined diesel
+    if (typeof allPrices[14] !== 'undefined' && allPrices[14] !== null) {
+      featureCard.querySelector('.price-slot.price-diesel-combined').textContent = (allPrices[14] / 10).toFixed(1);
+    } else if (typeof allPrices[3] !== 'undefined' && allPrices[3] !== null) {
+      featureCard.querySelector('.price-slot.price-diesel-combined').textContent = (allPrices[3] / 10).toFixed(1);
+    } else {
+      featureCard.querySelector('.price-slot.price-diesel-combined').textContent = '';
+    }
+    // Show card
     featureCard.classList.remove('hidden');
     featureCard.style.opacity = '0';
     setTimeout(() => { featureCard.style.opacity = '1'; }, 10);
   }
-
+  
   recenterBtn && recenterBtn.addEventListener("click", () => showUserLocation(true));
   closeFeatureCardBtn && closeFeatureCardBtn.addEventListener('click', () => {
     featureCard.classList.add('hidden');
