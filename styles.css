@@ -208,11 +208,11 @@ html, body {
   top: 0;
   display: inline-flex;
   background: rgba(255, 255, 255, 0.4);
-  border-radius: 26px;
+  border-radius: 30px;
   border: 1px solid rgba(255,255,255,0.6);
   margin: 8px auto;
   padding: 4px;
-  height: 44px;
+  height: 40px;
   width: 200px;
   justify-content: space-between;
   align-items: center;
@@ -231,8 +231,8 @@ html, body {
   font-size: 0.95em;
   font-weight: 500;
   cursor: pointer;
-  border-radius: 22px;
-  height: 36px;
+  border-radius: 30px;
+  height: 32px;
   transition: color 0.13s ease-in-out;
   position: relative;
   z-index: 1;
