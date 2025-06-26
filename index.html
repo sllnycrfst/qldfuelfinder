@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>QLD Fuel Finder</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
@@ -41,13 +41,6 @@
   <div class="map-wrapper">
     <div id="map"></div>
 
-    <!-- Sort Toggle -->
-    <div class="sort-toggle">
-      <div class="sort-toggle-slider"></div>
-      <button class="active">Price</button>
-      <button>Distance</button>
-    </div>
-
     <!-- Side Controls -->
     <div class="side-controls">
       <button id="list-btn" title="Show station list" class="list-btn glass-btn" aria-label="Show station list">
@@ -70,9 +63,17 @@
     </div>
   </div>
 
-  <!-- List Panel -->
+  <!-- List Panel (Slides In) -->
   <div id="list-panel" class="hidden" aria-modal="true" role="dialog">
     <button id="close-list-btn" title="Close list" aria-label="Close list">&times;</button>
+
+    <!-- Sort Toggle Now Inside Panel -->
+    <div class="sort-toggle">
+      <div class="sort-toggle-slider"></div>
+      <button class="active">Price</button>
+      <button>Distance</button>
+    </div>
+
     <ul id="list"></ul>
   </div>
 
