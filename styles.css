@@ -380,7 +380,7 @@ html, body {
 #feature-card {
   position: fixed;
   left: 50%;
-  bottom: 75px;
+  bottom: 50px;
   transform: translateX(-50%);
   background: none;
   border-radius: 24px;
@@ -388,7 +388,7 @@ html, body {
   border: 1px #fff !important;
   border: 0;
   padding: 0;
-  max-width: 340px;
+  max-width: 350px;
   width: 95vw;
   min-height: 230px;
   z-index: 4000;
