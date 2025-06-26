@@ -1,10 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   // UI controls
   const recenterBtn = document.getElementById("recenter-btn");
-  const listBtn = document.getElementById("list-btn");
-  const listPanel = document.getElementById("list-panel");
-  const openBtn = document.getElementById("list-btn");
-  const closeListBtn = document.getElementById("close-list-btn");
   const listUl = document.getElementById("list");
   const zoomInBtn = document.getElementById("zoom-in");
   const zoomOutBtn = document.getElementById("zoom-out");
@@ -13,7 +9,46 @@ document.addEventListener("DOMContentLoaded", () => {
   const fuelSelect = document.getElementById("fuel-select");
   const featureCard = document.getElementById("feature-card");
   const closeFeatureCardBtn = document.getElementById("close-feature-card-btn");
+  const listBtn = document.getElementById("list-btn");
+  const listPanel = document.getElementById("list-panel");
+  const closeListBtn = document.getElementById("close-list-btn");
+  const sortToggle = document.getElementById("sort-toggle");
 
+  // Open/close the list panel with the hamburger button
+  listBtn && listBtn.addEventListener("click", () => {
+    const isOpen = listPanel.classList.contains("visible");
+    if (isOpen) {
+      listPanel.classList.remove("visible");
+      listPanel.classList.add("hidden");
+      listBtn.classList.remove("active");
+    } else {
+      listPanel.classList.add("visible");
+      listPanel.classList.remove("hidden");
+      listBtn.classList.add("active");
+      updateStationList && updateStationList();
+    }
+  });
+
+  // Close the panel with the X button
+  closeListBtn && closeListBtn.addEventListener("click", () => {
+    listPanel.classList.remove("visible");
+    listPanel.classList.add("hidden");
+    listBtn.classList.remove("active");
+  });
+
+  // Sort toggle (inside the panel)
+  sortToggle && sortToggle.addEventListener("click", e => {
+    if (e.target.tagName === "BUTTON") {
+      sortBy = e.target.getAttribute("data-sort");
+      Array.from(sortToggle.querySelectorAll("button")).forEach(btn => {
+        btn.classList.toggle("active", btn === e.target);
+      });
+      updateStationList && updateStationList();
+    }
+  });
+
+  // ...rest of your setup
+});
   openBtn.addEventListener("click", () => {
     listPanel.classList.add("visible");
     listPanel.classList.remove("hidden");
