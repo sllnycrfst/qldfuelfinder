@@ -69,9 +69,8 @@ html, body {
   font-size: 1.1em;
   padding: 10px 0 10px 0;
   outline: none;
-  color: #bababc !important;
+  color: #090909 !important;
   min-width: 120px;
-  border: 1px #fff !important
 }
 #search::
   placeholder {
