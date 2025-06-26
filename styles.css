@@ -35,9 +35,8 @@ html, body {
   display: flex;
   align-items: center;
   gap: 0.5em;
-  background: none;
-  box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
   border: 1px #fff !important;
+  box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
   backdrop-filter: blur(8px);
   border-radius: 50px;
   padding: 0 12px;
@@ -67,7 +66,6 @@ html, body {
 #search {
   flex: 1 1 0;
   border: none;
-  background: rgba(255,255,255,0.55) !important;
   font-size: 1.1em;
   padding: 10px 0 10px 0;
   outline: none;
