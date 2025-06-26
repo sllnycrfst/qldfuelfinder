@@ -47,7 +47,7 @@ html, body {
   display: flex;
   align-items: center;
   font-size: 1.2em;
-  color: #bababc;
+  color: #090909;
   height: 24px;
   margin-right: 7px;
   margin-left: 4px;
@@ -75,7 +75,7 @@ html, body {
 #search::
   placeholder {
   color: #bababc !important; 
-  background: transparent;
+  background: none !important;
   opacity: 1; 
 }
 .divider {
