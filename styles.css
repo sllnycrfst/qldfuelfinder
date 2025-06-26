@@ -72,8 +72,7 @@ html, body {
   color: #090909 !important;
   min-width: 120px;
 }
-#search::
-  placeholder {
+#search::placeholder {
   color: #bababc !important;
   opacity: 1; 
 }
