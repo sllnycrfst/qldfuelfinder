@@ -214,19 +214,40 @@ html, body {
   overflow: hidden;
 }
 
+.sort-toggle {
+  position: fixed;
+  bottom: 80px; /* Or wherever you want it anchored */
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  background: rgba(255, 255, 255, 0.4); /* translucent for blur match */
+  border-radius: 26px;
+  border: 1px solid rgba(255,255,255,0.6);
+  min-width: 140px;
+  height: 44px;
+  font-size: 1.1em;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 0;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 999;
+}
+
 .sort-toggle button {
   flex: 1 1 50%;
   border: none;
   background: none;
-  color: #090909;
+  color: #555;
   padding: 0;
   margin: 0;
-  font-size: 1em;
+  font-size: 0.95em;
   font-weight: 500;
   cursor: pointer;
   border-radius: 22px;
   height: 36px;
-  transition: color 0.13s;
+  transition: color 0.13s ease-in-out;
   position: relative;
   z-index: 1;
 }
@@ -237,17 +258,16 @@ html, body {
   left: 4px;
   width: calc(50% - 8px);
   height: calc(100% - 8px);
-  background: #fff;
-  border: 1px solid #fff !important;
+  background: #ffffff;
+  border: 1px solid rgba(255,255,255,0.85);
   border-radius: 18px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-  transition: transform 0.2s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  transition: transform 0.25s cubic-bezier(0.45, 0, 0.2, 1);
   z-index: 0;
 }
 
 .sort-toggle .active {
   color: #090909;
-  z-index: 1;
 }
 
 #list {
