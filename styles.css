@@ -379,7 +379,7 @@ html, body {
 #feature-card {
   position: fixed;
   left: 50%;
-  bottom: 50px;
+  bottom: 40px;
   transform: translateX(-50%);
   background: none;
   border-radius: 24px;
