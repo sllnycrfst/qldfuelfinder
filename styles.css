@@ -253,7 +253,9 @@ html, body {
 }
 
 .sort-toggle .active {
-  color: #090909;
+  background: #387cc2;
+  color: #fff;
+  font-weight: bold;
 }
 
 #list {
