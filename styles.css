@@ -346,7 +346,7 @@ html, body {
   box-shadow: 0 2px 12px rgba(56,124,194,0.12);
   border-radius: 26px;
   overflow: hidden;
-  left: 4px;
+  right: 10px !important;
   width: 32px;
   border: 1px solid #fff !important;
   color: #090909 !important;
