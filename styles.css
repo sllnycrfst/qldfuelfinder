@@ -204,7 +204,7 @@ html, body {
   position: sticky;
   top: 0;
   z-index: 2;
-  background: rgba(245,255,255,0.22) !important;
+  background: rgba(245,255,255,0.12) !important;
   /* inherit glass if you like */
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px);
@@ -227,7 +227,7 @@ html, body {
 }
 
 .sort-toggle {
-  margin: 2px auto 8px auto;
+  margin: 2px 2px 8px 2px;
   /* keep your previous styles here */
   display: flex;
   background: rgba(255,255,255,0.4);
