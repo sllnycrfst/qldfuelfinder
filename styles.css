@@ -142,7 +142,7 @@ html, body {
   position: absolute;
   left: 13px;
   right: 0;
-  bottom: 50px;
+  bottom: 49px;
   text-align: center;
   background: none;
   color: #fff;
@@ -155,7 +155,7 @@ html, body {
   letter-spacing: 0.1em !important;
   z-index: 4;
   pointer-events: none;
-  min-width: 34px;
+  min-width: 32px;
   max-width: 66px;
   transform: scaleY(1.2) !important;
   margin: 0 auto;
