@@ -63,17 +63,16 @@
     </div>
   </div>
 
-  <!-- List Panel (Slides In) -->
+  <!-- List Panel -->
   <div id="list-panel" class="hidden" aria-modal="true" role="dialog">
-    <button id="close-list-btn" title="Close list" aria-label="Close list">&times;</button>
-
-    <!-- Sort Toggle Now Inside Panel -->
-    <div id="sort-toggle" class="sort-toggle">
-      <div class="sort-toggle-slider"></div>
-      <button class="active" data-sort="price">Price</button>
-      <button data-sort="distance">Distance</button>
+    <div class="list-header">
+      <button id="close-list-btn" title="Close list" aria-label="Close list">&times;</button>
+      <div id="sort-toggle" class="sort-toggle">
+        <div class="sort-toggle-slider"></div>
+        <button class="active" data-sort="price">Price</button>
+        <button data-sort="distance">Distance</button>
+      </div>
     </div>
-
     <ul id="list"></ul>
   </div>
 
