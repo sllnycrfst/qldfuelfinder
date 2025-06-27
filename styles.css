@@ -143,12 +143,12 @@ html, body {
   position: absolute;
   left: 13px;
   right: 0;
-  bottom: 49px;
+  bottom: 47px;
   text-align: center;
   background: none;
   color: #fff;
   font-family: 'Roboto', monospace;
-  font-size: 0.88em;
+  font-size: 0.95em;
   font-weight: 600;
   padding: 2px 0 1px 0;
   border-radius: 1px;
@@ -177,7 +177,7 @@ html, body {
 /* --- LIST PANEL & STATION LIST --- */
 #list-panel {
   position: fixed;
-  top: 220px;
+  top: 180px;
   left: 0;
   width: 330px;
   height: calc(100vh - 100px);
@@ -204,11 +204,11 @@ html, body {
   position: sticky;
   top: 0;
   z-index: 2;
-  background: rgba(255,255,255,0.72);
+  background: rgba(255,255,255,0.22) !important;
   /* inherit glass if you like */
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px);
-  padding-top: 8px;
+  padding-top: 2px;
   padding-bottom: 2px;
   border-radius: 0 20px 0 0;
   display: flex;
@@ -221,20 +221,20 @@ html, body {
   border: none;
   font-size: 2em;
   color: #090909;
-  margin: 2px 12px 0 0;
+  margin: 2px 6px 0 0;
   cursor: pointer;
   z-index: 10;
 }
 
 .sort-toggle {
-  margin: 6px auto 2px auto;
+  margin: 4px auto 2px auto;
   /* keep your previous styles here */
   display: flex;
   background: rgba(255,255,255,0.4);
   border-radius: 30px;
   border: 1px solid rgba(255,255,255,0.6);
-  padding: 4px;
-  height: 40px;
+  padding: 2px;
+  height: 38px;
   width: 200px;
   justify-content: space-between;
   align-items: center;
@@ -409,7 +409,7 @@ html, body {
 }
 .custom-zoom-rect button:hover { background: rgba(56,124,194,0.17); color: #17486c; }
 .zoom-divider {
-  width: 70%;
+  width: 85%;
   margin: 0 auto;
   height: 1px;
   background: rgba(56,124,194,0.11);
