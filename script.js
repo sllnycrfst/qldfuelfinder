@@ -31,28 +31,80 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   function startApp(center) {
-    map = L.map("map", { zoomControl: false, attributionControl: true }).setView(center, defaultZoom);
+    // Disable double-click zoom & load map
+    map = L.map("map", {
+      zoomControl: false,
+      attributionControl: true,
+      doubleClickZoom: false
+    }).setView(center, defaultZoom);
+
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       attribution: '<a href="https://www.sellanycarfast.com.au" target="_blank" rel="noopener" title="Sell Any Car Fast">SACF</a> | &copy; <a href="https://carto.com/attributions">CARTO</a>',
       subdomains: 'abcd',
       maxZoom: 18
     }).addTo(map);
 
-    markerLayer = L.layerGroup();
-    map.addLayer(markerLayer);
+    // Dynamically load markercluster if needed
+    function ensureMarkerClusterLoaded(cb) {
+      if (typeof L.MarkerClusterGroup !== "undefined") {
+        cb();
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = "https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js";
+      script.onload = cb;
+      document.body.appendChild(script);
 
-    showUserLocation(false);
-    fetchSitesAndPrices();
+      if (!document.getElementById("leaflet-markercluster-css")) {
+        const link = document.createElement('link');
+        link.id = "leaflet-markercluster-css";
+        link.rel = "stylesheet";
+        link.href = "https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css";
+        document.head.appendChild(link);
+      }
+    }
 
-    map.on("moveend", () => {
-      updateVisibleStations();
-      updateStationList();
-    });
-    map.on("zoomend", () => {
-      updateVisibleStations();
-      updateStationList();
+    ensureMarkerClusterLoaded(() => {
+      markerLayer = L.markerClusterGroup({
+        iconCreateFunction: function(cluster) {
+          // Find minimum rawPrice among all children
+          let containsCheapest = false;
+          let minRawPrice = null;
+          cluster.getAllChildMarkers().forEach(marker => {
+            if (typeof marker.options.rawPrice === "number" && (minRawPrice === null || marker.options.rawPrice < minRawPrice)) {
+              minRawPrice = marker.options.rawPrice;
+            }
+          });
+          // Check if any marker in cluster is the cheapest
+          cluster.getAllChildMarkers().forEach(marker => {
+            if (marker.options.rawPrice !== undefined && marker.options.rawPrice === minRawPrice) {
+              containsCheapest = true;
+            }
+          });
+          const color = containsCheapest ? "green" : "#387CC2";
+          return L.divIcon({
+            html: `<div style="background:${color};border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:15px;">${cluster.getChildCount()}</div>`,
+            className: 'custom-cluster-icon',
+            iconSize: [40, 40]
+          });
+        }
+      });
+
+      map.addLayer(markerLayer);
+      showUserLocation(false);
+      fetchSitesAndPrices();
+
+      map.on("moveend", () => {
+        updateVisibleStations();
+        updateStationList();
+      });
+      map.on("zoomend", () => {
+        updateVisibleStations();
+        updateStationList();
+      });
     });
   }
+
   zoomInBtn && (zoomInBtn.onclick = () => map && map.zoomIn());
   zoomOutBtn && (zoomOutBtn.onclick = () => map && map.zoomOut());
 
@@ -180,23 +232,26 @@ document.addEventListener("DOMContentLoaded", () => {
             <img src="images/mymarker.png" class="custom-marker-img"/>
             <div class="${priceClass} marker-price">
               ${s.price.toFixed(1)}
+            </div>
           </div>
-        </div>
-      `,
+        `,
         iconSize: [72, 72],
         iconAnchor: [36, 72],
         popupAnchor: [0, -72]
       });
-      markerLayer.addLayer(
-        L.marker([s.lat, s.lng], {
-          icon,
-          zIndexOffset: isCheapest ? 1000 : 0,
-          rawPrice: s.rawPrice,
-          price: s.price
-        }).on("click", () => {
-          showFeatureCard(s);
-        })
-      );
+
+      // Pass siteId and rawPrice to marker options for cluster coloring
+      const marker = L.marker([s.lat, s.lng], {
+        icon,
+        zIndexOffset: isCheapest ? 1000 : 0,
+        rawPrice: s.rawPrice,
+        price: s.price,
+        siteId: s.siteId
+      }).on("click", () => {
+        showFeatureCard(s);
+      });
+
+      markerLayer.addLayer(marker);
     });
   }
 
@@ -264,8 +319,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let featuredHTML = '';
     let others = stations;
-    
-    // --- Other stations as before ---
+
     let othersHTML = others.map(site => {
       const siteImgSrc = site.brand
         ? `images/${site.brand}.png`
@@ -370,7 +424,6 @@ document.addEventListener("DOMContentLoaded", () => {
     featureCard.style.opacity = '0';
   });
 
-  // ==== THIS IS THE MAIN CHANGE ====
   // List button: open/close the side panel
   listBtn && listBtn.addEventListener("click", () => {
     const isOpen = listPanel.classList.contains("visible");
