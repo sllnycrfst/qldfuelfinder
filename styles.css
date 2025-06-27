@@ -227,7 +227,7 @@ html, body {
 }
 
 .sort-toggle {
-  margin: 2px 2px 8px 2px;
+  margin: 0px auto 14px auto;
   /* keep your previous styles here */
   display: flex;
   background: rgba(255,255,255,0.4);
@@ -319,7 +319,7 @@ html, body {
 .list-price,
 .station-price {
   font-weight: bold;
-  color: #909090;
+  color: #909090 !important;
   font-size: 1.18em;
   letter-spacing: 0 !important;
 }
