@@ -7,7 +7,6 @@
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Quantico:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
@@ -102,42 +101,6 @@
 
   <!-- Scripts -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-  <script>
-    const map = L.map('map').setView([-27.4705, 153.0260], 12);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-
-    const sampleStations = [
-      { name: "Liberty", lat: -27.47, lng: 153.03, price: 169.9 },
-      { name: "Shell", lat: -27.48, lng: 153.04, price: 172.5 },
-      { name: "7-Eleven", lat: -27.46, lng: 153.02, price: 168.3 },
-      { name: "BP", lat: -27.49, lng: 153.05, price: 178.1 },
-    ];
-
-    const markers = L.markerClusterGroup({
-      iconCreateFunction: function(cluster) {
-        let childMarkers = cluster.getAllChildMarkers();
-        let minPrice = Math.min(...childMarkers.map(m => m.options.price));
-        let color = minPrice < 170 ? 'green' : (minPrice < 175 ? 'orange' : 'red');
-        return L.divIcon({
-          html: `<div style="background:${color};border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;">${minPrice.toFixed(1)}</div>`,
-          className: 'custom-cluster',
-          iconSize: [40, 40]
-        });
-      }
-    });
-
-    sampleStations.forEach(station => {
-      const marker = L.marker([station.lat, station.lng], { price: station.price })
-        .bindPopup(`<b>${station.name}</b><br>Price: ${station.price}`);
-      markers.addLayer(marker);
-    });
-
-    map.addLayer(markers);
-  </script>
   <script src="script.js"></script>
 </body>
 </html>
