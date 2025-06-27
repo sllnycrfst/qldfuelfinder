@@ -227,7 +227,7 @@ html, body {
 }
 
 .sort-toggle {
-  margin: 4px auto 2px auto;
+  margin: 2px auto 8px auto;
   /* keep your previous styles here */
   display: flex;
   background: rgba(255,255,255,0.4);
@@ -238,9 +238,7 @@ html, body {
   width: 200px;
   justify-content: space-between;
   align-items: center;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 2px 0 12px rgba(0,0,0,0.15);
+  box-shadow: 1px 1px 6px rgba(0,0,0,0.10);
   z-index: 9;
   position: relative;
   top: 0;
