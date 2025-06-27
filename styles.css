@@ -193,10 +193,26 @@ html, body {
   border-radius: 0px 20px 0 20px !important;
   border: 1px solid #ffffff !important;
   font-family: 'Roboto', Arial, sans-serif !important;
-  overflow-y: auto;
+  overflow: hidden; /* KEY: Don't scroll the panel, just the list */
 }
 #list-panel.visible {
   transform: translateX(0);
+}
+
+/* --- HEADER (Close + Sort) --- */
+.list-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: rgba(255,255,255,0.72);
+  /* inherit glass if you like */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding-top: 8px;
+  padding-bottom: 2px;
+  border-radius: 0 20px 0 0;
+  display: flex;
+  flex-direction: column;
 }
 
 #close-list-btn {
@@ -205,20 +221,18 @@ html, body {
   border: none;
   font-size: 2em;
   color: #090909;
-  margin: 4px 12px 0 0;
+  margin: 2px 12px 0 0;
   cursor: pointer;
-  z-index: 1;
+  z-index: 10;
 }
 
-/* --- SORT TOGGLE --- */
 .sort-toggle {
-  position: sticky;
-  top: 0;
-  display: inline-flex;
-  background: rgba(255, 255, 255, 0.4);
+  margin: 6px auto 2px auto;
+  /* keep your previous styles here */
+  display: flex;
+  background: rgba(255,255,255,0.4);
   border-radius: 30px;
   border: 1px solid rgba(255,255,255,0.6);
-  margin: 8px auto;
   padding: 4px;
   height: 40px;
   width: 200px;
@@ -226,7 +240,9 @@ html, body {
   align-items: center;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  z-index: 10;
+  z-index: 9;
+  position: relative;
+  top: 0;
 }
 
 .sort-toggle button {
@@ -245,22 +261,27 @@ html, body {
   position: relative;
   z-index: 1;
 }
-
 .sort-toggle .active {
   background: #387cc2;
   color: #fff;
   font-weight: 500;
 }
 
+/* --- STATION LIST SCROLLING --- */
 #list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
   list-style: none;
   margin: 0;
   padding: 0 0 12px 0;
   background: transparent;
 }
+
+/* --- LIST ITEM STYLING --- */
 #list li {
   padding: 12px 20px;
-  border-bottom: 1px solid rgba(56,124,194,0.13); /* transparent blue line */
+  border-bottom: 1px solid rgba(56,124,194,0.13);
   display: flex;
   align-items: center;
   gap: 12px;
@@ -293,10 +314,21 @@ html, body {
   margin-top: 2px;
   display: block;
 }
-.list-price {
+.list-price,
+.station-price {
   font-weight: bold;
   color: #387cc2;
+  font-size: 1.18em;
+  letter-spacing: 0 !important;
 }
+
+/* --- HIGHLIGHT CHEAPEST PRICE --- */
+.station-price.cheapest, .list-price.cheapest {
+  color: #21ea00 !important;
+  font-weight: 700;
+}
+
+/* --- LIST ITEM HOVER --- */
 #list li.list-station {
   cursor: pointer;
   transition: background 0.15s;
