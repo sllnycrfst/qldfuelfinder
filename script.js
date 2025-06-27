@@ -30,8 +30,56 @@ document.addEventListener("DOMContentLoaded", () => {
     "Stargazers Yarraman"
   ];
 
+  // --- Helper to get visible markers and their rawPrice on current map view ---
+  function getVisibleClusterMinPriceMap() {
+    // Returns { minPrice: number, markerIds: Set(siteId) } for the current map view
+    if (!markerLayer || !map) return { minPrice: null, markerIds: new Set() };
+
+    // Get all visible clusters and single markers
+    let clusters = [];
+    markerLayer.eachLayer(layer => {
+      // Only take direct children of the cluster group (clusters or markers)
+      if (layer instanceof L.MarkerCluster || layer instanceof L.Marker) {
+        // Only consider those in current map bounds
+        if (map.getBounds().intersects(layer.getBounds ? layer.getBounds() : layer.getLatLng())) {
+          clusters.push(layer);
+        }
+      }
+    });
+
+    let minPrice = null;
+    let cheapestIds = new Set();
+
+    // Find the min price among all visible cluster children and visible single markers
+    clusters.forEach(group => {
+      if (group instanceof L.MarkerCluster) {
+        group.getAllChildMarkers().forEach(marker => {
+          if (typeof marker.options.rawPrice === "number") {
+            if (minPrice === null || marker.options.rawPrice < minPrice) {
+              minPrice = marker.options.rawPrice;
+              cheapestIds = new Set([marker.options.siteId]);
+            } else if (marker.options.rawPrice === minPrice) {
+              cheapestIds.add(marker.options.siteId);
+            }
+          }
+        });
+      } else if (group instanceof L.Marker && !group.getAllChildMarkers) {
+        // Unclustered marker
+        if (typeof group.options.rawPrice === "number") {
+          if (minPrice === null || group.options.rawPrice < minPrice) {
+            minPrice = group.options.rawPrice;
+            cheapestIds = new Set([group.options.siteId]);
+          } else if (group.options.rawPrice === minPrice) {
+            cheapestIds.add(group.options.siteId);
+          }
+        }
+      }
+    });
+
+    return { minPrice, cheapestIds };
+  }
+
   function startApp(center) {
-    // Disable double-click zoom & load map
     map = L.map("map", {
       zoomControl: false,
       attributionControl: true,
@@ -44,7 +92,6 @@ document.addEventListener("DOMContentLoaded", () => {
       maxZoom: 18
     }).addTo(map);
 
-    // Dynamically load markercluster if needed
     function ensureMarkerClusterLoaded(cb) {
       if (typeof L.MarkerClusterGroup !== "undefined") {
         cb();
@@ -77,15 +124,53 @@ document.addEventListener("DOMContentLoaded", () => {
             }
           });
 
-          if (cheapestMarker) {
-            // Compose marker HTML, but inject the cluster count backing behind it
-            let markerHtml = cheapestMarker.options.icon.options.html;
-            // Replace price with cheapest price for cluster
-            markerHtml = markerHtml.replace(
+          // --- Only one green per map: get map's visible minPrice and cheapestIds (siteIds) ---
+          let isCheapestInMap = false;
+          let visibleCheapest = getVisibleClusterMinPriceMap();
+          if (
+            visibleCheapest.minPrice !== null &&
+            minRawPrice !== null &&
+            minRawPrice === visibleCheapest.minPrice &&
+            cheapestMarker &&
+            visibleCheapest.cheapestIds.has(cheapestMarker.options.siteId)
+          ) {
+            isCheapestInMap = true;
+          }
+
+          // Only show cluster as "cheapest" if it is the cheapest in the whole map's view
+          if (cheapestMarker && cluster.getChildCount() > 1 && isCheapestInMap) {
+            // Compose marker HTML, inject cheapest price
+            let markerHtml = cheapestMarker.options.icon.options.html.replace(
               /<div class="[^"]*marker-price[^"]*"[^>]*>[\s\S]*?<\/div>/,
               `<div class="marker-price marker-price-cheapest" style="z-index:5">${(cheapestMarker.options.price).toFixed(1)}</div>`
             );
-            // Cluster circle (behind marker)
+            // Cluster circle badge (behind marker, no logo!)
+            const clusterCircle = `
+              <div style="
+                position:absolute;
+                z-index:1;
+                left:12px;top:42px;
+                width:50px;height:50px;
+                background:#21ea00;
+                border-radius:50%;
+                display:flex;align-items:center;justify-content:center;
+                box-shadow:0 0 8px rgba(0,0,0,0.2);">
+                <span style="color:#fff;font-weight:bold;font-size:18px;">${cluster.getChildCount()}</span>
+              </div>
+            `;
+            return L.divIcon({
+              html: `<div style="position:relative;width:72px;height:72px;">${clusterCircle}${markerHtml}</div>`,
+              className: '',
+              iconSize: [72, 72],
+              iconAnchor: [36, 72],
+              popupAnchor: [0, -72]
+            });
+          } else if (cheapestMarker && cluster.getChildCount() > 1) {
+            // Not the cheapest cluster in view: regular blue badge and marker in foreground
+            let markerHtml = cheapestMarker.options.icon.options.html.replace(
+              /<div class="[^"]*marker-price[^"]*"[^>]*>[\s\S]*?<\/div>/,
+              `<div class="marker-price" style="z-index:5">${(cheapestMarker.options.price).toFixed(1)}</div>`
+            );
             const clusterCircle = `
               <div style="
                 position:absolute;
@@ -99,7 +184,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 <span style="color:#fff;font-weight:bold;font-size:18px;">${cluster.getChildCount()}</span>
               </div>
             `;
-            // Wrap everything in relative
             return L.divIcon({
               html: `<div style="position:relative;width:72px;height:72px;">${clusterCircle}${markerHtml}</div>`,
               className: '',
@@ -108,7 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
               popupAnchor: [0, -72]
             });
           } else {
-            // Standard dark blue circle with count
+            // Standard dark blue circle with count (for clusters with no price info)
             return L.divIcon({
               html: `<div style="background:#387CC2;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:15px;">${cluster.getChildCount()}</div>`,
               className: 'custom-cluster-icon',
@@ -244,12 +328,8 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .filter(Boolean);
 
-    const minPrice = visibleStations.length ? Math.min(...visibleStations.map(s => s.rawPrice)) : null;
-
+    // (marker cluster will handle cheapest per cluster + global min via iconCreateFunction)
     visibleStations.forEach(s => {
-      const isCheapest = minPrice !== null && s.rawPrice === minPrice;
-      const priceClass = isCheapest ? "marker-price marker-price-cheapest" : "marker-price";
-
       const icon = L.divIcon({
         className: "fuel-marker",
         html: `
@@ -258,7 +338,7 @@ document.addEventListener("DOMContentLoaded", () => {
               class="marker-brand-img"
                onerror="this.onerror=null;this.src='images/default.png';"/>
             <img src="images/mymarker.png" class="custom-marker-img"/>
-            <div class="${priceClass} marker-price">
+            <div class="marker-price">
               ${s.price.toFixed(1)}
             </div>
           </div>
@@ -271,7 +351,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Pass siteId and rawPrice to marker options for cluster coloring
       const marker = L.marker([s.lat, s.lng], {
         icon,
-        zIndexOffset: isCheapest ? 1000 : 0,
+        zIndexOffset: 0,
         rawPrice: s.rawPrice,
         price: s.price,
         siteId: s.siteId
