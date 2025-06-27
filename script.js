@@ -31,11 +31,12 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   function startApp(center) {
-    // Disable double-click zoom & load map
+    // Disable double-click zoom & load map, remove clustering
     map = L.map("map", {
       zoomControl: false,
       attributionControl: true,
-      doubleClickZoom: false
+      doubleClickZoom: false // disables double click zoom
+      minZoom: 10
     }).setView(center, defaultZoom);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -44,64 +45,20 @@ document.addEventListener("DOMContentLoaded", () => {
       maxZoom: 18
     }).addTo(map);
 
-    // Dynamically load markercluster if needed
-    function ensureMarkerClusterLoaded(cb) {
-      if (typeof L.MarkerClusterGroup !== "undefined") {
-        cb();
-        return;
-      }
-      const script = document.createElement('script');
-      script.src = "https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js";
-      script.onload = cb;
-      document.body.appendChild(script);
+    // Remove clustering: use a simple layer group for markers
+    markerLayer = L.layerGroup();
+    map.addLayer(markerLayer);
 
-      if (!document.getElementById("leaflet-markercluster-css")) {
-        const link = document.createElement('link');
-        link.id = "leaflet-markercluster-css";
-        link.rel = "stylesheet";
-        link.href = "https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css";
-        document.head.appendChild(link);
-      }
-    }
+    showUserLocation(false);
+    fetchSitesAndPrices();
 
-    ensureMarkerClusterLoaded(() => {
-      markerLayer = L.markerClusterGroup({
-        iconCreateFunction: function(cluster) {
-          // Find minimum rawPrice among all children
-          let containsCheapest = false;
-          let minRawPrice = null;
-          cluster.getAllChildMarkers().forEach(marker => {
-            if (typeof marker.options.rawPrice === "number" && (minRawPrice === null || marker.options.rawPrice < minRawPrice)) {
-              minRawPrice = marker.options.rawPrice;
-            }
-          });
-          // Check if any marker in cluster is the cheapest
-          cluster.getAllChildMarkers().forEach(marker => {
-            if (marker.options.rawPrice !== undefined && marker.options.rawPrice === minRawPrice) {
-              containsCheapest = true;
-            }
-          });
-          const color = containsCheapest ? "green" : "#387CC2";
-          return L.divIcon({
-            html: `<div style="background:${color};border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:15px;">${cluster.getChildCount()}</div>`,
-            className: 'custom-cluster-icon',
-            iconSize: [40, 40]
-          });
-        }
-      });
-
-      map.addLayer(markerLayer);
-      showUserLocation(false);
-      fetchSitesAndPrices();
-
-      map.on("moveend", () => {
-        updateVisibleStations();
-        updateStationList();
-      });
-      map.on("zoomend", () => {
-        updateVisibleStations();
-        updateStationList();
-      });
+    map.on("moveend", () => {
+      updateVisibleStations();
+      updateStationList();
+    });
+    map.on("zoomend", () => {
+      updateVisibleStations();
+      updateStationList();
     });
   }
 
@@ -240,7 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
         popupAnchor: [0, -72]
       });
 
-      // Pass siteId and rawPrice to marker options for cluster coloring
+      // Pass siteId and rawPrice to marker options for coloring
       const marker = L.marker([s.lat, s.lng], {
         icon,
         zIndexOffset: isCheapest ? 1000 : 0,
