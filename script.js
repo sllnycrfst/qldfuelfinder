@@ -30,68 +30,13 @@ document.addEventListener("DOMContentLoaded", () => {
     "Stargazers Yarraman"
   ];
 
-  // --- Helper to get visible clusters/min price on current map view ---
-  function getVisibleClusterMinPriceMap() {
-    if (!markerLayer || !map) return { minPrice: null, cheapestIds: new Set() };
-    let clusters = [];
-    markerLayer.eachLayer(layer => {
-      // Only take direct children of the cluster group (clusters or markers)
-      if ((window.L.MarkerCluster && layer instanceof window.L.MarkerCluster) || layer instanceof L.Marker) {
-        if (map.getBounds().intersects(layer.getBounds ? layer.getBounds() : layer.getLatLng())) {
-          clusters.push(layer);
-        }
-      }
-    });
-    let minPrice = null;
-    let cheapestIds = new Set();
-    clusters.forEach(group => {
-      if (window.L.MarkerCluster && group instanceof window.L.MarkerCluster) {
-        group.getAllChildMarkers().forEach(marker => {
-          if (typeof marker.options.rawPrice === "number") {
-            if (minPrice === null || marker.options.rawPrice < minPrice) {
-              minPrice = marker.options.rawPrice;
-              cheapestIds = new Set([marker.options.siteId]);
-            } else if (marker.options.rawPrice === minPrice) {
-              cheapestIds.add(marker.options.siteId);
-            }
-          }
-        });
-      } else if (group instanceof L.Marker && !group.getAllChildMarkers) {
-        if (typeof group.options.rawPrice === "number") {
-          if (minPrice === null || group.options.rawPrice < minPrice) {
-            minPrice = group.options.rawPrice;
-            cheapestIds = new Set([group.options.siteId]);
-          } else if (group.options.rawPrice === minPrice) {
-            cheapestIds.add(group.options.siteId);
-          }
-        }
-      }
-    });
-    return { minPrice, cheapestIds };
-  }
-
   function startApp(center) {
+    // Disable double-click zoom & load map
     map = L.map("map", {
       zoomControl: false,
       attributionControl: true,
-      doubleClickZoom: false, // always set this!
-      dragging: true // make sure dragging is enabled
+      doubleClickZoom: false
     }).setView(center, defaultZoom);
-
-    // Prevent double-tap zoom on mobile (browser zoom)
-    map.getContainer().addEventListener('touchstart', function(e) {
-      if (e.touches.length > 1) e.preventDefault();
-    }, { passive: false });
-
-    // Prevent browser double-tap zoom (iOS Safari)
-    let lastTouchEnd = 0;
-    document.body.addEventListener('touchend', function(event) {
-      const now = new Date().getTime();
-      if (now - lastTouchEnd <= 300) {
-        event.preventDefault();
-      }
-      lastTouchEnd = now;
-    }, false);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       attribution: '<a href="https://www.sellanycarfast.com.au" target="_blank" rel="noopener" title="Sell Any Car Fast">SACF</a> | &copy; <a href="https://carto.com/attributions">CARTO</a>',
@@ -99,6 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
       maxZoom: 18
     }).addTo(map);
 
+    // Dynamically load markercluster if needed
     function ensureMarkerClusterLoaded(cb) {
       if (typeof L.MarkerClusterGroup !== "undefined") {
         cb();
@@ -121,86 +67,26 @@ document.addEventListener("DOMContentLoaded", () => {
     ensureMarkerClusterLoaded(() => {
       markerLayer = L.markerClusterGroup({
         iconCreateFunction: function(cluster) {
-          // Find marker with cheapest price in this cluster
-          let cheapestMarker = null;
+          // Find minimum rawPrice among all children
+          let containsCheapest = false;
           let minRawPrice = null;
           cluster.getAllChildMarkers().forEach(marker => {
             if (typeof marker.options.rawPrice === "number" && (minRawPrice === null || marker.options.rawPrice < minRawPrice)) {
               minRawPrice = marker.options.rawPrice;
-              cheapestMarker = marker;
             }
           });
-
-          let isCheapestInMap = false;
-          let visibleCheapest = getVisibleClusterMinPriceMap();
-          if (
-            visibleCheapest.minPrice !== null &&
-            minRawPrice !== null &&
-            minRawPrice === visibleCheapest.minPrice &&
-            cheapestMarker &&
-            visibleCheapest.cheapestIds.has(cheapestMarker.options.siteId)
-          ) {
-            isCheapestInMap = true;
-          }
-
-          // Only show cluster as "cheapest" if it is the cheapest in the whole map's view
-          if (cheapestMarker && cluster.getChildCount() > 1 && isCheapestInMap) {
-            let markerHtml = cheapestMarker.options.icon.options.html.replace(
-              /<div class="[^"]*marker-price[^"]*"[^>]*>[\s\S]*?<\/div>/,
-              `<div class="marker-price marker-price-cheapest" style="z-index:5">${(cheapestMarker.options.price).toFixed(1)}</div>`
-            );
-            const clusterCircle = `
-              <div style="
-                position:absolute;
-                z-index:1;
-                left:12px;top:42px;
-                width:50px;height:50px;
-                background:#21ea00;
-                border-radius:50%;
-                display:flex;align-items:center;justify-content:center;
-                box-shadow:0 0 8px rgba(0,0,0,0.2);">
-                <span style="color:#fff;font-weight:bold;font-size:18px;">${cluster.getChildCount()}</span>
-              </div>
-            `;
-            return L.divIcon({
-              html: `<div style="position:relative;width:72px;height:72px;">${clusterCircle}${markerHtml}</div>`,
-              className: '',
-              iconSize: [72, 72],
-              iconAnchor: [36, 72],
-              popupAnchor: [0, -72]
-            });
-          } else if (cheapestMarker && cluster.getChildCount() > 1) {
-            let markerHtml = cheapestMarker.options.icon.options.html.replace(
-              /<div class="[^"]*marker-price[^"]*"[^>]*>[\s\S]*?<\/div>/,
-              `<div class="marker-price" style="z-index:5">${(cheapestMarker.options.price).toFixed(1)}</div>`
-            );
-            const clusterCircle = `
-              <div style="
-                position:absolute;
-                z-index:1;
-                left:12px;top:42px;
-                width:50px;height:50px;
-                background:#17486c;
-                border-radius:50%;
-                display:flex;align-items:center;justify-content:center;
-                box-shadow:0 0 8px rgba(0,0,0,0.2);">
-                <span style="color:#fff;font-weight:bold;font-size:18px;">${cluster.getChildCount()}</span>
-              </div>
-            `;
-            return L.divIcon({
-              html: `<div style="position:relative;width:72px;height:72px;">${clusterCircle}${markerHtml}</div>`,
-              className: '',
-              iconSize: [72, 72],
-              iconAnchor: [36, 72],
-              popupAnchor: [0, -72]
-            });
-          } else {
-            return L.divIcon({
-              html: `<div style="background:#387CC2;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:15px;">${cluster.getChildCount()}</div>`,
-              className: 'custom-cluster-icon',
-              iconSize: [40, 40]
-            });
-          }
+          // Check if any marker in cluster is the cheapest
+          cluster.getAllChildMarkers().forEach(marker => {
+            if (marker.options.rawPrice !== undefined && marker.options.rawPrice === minRawPrice) {
+              containsCheapest = true;
+            }
+          });
+          const color = containsCheapest ? "green" : "#387CC2";
+          return L.divIcon({
+            html: `<div style="background:${color};border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:15px;">${cluster.getChildCount()}</div>`,
+            className: 'custom-cluster-icon',
+            iconSize: [40, 40]
+          });
         }
       });
 
@@ -208,17 +94,13 @@ document.addEventListener("DOMContentLoaded", () => {
       showUserLocation(false);
       fetchSitesAndPrices();
 
-      // Only updateStationList on move/zoom, not markers!
       map.on("moveend", () => {
+        updateVisibleStations();
         updateStationList();
       });
       map.on("zoomend", () => {
+        updateVisibleStations();
         updateStationList();
-        // Resize user marker for zoom
-        if (userMarker) {
-          const currentZoom = map.getZoom();
-          userMarker.setRadius(Math.max(4, currentZoom * 0.7));
-        }
       });
     });
   }
@@ -234,9 +116,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (setView && map) map.setView(userLatLng, map.getZoom());
         if (userMarker && map) map.removeLayer(userMarker);
         if (map) {
-          const currentZoom = map.getZoom ? map.getZoom() : defaultZoom;
           userMarker = L.circleMarker(userLatLng, {
-            radius: Math.max(4, currentZoom * 0.7),
+            radius: 10,
             color: "#2196f3",
             fillColor: "#2196f3",
             fillOpacity: 0.85,
@@ -296,7 +177,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return null;
   }
 
-  // Only call this after data/fuel/search, not on every move/zoom!
   function updateVisibleStations() {
     if (!allSites.length || !allPrices.length || !markerLayer || !map) return;
     markerLayer.clearLayers();
@@ -336,7 +216,12 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .filter(Boolean);
 
+    const minPrice = visibleStations.length ? Math.min(...visibleStations.map(s => s.rawPrice)) : null;
+
     visibleStations.forEach(s => {
+      const isCheapest = minPrice !== null && s.rawPrice === minPrice;
+      const priceClass = isCheapest ? "marker-price marker-price-cheapest" : "marker-price";
+
       const icon = L.divIcon({
         className: "fuel-marker",
         html: `
@@ -345,7 +230,7 @@ document.addEventListener("DOMContentLoaded", () => {
               class="marker-brand-img"
                onerror="this.onerror=null;this.src='images/default.png';"/>
             <img src="images/mymarker.png" class="custom-marker-img"/>
-            <div class="marker-price">
+            <div class="${priceClass} marker-price">
               ${s.price.toFixed(1)}
             </div>
           </div>
@@ -355,9 +240,10 @@ document.addEventListener("DOMContentLoaded", () => {
         popupAnchor: [0, -72]
       });
 
+      // Pass siteId and rawPrice to marker options for cluster coloring
       const marker = L.marker([s.lat, s.lng], {
         icon,
-        zIndexOffset: 0,
+        zIndexOffset: isCheapest ? 1000 : 0,
         rawPrice: s.rawPrice,
         price: s.price,
         siteId: s.siteId
@@ -498,21 +384,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function showFeatureCard(site) {
     if (!featureCard) return;
+    // Station name
     const nameEl = featureCard.querySelector('.feature-station-name');
     nameEl.textContent = site.name || '';
+    // Address as a Google Maps link
     const addressEl = featureCard.querySelector('.feature-station-address');
     addressEl.textContent = site.address + (site.suburb ? ', ' + site.suburb : '');
     addressEl.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.address + (site.suburb ? ', ' + site.suburb : ''))}`;
+    // Distance
     const distanceEl = featureCard.querySelector('.feature-station-distance');
     distanceEl.textContent = (site.distance != null) ? `${site.distance.toFixed(1)} km` : '';
+    // Logo
     const logoEl = featureCard.querySelector('.priceboard-logo');
     logoEl.src = site.brand ? `images/${site.brand}.png` : 'images/default.png';
     logoEl.onerror = function(){this.onerror=null;this.src='images/default.png';};
+    // Update price slots directly
     const allPrices = site.allPrices || {};
     featureCard.querySelector('.price-slot.price-e10').textContent = (typeof allPrices[12] !== 'undefined' && allPrices[12] !== null) ? (allPrices[12] / 10).toFixed(1) : 'N/A';
     featureCard.querySelector('.price-slot.price-91').textContent = (typeof allPrices[2] !== 'undefined' && allPrices[2] !== null) ? (allPrices[2] / 10).toFixed(1) : 'N/A';
     featureCard.querySelector('.price-slot.price-95').textContent = (typeof allPrices[5] !== 'undefined' && allPrices[5] !== null) ? (allPrices[5] / 10).toFixed(1) : 'N/A';
     featureCard.querySelector('.price-slot.price-98').textContent = (typeof allPrices[8] !== 'undefined' && allPrices[8] !== null) ? (allPrices[8] / 10).toFixed(1) : 'N/A';
+    // Combined diesel
     if (typeof allPrices[14] !== 'undefined' && allPrices[14] !== null) {
       featureCard.querySelector('.price-slot.price-diesel-combined').textContent = (allPrices[14] / 10).toFixed(1);
     } else if (typeof allPrices[3] !== 'undefined' && allPrices[3] !== null) {
@@ -520,17 +412,19 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       featureCard.querySelector('.price-slot.price-diesel-combined').textContent = '';
     }
+    // Show card
     featureCard.classList.remove('hidden');
     featureCard.style.opacity = '0';
     setTimeout(() => { featureCard.style.opacity = '1'; }, 10);
   }
-
+  
   recenterBtn && recenterBtn.addEventListener("click", () => showUserLocation(true));
   closeFeatureCardBtn && closeFeatureCardBtn.addEventListener('click', () => {
     featureCard.classList.add('hidden');
     featureCard.style.opacity = '0';
   });
 
+  // List button: open/close the side panel
   listBtn && listBtn.addEventListener("click", () => {
     const isOpen = listPanel.classList.contains("visible");
     if (isOpen) {
@@ -545,12 +439,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // X close button inside the panel
   closeListBtn && closeListBtn.addEventListener("click", () => {
     listPanel.classList.remove("visible");
     listPanel.classList.add("hidden");
     listBtn.classList.remove("active");
   });
 
+  // Sort toggle (price/distance) inside the list panel
   if (sortToggle) {
     sortToggle.addEventListener("click", e => {
       if (e.target.tagName === "BUTTON") {
@@ -563,6 +459,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Fuel selector
   fuelSelect && fuelSelect.addEventListener("change", e => {
     currentFuel = e.target.value;
     updateVisibleStations();
@@ -571,6 +468,7 @@ document.addEventListener("DOMContentLoaded", () => {
   fuelSelect.value = "E10";
   currentFuel = "E10";
 
+  // Search suburb/station
   searchInput && searchInput.addEventListener("input", function (e) {
     const query = e.target.value.toLowerCase().trim();
     if (query.length < 2) return;
@@ -581,6 +479,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (match && map) map.setView([match.Lat, match.Lng], 15);
   });
 
+  // Start app with user location if possible
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       pos => startApp([pos.coords.latitude, pos.coords.longitude]),
