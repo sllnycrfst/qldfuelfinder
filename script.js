@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
     map = L.map("map", {
       zoomControl: false,
       attributionControl: true,
-      doubleClickZoom: false // disables double click zoom
+      doubleClickZoom: false, // disables double click zoom
       minZoom: 10
     }).setView(center, defaultZoom);
 
