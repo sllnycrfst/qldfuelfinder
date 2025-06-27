@@ -97,7 +97,7 @@ html, body {
   border: none;
   background: transparent;
   font-size: 1em;
-  font-weight: 600;
+  font-weight: 500;
   padding: 10px 8px 10px 0;
   color: #090909 !important;
   min-width: 70px;
@@ -290,7 +290,7 @@ html, body {
   font-family: 'Roboto', Arial, sans-serif !important;
 }
 .list-logo img {
-  border-radius: 50%;
+  border-radius: 10%;
   width: 35px;
   height: 35px;
   object-fit: contain;
@@ -302,9 +302,12 @@ html, body {
   font-size: 1.1em;
   flex-direction: column;
   flex: 1;
+  font-weight: bold !important;
+  color: #265786;
+  line-height: 1.1;
 }
 .list-station-name {
-  font-weight: bold;
+  font-weight: bold !important;
   color: #265786;
   line-height: 1.1;
 }
@@ -317,7 +320,7 @@ html, body {
 .list-price,
 .station-price {
   font-weight: bold;
-  color: #387cc2;
+  color: #909090;
   font-size: 1.18em;
   letter-spacing: 0 !important;
 }
