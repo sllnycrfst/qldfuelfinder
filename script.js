@@ -36,13 +36,13 @@ document.addEventListener("DOMContentLoaded", () => {
       zoomControl: false,
       attributionControl: true,
       doubleClickZoom: false, // disables double click zoom
-      minZoom: 10
+      minZoom: 12
     }).setView(center, defaultZoom);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       attribution: '<a href="https://www.sellanycarfast.com.au" target="_blank" rel="noopener" title="Sell Any Car Fast">SACF</a> | &copy; <a href="https://carto.com/attributions">CARTO</a>',
       subdomains: 'abcd',
-      maxZoom: 18
+      maxZoom: 16
     }).addTo(map);
 
     // Remove clustering: use a simple layer group for markers
