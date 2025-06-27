@@ -157,6 +157,7 @@ html, body {
   pointer-events: none;
   min-width: 34px;
   max-width: 66px;
+  transform: scaleY(1.3) !important;
   margin: 0 auto;
   line-height: 1.2;
 }
