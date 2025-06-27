@@ -67,26 +67,54 @@ document.addEventListener("DOMContentLoaded", () => {
     ensureMarkerClusterLoaded(() => {
       markerLayer = L.markerClusterGroup({
         iconCreateFunction: function(cluster) {
-          // Find minimum rawPrice among all children
-          let containsCheapest = false;
+          // Find marker with cheapest price in this cluster
+          let cheapestMarker = null;
           let minRawPrice = null;
           cluster.getAllChildMarkers().forEach(marker => {
             if (typeof marker.options.rawPrice === "number" && (minRawPrice === null || marker.options.rawPrice < minRawPrice)) {
               minRawPrice = marker.options.rawPrice;
+              cheapestMarker = marker;
             }
           });
-          // Check if any marker in cluster is the cheapest
-          cluster.getAllChildMarkers().forEach(marker => {
-            if (marker.options.rawPrice !== undefined && marker.options.rawPrice === minRawPrice) {
-              containsCheapest = true;
-            }
-          });
-          const color = containsCheapest ? "green" : "#387CC2";
-          return L.divIcon({
-            html: `<div style="background:${color};border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:15px;">${cluster.getChildCount()}</div>`,
-            className: 'custom-cluster-icon',
-            iconSize: [40, 40]
-          });
+
+          if (cheapestMarker) {
+            // Compose marker HTML, but inject the cluster count backing behind it
+            let markerHtml = cheapestMarker.options.icon.options.html;
+            // Replace price with cheapest price for cluster
+            markerHtml = markerHtml.replace(
+              /<div class="[^"]*marker-price[^"]*"[^>]*>[\s\S]*?<\/div>/,
+              `<div class="marker-price marker-price-cheapest" style="z-index:5">${(cheapestMarker.options.price).toFixed(1)}</div>`
+            );
+            // Cluster circle (behind marker)
+            const clusterCircle = `
+              <div style="
+                position:absolute;
+                z-index:1;
+                left:12px;top:42px;
+                width:50px;height:50px;
+                background:#17486c;
+                border-radius:50%;
+                display:flex;align-items:center;justify-content:center;
+                box-shadow:0 0 8px rgba(0,0,0,0.2);">
+                <span style="color:#fff;font-weight:bold;font-size:18px;">${cluster.getChildCount()}</span>
+              </div>
+            `;
+            // Wrap everything in relative
+            return L.divIcon({
+              html: `<div style="position:relative;width:72px;height:72px;">${clusterCircle}${markerHtml}</div>`,
+              className: '',
+              iconSize: [72, 72],
+              iconAnchor: [36, 72],
+              popupAnchor: [0, -72]
+            });
+          } else {
+            // Standard dark blue circle with count
+            return L.divIcon({
+              html: `<div style="background:#387CC2;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:15px;">${cluster.getChildCount()}</div>`,
+              className: 'custom-cluster-icon',
+              iconSize: [40, 40]
+            });
+          }
         }
       });
 
