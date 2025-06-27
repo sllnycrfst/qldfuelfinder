@@ -37,7 +37,7 @@ html, body {
   gap: 0.5em;
   border: 1px #fff !important;
   box-shadow: 0 4px 24px rgba(46, 54, 80, 0.10);
-  background: rgba(255,255,255,0.55) !important;
+  background: rgba(255,255,255,0.85) !important;
   backdrop-filter: blur(15px);
   border: 1px solid #ffffff !important;
   border-radius: 50px;
