@@ -30,12 +30,26 @@ document.addEventListener("DOMContentLoaded", () => {
     "Stargazers Yarraman"
   ];
 
+  // --- Add for suburb suggestions UI ---
+  // Create suggestion dropdown
+  const suggestionBox = document.createElement("ul");
+  suggestionBox.id = "suburb-suggestions";
+  suggestionBox.className = "suburb-suggestions-list";
+  suggestionBox.style.display = "none";
+  suggestionBox.setAttribute("role", "listbox");
+  suggestionBox.setAttribute("tabindex", "-1");
+  if (searchInput) {
+    searchInput.parentNode.insertBefore(suggestionBox, searchInput.nextSibling);
+  }
+  let suburbSuggestionData = []; // Populated after sites load
+  // --- End of addition ---
+
   function startApp(center) {
     // Disable double-click zoom & load map, remove clustering
     map = L.map("map", {
       zoomControl: false,
       attributionControl: true,
-      doubleClickZoom: false, // disables double click zoom
+      doubleClickZoom: false,
       minZoom: 12
     }).setView(center, defaultZoom);
 
@@ -97,6 +111,15 @@ document.addEventListener("DOMContentLoaded", () => {
       allSites = (Array.isArray(siteRes) ? siteRes : siteRes.S).filter(site => {
         return !bannedStations.some(b => site.N && site.N.includes(b));
       });
+
+      // --- Add: build unique QLD suburb list for suggestions ---
+      const suburbSet = new Set();
+      allSites.forEach(site => {
+        if (site.P && /^[a-zA-Z\s\-']+$/.test(site.P)) suburbSet.add(site.P.trim());
+      });
+      suburbSuggestionData = Array.from(suburbSet).sort((a, b) => a.localeCompare(b));
+      // --- End Add ---
+
       allPrices = priceRes.SitePrices.filter(
         p => [12, 2, 5, 8, 3, 14].includes(p.FuelId)
       );
@@ -425,16 +448,93 @@ document.addEventListener("DOMContentLoaded", () => {
   fuelSelect.value = "E10";
   currentFuel = "E10";
 
-  // Search suburb/station
+  // --- Suburb suggestion logic ---
+  function showSuburbSuggestions(query) {
+    if (!query || query.length < 1 || !suburbSuggestionData.length) {
+      suggestionBox.style.display = "none";
+      suggestionBox.innerHTML = "";
+      return;
+    }
+    const matches = suburbSuggestionData.filter(suburb =>
+      suburb.toLowerCase().startsWith(query.toLowerCase())
+    ).slice(0, 8);
+    if (!matches.length) {
+      suggestionBox.style.display = "none";
+      suggestionBox.innerHTML = "";
+      return;
+    }
+    suggestionBox.innerHTML = matches.map(suburb =>
+      `<li tabindex="0" class="suburb-suggestion-item" role="option">${suburb}</li>`
+    ).join("");
+    suggestionBox.style.display = "block";
+  }
+
+  function hideSuburbSuggestions() {
+    suggestionBox.style.display = "none";
+    suggestionBox.innerHTML = "";
+  }
+
+  let suggestionBlurTimeout;
   searchInput && searchInput.addEventListener("input", function (e) {
-    const query = e.target.value.toLowerCase().trim();
+    const query = e.target.value.trim();
+    showSuburbSuggestions(query);
+
+    // Old search: keep for station jump by name
     if (query.length < 2) return;
     const match = allSites.find(s =>
-      (s.P && s.P.toLowerCase().includes(query)) ||
-      (s.N && s.N.toLowerCase().includes(query))
+      (s.P && s.P.toLowerCase().includes(query.toLowerCase())) ||
+      (s.N && s.N.toLowerCase().includes(query.toLowerCase()))
     );
     if (match && map) map.setView([match.Lat, match.Lng], 15);
   });
+
+  suggestionBox.addEventListener("mousedown", function (e) {
+    if (e.target && e.target.classList.contains("suburb-suggestion-item")) {
+      const suburb = e.target.textContent;
+      searchInput.value = suburb;
+      hideSuburbSuggestions();
+      // Center map to the first site in this suburb
+      const firstMatch = allSites.find(s => s.P === suburb);
+      if (firstMatch && map) map.setView([firstMatch.Lat, firstMatch.Lng], 14);
+      searchInput.blur();
+    }
+  });
+
+  searchInput && searchInput.addEventListener("blur", function () {
+    suggestionBlurTimeout = setTimeout(hideSuburbSuggestions, 120);
+  });
+  searchInput && searchInput.addEventListener("focus", function () {
+    showSuburbSuggestions(searchInput.value.trim());
+  });
+
+  // Keyboard navigation for the suggestions
+  searchInput && searchInput.addEventListener("keydown", function (e) {
+    const items = suggestionBox.querySelectorAll(".suburb-suggestion-item");
+    if (!items.length || suggestionBox.style.display === "none") return;
+    let index = Array.from(items).findIndex(item => item === document.activeElement);
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (index === -1 || index === items.length - 1) {
+        items[0].focus();
+      } else {
+        items[index + 1].focus();
+      }
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (index <= 0) {
+        searchInput.focus();
+      } else {
+        items[index - 1].focus();
+      }
+    } else if (e.key === "Enter") {
+      if (document.activeElement.classList.contains("suburb-suggestion-item")) {
+        document.activeElement.click();
+      }
+    }
+  });
+  // --- End Suburb suggestion logic ---
+
+  // --- Blinking divider animation handled in CSS ---
 
   // Start app with user location if possible
   if (navigator.geolocation) {
