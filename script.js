@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "Stargazers Yarraman"
   ];
 
-  // --- Add for suburb suggestions UI ---
+  // --- Suburb suggestions UI ---
   // Create suggestion dropdown
   const suggestionBox = document.createElement("ul");
   suggestionBox.id = "suburb-suggestions";
@@ -42,10 +42,15 @@ document.addEventListener("DOMContentLoaded", () => {
     searchInput.parentNode.insertBefore(suggestionBox, searchInput.nextSibling);
   }
   let suburbSuggestionData = []; // Populated after sites load
-  // --- End of addition ---
+
+  // --- Polling line (blinking |) on the left of input ---
+  const pollingLine = document.createElement("span");
+  pollingLine.className = "polling-line";
+  pollingLine.innerText = "|";
+  const searchBar = searchInput.parentNode;
+  searchBar.insertBefore(pollingLine, searchInput);
 
   function startApp(center) {
-    // Disable double-click zoom & load map, remove clustering
     map = L.map("map", {
       zoomControl: false,
       attributionControl: true,
@@ -59,7 +64,6 @@ document.addEventListener("DOMContentLoaded", () => {
       maxZoom: 16
     }).addTo(map);
 
-    // Remove clustering: use a simple layer group for markers
     markerLayer = L.layerGroup();
     map.addLayer(markerLayer);
 
@@ -112,7 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return !bannedStations.some(b => site.N && site.N.includes(b));
       });
 
-      // --- Add: build unique QLD suburb list for suggestions ---
+      // --- Unique QLD suburb list for suggestions ---
       const suburbSet = new Set();
       allSites.forEach(site => {
         if (site.P && /^[a-zA-Z\s\-']+$/.test(site.P)) suburbSet.add(site.P.trim());
@@ -220,7 +224,6 @@ document.addEventListener("DOMContentLoaded", () => {
         popupAnchor: [0, -72]
       });
 
-      // Pass siteId and rawPrice to marker options for coloring
       const marker = L.marker([s.lat, s.lng], {
         icon,
         zIndexOffset: isCheapest ? 1000 : 0,
@@ -297,9 +300,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    let featuredHTML = '';
     let others = stations;
-
     let othersHTML = others.map(site => {
       const siteImgSrc = site.brand
         ? `images/${site.brand}.png`
@@ -320,7 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     }).join('');
 
-    listUl.innerHTML = featuredHTML + othersHTML;
+    listUl.innerHTML = othersHTML;
 
     Array.from(listUl.querySelectorAll('.list-station')).forEach(item => {
       item.addEventListener('click', function() {
@@ -332,59 +333,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   }
 
-  function renderPriceSlots(allPrices) {
-    const fuelSlots = [
-      { slot: "price-e10", id: 12 },
-      { slot: "price-91", id: 2 },
-      { slot: "price-95", id: 5 },
-      { slot: "price-98", id: 8 }
-    ];
-
-    let html = fuelSlots.map(({slot, id}) => {
-      let value = (allPrices && typeof allPrices[id] !== "undefined" && allPrices[id] !== null)
-        ? (allPrices[id] / 10).toFixed(1)
-        : "N/A";
-      return `<div class="price-slot ${slot}">${value}</div>`;
-    }).join('');
-
-    html += renderDieselCombinedSlot(allPrices);
-
-    return html;
-  }
-
-  function renderDieselCombinedSlot(allPrices) {
-    let priceValue = null;
-    if (allPrices && typeof allPrices[14] !== "undefined" && allPrices[14] !== null) {
-      priceValue = (allPrices[14] / 10).toFixed(1);
-    } else if (allPrices && typeof allPrices[3] !== "undefined" && allPrices[3] !== null) {
-      priceValue = (allPrices[3] / 10).toFixed(1);
-    }
-    return `<div class="price-slot price-diesel-combined">${priceValue !== null ? priceValue : ''}</div>`;
-  }
-
   function showFeatureCard(site) {
     if (!featureCard) return;
-    // Station name
     const nameEl = featureCard.querySelector('.feature-station-name');
     nameEl.textContent = site.name || '';
-    // Address as a Google Maps link
     const addressEl = featureCard.querySelector('.feature-station-address');
     addressEl.textContent = site.address + (site.suburb ? ', ' + site.suburb : '');
     addressEl.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.address + (site.suburb ? ', ' + site.suburb : ''))}`;
-    // Distance
     const distanceEl = featureCard.querySelector('.feature-station-distance');
     distanceEl.textContent = (site.distance != null) ? `${site.distance.toFixed(1)} km` : '';
-    // Logo
     const logoEl = featureCard.querySelector('.priceboard-logo');
     logoEl.src = site.brand ? `images/${site.brand}.png` : 'images/default.png';
     logoEl.onerror = function(){this.onerror=null;this.src='images/default.png';};
-    // Update price slots directly
     const allPrices = site.allPrices || {};
     featureCard.querySelector('.price-slot.price-e10').textContent = (typeof allPrices[12] !== 'undefined' && allPrices[12] !== null) ? (allPrices[12] / 10).toFixed(1) : 'N/A';
     featureCard.querySelector('.price-slot.price-91').textContent = (typeof allPrices[2] !== 'undefined' && allPrices[2] !== null) ? (allPrices[2] / 10).toFixed(1) : 'N/A';
     featureCard.querySelector('.price-slot.price-95').textContent = (typeof allPrices[5] !== 'undefined' && allPrices[5] !== null) ? (allPrices[5] / 10).toFixed(1) : 'N/A';
     featureCard.querySelector('.price-slot.price-98').textContent = (typeof allPrices[8] !== 'undefined' && allPrices[8] !== null) ? (allPrices[8] / 10).toFixed(1) : 'N/A';
-    // Combined diesel
     if (typeof allPrices[14] !== 'undefined' && allPrices[14] !== null) {
       featureCard.querySelector('.price-slot.price-diesel-combined').textContent = (allPrices[14] / 10).toFixed(1);
     } else if (typeof allPrices[3] !== 'undefined' && allPrices[3] !== null) {
@@ -392,7 +357,6 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       featureCard.querySelector('.price-slot.price-diesel-combined').textContent = '';
     }
-    // Show card
     featureCard.classList.remove('hidden');
     featureCard.style.opacity = '0';
     setTimeout(() => { featureCard.style.opacity = '1'; }, 10);
@@ -404,7 +368,6 @@ document.addEventListener("DOMContentLoaded", () => {
     featureCard.style.opacity = '0';
   });
 
-  // List button: open/close the side panel
   listBtn && listBtn.addEventListener("click", () => {
     const isOpen = listPanel.classList.contains("visible");
     if (isOpen) {
@@ -419,14 +382,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // X close button inside the panel
   closeListBtn && closeListBtn.addEventListener("click", () => {
     listPanel.classList.remove("visible");
     listPanel.classList.add("hidden");
     listBtn.classList.remove("active");
   });
 
-  // Sort toggle (price/distance) inside the list panel
   if (sortToggle) {
     sortToggle.addEventListener("click", e => {
       if (e.target.tagName === "BUTTON") {
@@ -439,7 +400,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Fuel selector
   fuelSelect && fuelSelect.addEventListener("change", e => {
     currentFuel = e.target.value;
     updateVisibleStations();
@@ -507,7 +467,6 @@ document.addEventListener("DOMContentLoaded", () => {
     showSuburbSuggestions(searchInput.value.trim());
   });
 
-  // Keyboard navigation for the suggestions
   searchInput && searchInput.addEventListener("keydown", function (e) {
     const items = suggestionBox.querySelectorAll(".suburb-suggestion-item");
     if (!items.length || suggestionBox.style.display === "none") return;
@@ -532,9 +491,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   });
-  // --- End Suburb suggestion logic ---
-
-  // --- Blinking divider animation handled in CSS ---
 
   // Start app with user location if possible
   if (navigator.geolocation) {
