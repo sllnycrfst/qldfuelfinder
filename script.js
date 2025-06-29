@@ -74,7 +74,20 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Update caret position as user types
-  searchInput.addEventListener("input", updateCaretPosition);
+  searchInput.addEventListener("input", function (e) {
+    updateCaretPosition();
+  
+    const query = searchInput.value.trim().toLowerCase();
+    if (query.length < 2) return;
+  
+    // Try to find a matching suburb (full or partial, case-insensitive)
+    const match = allSites.find(s =>
+      s.P && s.P.toLowerCase().startsWith(query)
+    );
+    if (match && map) {
+      map.setView([match.Lat, match.Lng], 15);
+    }
+  });
 
   // Also update caret position when window is resized
   window.addEventListener("resize", updateCaretPosition);
