@@ -88,6 +88,19 @@ document.addEventListener("DOMContentLoaded", () => {
       map.setView([match.Lat, match.Lng], 15);
     }
   });
+  
+  const query = searchInput.value.trim().toLowerCase();
+  if (query.length < 2) return;
+
+  // Try to find a matching suburb by postcode or name (full or partial, case-insensitive)
+  const match = allSites.find(s =>
+    (s.P && s.P.toLowerCase().startsWith(query)) || 
+    (s.N && s.N.toLowerCase().includes(query))
+  );
+  if (match && map) {
+    map.setView([match.Lat, match.Lng], 15);
+  }
+});
 
   // Also update caret position when window is resized
   window.addEventListener("resize", updateCaretPosition);
