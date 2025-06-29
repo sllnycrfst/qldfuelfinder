@@ -455,4 +455,4 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     startApp(defaultCenter);
   }
-});
+})
