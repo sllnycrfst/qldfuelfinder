@@ -30,25 +30,57 @@ document.addEventListener("DOMContentLoaded", () => {
     "Stargazers Yarraman"
   ];
 
-  // --- Suburb suggestions UI ---
-  // Create suggestion dropdown
-  const suggestionBox = document.createElement("ul");
-  suggestionBox.id = "suburb-suggestions";
-  suggestionBox.className = "suburb-suggestions-list";
-  suggestionBox.style.display = "none";
-  suggestionBox.setAttribute("role", "listbox");
-  suggestionBox.setAttribute("tabindex", "-1");
-  if (searchInput) {
-    searchInput.parentNode.insertBefore(suggestionBox, searchInput.nextSibling);
-  }
-  let suburbSuggestionData = []; // Populated after sites load
+  // --- Blinking polling line after typed text in search ---
+  // Wrap the input in a relative-positioned wrapper
+  const searchWrapper = document.createElement("div");
+  searchWrapper.className = "search-input-wrapper";
+  searchInput.parentNode.insertBefore(searchWrapper, searchInput);
+  searchWrapper.appendChild(searchInput);
 
-  // --- Polling line (blinking |) on the left of input ---
+  // Add a "display" span to mirror the text and a blinking caret span
+  const searchDisplay = document.createElement("span");
+  searchDisplay.className = "search-display";
+  searchWrapper.appendChild(searchDisplay);
+
   const pollingLine = document.createElement("span");
   pollingLine.className = "polling-line";
-  pollingLine.innerText = "|";
-  const searchBar = searchInput.parentNode;
-  searchBar.insertBefore(pollingLine, searchInput);
+  pollingLine.textContent = "|";
+  searchWrapper.appendChild(pollingLine);
+
+  // Helper: update the searchDisplay and move the caret after text
+  function updateCaretPosition() {
+    // Mirror the input text for measuring
+    searchDisplay.textContent = searchInput.value;
+    searchDisplay.style.visibility = "visible";
+    // Measure width of text
+    const textWidth = searchDisplay.offsetWidth;
+    // Move the caret just after the text
+    pollingLine.style.left = (parseInt(window.getComputedStyle(searchInput).paddingLeft) + textWidth) + "px";
+    searchDisplay.style.visibility = "hidden";
+  }
+
+  // Show/hide caret and hide native caret on focus/blur
+  searchInput.addEventListener("focus", () => {
+    pollingLine.style.display = "inline";
+    searchDisplay.style.display = "inline";
+    searchInput.classList.add("hide-caret");
+    updateCaretPosition();
+  });
+
+  searchInput.addEventListener("blur", () => {
+    pollingLine.style.display = "none";
+    searchDisplay.style.display = "none";
+    searchInput.classList.remove("hide-caret");
+  });
+
+  // Update caret position as user types
+  searchInput.addEventListener("input", updateCaretPosition);
+
+  // Also update caret position when window is resized
+  window.addEventListener("resize", updateCaretPosition);
+
+  // Initialize caret position on load for autofilled values
+  updateCaretPosition();
 
   function startApp(center) {
     map = L.map("map", {
@@ -115,14 +147,6 @@ document.addEventListener("DOMContentLoaded", () => {
       allSites = (Array.isArray(siteRes) ? siteRes : siteRes.S).filter(site => {
         return !bannedStations.some(b => site.N && site.N.includes(b));
       });
-
-      // --- Unique QLD suburb list for suggestions ---
-      const suburbSet = new Set();
-      allSites.forEach(site => {
-        if (site.P && /^[a-zA-Z\s\-']+$/.test(site.P)) suburbSet.add(site.P.trim());
-      });
-      suburbSuggestionData = Array.from(suburbSet).sort((a, b) => a.localeCompare(b));
-      // --- End Add ---
 
       allPrices = priceRes.SitePrices.filter(
         p => [12, 2, 5, 8, 3, 14].includes(p.FuelId)
@@ -407,90 +431,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   fuelSelect.value = "E10";
   currentFuel = "E10";
-
-  // --- Suburb suggestion logic ---
-  function showSuburbSuggestions(query) {
-    if (!query || query.length < 1 || !suburbSuggestionData.length) {
-      suggestionBox.style.display = "none";
-      suggestionBox.innerHTML = "";
-      return;
-    }
-    const matches = suburbSuggestionData.filter(suburb =>
-      suburb.toLowerCase().startsWith(query.toLowerCase())
-    ).slice(0, 8);
-    if (!matches.length) {
-      suggestionBox.style.display = "none";
-      suggestionBox.innerHTML = "";
-      return;
-    }
-    suggestionBox.innerHTML = matches.map(suburb =>
-      `<li tabindex="0" class="suburb-suggestion-item" role="option">${suburb}</li>`
-    ).join("");
-    suggestionBox.style.display = "block";
-  }
-
-  function hideSuburbSuggestions() {
-    suggestionBox.style.display = "none";
-    suggestionBox.innerHTML = "";
-  }
-
-  let suggestionBlurTimeout;
-  searchInput && searchInput.addEventListener("input", function (e) {
-    const query = e.target.value.trim();
-    showSuburbSuggestions(query);
-
-    // Old search: keep for station jump by name
-    if (query.length < 2) return;
-    const match = allSites.find(s =>
-      (s.P && s.P.toLowerCase().includes(query.toLowerCase())) ||
-      (s.N && s.N.toLowerCase().includes(query.toLowerCase()))
-    );
-    if (match && map) map.setView([match.Lat, match.Lng], 15);
-  });
-
-  suggestionBox.addEventListener("mousedown", function (e) {
-    if (e.target && e.target.classList.contains("suburb-suggestion-item")) {
-      const suburb = e.target.textContent;
-      searchInput.value = suburb;
-      hideSuburbSuggestions();
-      // Center map to the first site in this suburb
-      const firstMatch = allSites.find(s => s.P === suburb);
-      if (firstMatch && map) map.setView([firstMatch.Lat, firstMatch.Lng], 14);
-      searchInput.blur();
-    }
-  });
-
-  searchInput && searchInput.addEventListener("blur", function () {
-    suggestionBlurTimeout = setTimeout(hideSuburbSuggestions, 120);
-  });
-  searchInput && searchInput.addEventListener("focus", function () {
-    showSuburbSuggestions(searchInput.value.trim());
-  });
-
-  searchInput && searchInput.addEventListener("keydown", function (e) {
-    const items = suggestionBox.querySelectorAll(".suburb-suggestion-item");
-    if (!items.length || suggestionBox.style.display === "none") return;
-    let index = Array.from(items).findIndex(item => item === document.activeElement);
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      if (index === -1 || index === items.length - 1) {
-        items[0].focus();
-      } else {
-        items[index + 1].focus();
-      }
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      if (index <= 0) {
-        searchInput.focus();
-      } else {
-        items[index - 1].focus();
-      }
-    } else if (e.key === "Enter") {
-      if (document.activeElement.classList.contains("suburb-suggestion-item")) {
-        document.activeElement.click();
-      }
-    }
-  });
 
   // Start app with user location if possible
   if (navigator.geolocation) {
