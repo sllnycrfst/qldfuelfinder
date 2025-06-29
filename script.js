@@ -31,13 +31,11 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   // --- Blinking polling line after typed text in search ---
-  // Wrap the input in a relative-positioned wrapper
   const searchWrapper = document.createElement("div");
   searchWrapper.className = "search-input-wrapper";
   searchInput.parentNode.insertBefore(searchWrapper, searchInput);
   searchWrapper.appendChild(searchInput);
 
-  // Add a "display" span to mirror the text and a blinking caret span
   const searchDisplay = document.createElement("span");
   searchDisplay.className = "search-display";
   searchWrapper.appendChild(searchDisplay);
@@ -47,19 +45,14 @@ document.addEventListener("DOMContentLoaded", () => {
   pollingLine.textContent = "|";
   searchWrapper.appendChild(pollingLine);
 
-  // Helper: update the searchDisplay and move the caret after text
   function updateCaretPosition() {
-    // Mirror the input text for measuring
     searchDisplay.textContent = searchInput.value;
     searchDisplay.style.visibility = "visible";
-    // Measure width of text
     const textWidth = searchDisplay.offsetWidth;
-    // Move the caret just after the text
     pollingLine.style.left = (parseInt(window.getComputedStyle(searchInput).paddingLeft) + textWidth) + "px";
     searchDisplay.style.visibility = "hidden";
   }
 
-  // Show/hide caret and hide native caret on focus/blur
   searchInput.addEventListener("focus", () => {
     pollingLine.style.display = "inline";
     searchDisplay.style.display = "inline";
@@ -73,39 +66,24 @@ document.addEventListener("DOMContentLoaded", () => {
     searchInput.classList.remove("hide-caret");
   });
 
-  // Update caret position as user types
-  searchInput.addEventListener("input", function (e) {
+  // --- THIS IS THE ONLY SEARCH LOGIC YOU NEED ---
+  searchInput.addEventListener("input", function () {
     updateCaretPosition();
-  
+
     const query = searchInput.value.trim().toLowerCase();
     if (query.length < 2) return;
-  
-    // Try to find a matching suburb (full or partial, case-insensitive)
+
+    // Try to find a matching suburb or station (full or partial, case-insensitive)
     const match = allSites.find(s =>
-      s.P && s.P.toLowerCase().startsWith(query)
+      (s.P && s.P.toLowerCase().startsWith(query)) ||
+      (s.N && s.N.toLowerCase().includes(query))
     );
     if (match && map) {
       map.setView([match.Lat, match.Lng], 15);
     }
   });
-  
-  const query = searchInput.value.trim().toLowerCase();
-  if (query.length < 2) return;
 
-  // Try to find a matching suburb by postcode or name (full or partial, case-insensitive)
-  const match = allSites.find(s =>
-    (s.P && s.P.toLowerCase().startsWith(query)) || 
-    (s.N && s.N.toLowerCase().includes(query))
-  );
-  if (match && map) {
-    map.setView([match.Lat, match.Lng], 15);
-  }
-});
-
-  // Also update caret position when window is resized
   window.addEventListener("resize", updateCaretPosition);
-
-  // Initialize caret position on load for autofilled values
   updateCaretPosition();
 
   function startApp(center) {
@@ -458,7 +436,6 @@ document.addEventListener("DOMContentLoaded", () => {
   fuelSelect.value = "E10";
   currentFuel = "E10";
 
-  // Start app with user location if possible
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       pos => startApp([pos.coords.latitude, pos.coords.longitude]),
@@ -468,4 +445,4 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     startApp(defaultCenter);
   }
-})
+});
