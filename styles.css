@@ -278,15 +278,17 @@ html, body {
   flex-direction: column;
 }
 
-#close-list-btn {
-  align-self: flex-end;
-  background: none;
-  border: none;
-  font-size: 2em;
-  color: #090909;
-  margin: 2px 6px 0 0;
-  cursor: pointer;
-  z-index: 10;
+.list-drag-bar {
+  width: 60px;
+  height: 6px;
+  background: #ccc;
+  border-radius: 3px;
+  margin: 12px auto 8px auto;
+  cursor: grab;
+  transition: background 0.2s;
+}
+.list-drag-bar:hover {
+  background: #888;
 }
 
 .sort-toggle {
@@ -604,15 +606,18 @@ html, body {
   letter-spacing: 0px !important;
   letter-spacing: 0 !important;
 }
-#close-feature-card-btn {
+.feature-drag-bar {
   position: absolute;
-  transition: opacity 0.4s ease;
-  top: 1px !important;
-  right: 2px !important;
-  background: none;
-  border: none;
-  font-size: 2em;
-  color: #265786;
-  cursor: pointer;
-  z-index: 4;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 60px;
+  background: #ccc;
+  border-radius: 3px;
+  cursor: ew-resize;
+  transition: background 0.2s;
+}
+.feature-drag-bar:hover {
+  background: #888;
 }
