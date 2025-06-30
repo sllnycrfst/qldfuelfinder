@@ -445,7 +445,4 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     startApp(defaultCenter);
   }
-  document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('zoom-in').addEventListener('dblclick', e => e.preventDefault());
-  document.getElementById('zoom-out').addEventListener('dblclick', e => e.preventDefault());
 });
