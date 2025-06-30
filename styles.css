@@ -233,34 +233,26 @@ html, body {
 /* --- LIST PANEL & STATION LIST --- */
 #list-panel {
   position: fixed;
+  top: 180px;
   left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100vw;
-  height: 45vh;
-  max-width: 100vw;
-  box-shadow: 0 -4px 24px rgba(0,0,0,0.08);
-  transform: translateY(100%);
+  width: 330px;
+  height: calc(100vh - 100px);
+  box-shadow: 2px 0 12px rgba(0,0,0,0.15);
+  transform: translateX(-100%);
   transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
-  z-index: 1005;
+  z-index: 1000;
   display: flex;
   flex-direction: column;
+  max-width: 100vw;
   background: rgba(255,255,255,0.55) !important;
   backdrop-filter: blur(15px);
-  border-radius: 16px 16px 0 0 !important;
-  border: 1.5px solid #ffffff !important;
-  box-shadow: 6px 6px 28px rgba(30, 49, 80, 0.33);
+  border-radius: 0px 20px 0 20px !important;
+  border: 1px solid #ffffff !important;
   font-family: 'Roboto', Arial, sans-serif !important;
-  overflow: hidden;
-  pointer-events: none;
-  opacity: 1;
+  overflow: hidden; /* KEY: Don't scroll the panel, just the list */
 }
-
 #list-panel.visible {
-  transform: translateY(0);
-  pointer-events: auto !important;
-}
-#list-panel.hidden {
+  transform: translateX(0);
 }
 
 /* --- HEADER (Close + Sort) --- */
@@ -279,17 +271,15 @@ html, body {
   flex-direction: column;
 }
 
-.list-drag-bar {
-  width: 60px;
-  height: 6px;
-  background: #ccc;
-  border-radius: 3px;
-  margin: 12px auto 8px auto;
-  cursor: grab;
-  transition: background 0.2s;
-}
-.list-drag-bar:hover {
-  background: #888;
+#close-list-btn {
+  align-self: flex-end;
+  background: none;
+  border: none;
+  font-size: 2em;
+  color: #090909;
+  margin: 2px 6px 0 0;
+  cursor: pointer;
+  z-index: 10;
 }
 
 .sort-toggle {
@@ -428,7 +418,7 @@ html, body {
   transition: background 0.15s;
   outline: none;
 }
-.list-button, .recenter-btn {
+.list-btn, .recenter-btn {
   width: 40px;
   height: 40px;
   font-size: 26px;
@@ -448,7 +438,7 @@ html, body {
   border-radius: 26px;
   overflow: hidden;
   right: 10px !important;
-  width: 40px;
+  width: 32px;
   border: 1px solid #fff !important;
   color: #090909 !important;
   backdrop-filter: blur(8px) !important;
@@ -462,7 +452,7 @@ html, body {
   font-size: 1.5em;
   font-weight: 500;
   width: 40px;
-  height: 60px;
+  height: 40px;
   cursor: pointer;
   outline: none;
   transition: background 0.13s, color 0.13s;
@@ -482,58 +472,34 @@ html, body {
 }
 
 /* --- FEATURE CARD --- */
-/* --- FEATURE CARD --- */
 #feature-card {
   position: fixed;
-  right: 24px;               /* Position from the right edge */
-  top: 80px;                 /* Lowered to avoid search bar */
-  opacity: 0;
-  pointer-events: none;
-  transform: translateX(120%);
+  left: 50%;
+  bottom: 40px;
+  transform: translateX(-50%);
   background: none;
   border-radius: 24px;
-  box-shadow: 6px 6px 28px rgba(30, 49, 80, 0.33);
-  border: 1px solid #fff !important;
+  box-shadow: 0 8px 48px rgba(30, 49, 80, 0.13);
+  border: 1px #fff !important;
+  border: 0;
   padding: 0;
-  max-width: 96vw;           /* Allow some breathing room on mobile */
-  width: 340px;              /* Wider card for more content */
-  min-width: 220px;
-  height: auto;              /* Let content define height */
-  max-height: 300px;         /* Prevent overflow */
-  z-index: 900;
+  max-width: 350px;
+  width: 95vw;
+  min-height: 230px;
+  z-index: 4000;
   display: flex;
   flex-direction: column;
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  transition: opacity 0.3s ease;
   overflow: hidden;
-  background: rgba(255,255,255,0.95); /* Optional: add background for readability */
 }
-
-@media (max-width: 600px) {
-  #feature-card {
-    right: 8px;
-    top: 70px;
-    width: 96vw;
-    min-width: 0;
-    max-width: 98vw;
-    border-radius: 14px;
-    max-height: 60vw;
-  }
-}
-
-#feature-card.visible {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateX(0);
-}
-#feature-card.hidden {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateX(120%);
+.hidden {
+  display: none !important;
 }
 .feature-card-inner {
   position: relative;
   width: 100%;
-  min-height: 180px;
+  height: 230px;
+  min-height: 230px;
 }
 .priceboard-img-bg {
   position: absolute;
@@ -551,8 +517,8 @@ html, body {
 }
 .priceboard-logo-wrap {
   position: absolute;
-  top: 17px;
-  right: 16px;
+  top: 51px;
+  right: 60px;
   width: 46px;
   height: 46px;
   background: none;
@@ -562,20 +528,19 @@ html, body {
   justify-content: center;
 }
 .priceboard-logo {
-  max-width: 85%;
-  max-height: 85%;
-  border-radius: 60%;
+  max-width: 90%;
+  max-height: 90%;
   object-fit: contain;
 }
 .price-slot {
   position: absolute;
   width: 60px;
   height: 26px;
-  right: 15px;
+  right: 59px;
   font-family: 'Quantico', 'Roboto', monospace;
-  font-weight: 300;
-  font-size: 0.7em !important;
-  letter-spacing: 0px !important;
+  font-weight: 500;
+  font-size: 0.65em !important;
+  letter-spacing: 0.1px !important;
   text-align: right;
   line-height: 26px;
   color: #ffffff;
@@ -583,11 +548,11 @@ html, body {
   transition: color 0.2s;
   pointer-events: none;
 }
-.price-e10            { top: 58px;  }
-.price-91             { top: 75px;  }
-.price-95             { top: 91px;  }
-.price-98             { top: 107px; }
-.price-diesel-combined{ top: 124px; }
+.price-e10            { top: 91px;  }
+.price-91             { top: 107px;  }
+.price-95             { top: 124px;  }
+.price-98             { top: 140px; }
+.price-diesel-combined{ top: 156px; }
 
 .price-slot.cheapest { 
   color: #21ea00 !important; 
@@ -595,10 +560,10 @@ html, body {
 
 .feature-card-overlay {
   position: absolute;
-  top: 23px !important;
+  top: 70px !important;
   left: 14px !important;
   z-index: 3;
-  background: rgba(255,255,255,0.90);
+  background: rgba(255,255,255,0.62);
   border-radius: 14px;
   padding: 16px 18px 12px 16px;
   max-width: 50%;
@@ -611,39 +576,32 @@ html, body {
 }
 
 .feature-station-name {
-  font-size: 1.2em;
+  font-size: 1.1em;
   font-weight: bold;
-  color: #265786;
+  color: #090909;
   margin: 0;
-  line-height: 1.1;
+  line-height: 1.2;
 }
 .feature-station-address {
   font-size: 0.90em;
   color: #387cc2;
-  font-weight: 600;
   margin: 0;
   word-break: break-word;
 }
 .feature-station-distance {
-  font-size: 0.7em;
-  color: #717171;
+  font-size: 0.92em;
+  color: #5a5a5a;
   margin: 0;
   font-weight: 500;
-  letter-spacing: 0px !important;
-  letter-spacing: 0 !important;
 }
-.feature-drag-bar {
+#close-feature-card-btn {
   position: absolute;
-  top: 50%;
-  right: 0;
-  width: 6px;
-  height: 60px;
-  background: #ccc;
-  border-radius: 3px;
-  cursor: ew-resize;
-  transition: background 0.2s;
-  z-index: 900;
-}
-.feature-drag-bar:hover {
-  background: #888;
+  top: 4px !important;
+  right: 6px !important;
+  background: none;
+  border: none;
+  font-size: 2em;
+  color: #fff;
+  cursor: pointer;
+  z-index: 4;
 }
