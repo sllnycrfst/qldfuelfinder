@@ -1,16 +1,16 @@
 document.addEventListener("DOMContentLoaded", () => {
   // UI controls
   const recenterBtn = document.getElementById("recenter-btn");
-  const listButton = document.getElementById('list-button');
+  const listBtn = document.getElementById("list-btn");
   const listPanel = document.getElementById("list-panel");
-  const closeListButton = document.getElementById("close-list-btn");
+  const closeListBtn = document.getElementById("close-list-btn");
   const listUl = document.getElementById("list");
   const zoomInBtn = document.getElementById("zoom-in");
   const zoomOutBtn = document.getElementById("zoom-out");
   const sortToggle = document.getElementById("sort-toggle");
   const searchInput = document.getElementById("search");
   const fuelSelect = document.getElementById("fuel-select");
-  const featureCard = document.getElementById('feature-card');
+  const featureCard = document.getElementById("feature-card");
   const closeFeatureCardBtn = document.getElementById("close-feature-card-btn");
 
   let map, markerLayer, userMarker;
@@ -396,24 +396,24 @@ document.addEventListener("DOMContentLoaded", () => {
     featureCard.style.opacity = '0';
   });
 
-  listButton && listButton.addEventListener("click", () => {
+  listBtn && listBtn.addEventListener("click", () => {
     const isOpen = listPanel.classList.contains("visible");
     if (isOpen) {
       listPanel.classList.remove("visible");
       listPanel.classList.add("hidden");
-      listButton.classList.remove("active");
+      listBtn.classList.remove("active");
     } else {
       listPanel.classList.add("visible");
       listPanel.classList.remove("hidden");
-      listButton.classList.add("active");
+      listBtn.classList.add("active");
       updateStationList && updateStationList();
     }
   });
 
-  closeListButton && closeListButton.addEventListener("click", () => {
+  closeListBtn && closeListBtn.addEventListener("click", () => {
     listPanel.classList.remove("visible");
     listPanel.classList.add("hidden");
-    listButton.classList.remove("active");
+    listBtn.classList.remove("active");
   });
 
   if (sortToggle) {
