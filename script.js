@@ -1,4 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Prevent accidental page zoom from double-clicking
+  document.addEventListener('dblclick', function(e) {
+    e.preventDefault();
+  }, { passive: false });
+
   // UI controls
   const recenterBtn = document.getElementById("recenter-btn");
   const listBtn = document.getElementById("list-btn");
@@ -12,6 +17,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const fuelSelect = document.getElementById("fuel-select");
   const featureCard = document.getElementById("feature-card");
   const closeFeatureCardBtn = document.getElementById("close-feature-card-btn");
+  const trendsBtn = document.getElementById("trends-btn");
+  const trendsPanel = document.getElementById("trends-panel");
 
   let map, markerLayer, userMarker;
   const defaultCenter = [-27.4698, 153.0251];
@@ -194,6 +201,14 @@ document.addEventListener("DOMContentLoaded", () => {
     markerLayer.clearLayers();
     const bounds = map.getBounds();
 
+    // Get user location for distance calculation
+    let userLat = null, userLng = null;
+    if (userMarker && userMarker.getLatLng) {
+      const pos = userMarker.getLatLng();
+      userLat = pos.lat;
+      userLng = pos.lng;
+    }
+
     const isCombinedDiesel = currentFuel === "Diesel/Premium Diesel";
 
     const visibleStations = allSites
@@ -222,6 +237,7 @@ document.addEventListener("DOMContentLoaded", () => {
             lng: site.Lng,
             siteId: String(site.S),
             allPrices: priceMap[site.S],
+            distance: userLat != null ? getDistance(userLat, userLng, site.Lat, site.Lng) : null,
           };
         }
         return null;
@@ -258,8 +274,11 @@ document.addEventListener("DOMContentLoaded", () => {
         rawPrice: s.rawPrice,
         price: s.price,
         siteId: s.siteId
-      }).on("click", () => {
-        showFeatureCard(s);
+      }).on("click", (e) => {
+        // Capture mouse position from the click event
+        const clickX = e.originalEvent.clientX;
+        const clickY = e.originalEvent.clientY;
+        showFeatureCard(s, { type: 'click', x: clickX, y: clickY });
       });
 
       markerLayer.addLayer(marker);
@@ -328,11 +347,16 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    // Find the cheapest price for highlighting
+    const minPrice = stations.length ? Math.min(...stations.map(s => s.rawPrice)) : null;
+
     let others = stations;
     let othersHTML = others.map(site => {
       const siteImgSrc = site.brand
         ? `images/${site.brand}.png`
         : 'images/default.png';
+      const isCheapest = minPrice !== null && site.rawPrice === minPrice;
+      const priceClass = isCheapest ? "list-price cheapest" : "list-price";
       return `
         <li class="list-station" data-siteid="${String(site.siteId)}">
           <span class="list-logo">
@@ -344,7 +368,7 @@ document.addEventListener("DOMContentLoaded", () => {
             />
           </span>
           <span class="list-name">${site.name}<span class="list-distance">${site.distance != null ? site.distance.toFixed(1) + ' km' : ''}</span></span>
-          <span class="list-price">${site.price.toFixed(1)}</span>
+          <span class="${priceClass}">${site.price.toFixed(1)}</span>
         </li>
       `;
     }).join('');
@@ -352,74 +376,281 @@ document.addEventListener("DOMContentLoaded", () => {
     listUl.innerHTML = othersHTML;
 
     Array.from(listUl.querySelectorAll('.list-station')).forEach(item => {
-      item.addEventListener('click', function() {
+      item.addEventListener('click', function(e) {
+        // Capture mouse/touch position from the click event
+        const clickX = e.clientX;
+        const clickY = e.clientY;
         const siteId = this.getAttribute('data-siteid');
         const found = stations.find(s => String(s.siteId) === String(siteId));
-        if (found) showFeatureCard(found);
+        if (found) showFeatureCard(found, { type: 'click', x: clickX, y: clickY });
       });
     });
 
   }
 
-  function showFeatureCard(site) {
+  // Track the current feature card's source for smooth transitions
+  let currentFeatureSourceData = null;
+  let isFeatureCardVisible = false;
+
+  function showFeatureCard(site, sourceData = null) {
     if (!featureCard) return;
-    const nameEl = featureCard.querySelector('.feature-station-name');
-    nameEl.textContent = site.name || '';
-    const addressEl = featureCard.querySelector('.feature-station-address');
-    addressEl.textContent = site.address + (site.suburb ? ', ' + site.suburb : '');
-    addressEl.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.address + (site.suburb ? ', ' + site.suburb : ''))}`;
-    const distanceEl = featureCard.querySelector('.feature-station-distance');
-    distanceEl.textContent = (site.distance != null) ? `${site.distance.toFixed(1)} km` : '';
-    const logoEl = featureCard.querySelector('.priceboard-logo');
-    logoEl.src = site.brand ? `images/${site.brand}.png` : 'images/default.png';
-    logoEl.onerror = function(){this.onerror=null;this.src='images/default.png';};
-    const allPrices = site.allPrices || {};
-    featureCard.querySelector('.price-slot.price-e10').textContent = (typeof allPrices[12] !== 'undefined' && allPrices[12] !== null) ? (allPrices[12] / 10).toFixed(1) : 'N/A';
-    featureCard.querySelector('.price-slot.price-91').textContent = (typeof allPrices[2] !== 'undefined' && allPrices[2] !== null) ? (allPrices[2] / 10).toFixed(1) : 'N/A';
-    featureCard.querySelector('.price-slot.price-95').textContent = (typeof allPrices[5] !== 'undefined' && allPrices[5] !== null) ? (allPrices[5] / 10).toFixed(1) : 'N/A';
-    featureCard.querySelector('.price-slot.price-98').textContent = (typeof allPrices[8] !== 'undefined' && allPrices[8] !== null) ? (allPrices[8] / 10).toFixed(1) : 'N/A';
-    if (typeof allPrices[14] !== 'undefined' && allPrices[14] !== null) {
-      featureCard.querySelector('.price-slot.price-diesel-combined').textContent = (allPrices[14] / 10).toFixed(1);
-    } else if (typeof allPrices[3] !== 'undefined' && allPrices[3] !== null) {
-      featureCard.querySelector('.price-slot.price-diesel-combined').textContent = (allPrices[3] / 10).toFixed(1);
-    } else {
-      featureCard.querySelector('.price-slot.price-diesel-combined').textContent = '';
+    
+    // Calculate final position - always position as if list panel will be open
+    const listHeight = window.innerHeight * 0.5; // Always assume 50vh list height
+    const cardHeight = 233; // Updated to match your 233px height
+    const finalTop = window.innerHeight - listHeight - cardHeight - 40; // 20px higher (was -20, now -40)
+    const finalLeft = (window.innerWidth / 2) - 20; // 10px more to the left (was -10, now -20)
+    
+    // Capture the NEW source data for the new card
+    let newSourceData = sourceData;
+    
+    // Function to show new card
+    function showNewCard() {
+      // Update tracking variables to the NEW source
+      currentFeatureSourceData = newSourceData;
+      isFeatureCardVisible = true;
+      
+      // Update content first
+      const nameEl = featureCard.querySelector('.feature-station-name');
+      nameEl.textContent = site.name || '';
+      const addressEl = featureCard.querySelector('.feature-station-address');
+      addressEl.textContent = site.address + (site.suburb ? ', ' + site.suburb : '');
+      addressEl.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.address + (site.suburb ? ', ' + site.suburb : ''))}`;
+      const distanceEl = featureCard.querySelector('.feature-station-distance');
+      distanceEl.textContent = (site.distance != null) ? `${site.distance.toFixed(1)} km` : '';
+      const logoEl = featureCard.querySelector('.priceboard-logo');
+      logoEl.src = site.brand ? `images/${site.brand}.png` : 'images/default.png';
+      logoEl.onerror = function(){this.onerror=null;this.src='images/default.png';};
+      const allPrices = site.allPrices || {};
+      featureCard.querySelector('.price-slot.price-e10').textContent = (typeof allPrices[12] !== 'undefined' && allPrices[12] !== null) ? (allPrices[12] / 10).toFixed(1) : 'N/A';
+      featureCard.querySelector('.price-slot.price-91').textContent = (typeof allPrices[2] !== 'undefined' && allPrices[2] !== null) ? (allPrices[2] / 10).toFixed(1) : 'N/A';
+      featureCard.querySelector('.price-slot.price-95').textContent = (typeof allPrices[5] !== 'undefined' && allPrices[5] !== null) ? (allPrices[5] / 10).toFixed(1) : 'N/A';
+      featureCard.querySelector('.price-slot.price-98').textContent = (typeof allPrices[8] !== 'undefined' && allPrices[8] !== null) ? (allPrices[8] / 10).toFixed(1) : 'N/A';
+      if (typeof allPrices[14] !== 'undefined' && allPrices[14] !== null) {
+        featureCard.querySelector('.price-slot.price-diesel-combined').textContent = (allPrices[14] / 10).toFixed(1);
+      } else if (typeof allPrices[3] !== 'undefined' && allPrices[3] !== null) {
+        featureCard.querySelector('.price-slot.price-diesel-combined').textContent = (allPrices[3] / 10).toFixed(1);
+      } else {
+        featureCard.querySelector('.price-slot.price-diesel-combined').textContent = '';
+      }
+      
+      // Show the card first (without transition)
+      featureCard.classList.remove('hidden');
+      
+      // Set initial position for animation from the NEW source
+      if (newSourceData && newSourceData.type === 'click') {
+        // Temporarily disable transitions for instant positioning
+        featureCard.style.transition = 'none';
+        
+        // Start animation from the click/touch position
+        featureCard.style.left = `${newSourceData.x}px`;
+        featureCard.style.top = `${newSourceData.y}px`;
+        featureCard.style.transform = 'translate(-50%, -50%) scale(0.1)';
+        featureCard.style.opacity = '0';
+        
+        // Force a reflow to ensure initial styles are applied
+        featureCard.offsetHeight;
+        
+        // Re-enable transitions
+        featureCard.style.transition = 'all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        
+        // Animate to final position (fast bounce animation)
+        requestAnimationFrame(() => {
+          featureCard.style.left = `${finalLeft}px`;
+          featureCard.style.top = `${finalTop}px`;
+          featureCard.style.transform = 'translate(-50%, 0) scale(1)';
+          featureCard.style.opacity = '1';
+        });
+      } else {
+        // Default positioning (no animation)
+        featureCard.style.transition = 'none';
+        featureCard.style.left = `${finalLeft}px`;
+        featureCard.style.top = `${finalTop}px`;
+        featureCard.style.transform = 'translate(-50%, 0) scale(1)';
+        featureCard.style.opacity = '1';
+        // Re-enable transitions for future animations
+        requestAnimationFrame(() => {
+          featureCard.style.transition = 'all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        });
+      }
     }
-    featureCard.classList.remove('hidden');
-    featureCard.style.opacity = '0';
-    setTimeout(() => { featureCard.style.opacity = '1'; }, 10);
+    
+    // If a feature card is already visible, animate it back to its source first
+    if (isFeatureCardVisible && currentFeatureSourceData) {
+      // Animate back to the ORIGINAL source (where the current card came from)
+      if (currentFeatureSourceData.type === 'click') {
+        // Original was a click - animate back to original click position
+        featureCard.style.transition = 'all 0.1s cubic-bezier(0.55, 0.085, 0.68, 0.53)';
+        featureCard.style.left = `${currentFeatureSourceData.x}px`;
+        featureCard.style.top = `${currentFeatureSourceData.y}px`;
+        featureCard.style.transform = 'translate(-50%, -50%) scale(0.1)';
+        featureCard.style.opacity = '0';
+      }
+      
+      // After shrinking animation completes, show new card from the NEW source
+      setTimeout(() => {
+        showNewCard();
+      }, 100); // Quick shrink animation
+    } else {
+      // No existing card, show new one immediately
+      showNewCard();
+    }
   }
   
   recenterBtn && recenterBtn.addEventListener("click", () => showUserLocation(true));
   closeFeatureCardBtn && closeFeatureCardBtn.addEventListener('click', () => {
-    featureCard.classList.add('hidden');
-    featureCard.style.opacity = '0';
+    if (isFeatureCardVisible && currentFeatureSourceData && currentFeatureSourceData.type === 'click') {
+      // Animate back to the source position before hiding
+      featureCard.style.transition = 'all 0.1s cubic-bezier(0.55, 0.085, 0.68, 0.53)';
+      featureCard.style.left = `${currentFeatureSourceData.x}px`;
+      featureCard.style.top = `${currentFeatureSourceData.y}px`;
+      featureCard.style.transform = 'translate(-50%, -50%) scale(0.1)';
+      featureCard.style.opacity = '0';
+      
+      setTimeout(() => {
+        featureCard.classList.add('hidden');
+        // Reset positioning for next show
+        featureCard.style.transition = 'none';
+        featureCard.style.transform = 'translate(-50%, 0) scale(1)';
+        featureCard.style.opacity = '1';
+        // Reset tracking variables
+        currentFeatureSourceData = null;
+        isFeatureCardVisible = false;
+      }, 100);
+    } else {
+      // No animation, just hide
+      featureCard.classList.add('hidden');
+      featureCard.style.opacity = '0';
+      // Reset positioning for next show
+      featureCard.style.transform = 'translate(-50%, 0) scale(1)';
+      // Reset tracking variables
+      currentFeatureSourceData = null;
+      isFeatureCardVisible = false;
+    }
   });
 
   listBtn && listBtn.addEventListener("click", () => {
     const isOpen = listPanel.classList.contains("visible");
     if (isOpen) {
+      // Closing the panel
       listPanel.classList.remove("visible");
       listPanel.classList.add("hidden");
       listBtn.classList.remove("active");
     } else {
-      listPanel.classList.add("visible");
+      // Opening the panel - remove hidden first, then add visible for animation
       listPanel.classList.remove("hidden");
-      listBtn.classList.add("active");
-      updateStationList && updateStationList();
+      // Use requestAnimationFrame to ensure the removal of hidden takes effect first
+      requestAnimationFrame(() => {
+        listPanel.classList.add("visible");
+        listBtn.classList.add("active");
+        updateStationList && updateStationList();
+      });
     }
   });
 
-  closeListBtn && closeListBtn.addEventListener("click", () => {
-    listPanel.classList.remove("visible");
-    listPanel.classList.add("hidden");
-    listBtn.classList.remove("active");
-  });
+  // Add touch/drag functionality to the list header for sliding down
+  const listHeader = document.querySelector('.list-header');
+  if (listHeader && listPanel) {
+    let startY = 0;
+    let currentY = 0;
+    let isDragging = false;
+
+    // Touch events
+    listHeader.addEventListener('touchstart', (e) => {
+      startY = e.touches[0].clientY;
+      isDragging = true;
+      listPanel.classList.add('dragging');
+    });
+
+    listHeader.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      e.preventDefault();
+      currentY = e.touches[0].clientY;
+      const deltaY = currentY - startY;
+      
+      // Only allow dragging down with some resistance
+      if (deltaY > 0) {
+        const resistance = Math.min(deltaY * 0.8, window.innerHeight * 0.7);
+        listPanel.style.transform = `translateY(${resistance}px)`;
+      }
+    });
+
+    listHeader.addEventListener('touchend', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      listPanel.classList.remove('dragging');
+      listPanel.classList.add('animating');
+      
+      const deltaY = currentY - startY;
+      
+      // If dragged down more than 100px, close the panel
+      if (deltaY > 100) {
+        listPanel.classList.remove("visible");
+        listPanel.classList.add("hidden");
+        listBtn.classList.remove("active");
+      }
+      
+      // Reset transform with animation
+      listPanel.style.transform = '';
+      
+      // Remove animating class after animation completes
+      setTimeout(() => {
+        listPanel.classList.remove('animating');
+      }, 300);
+    });
+
+    // Mouse events for desktop
+    listHeader.addEventListener('mousedown', (e) => {
+      startY = e.clientY;
+      isDragging = true;
+      listPanel.classList.add('dragging');
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      currentY = e.clientY;
+      const deltaY = currentY - startY;
+      
+      if (deltaY > 0) {
+        const resistance = Math.min(deltaY * 0.8, window.innerHeight * 0.7);
+        listPanel.style.transform = `translateY(${resistance}px)`;
+      }
+    });
+
+    document.addEventListener('mouseup', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      listPanel.classList.remove('dragging');
+      listPanel.classList.add('animating');
+      
+      const deltaY = currentY - startY;
+      
+      if (deltaY > 100) {
+        listPanel.classList.remove("visible");
+        listPanel.classList.add("hidden");
+        listBtn.classList.remove("active");
+      }
+      
+      listPanel.style.transform = '';
+      
+      setTimeout(() => {
+        listPanel.classList.remove('animating');
+      }, 300);
+    });
+  }
 
   if (sortToggle) {
+    // Initialize the data attribute for the sliding background
+    sortToggle.setAttribute('data-active', 'price');
+    
     sortToggle.addEventListener("click", e => {
       if (e.target.tagName === "BUTTON") {
         sortBy = e.target.getAttribute("data-sort");
+        
+        // Update the data attribute for the sliding background
+        sortToggle.setAttribute('data-active', sortBy);
+        
         Array.from(sortToggle.querySelectorAll("button")).forEach(btn => {
           btn.classList.toggle("active", btn === e.target);
         });
@@ -445,4 +676,111 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     startApp(defaultCenter);
   }
+
+  // Trends functionality
+  function calculateTrends() {
+    if (!allSites.length || !allPrices.length) return;
+    
+    let userLat = null, userLng = null;
+    if (userMarker && userMarker.getLatLng) {
+      const pos = userMarker.getLatLng();
+      userLat = pos.lat;
+      userLng = pos.lng;
+    }
+    
+    if (!userLat || !userLng) {
+      // Use default location if no user location
+      userLat = defaultCenter[0];
+      userLng = defaultCenter[1];
+    }
+    
+    // Get stations within 50km
+    const nearbyStations = allSites.filter(site => {
+      const distance = getDistance(userLat, userLng, site.Lat, site.Lng);
+      return distance !== null && distance <= 50;
+    });
+    
+    // Calculate average prices for each fuel type
+    const fuelAverages = {};
+    [12, 2, 5, 8, 3, 14].forEach(fuelId => {
+      const prices = [];
+      nearbyStations.forEach(site => {
+        const sitePrice = priceMap[site.S]?.[fuelId];
+        if (typeof sitePrice !== "undefined" && sitePrice !== null) {
+          prices.push(sitePrice / 10);
+        }
+      });
+      
+      if (prices.length > 0) {
+        fuelAverages[fuelId] = prices.reduce((a, b) => a + b) / prices.length;
+      }
+    });
+    
+    // Simple trend simulation (in a real app, you'd compare with historical data)
+    // For demo purposes, we'll simulate some trends based on current averages
+    const trends = {
+      12: Math.random() < 0.3 ? 'up' : Math.random() < 0.3 ? 'down' : 'stable', // E10
+      2: Math.random() < 0.3 ? 'up' : Math.random() < 0.3 ? 'down' : 'stable',  // 91
+      5: Math.random() < 0.3 ? 'up' : Math.random() < 0.3 ? 'down' : 'stable',  // 95
+      8: Math.random() < 0.3 ? 'up' : Math.random() < 0.3 ? 'down' : 'stable',  // 98
+      diesel: Math.random() < 0.3 ? 'up' : Math.random() < 0.3 ? 'down' : 'stable' // Diesel
+    };
+    
+    // Update trend indicators
+    updateTrendIndicator('trend-e10', trends[12]);
+    updateTrendIndicator('trend-91', trends[2]);
+    updateTrendIndicator('trend-95', trends[5]);
+    updateTrendIndicator('trend-98', trends[8]);
+    updateTrendIndicator('trend-diesel', trends.diesel);
+  }
+  
+  function updateTrendIndicator(elementId, trend) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    const arrow = element.querySelector('.trend-arrow');
+    const text = element.querySelector('.trend-text');
+    
+    // Reset classes
+    element.className = 'trend-indicator';
+    
+    switch(trend) {
+      case 'up':
+        element.classList.add('trend-up');
+        arrow.textContent = '↗';
+        text.textContent = 'Rising';
+        break;
+      case 'down':
+        element.classList.add('trend-down');
+        arrow.textContent = '↘';
+        text.textContent = 'Falling';
+        break;
+      default:
+        element.classList.add('trend-stable');
+        arrow.textContent = '→';
+        text.textContent = 'Stable';
+    }
+  }
+
+  // Trends button functionality
+  trendsBtn && trendsBtn.addEventListener("click", () => {
+    if (trendsPanel.classList.contains("visible")) {
+      trendsPanel.classList.remove("visible");
+      trendsPanel.classList.add("hidden");
+    } else {
+      trendsPanel.classList.remove("hidden");
+      trendsPanel.classList.add("visible");
+      calculateTrends(); // Calculate trends when opening
+    }
+  });
+
+  // Close trends panel when clicking outside
+  document.addEventListener('click', (e) => {
+    if (trendsPanel && !trendsPanel.contains(e.target) && e.target !== trendsBtn) {
+      if (trendsPanel.classList.contains("visible")) {
+        trendsPanel.classList.remove("visible");
+        trendsPanel.classList.add("hidden");
+      }
+    }
+  });
 });

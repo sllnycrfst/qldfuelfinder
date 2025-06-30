@@ -43,9 +43,6 @@
 
     <!-- Side Controls -->
     <div class="side-controls">
-      <button id="list-btn" title="Show station list" class="list-btn glass-btn" aria-label="Show station list">
-        <span aria-hidden="true">☰</span>
-      </button>
       <div class="custom-zoom-rect">
         <button id="zoom-in" aria-label="Zoom in">+</button>
         <div class="zoom-divider"></div>
@@ -53,12 +50,21 @@
       </div>
       <button id="recenter-btn" title="Go to my location" class="recenter-btn glass-btn" aria-label="Go to my location">
         <svg width="26" height="26" viewBox="0 0 26 26" fill="none" style="display:block" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="13" cy="13" r="7" stroke="#060606" stroke-width="2"/>
-          <line x1="13" y1="3" x2="13" y2="7" stroke="#060606" stroke-width="2"/>
-          <line x1="13" y1="19" x2="13" y2="23" stroke="#060606" stroke-width="2"/>
-          <line x1="3" y1="13" x2="7" y2="13" stroke="#060606" stroke-width="2"/>
-          <line x1="19" y1="13" x2="23" y2="13" stroke="#060606" stroke-width="2"/>
+          <circle cx="13" cy="13" r="7" stroke="#111111" stroke-width="2"/>
+          <line x1="13" y1="3" x2="13" y2="7" stroke="#111111" stroke-width="2"/>
+          <line x1="13" y1="19" x2="13" y2="23" stroke="#111111" stroke-width="2"/>
+          <line x1="3" y1="13" x2="7" y2="13" stroke="#111111" stroke-width="2"/>
+          <line x1="19" y1="13" x2="23" y2="13" stroke="#111111" stroke-width="2"/>
         </svg>
+      </button>
+      <button id="trends-btn" title="View price trends" class="trends-btn glass-btn" aria-label="View price trends">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display:block" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 17L9 11L13 15L21 7" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 7H21V12" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button id="list-btn" title="Show station list" class="list-btn glass-btn" aria-label="Show station list">
+        <span aria-hidden="true">☰</span>
       </button>
     </div>
   </div>
@@ -66,7 +72,6 @@
   <!-- List Panel -->
   <div id="list-panel" class="hidden" aria-modal="true" role="dialog">
     <div class="list-header">
-      <button id="close-list-btn" title="Close list" aria-label="Close list">&times;</button>
       <div id="sort-toggle" class="sort-toggle">
         <div class="sort-toggle-slider"></div>
         <button class="active" data-sort="price">Price</button>
@@ -74,6 +79,50 @@
       </div>
     </div>
     <ul id="list"></ul>
+  </div>
+
+  <!-- Trends Panel -->
+  <div id="trends-panel" class="hidden" aria-modal="true" role="dialog">
+    <div class="trends-header">
+      <h3>Price Trends (50km radius)</h3>
+      <div id="trends-content">
+        <div class="trend-item">
+          <div class="trend-fuel">E10</div>
+          <div class="trend-indicator" id="trend-e10">
+            <span class="trend-arrow">→</span>
+            <span class="trend-text">No change</span>
+          </div>
+        </div>
+        <div class="trend-item">
+          <div class="trend-fuel">91</div>
+          <div class="trend-indicator" id="trend-91">
+            <span class="trend-arrow">→</span>
+            <span class="trend-text">No change</span>
+          </div>
+        </div>
+        <div class="trend-item">
+          <div class="trend-fuel">95</div>
+          <div class="trend-indicator" id="trend-95">
+            <span class="trend-arrow">→</span>
+            <span class="trend-text">No change</span>
+          </div>
+        </div>
+        <div class="trend-item">
+          <div class="trend-fuel">98</div>
+          <div class="trend-indicator" id="trend-98">
+            <span class="trend-arrow">→</span>
+            <span class="trend-text">No change</span>
+          </div>
+        </div>
+        <div class="trend-item">
+          <div class="trend-fuel">Diesel</div>
+          <div class="trend-indicator" id="trend-diesel">
+            <span class="trend-arrow">→</span>
+            <span class="trend-text">No change</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Feature Card -->
