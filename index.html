@@ -66,7 +66,7 @@
   <!-- List Panel -->
   <div id="list-panel" class="hidden" aria-modal="true" role="dialog">
     <div class="list-header">
-      <div class="list-drag-bar" title="Drag down to close"></div>
+      <button id="close-list-btn" title="Close list" aria-label="Close list">&times;</button>
       <div id="sort-toggle" class="sort-toggle">
         <div class="sort-toggle-slider"></div>
         <button class="active" data-sort="price">Price</button>
@@ -78,7 +78,7 @@
 
   <!-- Feature Card -->
   <div id="feature-card" class="feature-card hidden" role="dialog" aria-modal="true">
-    <div class="feature-drag-bar" title="Drag left to close"></div>
+    <button id="close-feature-card-btn" title="Close">&times;</button>
     <div class="feature-card-inner">
       <img src="images/priceboard.png" alt="Price Board" class="priceboard-img-bg" />
       <div class="priceboard-absolute-wrap">
