@@ -1,9 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
   // UI controls
   const recenterBtn = document.getElementById("recenter-btn");
-  const listButton = document.getElementById('list-btn');
+  const listButton = document.getElementById('list-button');
   const listPanel = document.getElementById("list-panel");
-  const closeListBtn = document.getElementById("close-list-btn");
+  const closeListButton = document.getElementById("close-list-btn");
   const listUl = document.getElementById("list");
   const zoomInBtn = document.getElementById("zoom-in");
   const zoomOutBtn = document.getElementById("zoom-out");
@@ -396,24 +396,24 @@ document.addEventListener("DOMContentLoaded", () => {
     featureCard.style.opacity = '0';
   });
 
-  listBtn && listBtn.addEventListener("click", () => {
+  listButton && listButton.addEventListener("click", () => {
     const isOpen = listPanel.classList.contains("visible");
     if (isOpen) {
       listPanel.classList.remove("visible");
       listPanel.classList.add("hidden");
-      listBtn.classList.remove("active");
+      listButton.classList.remove("active");
     } else {
       listPanel.classList.add("visible");
       listPanel.classList.remove("hidden");
-      listBtn.classList.add("active");
+      listButton.classList.add("active");
       updateStationList && updateStationList();
     }
   });
 
-  closeListBtn && closeListBtn.addEventListener("click", () => {
+  closeListButton && closeListButton.addEventListener("click", () => {
     listPanel.classList.remove("visible");
     listPanel.classList.add("hidden");
-    listBtn.classList.remove("active");
+    listButton.classList.remove("active");
   });
 
   if (sortToggle) {
