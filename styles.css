@@ -254,6 +254,9 @@ html, body {
 #list-panel.visible {
   transform: translateY(0);
 }
+#list-panel.hidden {
+  bottom: -100%;
+}
 
 /* --- HEADER (Close + Sort) --- */
 .list-header {
