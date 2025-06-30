@@ -438,7 +438,7 @@ html, body {
   border-radius: 26px;
   overflow: hidden;
   right: 10px !important;
-  width: 32px;
+  width: 40px;
   border: 1px solid #fff !important;
   color: #090909 !important;
   backdrop-filter: blur(8px) !important;
@@ -452,7 +452,7 @@ html, body {
   font-size: 1.5em;
   font-weight: 500;
   width: 40px;
-  height: 40px;
+  height: 60px;
   cursor: pointer;
   outline: none;
   transition: background 0.13s, color 0.13s;
@@ -474,32 +474,31 @@ html, body {
 /* --- FEATURE CARD --- */
 #feature-card {
   position: fixed;
-  left: 50%;
-  bottom: 40px;
+  left: 43%;
+  top: 120px;
   transform: translateX(-50%);
   background: none;
   border-radius: 24px;
-  box-shadow: 0 8px 48px rgba(30, 49, 80, 0.13);
+  box-shadow: 6px 6px 28px rgba(30, 49, 80, 0.33);
   border: 1px #fff !important;
   border: 0;
   padding: 0;
   max-width: 350px;
-  width: 95vw;
-  min-height: 230px;
-  z-index: 4000;
+  width: 77vw;
+  min-height: 180px;
+  z-index: 999;
   display: flex;
   flex-direction: column;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.4s ease;
   overflow: hidden;
 }
-.hidden {
+#feature-card.hidden {
   display: none !important;
 }
 .feature-card-inner {
   position: relative;
   width: 100%;
-  height: 230px;
-  min-height: 230px;
+  min-height: 180px;
 }
 .priceboard-img-bg {
   position: absolute;
@@ -517,8 +516,8 @@ html, body {
 }
 .priceboard-logo-wrap {
   position: absolute;
-  top: 51px;
-  right: 60px;
+  top: 17px;
+  right: 16px;
   width: 46px;
   height: 46px;
   background: none;
@@ -528,19 +527,20 @@ html, body {
   justify-content: center;
 }
 .priceboard-logo {
-  max-width: 90%;
-  max-height: 90%;
+  max-width: 85%;
+  max-height: 85%;
+  border-radius: 60%;
   object-fit: contain;
 }
 .price-slot {
   position: absolute;
   width: 60px;
   height: 26px;
-  right: 59px;
+  right: 15px;
   font-family: 'Quantico', 'Roboto', monospace;
-  font-weight: 500;
-  font-size: 0.65em !important;
-  letter-spacing: 0.1px !important;
+  font-weight: 300;
+  font-size: 0.7em !important;
+  letter-spacing: 0px !important;
   text-align: right;
   line-height: 26px;
   color: #ffffff;
@@ -548,11 +548,11 @@ html, body {
   transition: color 0.2s;
   pointer-events: none;
 }
-.price-e10            { top: 91px;  }
-.price-91             { top: 107px;  }
-.price-95             { top: 124px;  }
-.price-98             { top: 140px; }
-.price-diesel-combined{ top: 156px; }
+.price-e10            { top: 58px;  }
+.price-91             { top: 75px;  }
+.price-95             { top: 91px;  }
+.price-98             { top: 107px; }
+.price-diesel-combined{ top: 124px; }
 
 .price-slot.cheapest { 
   color: #21ea00 !important; 
@@ -560,10 +560,10 @@ html, body {
 
 .feature-card-overlay {
   position: absolute;
-  top: 70px !important;
+  top: 23px !important;
   left: 14px !important;
   z-index: 3;
-  background: rgba(255,255,255,0.62);
+  background: rgba(255,255,255,0.90);
   border-radius: 14px;
   padding: 16px 18px 12px 16px;
   max-width: 50%;
@@ -576,32 +576,36 @@ html, body {
 }
 
 .feature-station-name {
-  font-size: 1.1em;
+  font-size: 1.2em;
   font-weight: bold;
-  color: #090909;
+  color: #265786;
   margin: 0;
-  line-height: 1.2;
+  line-height: 1.1;
 }
 .feature-station-address {
   font-size: 0.90em;
   color: #387cc2;
+  font-weight: 600;
   margin: 0;
   word-break: break-word;
 }
 .feature-station-distance {
-  font-size: 0.92em;
-  color: #5a5a5a;
+  font-size: 0.7em;
+  color: #717171;
   margin: 0;
   font-weight: 500;
+  letter-spacing: 0px !important;
+  letter-spacing: 0 !important;
 }
 #close-feature-card-btn {
   position: absolute;
-  top: 4px !important;
-  right: 6px !important;
+  transition: opacity 0.4s ease;
+  top: 1px !important;
+  right: 2px !important;
   background: none;
   border: none;
   font-size: 2em;
-  color: #fff;
+  color: #265786;
   cursor: pointer;
   z-index: 4;
 }
