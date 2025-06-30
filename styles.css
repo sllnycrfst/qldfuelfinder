@@ -238,17 +238,18 @@ html, body {
   bottom: 0;
   width: 100vw;
   height: 45vh;
-  max-width: 95vw;
+  max-width: 100vw;
   box-shadow: 0 -4px 24px rgba(0,0,0,0.08);
   transform: translateY(100%);
   transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
-  z-index: 1000;
+  z-index: 1005;
   display: flex;
   flex-direction: column;
-  background: rgba(255,255,255,0.95) !important;
+  background: rgba(255,255,255,0.55) !important;
   backdrop-filter: blur(15px);
   border-radius: 16px 16px 0 0 !important;
-  border: 1px solid #ffffff !important;
+  border: 1.5px solid #ffffff !important;
+  box-shadow: 6px 6px 28px rgba(30, 49, 80, 0.33);
   font-family: 'Roboto', Arial, sans-serif !important;
   overflow: hidden;
   pointer-events: none;
@@ -492,9 +493,9 @@ box-shadow: 6px 6px 28px rgba(30, 49, 80, 0.33);
 border: 1px #fff !important;
 border: 0;
 padding: 0;
-max-width: 300px;
+max-width: 100vw;
 width: 80vw;
-min-height: 180px;
+height: 180px;
 z-index: 900;
 display: flex;
 flex-direction: column;
@@ -502,7 +503,7 @@ transition: opacity 0.4s ease;
 overflow: hidden;
 }
 #feature-card.visible {
-transform: translateY(0);
+transform: translateX(0);
 pointer-events: auto !important;
 }
 #feature-card.hidden {
