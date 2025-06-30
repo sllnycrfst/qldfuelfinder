@@ -235,10 +235,10 @@ html, body {
   position: fixed;
   top: 180px;
   left: 0;
-  width: 330px;
-  height: calc(100vh - 100px);
+  width: 340px;
+  height: 100vh;
   box-shadow: 2px 0 12px rgba(0,0,0,0.15);
-  transform: translateX(-100%);
+  transform: translateY(-100%);
   transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
   z-index: 1000;
   display: flex;
@@ -252,7 +252,7 @@ html, body {
   overflow: hidden; /* KEY: Don't scroll the panel, just the list */
 }
 #list-panel.visible {
-  transform: translateX(0);
+  transform: translateY(0);
 }
 
 /* --- HEADER (Close + Sort) --- */
