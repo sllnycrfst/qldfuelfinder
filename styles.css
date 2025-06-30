@@ -513,8 +513,8 @@ html, body {
 }
 .priceboard-logo-wrap {
   position: absolute;
-  top: 24px;
-  right: 24px;
+  top: 20px;
+  right: 22px;
   width: 46px;
   height: 46px;
   background: none;
@@ -526,6 +526,7 @@ html, body {
 .priceboard-logo {
   max-width: 90%;
   max-height: 90%;
+  border-radius: 50%;
   object-fit: contain;
 }
 .price-slot {
