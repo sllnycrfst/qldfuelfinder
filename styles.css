@@ -513,8 +513,8 @@ html, body {
 }
 .priceboard-logo-wrap {
   position: absolute;
-  top: 31px;
-  right: 30px;
+  top: 24px;
+  right: 24px;
   width: 46px;
   height: 46px;
   background: none;
@@ -532,7 +532,7 @@ html, body {
   position: absolute;
   width: 60px;
   height: 26px;
-  right: 59px;
+  right: 24px;
   font-family: 'Quantico', 'Roboto', monospace;
   font-weight: 500;
   font-size: 0.65em !important;
