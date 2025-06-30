@@ -475,7 +475,7 @@ html, body {
 #feature-card {
   position: fixed;
   top: 120px;
-  left: 0%;
+  left: 30%;
   transform: translateX(-50%);
   background: none;
   border-radius: 24px;
