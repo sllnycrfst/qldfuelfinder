@@ -556,7 +556,7 @@ html, body {
 
 .feature-card-overlay {
   position: absolute;
-  top: 70px !important;
+  top: 30px !important;
   left: 14px !important;
   z-index: 3;
   background: rgba(255,255,255,0.62);
