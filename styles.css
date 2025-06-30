@@ -178,7 +178,7 @@ html, body {
   height: 29px;
   object-fit: contain;
   border-radius: 50%;
-  background: #edefef;
+  background: #ffffff;
   box-shadow: 0 1px 2px rgba(0,0,0,0.07);
   z-index: 2;
 }
@@ -533,11 +533,11 @@ html, body {
   position: absolute;
   width: 60px;
   height: 10px;
-  right: 22px;
+  right: 23px;
   font-family: 'Quantico', 'Roboto', monospace;
   font-weight: 500;
   font-size: 0.65em !important;
-  letter-spacing: 0.1px !important;
+  letter-spacing: 0px !important;
   text-align: right;
   line-height: 26px;
   color: #ffffff;
@@ -545,11 +545,11 @@ html, body {
   transition: color 0.2s;
   pointer-events: none;
 }
-.price-e10            { top: 59px;  }
-.price-91             { top: 75px;  }
+.price-e10            { top: 57px;  }
+.price-91             { top: 74px;  }
 .price-95             { top: 91px;  }
-.price-98             { top: 107px; }
-.price-diesel-combined{ top: 123px; }
+.price-98             { top: 108px; }
+.price-diesel-combined{ top: 125px; }
 
 .price-slot.cheapest { 
   color: #21ea00 !important; 
@@ -566,7 +566,7 @@ html, body {
   max-width: 50%;
   min-width: 120px;
   box-shadow: 0 2px 16px 0 rgba(60,80,140,0.09);
-  backdrop-filter: blur(15px);
+  backdrop-filter: blur(8px);
   border: 1px #fff !important;
   display: flex;
   flex-direction: column;
