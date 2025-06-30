@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   // UI controls
   const recenterBtn = document.getElementById("recenter-btn");
-  const listBtn = document.getElementById("list-btn");
+  const listButton = document.getElementById('list-btn');
   const listPanel = document.getElementById("list-panel");
   const closeListBtn = document.getElementById("close-list-btn");
   const listUl = document.getElementById("list");
@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const sortToggle = document.getElementById("sort-toggle");
   const searchInput = document.getElementById("search");
   const fuelSelect = document.getElementById("fuel-select");
-  const featureCard = document.getElementById("feature-card");
+  const featureCard = document.getElementById('feature-card');
   const closeFeatureCardBtn = document.getElementById("close-feature-card-btn");
 
   let map, markerLayer, userMarker;
