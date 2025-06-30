@@ -428,7 +428,7 @@ html, body {
   transition: background 0.15s;
   outline: none;
 }
-.list-btn, .recenter-btn {
+.list-button, .recenter-btn {
   width: 40px;
   height: 40px;
   font-size: 26px;
