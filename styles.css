@@ -231,7 +231,7 @@ html, body {
 /* --- LIST PANEL & STATION LIST --- */
 #list-panel {
   position: fixed;
-  bottom: 20px;
+  bottom: 0;
   left: 0;
   right: 0;
   width: 100vw;
