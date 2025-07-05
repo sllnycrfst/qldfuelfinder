@@ -1,155 +1,205 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>QLD Fuel Finder</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Quantico:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="icon" type="image/png" href="images/favicon.png">
-  <link rel="apple-touch-icon" href="./images/home-icon.png">
-
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QLD Fuel Finder</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+          crossorigin="" />
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-
-  <!-- Search Bar -->
-  <div class="search-bar-glass">
-    <span class="search-icon" aria-hidden="true">
-      <i class="fa-solid fa-magnifying-glass"></i>
-    </span>
-    <input id="search" type="text" placeholder="Search suburb" autocomplete="on" />
-    <span class="divider">|</span>
-    <span class="fuel-icon" aria-hidden="true">
-      <i class="fa-solid fa-gas-pump"></i>
-    </span>
-    <select id="fuel-select">
-      <option value="E10">E10</option>
-      <option value="91">91</option>
-      <option value="95">95</option>
-      <option value="98">98</option>
-      <option value="Diesel/Premium Diesel">Diesel</option>
-    </select>
-  </div>
-
-  <!-- Map Container -->
-  <div class="map-wrapper">
+    <!-- Map -->
     <div id="map"></div>
-
+    
+    <!-- Search Bar -->
+    <div class="search-bar-glass">
+        <div class="search-container">
+            <div class="search-input-section">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="search" placeholder="Search location..." />
+            </div>
+            <div class="fuel-divider"></div>
+            <div class="fuel-selector-inline">
+                <i class="fas fa-gas-pump fuel-icon"></i>
+                <select id="fuel-select">
+                    <option value="E10">E10</option>
+                    <option value="91">91</option>
+                    <option value="95">95</option>
+                    <option value="98">98</option>
+                    <option value="Diesel/Premium Diesel">Diesel</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
     <!-- Side Controls -->
     <div class="side-controls">
-      <div class="custom-zoom-rect">
-        <button id="zoom-in" aria-label="Zoom in">+</button>
-        <div class="zoom-divider"></div>
-        <button id="zoom-out" aria-label="Zoom out">−</button>
-      </div>
-      <button id="recenter-btn" title="Go to my location" class="recenter-btn glass-btn" aria-label="Go to my location">
-        <svg width="26" height="26" viewBox="0 0 26 26" fill="none" style="display:block" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="13" cy="13" r="7" stroke="#111111" stroke-width="2"/>
-          <line x1="13" y1="3" x2="13" y2="7" stroke="#111111" stroke-width="2"/>
-          <line x1="13" y1="19" x2="13" y2="23" stroke="#111111" stroke-width="2"/>
-          <line x1="3" y1="13" x2="7" y2="13" stroke="#111111" stroke-width="2"/>
-          <line x1="19" y1="13" x2="23" y2="13" stroke="#111111" stroke-width="2"/>
-        </svg>
-      </button>
-      <button id="trends-btn" title="View price trends" class="trends-btn glass-btn" aria-label="View price trends">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display:block" xmlns="http://www.w3.org/2000/svg">
-          <path d="M3 17L9 11L13 15L21 7" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M16 7H21V12" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-      <button id="list-btn" title="Show station list" class="list-btn glass-btn" aria-label="Show station list">
-        <span aria-hidden="true">☰</span>
-      </button>
+        <div class="custom-zoom-rect">
+            <button id="zoom-in">+</button>
+            <div class="zoom-divider"></div>
+            <button id="zoom-out">−</button>
+        </div>
     </div>
-  </div>
-
-  <!-- List Panel -->
-  <div id="list-panel" class="hidden" aria-modal="true" role="dialog">
-    <div class="list-header">
-      <div id="sort-toggle" class="sort-toggle">
-        <div class="sort-toggle-slider"></div>
-        <button class="active" data-sort="price">Price</button>
-        <button data-sort="distance">Distance</button>
-      </div>
+    
+    <!-- Bottom Feature Card (initially hidden) -->
+    <div class="bottom-feature-card" id="bottom-feature-card">
+        <button class="bottom-feature-close" onclick="hideBottomFeatureCard()">×</button>
+        <div class="bottom-feature-inner">
+            <!-- Content will be dynamically inserted here -->
+        </div>
     </div>
-    <ul id="list"></ul>
-  </div>
-
-  <!-- Trends Panel -->
-  <div id="trends-panel" class="hidden" aria-modal="true" role="dialog">
-    <div class="trends-header">
-      <h3>Price Trends (50km radius)</h3>
-      <div id="trends-content">
-        <div class="trend-item">
-          <div class="trend-fuel">E10</div>
-          <div class="trend-indicator" id="trend-e10">
-            <span class="trend-arrow">→</span>
-            <span class="trend-text">No change</span>
-          </div>
-        </div>
-        <div class="trend-item">
-          <div class="trend-fuel">91</div>
-          <div class="trend-indicator" id="trend-91">
-            <span class="trend-arrow">→</span>
-            <span class="trend-text">No change</span>
-          </div>
-        </div>
-        <div class="trend-item">
-          <div class="trend-fuel">95</div>
-          <div class="trend-indicator" id="trend-95">
-            <span class="trend-arrow">→</span>
-            <span class="trend-text">No change</span>
-          </div>
-        </div>
-        <div class="trend-item">
-          <div class="trend-fuel">98</div>
-          <div class="trend-indicator" id="trend-98">
-            <span class="trend-arrow">→</span>
-            <span class="trend-text">No change</span>
-          </div>
-        </div>
-        <div class="trend-item">
-          <div class="trend-fuel">Diesel</div>
-          <div class="trend-indicator" id="trend-diesel">
-            <span class="trend-arrow">→</span>
-            <span class="trend-text">No change</span>
-          </div>
-        </div>
-      </div>
+    
+    <!-- Bottom Toolbar -->
+    <div class="bottom-toolbar">
+        <button class="toolbar-side-btn" id="home-tab">
+            <i class="fas fa-chart-line"></i>
+        </button>
+        <button class="toolbar-center-btn map-view" id="map-tab">
+            <i class="fas fa-map map-icon"></i>
+            <i class="fas fa-location-crosshairs recenter-icon"></i>
+        </button>
+        <button class="toolbar-side-btn" id="list-tab">
+            <i class="fas fa-list"></i>
+        </button>
     </div>
-  </div>
-
-  <!-- Feature Card -->
-  <div id="feature-card" class="feature-card hidden" role="dialog" aria-modal="true">
-    <button id="close-feature-card-btn" title="Close">&times;</button>
-    <div class="feature-card-inner">
-      <img src="images/priceboard.png" alt="Price Board" class="priceboard-img-bg" />
-      <div class="priceboard-absolute-wrap">
-        <div class="priceboard-logo-wrap">
-          <img class="priceboard-logo" src="images/default.png" alt="Station logo" />
+    
+    <!-- Home Panel -->
+    <div class="fullscreen-panel hidden" id="home-panel">
+        <div class="panel-header">
+            <h2><i class="fas fa-chart-line"></i> Fuel Insights</h2>
         </div>
-        <div class="price-slot price-e10"></div>
-        <div class="price-slot price-91"></div>
-        <div class="price-slot price-95"></div>
-        <div class="price-slot price-98"></div>
-        <div class="price-slot price-diesel-combined"></div>
-      </div>
-      <div class="feature-card-overlay">
-        <div class="feature-station-name"></div>
-        <a class="feature-station-address" href="#" target="_blank" rel="noopener"></a>
-        <div class="feature-station-distance"></div>
-      </div>
+        <div class="panel-content">
+            
+            <div class="chart-container">
+                <h3>Price Trends</h3>
+                <canvas id="price-chart"></canvas>
+            </div>
+            
+            <div class="price-stats">
+                <h3>Current Price Statistics</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <i class="fas fa-gas-pump"></i>
+                            <span>E10</span>
+                        </div>
+                        <div class="stat-values">
+                            <div class="stat-value">
+                                <span class="label">Average:</span>
+                                <span class="value" id="e10-avg">--.-¢</span>
+                            </div>
+                            <div class="stat-value">
+                                <span class="label">Cheapest:</span>
+                                <span class="value cheapest" id="e10-min">--.-¢</span>
+                            </div>
+                            <div class="stat-value">
+                                <span class="label">Most Expensive:</span>
+                                <span class="value expensive" id="e10-max">--.-¢</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="calculator-section">
+                <h3>Fuel Calculator</h3>
+                <p class="calculator-description">Calculate how much fuel you can get for your money</p>
+                <div class="calculator-grid">
+                    <div class="calc-input">
+                        <label for="fuel-price">Fuel Price (¢/L)</label>
+                        <input type="number" id="fuel-price" step="0.1" value="160.5">
+                    </div>
+                    <div class="calc-input">
+                        <label for="discount-amount">Discount (¢/L)</label>
+                        <select id="discount-amount">
+                            <option value="0">No discount</option>
+                            <option value="4">4¢/L</option>
+                            <option value="8">8¢/L</option>
+                        </select>
+                    </div>
+                    <div class="calc-input">
+                        <label for="spend-amount">Amount to Spend ($)</label>
+                        <input type="number" id="spend-amount" step="1" value="50">
+                    </div>
+                    <div class="calc-result">
+                        <label>Litres You'll Get</label>
+                        <div class="result-display" id="litres-result">31.1 L</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+    
+    <!-- List Panel -->
+    <div class="fullscreen-panel hidden" id="list-panel">
+        <div class="panel-header">
+            <h2><i class="fas fa-list"></i> Station List</h2>
+        </div>
+        <div class="panel-content">
+            <div class="list-controls">
+                <div class="distance-sort-container">
+                    <div class="distance-section">
+                        <label class="control-label">Distance</label>
+                        <div class="distance-toggle" id="distance-toggle" data-active="5">
+                            <button class="distance-btn active" data-radius="5">5km</button>
+                            <button class="distance-btn" data-radius="10">10km</button>
+                            <button class="distance-btn" data-radius="20">20km</button>
+                        </div>
+                    </div>
+                    
+                    <div class="fuel-section">
+                        <label class="control-label">Fuel Type</label>
+                        <div class="fuel-toggle" id="fuel-toggle" data-active="E10">
+                            <button class="fuel-btn active" data-fuel="E10">E10</button>
+                            <button class="fuel-btn" data-fuel="91">91</button>
+                            <button class="fuel-btn" data-fuel="95">95</button>
+                            <button class="fuel-btn" data-fuel="98">98</button>
+                            <button class="fuel-btn" data-fuel="Diesel/Premium Diesel">DSL</button>
+                        </div>
+                    </div>
+                    
+                    <div class="sort-section">
+                        <label class="control-label">Sort By</label>
+                        <div class="sort-toggle" id="sort-toggle" data-active="price">
+                            <button class="sort-btn active" data-sort="price">
+                                <i class="fas fa-dollar-sign"></i> Price
+                            </button>
+                            <button class="sort-btn" data-sort="distance">
+                                <i class="fas fa-route"></i> Distance
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <ul id="list">
+                <li>Loading...</li>
+            </ul>
+        </div>
+    </div>
 
-  <!-- Scripts -->
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="script.js"></script>
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+            crossorigin=""></script>
+    <script src="script.js"></script>
 </body>
 </html>
