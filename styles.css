@@ -868,7 +868,7 @@ html, body {
   min-width: 110px;
   margin: 0;
   padding: 3px 8px;
-  top: 120px;
+  top: 80px !important;
 }
 
 .price-slot-fuel {
@@ -900,8 +900,8 @@ html, body {
 
 .priceboard-logo-wrap {
   position: absolute;
-  top: 38px;
-  right: 55px;
+  top: 36px;
+  right: 58px;
   width: 74px;
   height: 74px;
   border-radius: 50%;
