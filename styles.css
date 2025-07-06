@@ -868,14 +868,14 @@ html, body {
   min-width: 110px;
   margin: 0;
   padding: 3px 8px;
-  top: 50px;
+  top: 120px;
 }
 
 .price-slot-fuel {
   font-family: 'Roboto', sans-serif;
   font-size: 12px;
   font-weight: 500;
-  color: #fff;
+  color: #111;
   padding: 2px 4px;
   border-radius: 4px;
   text-align: center;
@@ -886,7 +886,7 @@ html, body {
 .price-slot-price {
   font-family: 'Orbitron', monospace;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   color: #ffffff;
   background: rgba(0, 0, 0, 0.9);
   padding: 2px 4px;
@@ -898,16 +898,10 @@ html, body {
   margin-left: auto;
 }
 
-.price-slot.cheapest .price-slot-fuel {
-  color: #000000;
-  border: 1px solid rgba(16, 185, 129, 0.3);
-}
-
-
 .priceboard-logo-wrap {
   position: absolute;
-  top: 40px;
-  right: 53px;
+  top: 38px;
+  right: 55px;
   width: 74px;
   height: 74px;
   border-radius: 50%;
