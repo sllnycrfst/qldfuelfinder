@@ -852,8 +852,8 @@ html, body {
   align-items: flex-end;
   padding: 0;
   z-index: 10;
-  left: 328px;
-  top: 120px;
+  left: 334px;
+  top: 122px;
 }
 
 .price-slot {
@@ -868,10 +868,10 @@ html, body {
 
 .price-slot-fuel {
   font-family: 'Roboto', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 600;
   color: #111;
-  padding: 2px 4px;
+  padding: 2px 3px;
   border-radius: 4px;
   text-align: center;
   flex-shrink: 0;
@@ -880,7 +880,7 @@ html, body {
 
 .price-slot-price {
   font-family: 'Quantico', monospace;
-  font-size: 14px;
+  font-size: 16px;
   left: 2px;
   font-weight: 500;
   color: #ffffff;
@@ -897,7 +897,7 @@ html, body {
 .priceboard-logo-wrap {
   position: absolute;
   top: 37px;
-  right: 61px;
+  right: 62px;
   width: 74px;
   height: 74px;
   border-radius: 50%;
