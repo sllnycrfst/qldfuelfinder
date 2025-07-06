@@ -853,7 +853,7 @@ html, body {
   align-items: flex-end;
   padding: 0;
   z-index: 10;
-  left: 320px;
+  left: 321px;
   top: 120px;
 }
 
@@ -869,7 +869,7 @@ html, body {
 
 .price-slot-fuel {
   font-family: 'Roboto', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   color: #111;
   padding: 2px 4px;
