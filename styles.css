@@ -827,8 +827,6 @@ html, body {
   /* Remove or override any fixed height, e.g. height: 300px; */
   height: auto;
   overflow: hidden;
-  border-radius: 15px;
-  background: #f8f9fa;
   margin: 0 auto;
 }
 
@@ -840,6 +838,7 @@ html, body {
   position: absolute;
   top: 0;
   left: 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   border-radius: inherit;
   z-index: 1;
 }
