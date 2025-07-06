@@ -859,39 +859,46 @@ html, body {
 .price-slot {
   display: flex;
   flex-direction: row;
-  align-items: center;
-  gap: 2px;
-  min-width: 110px;
+  align-items: flex-end; /* Align items to the bottom */
+  gap: 8px;
+  min-width: 120px;
   margin: 0;
-  padding: 3px 4px;
+  padding: 2px 0;
+  height: 44px; /* Ensure height is consistent */
 }
 
 .price-slot-fuel {
   font-family: 'Roboto', sans-serif;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 600;
   color: #111;
-  padding: 2px 3px;
+  padding: 0 6px 2px 6px; /* bottom padding for vertical alignment */
   border-radius: 4px;
   text-align: center;
   flex-shrink: 0;
-  min-width: 28px;
+  min-width: 36px;
+  align-self: flex-end; /* Explicitly align to bottom */
+  line-height: 1.05;
 }
 
 .price-slot-price {
   font-family: 'Quantico', monospace;
-  font-size: 16px;
-  left: 2px;
-  font-weight: 500;
+  font-size: 22px;
+  font-weight: 700;
   color: #ffffff;
-  background: rgba(0, 0, 0, 0.9);
-  padding: 1px 1px;
-  border-radius: 4px;
+  background: #222; /* More solid black */
+  padding: 5px 18px 5px 18px;
+  border-radius: 7px;
   text-align: center;
-  border: 3px solid #3c3c3c;
-  letter-spacing: 0.1px;
-  flex: 1;
-  margin-left: auto;
+  border: 3.5px solid #3c3c3c;
+  letter-spacing: 0.3px;
+  flex: 1 1 auto;
+  min-width: 88px;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 1px 2px 6px rgba(0,0,0,0.09);
 }
 
 .priceboard-logo-wrap {
