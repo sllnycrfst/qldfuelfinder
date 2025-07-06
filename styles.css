@@ -853,7 +853,7 @@ html, body {
   align-items: flex-end;
   padding: 0;
   z-index: 10;
-  left: 280px;
+  left: 340px;
   top: 120px;
 }
 
@@ -949,7 +949,7 @@ html, body {
 
 .feature-distance-direction {
   display: flex;
-  margin-left: 8px;
+  margin-left: 4px;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
   align-items: center;
 }
