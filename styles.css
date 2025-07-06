@@ -880,15 +880,15 @@ html, body {
 .price-slot-price {
   font-family: 'Quantico', monospace;
   font-size: 16px;
-  transform: scaleY(1.2) !important;
+  transform: scaleY(1.1) !important;
   font-weight: 300;
   color: #ffffff;
   background: #222; /* More solid black */
-  padding: 2px 4px;
+  padding: 2px 2px;
   border-radius: 4px;
   text-align: center;
   border: 1.5px solid #3c3c3c;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.3px;
   display: flex;
   min-width: unset;
   min-height: unset;
