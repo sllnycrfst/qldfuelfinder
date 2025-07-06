@@ -656,7 +656,7 @@ html, body {
   cursor: pointer;
   transition: all 0.3s ease;
   color: #666;
-  display: flex;
+  display: grid
   align-items: center;
   justify-content: center;
   gap: 6px;
