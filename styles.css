@@ -881,14 +881,14 @@ html, body {
 
 .price-slot-price {
   font-family: 'Quantico', monospace;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
   color: #ffffff;
   background: rgba(0, 0, 0, 0.9);
   padding: 2px 4px;
   border-radius: 4px;
   text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(0, 0, 0, 0.6);
   letter-spacing: 0.2px;
   flex: 1;
   margin-left: auto;
