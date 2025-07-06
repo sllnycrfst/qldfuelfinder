@@ -864,7 +864,7 @@ html, body {
   gap: 2px;
   min-width: 110px;
   margin: 0;
-  padding: 3px 8px;
+  padding: 3px 4px;
 }
 
 .price-slot-fuel {
@@ -881,12 +881,12 @@ html, body {
 
 .price-slot-price {
   font-family: 'Quantico', monospace;
-  font-size: 16px;
+  font-size: 14px;
   left: 2px;
   font-weight: 500;
   color: #ffffff;
   background: rgba(0, 0, 0, 0.9);
-  padding: 2px 4px;
+  padding: 2px 2px;
   border-radius: 4px;
   text-align: center;
   border: 2px solid rgba(0, 0, 0, 0.6);
