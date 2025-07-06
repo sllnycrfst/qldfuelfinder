@@ -887,15 +887,15 @@ html, body {
   font-weight: 700;
   color: #ffffff;
   background: #222; /* More solid black */
-  padding: 1px 1px 1px 1px;
+  padding: 1px 1px;
   border-radius: 7px;
   text-align: center;
   border: 2px solid #3c3c3c;
   letter-spacing: 0.1px;
   flex: 1 1 auto;
-  min-width: 88px;
-  min-height: 38px;
   display: flex;
+  min-width: unset;
+  min-height: unset;
   align-items: center;
   justify-content: center;
   box-shadow: 1px 2px 6px rgba(0,0,0,0.09);
@@ -1189,28 +1189,23 @@ html, body {
   min-width: 0;
 }
 
+.distance-toggle,
+.fuel-toggle,
+.sort-toggle {
+  display: flex;
+  gap: 0;
+}
+
 /* --- Buttons --- */
 .distance-btn,
 .fuel-btn,
 .sort-btn {
-  flex: 1;
-  padding: 8px 16px;
-  border: none;
-  background: transparent;
-  border-radius: 20px;
-  font-size: 0.85em;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  color: #666;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  position: relative;
-  z-index: 1;
-  font-weight: 500;
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 10px 0;
+  font-size: 1em;
+  text-align: center;
 }
-
 .fuel-btn {
   padding: 6px 8px;
   font-size: 0.75em;
@@ -1230,16 +1225,13 @@ html, body {
 .sort-toggle::before {
   content: '';
   position: absolute;
-  top: 3px;
-  left: 3px;
-  height: calc(100% - 6px);
   background: #387cc2;
   border-radius: 20px;
   transition: transform 0.3s ease;
   z-index: 0;
   box-shadow: 0 2px 4px rgba(56, 124, 194, 0.3);
 }
-
+.fuel-btn { font-size: 0.95em; }
 /* Distance toggle (3 buttons) */
 .distance-toggle::before {
   width: calc(30% - 2px);
