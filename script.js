@@ -3,7 +3,25 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener('dblclick', function(e) {
     e.preventDefault();
   }, { passive: false });
+  
+  // Search function
+  const searchInput = document.getElementById('search');
 
+  if (searchInput) {
+    searchInput.addEventListener('input', function () {
+      const query = this.value.trim().toLowerCase();
+      if (!query) return;
+  
+      // Search for a suburb or station name
+      const match = allSites.find(site =>
+        (site.P && site.P.toLowerCase().includes(query)) ||
+        (site.N && site.N.toLowerCase().includes(query))
+      );
+      if (match && map) {
+        map.setView([match.Lat, match.Lng], 15, { animate: true });
+      }
+    });
+  }
   // UI controls
   const zoomInBtn = document.getElementById("zoom-in");
   const zoomOutBtn = document.getElementById("zoom-out");
