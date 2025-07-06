@@ -868,11 +868,11 @@ html, body {
   min-width: 110px;
   margin: 0;
   padding: 3px 8px;
-  top: 80px !important;
 }
 
 .price-slot-fuel {
   font-family: 'Roboto', sans-serif;
+  top: 80px;
   font-size: 12px;
   font-weight: 500;
   color: #111;
@@ -885,6 +885,7 @@ html, body {
 
 .price-slot-price {
   font-family: 'Orbitron', monospace;
+  top: 80px;
   font-size: 13px;
   font-weight: 500;
   color: #ffffff;
@@ -900,7 +901,7 @@ html, body {
 
 .priceboard-logo-wrap {
   position: absolute;
-  top: 36px;
+  top: 35px;
   right: 58px;
   width: 74px;
   height: 74px;
