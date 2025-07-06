@@ -1086,14 +1086,6 @@ html, body {
     padding: 8px 6px;
     font-size: 0.7em;
   }
-  
-  .feature-card-scale-wrapper {
-    transform: scale(0.75);
-  }
-  
-  .bottom-feature-card {
-    max-width: 90vw;
-  }
 }
 
 @media (max-width: 480px) {
@@ -1115,21 +1107,6 @@ html, body {
   .fuel-btn {
     padding: 6px 4px;
     font-size: 0.65em;
-  }
-  
-  .feature-card-scale-wrapper {
-    transform: scale(0.6);
-  }
-  
-  .bottom-feature-card {
-    width: calc(100vw - 20px);
-    max-width: none;
-  }
-}
-
-@media (max-width: 360px) {
-  .feature-card-scale-wrapper {
-    transform: scale(0.5);
   }
 }
 
