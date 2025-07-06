@@ -861,8 +861,8 @@ html, body {
   flex-direction: row;
   align-items: flex-end; /* Align items to the bottom */
   gap: 4px;
-  margin: 2px 2px;
-  padding: 2px 2px;
+  margin: 1px 1px;
+  padding: 1px 1px;
 }
 
 .price-slot-fuel {
@@ -870,7 +870,7 @@ html, body {
   font-size: 15px;
   font-weight: 600;
   color: #111;
-  padding: 0 6px 2px 6px; /* bottom padding for vertical alignment */
+  padding: 2px 2px; 
   border-radius: 4px;
   text-align: center;
   flex-shrink: 0;
@@ -880,14 +880,13 @@ html, body {
 .price-slot-price {
   font-family: 'Quantico', monospace;
   font-size: 16px;
-  transform: scaleY(1.1) !important;
   font-weight: 300;
   color: #ffffff;
   background: #222; /* More solid black */
   padding: 2px 2px;
   border-radius: 4px;
   text-align: center;
-  border: 1.5px solid #3c3c3c;
+  border: 1px solid #3c3c3c;
   letter-spacing: 0.3px;
   display: flex;
   min-width: unset;
