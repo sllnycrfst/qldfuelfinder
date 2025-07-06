@@ -863,8 +863,8 @@ html, body {
   gap: 4px;
   min-width: 120px;
   margin: 0;
-  padding: 2px 0;
-  height: 44px; /* Ensure height is consistent */
+  padding: 1px 0;
+  height: 38px; /* Ensure height is consistent */
 }
 
 .price-slot-fuel {
