@@ -881,14 +881,14 @@ html, body {
   font-family: 'Quantico', monospace;
   font-size: 16px;
   transform: scaleY(1.2) !important;
-  font-weight: 400;
+  font-weight: 300;
   color: #ffffff;
   background: #222; /* More solid black */
-  padding: 1px 1px !important;
+  padding: 2px 4px !important;
   border-radius: 7px;
   text-align: center;
-  border: 2px solid #3c3c3c;
-  letter-spacing: 0.1px;
+  border: 1.5px solid #3c3c3c;
+  letter-spacing: 0.2px;
   display: flex;
   min-width: unset;
   min-height: unset;
