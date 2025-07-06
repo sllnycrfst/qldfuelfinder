@@ -883,8 +883,8 @@ html, body {
 
 .price-slot-price {
   font-family: 'Quantico', monospace;
-  font-size: 18px;
-  transform: scaleY(1.2);
+  font-size: 16px;
+  transform: scaleY(1.2) !important;
   font-weight: 400;
   color: #ffffff;
   background: #222; /* More solid black */
