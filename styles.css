@@ -852,8 +852,8 @@ html, body {
   align-items: flex-end;
   padding: 0;
   z-index: 10;
-  left: 324px;
-  top: 118px;
+  left: 328px;
+  top: 120px;
 }
 
 .price-slot {
@@ -896,8 +896,8 @@ html, body {
 
 .priceboard-logo-wrap {
   position: absolute;
-  top: 35px;
-  right: 58px;
+  top: 37px;
+  right: 61px;
   width: 74px;
   height: 74px;
   border-radius: 50%;
