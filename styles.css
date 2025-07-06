@@ -864,7 +864,6 @@ html, body {
   min-width: 120px;
   margin: 0;
   padding: 1px 0;
-  height: 38px; /* Ensure height is consistent */
 }
 
 .price-slot-fuel {
@@ -876,9 +875,7 @@ html, body {
   border-radius: 4px;
   text-align: center;
   flex-shrink: 0;
-  min-width: 36px;
   align-self: flex-end; /* Explicitly align to bottom */
-  line-height: 1.05;
 }
 
 .price-slot-price {
