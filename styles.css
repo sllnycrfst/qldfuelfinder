@@ -861,14 +861,13 @@ html, body {
   flex-direction: row;
   align-items: flex-end; /* Align items to the bottom */
   gap: 4px;
-  min-width: 120px;
   margin: 0;
-  padding: 1px 0;
+  padding: 2px 2px;
 }
 
 .price-slot-fuel {
   font-family: 'Roboto', sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 600;
   color: #111;
   padding: 0 6px 2px 6px; /* bottom padding for vertical alignment */
@@ -890,7 +889,6 @@ html, body {
   text-align: center;
   border: 2px solid #3c3c3c;
   letter-spacing: 0.1px;
-  flex: 1 1 auto;
   display: flex;
   min-width: unset;
   min-height: unset;
