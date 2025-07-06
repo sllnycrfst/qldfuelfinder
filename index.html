@@ -154,39 +154,30 @@
             <h2><i class="fas fa-list"></i> Station List</h2>
         </div>
         <div class="panel-content">
-          <div class="list-controls">
-            <!-- Fuel toggle on its own row -->
-            <div class="list-filter-row">
-              <div class="fuel-section">
-                <label class="control-label">Fuel Type</label>
-                <div class="fuel-toggle" id="fuel-toggle" data-active="E10">
-                  <button class="fuel-btn active" data-fuel="E10">E10</button>
-                  <button class="fuel-btn" data-fuel="91">91</button>
-                  <button class="fuel-btn" data-fuel="95">95</button>
-                  <button class="fuel-btn" data-fuel="98">98</button>
-                  <button class="fuel-btn" data-fuel="Diesel/Premium Diesel">DSL</button>
+          <div class="filter-group">
+              <div class="filter-row">
+                <label>Fuel Type</label>
+                <div class="toggle-row">
+                  <button class="toggle-btn selected">E10</button>
+                  <button class="toggle-btn">91</button>
+                  <button class="toggle-btn">95</button>
+                  <button class="toggle-btn">98</button>
+                  <button class="toggle-btn">DSL</button>
                 </div>
               </div>
-            </div>
-            <!-- Distance and Sort By on same row below -->
-            <div class="list-toggle-row">
-              <div class="distance-section">
-                <label class="control-label">Distance</label>
-                <div class="distance-toggle" id="distance-toggle" data-active="5">
-                  <button class="distance-btn active" data-radius="5">5km</button>
-                  <button class="distance-btn" data-radius="10">10km</button>
-                  <button class="distance-btn" data-radius="20">20km</button>
+              <div class="filter-row">
+                <label>Distance</label>
+                <div class="toggle-row">
+                  <button class="toggle-btn selected">5km</button>
+                  <button class="toggle-btn">10km</button>
+                  <button class="toggle-btn">20km</button>
                 </div>
               </div>
-              <div class="sort-section">
-                <label class="control-label">Sort By</label>
-                <div class="sort-toggle" id="sort-toggle" data-active="price">
-                  <button class="sort-btn active" data-sort="price">
-                    <i class="fas fa-dollar-sign"></i> Price
-                  </button>
-                  <button class="sort-btn" data-sort="distance">
-                    <i class="fas fa-route"></i> Distance
-                  </button>
+              <div class="filter-row">
+                <label>Sort By</label>
+                <div class="toggle-row">
+                  <button class="toggle-btn selected">$ Price</button>
+                  <button class="toggle-btn">Distance</button>
                 </div>
               </div>
             </div>
