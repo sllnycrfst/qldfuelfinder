@@ -822,35 +822,42 @@ html, body {
 
 .feature-card-inner {
   position: relative;
-  width: 600px;
-  height: 300px; 
+  width: 100%;
+  max-width: 600px;
+  aspect-ratio: 3 / 2; /* 6:4 ratio */
+  /* Remove or override any fixed height, e.g. height: 300px; */
+  height: auto;
   overflow: hidden;
   border-radius: 15px;
+  background: #f8f9fa;
+  margin: 0 auto;
 }
 
 .priceboard-img-bg {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* Changed from 'cover' to 'contain' to show full image */
+  object-fit: cover; /* changed from 'contain' to 'cover' */
   object-position: center;
   position: absolute;
   top: 0;
   left: 0;
   border-radius: inherit;
+  z-index: 1;
 }
-
 .priceboard-absolute-wrap {
   position: absolute;
-  top: 56px;
-  left: 346px;
+  top: 55px;
+  left: auto;
+  right: 40px;
   width: 200px;
-  height: 280px;
+  height: auto;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
+  justify-content: flex-start;
+  align-items: flex-end;
   gap: 2px;
   padding: 0;
+  z-index: 10;
 }
 
 .price-slot {
