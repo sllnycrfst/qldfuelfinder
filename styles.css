@@ -976,10 +976,9 @@ html, body {
   border-radius: 20px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   overflow: hidden;
-  border: 11px solid rgba(255, 255, 255, 1);
   z-index: 5010;
   transition: transform 0.3s ease;
-  aspect-ratio: 595/350; /* Updated aspect ratio */
+  aspect-ratio: 3/2; /* Updated aspect ratio */
 }
 
 .bottom-feature-card.visible {
@@ -988,8 +987,8 @@ html, body {
 
 .bottom-feature-close {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 8px;
+  right: 8px;
   width: 30px;
   height: 30px;
   border: none;
