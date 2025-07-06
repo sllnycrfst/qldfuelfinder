@@ -884,10 +884,11 @@ html, body {
 .price-slot-price {
   font-family: 'Quantico', monospace;
   font-size: 18px;
-  font-weight: 700;
+  transform: scaleY(1.2);
+  font-weight: 500;
   color: #ffffff;
   background: #222; /* More solid black */
-  padding: 1px 1px;
+  padding: 1px 1px !important;
   border-radius: 7px;
   text-align: center;
   border: 2px solid #3c3c3c;
