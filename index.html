@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QLD Fuel Finder</title>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -89,12 +92,12 @@
         <div class="panel-content">
             
             <div class="chart-container">
-                <h3>Price Trends</h3>
+                <h3>QLD Fuel Price Trends (3 Month Average)</h3>
                 <canvas id="price-chart"></canvas>
             </div>
             
             <div class="price-stats">
-                <h3>Current Price Statistics</h3>
+                <h3>Current QLD Price Statistics</h3>
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-header">
@@ -116,6 +119,66 @@
                             </div>
                         </div>
                     </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <i class="fas fa-gas-pump"></i>
+                            <span>Unleaded 91</span>
+                        </div>
+                        <div class="stat-values">
+                            <div class="stat-value">
+                                <span class="label">Average:</span>
+                                <span class="value" id="91-avg">--.-¢</span>
+                            </div>
+                            <div class="stat-value">
+                                <span class="label">Cheapest:</span>
+                                <span class="value cheapest" id="91-min">--.-¢</span>
+                            </div>
+                            <div class="stat-value">
+                                <span class="label">Most Expensive:</span>
+                                <span class="value expensive" id="91-max">--.-¢</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <i class="fas fa-gas-pump"></i>
+                            <span>Premium 98</span>
+                        </div>
+                        <div class="stat-values">
+                            <div class="stat-value">
+                                <span class="label">Average:</span>
+                                <span class="value" id="98-avg">--.-¢</span>
+                            </div>
+                            <div class="stat-value">
+                                <span class="label">Cheapest:</span>
+                                <span class="value cheapest" id="98-min">--.-¢</span>
+                            </div>
+                            <div class="stat-value">
+                                <span class="label">Most Expensive:</span>
+                                <span class="value expensive" id="98-max">--.-¢</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <i class="fas fa-gas-pump"></i>
+                            <span>Diesel</span>
+                        </div>
+                        <div class="stat-values">
+                            <div class="stat-value">
+                                <span class="label">Average:</span>
+                                <span class="value" id="diesel-avg">--.-¢</span>
+                            </div>
+                            <div class="stat-value">
+                                <span class="label">Cheapest:</span>
+                                <span class="value cheapest" id="diesel-min">--.-¢</span>
+                            </div>
+                            <div class="stat-value">
+                                <span class="label">Most Expensive:</span>
+                                <span class="value expensive" id="diesel-max">--.-¢</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -132,6 +195,7 @@
                         <select id="discount-amount">
                             <option value="0">No discount</option>
                             <option value="4">4¢/L</option>
+                            <option value="6">6¢/L</option>
                             <option value="8">8¢/L</option>
                         </select>
                     </div>
@@ -154,34 +218,37 @@
             <h2><i class="fas fa-list"></i> Station List</h2>
         </div>
         <div class="panel-content">
-          <div class="filter-group">
-              <div class="filter-row">
-                <label>Fuel Type</label>
-                <div class="toggle-row">
-                  <button class="toggle-btn selected">E10</button>
-                  <button class="toggle-btn">91</button>
-                  <button class="toggle-btn">95</button>
-                  <button class="toggle-btn">98</button>
-                  <button class="toggle-btn">DSL</button>
+          <div class="list-controls">
+              <div class="filter-controls-row">
+                <div class="fuel-filter-group">
+                  <label class="filter-label">Fuel Type</label>
+                  <div class="pill-selector" id="fuel-pill-selector" data-selected="E10">
+                    <button class="pill-option selected" data-value="E10">E10</button>
+                    <button class="pill-option" data-value="91">91</button>
+                    <button class="pill-option" data-value="95">95</button>
+                    <button class="pill-option" data-value="98">98</button>
+                    <button class="pill-option" data-value="Diesel/Premium Diesel">DSL</button>
+                  </div>
                 </div>
               </div>
-              <div class="filter-row">
-                <label>Distance</label>
-                <div class="toggle-row">
-                  <button class="toggle-btn selected">5km</button>
-                  <button class="toggle-btn">10km</button>
-                  <button class="toggle-btn">20km</button>
+              <div class="controls-bottom-row">
+                <div class="distance-filter-group">
+                  <label class="filter-label">Distance</label>
+                  <div class="pill-selector" id="distance-pill-selector" data-selected="5">
+                    <button class="pill-option selected" data-value="5">5km</button>
+                    <button class="pill-option" data-value="10">10km</button>
+                    <button class="pill-option" data-value="20">20km</button>
+                  </div>
                 </div>
-              </div>
-              <div class="filter-row">
-                <label>Sort By</label>
-                <div class="toggle-row">
-                  <button class="toggle-btn selected">$ Price</button>
-                  <button class="toggle-btn">Distance</button>
+                <div class="sort-filter-group">
+                  <label class="filter-label">Sort By</label>
+                  <div class="pill-selector" id="sort-pill-selector" data-selected="price">
+                    <button class="pill-option selected" data-value="price">$ Price</button>
+                    <button class="pill-option" data-value="distance">Distance</button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
           <ul id="list">
             <li>Loading...</li>
           </ul>
