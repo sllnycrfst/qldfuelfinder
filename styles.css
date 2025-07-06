@@ -823,7 +823,6 @@ html, body {
 .feature-card-inner {
   position: relative;
   width: 100%;
-  max-width: 600px;
   aspect-ratio: 3 / 2; /* 6:4 ratio */
   /* Remove or override any fixed height, e.g. height: 300px; */
   height: auto;
@@ -846,16 +845,12 @@ html, body {
 }
 .priceboard-absolute-wrap {
   position: absolute;
-  top: 55px;
-  left: auto;
-  right: 40px;
-  width: 200px;
+  width: auto;
   height: auto;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-end;
-  gap: 2px;
   padding: 0;
   z-index: 10;
 }
