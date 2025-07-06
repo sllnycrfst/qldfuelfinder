@@ -689,7 +689,7 @@ html, body {
 
 /* Distance toggle (3 buttons) */
 .distance-toggle::before {
-  width: calc(33.333% - 2px);
+  width: calc(30% - 2px);
 }
 
 .distance-toggle[data-active="5"]::before {
@@ -706,7 +706,7 @@ html, body {
 
 /* Fuel toggle (5 buttons) */
 .fuel-toggle::before {
-  width: calc(20% - 2px);
+  width: calc(30% - 2px);
 }
 
 .fuel-btn {
@@ -738,7 +738,7 @@ html, body {
 
 /* Sort toggle (2 buttons) */
 .sort-toggle::before {
-  width: calc(50% - 2px);
+  width: calc(30% - 2px);
 }
 
 .sort-toggle[data-active="price"]::before {
