@@ -853,6 +853,8 @@ html, body {
   align-items: flex-end;
   padding: 0;
   z-index: 10;
+  left: 100px;
+  top: 100px;
 }
 
 .price-slot {
