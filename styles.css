@@ -885,11 +885,11 @@ html, body {
   font-weight: 500;
   color: #ffffff;
   background: rgba(0, 0, 0, 0.9);
-  padding: 2px 2px;
+  padding: 1px 1px;
   border-radius: 4px;
   text-align: center;
-  border: 2px solid rgba(0, 0, 0, 0.6);
-  letter-spacing: 0.2px;
+  border: 3px solid #3c3c3c;
+  letter-spacing: 0.1px;
   flex: 1;
   margin-left: auto;
 }
