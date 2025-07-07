@@ -583,7 +583,7 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
 }
 
 .stat-value .value.expensive {
-  color: #DC2626 !important;
+  color: #ff6012 !important;
 }
 
 .calculator-section {
