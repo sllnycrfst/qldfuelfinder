@@ -720,8 +720,8 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
   display: block;
   font-size: 0.9em;
   font-weight: 500;
-  color: #666;
-  margin-bottom: 8px;
+  color: #fff;
+  margin-bottom: 4px;
 }
 
 /* Consistent toggle styling for distance, fuel, and sort */
