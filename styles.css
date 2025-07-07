@@ -894,12 +894,12 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
 .list-logo {
   margin-right: 15px;
   flex-shrink: 0;
-  background: transparent !important;
+  background: none !important;
 }
 
 .list-logo img {
-  background: transparent !important;
-  border-radius: 10%;
+  background: none !important;
+  border-radius: 0%;
   object-fit: contain;
 }
 
@@ -994,17 +994,6 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
   to {
     transform: translateX(-50%) translateY(0);
     opacity: 1;
-  }
-}
-
-@keyframes slideOutToRight {
-  from {
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateX(calc(-50% + 100vw)) translateY(0);
-    opacity: 0;
   }
 }
 
