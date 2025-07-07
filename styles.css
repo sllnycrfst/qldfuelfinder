@@ -1010,7 +1010,7 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
   min-height: unset;
   align-items: center;
   justify-content: center;
-  box-shadow: 4px 4px 2px rgba(0,0,0,0.15);
+  box-shadow: 2px 2px 2px rgba(0,0,0,0.35);
 }
 
 .priceboard-logo-wrap {
