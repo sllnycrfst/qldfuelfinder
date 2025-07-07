@@ -9,16 +9,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (searchInput) {
     searchInput.addEventListener('focus', function () {
-      // Hide feature card when search bar is tapped/focused
-      hideBottomFeatureCard();
+      // Only hide feature card on focus if we're not on map view
+      if (currentView !== 'map') {
+        hideBottomFeatureCard();
+      }
     });
     
     searchInput.addEventListener('input', function () {
       const query = this.value.trim().toLowerCase();
       if (!query) return;
   
-      // Hide feature card when searching
-      hideBottomFeatureCard();
+      // Don't hide feature card when searching - let user see both
       
       // Search for a suburb or station name
       const match = allSites.find(site =>
@@ -46,6 +47,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const homePanel = document.getElementById("home-panel");
   const listPanel = document.getElementById("list-panel");
   const listUl = document.getElementById("list");
+
+  // Initialize map view as default
+  document.body.classList.add('map-view');
+  if (mapTab) {
+    mapTab.classList.add('map-view');
+  }
 
   let map, markerLayer, userMarker;
   const defaultCenter = [-27.4698, 153.0251];
@@ -366,18 +373,15 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchSitesAndPrices();
 
     map.on("movestart", () => {
-      // Hide feature card when map starts moving
-      if (currentView === 'map') {
-        hideBottomFeatureCard();
-      }
+      // Don't hide feature card on map move - let it stay visible
     });
     
     map.on("zoomstart", () => {
-      // Hide feature card when zooming
-      if (currentView === 'map') {
-        hideBottomFeatureCard();
-      }
+      // Don't hide feature card on zoom - let it stay visible
     });
+
+    // Add map click handler to close feature card
+    addMapClickHandler();
     
     map.on("moveend", () => {
       updateVisibleStations();
@@ -473,6 +477,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function getCombinedDieselPrice(prices) {
+    // Check for ULSD (6), Premium Diesel (14), and regular Diesel (3) in order of preference
+    if (prices && typeof prices[6] !== "undefined" && prices[6] !== null && isValidPrice(prices[6])) {
+      return { price: prices[6] / 10, raw: prices[6], which: 6 };
+    }
     if (prices && typeof prices[14] !== "undefined" && prices[14] !== null && isValidPrice(prices[14])) {
       return { price: prices[14] / 10, raw: prices[14], which: 14 };
     }
@@ -565,7 +573,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       marker.on('click', function() {
         s.brandLogoSrc = s.brand ? `images/${s.brand}.png` : 'images/default.png';
-        showBottomFeatureCard(s);
+        showBottomFeatureCardSlideUp(s);
       });
 
       markerLayer.addLayer(marker);
@@ -1049,7 +1057,7 @@ document.addEventListener("DOMContentLoaded", () => {
       featureCard.classList.add('slide-down');
       
       // Reset transform
-      featureCard.style.transform = 'translateX(-50%) translateY(100%)';
+      featureCard.style.transform = 'translateX(-50%) translateY(150%)';
       
       // Remove the card completely after animation
       setTimeout(() => {
@@ -1061,10 +1069,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // New slide up function for station clicks
   function showBottomFeatureCardSlideUp(station) {
     const featureCard = document.getElementById('bottom-feature-card');
-    const inner = featureCard.querySelector('.bottom-feature-inner');
     
-    if (!featureCard || !inner) {
-      console.error('Bottom feature card elements not found');
+    if (!featureCard) {
+      console.error('Bottom feature card element not found');
       return;
     }
     
@@ -1075,53 +1082,45 @@ document.addEventListener("DOMContentLoaded", () => {
     
     const cardContent = generateGlassyFeatureCard(station, direction, brandImgSrc);
     
-    // Show with slide up animation
-    inner.innerHTML = cardContent;
-    featureCard.style.transform = 'translateX(-50%) translateY(0)';
-    featureCard.classList.remove('slide-down', 'slide-out');
-    featureCard.classList.add('visible', 'slide-up');
-    
-    // Initialize drag functionality after card is shown
-    setTimeout(initializeDragFunctionality, 100);
-  }
-
-  // Find and replace the showBottomFeatureCard function
-  function showBottomFeatureCard(station) {
-    const featureCard = document.getElementById('bottom-feature-card');
-    const inner = featureCard.querySelector('.bottom-feature-inner');
-    
-    if (!featureCard || !inner) {
-      console.error('Bottom feature card elements not found');
-      return;
-    }
-    
-    const direction = userMarker && userMarker.getLatLng ? 
-      getDirection(userMarker.getLatLng().lat, userMarker.getLatLng().lng, station.lat, station.lng) : '';
-    
-    const brandImgSrc = station.brand ? `images/${station.brand}.png` : 'images/default.png';
-    
-    const cardContent = generateGlassyFeatureCard(station, direction, brandImgSrc);
-    
-    // If card is already visible, slide it out first
+    // If card is already visible, slide it down first then slide up with new content
     if (featureCard.classList.contains('visible')) {
-      featureCard.classList.remove('visible', 'slide-in');
-      featureCard.classList.add('slide-out');
+      featureCard.classList.remove('slide-up', 'slide-in');
+      featureCard.classList.add('slide-down');
       
       setTimeout(() => {
-        inner.innerHTML = cardContent;
-        featureCard.style.transform = 'translateX(-50%) translateY(0)';
-        featureCard.classList.remove('slide-out');
-        featureCard.classList.add('visible', 'slide-in');
+        featureCard.innerHTML = `
+          <div class="feature-card-drag-bar">
+            <div class="drag-handle"></div>
+          </div>
+          ${cardContent}
+        `;
+        featureCard.classList.remove('slide-down');
+        featureCard.classList.add('visible', 'slide-up');
         setTimeout(initializeDragFunctionality, 100);
       }, 200);
     } else {
-      // Card is hidden, show it directly
-      inner.innerHTML = cardContent;
+      // Card is hidden, show with slide up animation
+      featureCard.innerHTML = `
+        <div class="feature-card-drag-bar">
+          <div class="drag-handle"></div>
+        </div>
+        ${cardContent}
+      `;
       featureCard.style.transform = 'translateX(-50%) translateY(0)';
-      featureCard.classList.remove('slide-out');
-      featureCard.classList.add('visible', 'slide-in');
+      featureCard.classList.remove('slide-down', 'slide-out');
+      featureCard.classList.add('visible', 'slide-up');
       setTimeout(initializeDragFunctionality, 100);
     }
+  }
+
+  // Add map click event to close feature card
+  function addMapClickHandler() {
+    map.on('click', function(e) {
+      const featureCard = document.getElementById('bottom-feature-card');
+      if (featureCard && featureCard.classList.contains('visible')) {
+        hideBottomFeatureCard();
+      }
+    });
   }
 
   // Generate glassy feature card content
@@ -1162,8 +1161,7 @@ document.addEventListener("DOMContentLoaded", () => {
       { key: "12", label: "E10" },
       { key: "2", label: "U91" },
       { key: "5", label: "P95" },
-      { key: "8", label: "P98" },
-      { key: "6", label: "DSL" }
+      { key: "8", label: "P98" }
     ];
     
     let slots = "";
@@ -1188,20 +1186,18 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
     
-    // Handle combined diesel
-    if (!availablePrices.find(p => p.key === "6")) {
-      const dieselResult = getCombinedDieselPrice(site.allPrices);
-      if (dieselResult) {
-        availablePrices.push({
-          key: "6",
-          label: "DSL",
-          price: dieselResult.price,
-          raw: dieselResult.raw
-        });
-        
-        if (minPrice === null || dieselResult.raw < minPrice) {
-          minPrice = dieselResult.raw;
-        }
+    // Handle all diesel types (ULSD=6, Diesel=3, Premium Diesel=14)
+    const dieselResult = getCombinedDieselPrice(site.allPrices);
+    if (dieselResult) {
+      availablePrices.push({
+        key: "diesel",
+        label: "DSL",
+        price: dieselResult.price,
+        raw: dieselResult.raw
+      });
+      
+      if (minPrice === null || dieselResult.raw < minPrice) {
+        minPrice = dieselResult.raw;
       }
     }
     
