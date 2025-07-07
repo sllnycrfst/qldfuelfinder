@@ -1040,7 +1040,7 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
   right: 0;
   bottom: auto;
   color: white;
-  padding: 15px 155px 50px 15px;
+  padding: 15px 100px 50px 15px;
   z-index: 15;
 }
 
@@ -1243,7 +1243,7 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
   right: 0;
   bottom: auto;
   color: white;
-  padding: 15px 80px 50px 15px;
+  padding: 15px 30px 50px 15px;
   z-index: 15;
   }
 }
@@ -1307,7 +1307,7 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
   }
   
   .bottom-feature-card {
-    bottom: 50px;
+    bottom: 80px;
     width: calc(100vw - 0px);
   }
   
