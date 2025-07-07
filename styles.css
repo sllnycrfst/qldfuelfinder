@@ -1169,10 +1169,9 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
 }
 
 .feature-price-slot.cheapest {
-  background: rgba(16, 185, 129, 0.3);
-  border-color: rgba(16, 185, 129, 0.6);
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3),
-              inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  background: none;
+  border-color: none;
+  box-shadow: none;
 }
 
 .feature-price-slot:hover {
@@ -1183,11 +1182,11 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
 }
 
 .feature-price-slot.cheapest:hover {
-  background: rgba(16, 185, 129, 0.4);
+  background: none;
 }
 
 .feature-fuel-label {
-  font-size: 0.7em;
+  font-size: 0.9em;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.8);
   margin-bottom: 4px;
@@ -1203,11 +1202,6 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
   color: white;
   line-height: 1;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
-}
-
-.feature-price-slot.cheapest .feature-price-value {
-  color: #10b981;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
 }
 
 /* --- PILL SELECTORS --- */
