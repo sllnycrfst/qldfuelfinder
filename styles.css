@@ -1040,7 +1040,7 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
   right: 0;
   bottom: auto;
   color: white;
-  padding: 15px 25px 50px 15px;
+  padding: 15px 255px 50px 15px;
   z-index: 15;
 }
 
