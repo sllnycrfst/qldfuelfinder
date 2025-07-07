@@ -129,10 +129,11 @@ html, body {
 }
 
 /* --- SIDE CONTROLS --- */
+/* Modify these values to change zoom control position and size */
 .side-controls {
   position: fixed;
-  top: 120px;
-  right: 20px;
+  top: 160px;           /* Change this to move vertically */
+  right: 20px;          /* Change this to move horizontally */
   z-index: 5000;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 20px;
@@ -141,16 +142,17 @@ html, body {
   transition: all 0.3s ease;
 }
 
+/* Modify width to change overall control size */
 .custom-zoom-rect {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 20px;
-  padding: 8px;
+  padding: 8px;               /* Change padding to adjust spacing */
   display: flex;
   background: rgba(255, 255, 255, 0.15);
   flex-direction: column;
   align-items: center;
-  width: 48px;
+  width: 40px;                /* Change this to resize the control */
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1),
               inset 0 1px 0 rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
@@ -168,8 +170,8 @@ html, body {
   height: 40px;
   border: none;
   background: transparent;
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 500;
   color: #387CC2;
   cursor: pointer;
   display: flex;
@@ -294,6 +296,16 @@ html, body {
   background: rgba(56, 124, 194, 0.8);
   box-shadow: 0 4px 16px rgba(56, 124, 194, 0.4),
               inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* White color for non-active buttons when not on map */
+body:not(.map-view) .toolbar-side-btn:not(.active) {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+body:not(.map-view) .toolbar-side-btn:not(.active):hover {
+  color: rgba(255, 255, 255, 1);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 /* Icon switching for center button */
@@ -435,7 +447,7 @@ html, body {
 }
 
 .panel-content {
-  padding: 24px;
+  padding: 16px 24px 24px 24px;
   max-width: 700px;
   margin: 0 auto;
 }
@@ -673,7 +685,7 @@ html, body {
 /* --- LIST PANEL STYLES --- */
 .list-content-wrapper {
   max-width: 800px;
-  margin: 0 auto;
+  margin: 20px auto;
   padding: 20px;
   padding-top: 0;
 }
@@ -876,6 +888,13 @@ html, body {
 .list-logo {
   margin-right: 15px;
   flex-shrink: 0;
+  background: transparent !important;
+}
+
+.list-logo img {
+  background: transparent !important;
+  border-radius: 50%;
+  object-fit: contain;
 }
 
 .list-name {
@@ -1098,6 +1117,16 @@ html, body {
   opacity: 1;
 }
 
+/* List view positioning */
+.list-view .bottom-feature-card {
+  bottom: 20px;
+  transform: translateX(-50%) translateY(120%);
+}
+
+.list-view .bottom-feature-card.visible {
+  transform: translateX(-50%) translateY(0);
+}
+
 .bottom-feature-close {
   position: absolute;
   top: 8px;
@@ -1170,19 +1199,8 @@ html, body {
     width: calc(100vw - 32px);
   }
   
-  .side-controls {
-    top: 100px;
-    right: 8px;
-  }
-  
   .custom-zoom-rect {
-    width: 44px;
-  }
-  
-  .custom-zoom-rect button {
-    width: 36px;
-    height: 36px;
-    font-size: 16px;
+    width: 36px !important;
   }
   
   .bottom-toolbar {
@@ -1231,31 +1249,32 @@ html, body {
   }
   
   .side-controls {
-    top: 80px;
-    right: 8px;
+    top: 140px;
+    right: 12px;
   }
   
   .custom-zoom-rect {
-    width: 40px;
-    padding: 6px;
+    width: 36px !important;
+    padding: 6px !important;
   }
   
   .custom-zoom-rect button {
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
+    width: 30px !important;
+    height: 36px !important;
+    font-size: 20px !important;
+    font-weight: 400;
   }
   
   .bottom-toolbar {
-    height: 70px;
+    height: 60px;
     padding: 0 20px;
   }
   
   .toolbar-center-btn {
-    width: 66px;
-    height: 66px;
+    width: 70px;
+    height: 70px;
     font-size: 18px;
-    bottom: 36px;
+    bottom: 21px;
   }
   
   .toolbar-side-btn {
@@ -1266,16 +1285,33 @@ html, body {
   }
   
   .bottom-feature-card {
-    bottom: 75px;
-    width: calc(100vw - 24px);
+    bottom: 50px;
+    width: calc(100vw - 0px);
   }
   
   .feature-station-name {
-    font-size: 1.2em;
+    font-size: 0.95em;
   }
   
   .feature-station-address {
-    font-size: 0.9em;
+    font-size: 0.85em;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+  }
+  
+  /* Mobile positioning for feature card logo */
+  .priceboard-logo-wrap {
+    top: 32px !important;        /* Change this to move logo vertically */
+    right: 50px !important;      /* Change this to move logo horizontally */
+    width: 53px !important;      /* Change logo size */
+    height: 53px !important;
+  }
+  
+  /* Mobile positioning for feature card prices */
+  .priceboard-absolute-wrap {
+    left: 272px !important;      /* Change this to move prices horizontally */
+    top: 95px !important;        /* Change this to move prices vertically */
+    transform: scale(0.8);       /* Scale down prices for mobile */
+    transform-origin: top left;
   }
 }
 
@@ -1360,7 +1396,7 @@ html, body {
 .filter-controls-row {
   display: flex;
   justify-content: center;
-  margin-bottom: 24px;
+  margin-bottom: 10px;
 }
 
 .controls-bottom-row {
@@ -1646,7 +1682,7 @@ html, body {
 @media (max-width: 600px) {
   .list-controls {
     padding: 14px;
-    gap: 14px;
+    gap: 2px;
   }
   .list-filter-row,
   .list-toggle-row {
