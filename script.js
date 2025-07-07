@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+  
   // UI controls
   const zoomInBtn = document.getElementById("zoom-in");
   const zoomOutBtn = document.getElementById("zoom-out");
@@ -951,12 +952,104 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Drag functionality for feature cards
+  function initializeDragFunctionality() {
+    const featureCard = document.getElementById('bottom-feature-card');
+    const dragBar = featureCard.querySelector('.feature-card-drag-bar');
+    
+    if (!dragBar) return;
+    
+    let isDragging = false;
+    let startY = 0;
+    let startTransform = 0;
+    
+    // Touch events for mobile
+    dragBar.addEventListener('touchstart', function(e) {
+      isDragging = true;
+      startY = e.touches[0].clientY;
+      const currentTransform = getComputedStyle(featureCard).transform;
+      startTransform = currentTransform === 'none' ? 0 : parseInt(currentTransform.split(',')[5]);
+      e.preventDefault();
+    }, { passive: false });
+    
+    document.addEventListener('touchmove', function(e) {
+      if (!isDragging) return;
+      
+      const currentY = e.touches[0].clientY;
+      const deltaY = currentY - startY;
+      
+      // Only allow dragging down
+      if (deltaY > 0) {
+        const newTransform = Math.min(deltaY, 200); // Limit drag distance
+        featureCard.style.transform = `translateX(-50%) translateY(${newTransform}px)`;
+      }
+      e.preventDefault();
+    }, { passive: false });
+    
+    document.addEventListener('touchend', function(e) {
+      if (!isDragging) return;
+      isDragging = false;
+      
+      const currentTransform = getComputedStyle(featureCard).transform;
+      const currentY = currentTransform === 'none' ? 0 : parseInt(currentTransform.split(',')[5]);
+      
+      // If dragged more than 100px, hide the card
+      if (currentY > 100) {
+        hideBottomFeatureCard();
+      } else {
+        // Snap back to original position
+        featureCard.style.transform = 'translateX(-50%) translateY(0)';
+      }
+    });
+    
+    // Mouse events for desktop
+    dragBar.addEventListener('mousedown', function(e) {
+      isDragging = true;
+      startY = e.clientY;
+      const currentTransform = getComputedStyle(featureCard).transform;
+      startTransform = currentTransform === 'none' ? 0 : parseInt(currentTransform.split(',')[5]);
+      e.preventDefault();
+    });
+    
+    document.addEventListener('mousemove', function(e) {
+      if (!isDragging) return;
+      
+      const currentY = e.clientY;
+      const deltaY = currentY - startY;
+      
+      // Only allow dragging down
+      if (deltaY > 0) {
+        const newTransform = Math.min(deltaY, 200); // Limit drag distance
+        featureCard.style.transform = `translateX(-50%) translateY(${newTransform}px)`;
+      }
+    });
+    
+    document.addEventListener('mouseup', function(e) {
+      if (!isDragging) return;
+      isDragging = false;
+      
+      const currentTransform = getComputedStyle(featureCard).transform;
+      const currentY = currentTransform === 'none' ? 0 : parseInt(currentTransform.split(',')[5]);
+      
+      // If dragged more than 100px, hide the card
+      if (currentY > 100) {
+        hideBottomFeatureCard();
+      } else {
+        // Snap back to original position
+        featureCard.style.transform = 'translateX(-50%) translateY(0)';
+      }
+    });
+  }
+
   // Bottom feature card functions
   function hideBottomFeatureCard() {
     const featureCard = document.getElementById('bottom-feature-card');
     if (featureCard) {
       featureCard.classList.remove('visible', 'slide-in', 'slide-up');
       featureCard.classList.add('slide-down');
+      
+      // Reset transform
+      featureCard.style.transform = 'translateX(-50%) translateY(100%)';
       
       // Remove the card completely after animation
       setTimeout(() => {
@@ -980,38 +1073,16 @@ document.addEventListener("DOMContentLoaded", () => {
     
     const brandImgSrc = station.brand ? `images/${station.brand}.png` : 'images/default.png';
     
-    const cardContent = `
-      <div class="feature-card-scale-wrapper">
-        <div class="feature-card-inner">
-          <img src="images/priceboard.png" alt="Price Board" class="priceboard-img-bg">
-          <div class="priceboard-absolute-wrap">
-            ${generatePriceSlots(station)}
-          </div>
-          <div class="priceboard-logo-wrap">
-            <img src="${brandImgSrc}" alt="${station.brand || 'Station'}" class="priceboard-logo" 
-                 onerror="this.onerror=null;this.src='images/default.png';">
-          </div>
-          <div class="feature-card-overlay">
-            <div class="feature-station-name">${station.name}</div>
-            <a class="feature-station-address" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(station.address + (station.suburb ? ', ' + station.suburb : ''))}" target="_blank" rel="noopener">
-              ${station.address}${station.suburb ? ', ' + station.suburb : ''}
-            </a>
-            
-            <div class="feature-distance-direction">
-              <div class="feature-distance-badge">
-                <i class="fa-solid fa-location-dot"></i>
-                <span class="feature-distance-text">${station.distance ? station.distance.toFixed(1) + 'km' : ''} ${direction}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
+    const cardContent = generateGlassyFeatureCard(station, direction, brandImgSrc);
     
     // Show with slide up animation
     inner.innerHTML = cardContent;
+    featureCard.style.transform = 'translateX(-50%) translateY(0)';
     featureCard.classList.remove('slide-down', 'slide-out');
     featureCard.classList.add('visible', 'slide-up');
+    
+    // Initialize drag functionality after card is shown
+    setTimeout(initializeDragFunctionality, 100);
   }
 
   // Find and replace the showBottomFeatureCard function
@@ -1029,20 +1100,41 @@ document.addEventListener("DOMContentLoaded", () => {
     
     const brandImgSrc = station.brand ? `images/${station.brand}.png` : 'images/default.png';
     
-    const cardContent = `
+    const cardContent = generateGlassyFeatureCard(station, direction, brandImgSrc);
+    
+    // If card is already visible, slide it out first
+    if (featureCard.classList.contains('visible')) {
+      featureCard.classList.remove('visible', 'slide-in');
+      featureCard.classList.add('slide-out');
+      
+      setTimeout(() => {
+        inner.innerHTML = cardContent;
+        featureCard.style.transform = 'translateX(-50%) translateY(0)';
+        featureCard.classList.remove('slide-out');
+        featureCard.classList.add('visible', 'slide-in');
+        setTimeout(initializeDragFunctionality, 100);
+      }, 200);
+    } else {
+      // Card is hidden, show it directly
+      inner.innerHTML = cardContent;
+      featureCard.style.transform = 'translateX(-50%) translateY(0)';
+      featureCard.classList.remove('slide-out');
+      featureCard.classList.add('visible', 'slide-in');
+      setTimeout(initializeDragFunctionality, 100);
+    }
+  }
+
+  // Generate glassy feature card content
+  function generateGlassyFeatureCard(station, direction, brandImgSrc) {
+    return `
       <div class="feature-card-scale-wrapper">
         <div class="feature-card-inner">
-          <img src="images/priceboard.png" alt="Price Board" class="priceboard-img-bg">
-          <div class="priceboard-absolute-wrap">
-            ${generatePriceSlots(station)}
-          </div>
-          <div class="priceboard-logo-wrap">
-            <img src="${brandImgSrc}" alt="${station.brand || 'Station'}" class="priceboard-logo" 
-                 onerror="this.onerror=null;this.src='images/default.png';">
-          </div>
-          <div class="feature-card-overlay">
+          <img src="${brandImgSrc}" alt="${station.brand || 'Station'}" class="feature-station-logo" 
+               onerror="this.onerror=null;this.src='images/default.png';">
+          
+          <div class="feature-station-info">
             <div class="feature-station-name">${station.name}</div>
-            <a class="feature-station-address" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(station.address + (station.suburb ? ', ' + station.suburb : ''))}" target="_blank" rel="noopener">
+            <a class="feature-station-address" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(station.address + (station.suburb ? ', ' + station.suburb : ''))}" target="_blank">
               ${station.address}${station.suburb ? ', ' + station.suburb : ''}
             </a>
             
@@ -1053,30 +1145,17 @@ document.addEventListener("DOMContentLoaded", () => {
               </div>
             </div>
           </div>
+          
+          <div class="feature-prices-grid">
+            ${generateGlassyPriceSlots(station)}
+          </div>
         </div>
       </div>
     `;
-    
-    // If card is already visible, slide it out first
-    if (featureCard.classList.contains('visible')) {
-      featureCard.classList.remove('visible', 'slide-in');
-      featureCard.classList.add('slide-out');
-      
-      setTimeout(() => {
-        inner.innerHTML = cardContent;
-        featureCard.classList.remove('slide-out');
-        featureCard.classList.add('visible', 'slide-in');
-      }, 200);
-    } else {
-      // Card is hidden, show it directly
-      inner.innerHTML = cardContent;
-      featureCard.classList.remove('slide-out');
-      featureCard.classList.add('visible', 'slide-in');
-    }
   }
 
-  // Price slots generation
-  function generatePriceSlots(site) {
+  // Generate glassy price slots
+  function generateGlassyPriceSlots(site) {
     if (!site.allPrices) return "";
     
     const fuelTypes = [
@@ -1126,15 +1205,15 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
     
-    // Generate slots only for available fuels with horizontal layout
+    // Generate slots only for available fuels
     availablePrices.forEach(fuel => {
       const isCheapest = minPrice !== null && fuel.raw === minPrice;
       const cheapestClass = isCheapest ? " cheapest" : "";
       
       slots += `
-        <div class="price-slot${cheapestClass}">
-          <div class="price-slot-fuel">${fuel.label}</div>
-          <div class="price-slot-price">${fuel.price.toFixed(1)}</div>
+        <div class="feature-price-slot${cheapestClass}">
+          <div class="feature-fuel-label">${fuel.label}</div>
+          <div class="feature-price-value">${fuel.price.toFixed(1)}</div>
         </div>
       `;
     });
