@@ -1321,8 +1321,8 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
   
   /* Mobile positioning for feature card prices */
   .priceboard-absolute-wrap {
-    left: 272px !important;      /* Change this to move prices horizontally */
-    top: 95px !important;        /* Change this to move prices vertically */
+    left: 280px !important;      /* Change this to move prices horizontally */
+    top: 99px !important;        /* Change this to move prices vertically */
     transform: scale(0.8);       /* Scale down prices for mobile */
     transform-origin: top left;
   }
