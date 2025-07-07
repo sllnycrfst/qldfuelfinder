@@ -8,10 +8,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById('search');
 
   if (searchInput) {
+    searchInput.addEventListener('focus', function () {
+      // Hide feature card when search bar is tapped/focused
+      hideBottomFeatureCard();
+    });
+    
     searchInput.addEventListener('input', function () {
       const query = this.value.trim().toLowerCase();
       if (!query) return;
   
+      // Hide feature card when searching
+      hideBottomFeatureCard();
+      
       // Search for a suburb or station name
       const match = allSites.find(site =>
         (site.P && site.P.toLowerCase().includes(query)) ||
@@ -72,6 +80,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const fuel = this.getAttribute('data-value');
         listFuelFilter = fuel;
         
+        // Hide feature card when changing fuel type
+        hideBottomFeatureCard();
+        
         // Update selector appearance
         fuelSelector.setAttribute('data-selected', fuel);
         
@@ -94,6 +105,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (fuelSelect) {
     fuelSelect.addEventListener('change', (e) => {
       currentFuel = e.target.value;
+      // Hide feature card when changing fuel type on map
+      hideBottomFeatureCard();
       updateVisibleStations();
       if (currentView === 'list') {
         updateStationList();
@@ -110,8 +123,15 @@ document.addEventListener("DOMContentLoaded", () => {
     listPanel.classList.add('hidden');
     listPanel.classList.remove('visible');
     
+    // Hide feature card when switching views
+    hideBottomFeatureCard();
+    
     currentView = viewName;
     mapTab.setAttribute('data-view', viewName);
+    
+    // Update body class for styling
+    document.body.classList.remove('map-view', 'list-view', 'home-view');
+    document.body.classList.add(`${viewName}-view`);
     
     // Update center button classes for icon switching
     mapTab.classList.remove('map-view');
@@ -136,10 +156,125 @@ document.addEventListener("DOMContentLoaded", () => {
           initializeFuelPillSelector();
           initializeDistancePillSelector();
           initializeSortPillSelector();
+          setupListInteractions();
         }, 100);
         updateStationList();
         break;
     }
+  }
+  
+  // Setup list interactions
+  function setupListInteractions() {
+    // Handle station clicks in list
+    const setupStationClicks = () => {
+      const stationElements = document.querySelectorAll('.list-station');
+      stationElements.forEach(stationEl => {
+        stationEl.addEventListener('click', function() {
+          const siteId = this.getAttribute('data-siteid');
+          const stationIndex = parseInt(this.getAttribute('data-index'));
+          
+          // Find the station data
+          const stationData = getStationDataById(siteId);
+          if (stationData) {
+            showBottomFeatureCardSlideUp(stationData);
+          }
+        });
+      });
+    };
+    
+    // Handle scroll to hide feature card
+    const listContainer = document.getElementById('list');
+    if (listContainer) {
+      let scrollTimeout;
+      let isScrolling = false;
+      
+      listContainer.addEventListener('scroll', function() {
+        if (!isScrolling) {
+          isScrolling = true;
+          hideBottomFeatureCard();
+        }
+        
+        // Clear previous timeout
+        if (scrollTimeout) {
+          clearTimeout(scrollTimeout);
+        }
+        
+        // Reset scrolling flag after scroll ends
+        scrollTimeout = setTimeout(() => {
+          isScrolling = false;
+        }, 150);
+      });
+    }
+    
+    // Handle page scroll to hide feature card (for main document)
+    let pageScrollTimeout;
+    let isPageScrolling = false;
+    
+    window.addEventListener('scroll', function() {
+      if (!isPageScrolling && currentView === 'list') {
+        isPageScrolling = true;
+        hideBottomFeatureCard();
+      }
+      
+      if (pageScrollTimeout) {
+        clearTimeout(pageScrollTimeout);
+      }
+      
+      pageScrollTimeout = setTimeout(() => {
+        isPageScrolling = false;
+      }, 150);
+    }, { passive: true });
+    
+    // Setup clicks after station list is updated
+    setTimeout(setupStationClicks, 100);
+  }
+  
+  // Helper function to get station data by ID
+  function getStationDataById(siteId) {
+    const site = allSites.find(s => String(s.S) === String(siteId));
+    if (!site) return null;
+    
+    let userLat = null, userLng = null;
+    if (userMarker && userMarker.getLatLng) {
+      const pos = userMarker.getLatLng();
+      userLat = pos.lat;
+      userLng = pos.lng;
+    }
+    
+    const isCombinedDiesel = listFuelFilter === "Diesel/Premium Diesel";
+    let price, rawPrice;
+    
+    if (isCombinedDiesel) {
+      const dieselResult = getCombinedDieselPrice(priceMap[site.S]);
+      if (dieselResult) {
+        price = dieselResult.price;
+        rawPrice = dieselResult.raw;
+      }
+    } else {
+      const sitePrice = priceMap[site.S]?.[fuelIdMap[listFuelFilter]];
+      if (typeof sitePrice !== "undefined" && sitePrice !== null && isValidPrice(sitePrice)) {
+        price = sitePrice / 10;
+        rawPrice = sitePrice;
+      }
+    }
+    
+    if (typeof price === "undefined" || price === null) return null;
+    
+    return {
+      ...site,
+      price,
+      rawPrice,
+      allPrices: priceMap[site.S],
+      brand: site.B,
+      BrandId: site.BrandId,
+      address: site.A,
+      name: site.N,
+      suburb: site.P,
+      lat: site.Lat,
+      lng: site.Lng,
+      distance: userLat != null ? getDistance(userLat, userLng, site.Lat, site.Lng) : null,
+      siteId: String(site.S)
+    };
   }
 
   // Tab event listeners
@@ -164,6 +299,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const radius = parseInt(this.getAttribute('data-value'));
         listRadius = radius;
         
+        // Hide feature card when changing distance
+        hideBottomFeatureCard();
+        
         // Update selector appearance
         distanceSelector.setAttribute('data-selected', radius.toString());
         
@@ -187,6 +325,9 @@ document.addEventListener("DOMContentLoaded", () => {
       option.addEventListener('click', function() {
         const newSortBy = this.getAttribute('data-value');
         sortBy = newSortBy;
+        
+        // Hide feature card when changing sort
+        hideBottomFeatureCard();
         
         // Update selector appearance
         sortSelector.setAttribute('data-selected', newSortBy);
@@ -223,6 +364,20 @@ document.addEventListener("DOMContentLoaded", () => {
     showUserLocation(false);
     fetchSitesAndPrices();
 
+    map.on("movestart", () => {
+      // Hide feature card when map starts moving
+      if (currentView === 'map') {
+        hideBottomFeatureCard();
+      }
+    });
+    
+    map.on("zoomstart", () => {
+      // Hide feature card when zooming
+      if (currentView === 'map') {
+        hideBottomFeatureCard();
+      }
+    });
+    
     map.on("moveend", () => {
       updateVisibleStations();
       if (currentView === 'list') updateStationList();
@@ -518,6 +673,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     listUl.innerHTML = html;
+    
+    // Setup click handlers for new station elements
+    if (currentView === 'list') {
+      setTimeout(() => {
+        const stationElements = document.querySelectorAll('.list-station');
+        stationElements.forEach(stationEl => {
+          stationEl.addEventListener('click', function() {
+            const siteId = this.getAttribute('data-siteid');
+            const stationData = getStationDataById(siteId);
+            if (stationData) {
+              showBottomFeatureCardSlideUp(stationData);
+            }
+          });
+        });
+      }, 50);
+    }
   }
 
   // Home panel functions
@@ -784,9 +955,63 @@ document.addEventListener("DOMContentLoaded", () => {
   function hideBottomFeatureCard() {
     const featureCard = document.getElementById('bottom-feature-card');
     if (featureCard) {
-      featureCard.classList.remove('visible', 'slide-in');
-      featureCard.classList.add('slide-out');
+      featureCard.classList.remove('visible', 'slide-in', 'slide-up');
+      featureCard.classList.add('slide-down');
+      
+      // Remove the card completely after animation
+      setTimeout(() => {
+        featureCard.classList.remove('slide-down');
+      }, 400);
     }
+  }
+
+  // New slide up function for station clicks
+  function showBottomFeatureCardSlideUp(station) {
+    const featureCard = document.getElementById('bottom-feature-card');
+    const inner = featureCard.querySelector('.bottom-feature-inner');
+    
+    if (!featureCard || !inner) {
+      console.error('Bottom feature card elements not found');
+      return;
+    }
+    
+    const direction = userMarker && userMarker.getLatLng ? 
+      getDirection(userMarker.getLatLng().lat, userMarker.getLatLng().lng, station.lat, station.lng) : '';
+    
+    const brandImgSrc = station.brand ? `images/${station.brand}.png` : 'images/default.png';
+    
+    const cardContent = `
+      <div class="feature-card-scale-wrapper">
+        <div class="feature-card-inner">
+          <img src="images/priceboard.png" alt="Price Board" class="priceboard-img-bg">
+          <div class="priceboard-absolute-wrap">
+            ${generatePriceSlots(station)}
+          </div>
+          <div class="priceboard-logo-wrap">
+            <img src="${brandImgSrc}" alt="${station.brand || 'Station'}" class="priceboard-logo" 
+                 onerror="this.onerror=null;this.src='images/default.png';">
+          </div>
+          <div class="feature-card-overlay">
+            <div class="feature-station-name">${station.name}</div>
+            <a class="feature-station-address" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(station.address + (station.suburb ? ', ' + station.suburb : ''))}" target="_blank" rel="noopener">
+              ${station.address}${station.suburb ? ', ' + station.suburb : ''}
+            </a>
+            
+            <div class="feature-distance-direction">
+              <div class="feature-distance-badge">
+                <i class="fa-solid fa-location-dot"></i>
+                <span class="feature-distance-text">${station.distance ? station.distance.toFixed(1) + 'km' : ''} ${direction}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Show with slide up animation
+    inner.innerHTML = cardContent;
+    featureCard.classList.remove('slide-down', 'slide-out');
+    featureCard.classList.add('visible', 'slide-up');
   }
 
   // Find and replace the showBottomFeatureCard function
