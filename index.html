@@ -11,17 +11,26 @@
 <body>
   <!-- Theme Toggle -->
   <button id="theme-toggle" aria-label="Toggle dark mode">
-    <i class="fa fa-moon"></i>
+    <i class="fas fa-moon"></i>
   </button>
 
   <!-- Map -->
   <div id="map"></div>
 
-  <!-- Glassy Search Bar -->
+  <!-- Weather Widget -->
+  <div class="map-weather-widget" id="map-weather-widget">
+    <div class="map-weather-icon" id="map-weather-icon">☀️</div>
+    <div class="map-weather-details">
+      <div class="map-weather-temp" id="map-weather-temp">--°C</div>
+      <div class="map-weather-desc" id="map-weather-desc"></div>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
   <div class="search-bar-glass">
     <div class="search-container">
       <i class="fas fa-search"></i>
-      <input type="text" id="search" placeholder="Search suburbs or stations...">
+      <input type="text" id="search" placeholder="Search suburb or station...">
       <div class="fuel-selector-inline">
         <i class="fas fa-gas-pump fuel-icon"></i>
         <select id="fuel-select">
@@ -35,106 +44,152 @@
     </div>
   </div>
 
-  <!-- Bottom Navigation -->
-  <nav class="bottom-nav">
-    <button id="home-tab" class="active"><i class="fas fa-home"></i></button>
-    <button id="list-tab"><i class="fas fa-list"></i></button>
-    <button id="map-tab"><i class="fas fa-map"></i></button>
-  </nav>
+  <!-- Bottom Toolbar -->
+  <div class="bottom-toolbar">
+    <button class="toolbar-side-btn" id="home-tab" title="Home">
+      <i class="fas fa-home"></i>
+    </button>
+    <button class="toolbar-side-btn" id="list-tab" title="List">
+      <i class="fas fa-list"></i>
+    </button>
+  </div>
+  <button class="toolbar-center-btn map-view" id="map-tab" title="Map">
+    <i class="fas fa-map map-icon"></i>
+    <i class="fas fa-location-arrow recenter-icon"></i>
+  </button>
 
   <!-- Home Panel -->
-  <div class="panel" id="home-panel">
-    <section class="greeting-card card">
-      <div class="greeting-text" id="greeting-text">Good morning</div>
-      <div class="date-text" id="date-text">Today</div>
-      <div class="weather-info">
-        <span class="weather-icon" id="weather-icon">☀️</span>
-        <span class="weather-temp" id="weather-temp">22°C</span>
-        <span class="weather-location" id="weather-location">Brisbane</span>
-      </div>
-    </section>
-    <section class="stats-section card">
-      <h3>Today's Fuel Prices</h3>
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-header"><i class="fas fa-gas-pump"></i> E10</div>
-          <div class="stat-value">Avg: <span id="e10-average">---</span></div>
-          <div class="stat-value cheapest">Cheap: <span id="e10-cheapest">---</span></div>
-          <div class="stat-value expensive">Exp: <span id="e10-expensive">---</span></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-header"><i class="fas fa-gas-pump"></i> 91</div>
-          <div class="stat-value">Avg: <span id="ul91-average">---</span></div>
-          <div class="stat-value cheapest">Cheap: <span id="ul91-cheapest">---</span></div>
-          <div class="stat-value expensive">Exp: <span id="ul91-expensive">---</span></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-header"><i class="fas fa-gas-pump"></i> 98</div>
-          <div class="stat-value">Avg: <span id="p98-average">---</span></div>
-          <div class="stat-value cheapest">Cheap: <span id="p98-cheapest">---</span></div>
-          <div class="stat-value expensive">Exp: <span id="p98-expensive">---</span></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-header"><i class="fas fa-gas-pump"></i> Diesel</div>
-          <div class="stat-value">Avg: <span id="diesel-average">---</span></div>
-          <div class="stat-value cheapest">Cheap: <span id="diesel-cheapest">---</span></div>
-          <div class="stat-value expensive">Exp: <span id="diesel-expensive">---</span></div>
+  <div class="fullscreen-panel hidden" id="home-panel">
+    <div class="panel-header">
+      <h2><i class="fas fa-home"></i> Dashboard</h2>
+    </div>
+    <div class="panel-content">
+      <!-- Greeting -->
+      <div class="greeting-section">
+        <div class="greeting-text" id="greeting-text">Good morning</div>
+        <div class="date-text" id="date-text">Today</div>
+        <div class="weather-info">
+          <div class="weather-icon" id="weather-icon">☀️</div>
+          <div class="weather-details">
+            <div class="weather-temp" id="weather-temp">--°C</div>
+            <div class="weather-location" id="weather-location">Fetching...</div>
+          </div>
         </div>
       </div>
-    </section>
-    <section class="chart-section card">
-      <h3>Price Trends (7 Days)</h3>
-      <canvas id="priceChart"></canvas>
-    </section>
-    <section class="discount-section card">
-      <h3>Discount Calculator</h3>
-      <div class="discount-inputs">
-        <input type="number" id="discount-amount" placeholder="Discount (¢/L)">
-        <input type="number" id="fuel-amount" placeholder="Litres">
+      <!-- Stats -->
+      <div class="stats-section">
+        <h3>Today's Fuel Prices</h3>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-header"><i class="fas fa-gas-pump"></i> E10</div>
+            <div class="stat-values">
+              <div class="stat-value"><span class="label">Avg</span><span class="value" id="e10-average">---</span></div>
+              <div class="stat-value"><span class="label">Cheap</span><span class="value cheapest" id="e10-cheapest">---</span></div>
+              <div class="stat-value"><span class="label">Exp</span><span class="value expensive" id="e10-expensive">---</span></div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-header"><i class="fas fa-gas-pump"></i> 91</div>
+            <div class="stat-values">
+              <div class="stat-value"><span class="label">Avg</span><span class="value" id="ul91-average">---</span></div>
+              <div class="stat-value"><span class="label">Cheap</span><span class="value cheapest" id="ul91-cheapest">---</span></div>
+              <div class="stat-value"><span class="label">Exp</span><span class="value expensive" id="ul91-expensive">---</span></div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-header"><i class="fas fa-gas-pump"></i> 98</div>
+            <div class="stat-values">
+              <div class="stat-value"><span class="label">Avg</span><span class="value" id="p98-average">---</span></div>
+              <div class="stat-value"><span class="label">Cheap</span><span class="value cheapest" id="p98-cheapest">---</span></div>
+              <div class="stat-value"><span class="label">Exp</span><span class="value expensive" id="p98-expensive">---</span></div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-header"><i class="fas fa-gas-pump"></i> Diesel</div>
+            <div class="stat-values">
+              <div class="stat-value"><span class="label">Avg</span><span class="value" id="diesel-average">---</span></div>
+              <div class="stat-value"><span class="label">Cheap</span><span class="value cheapest" id="diesel-cheapest">---</span></div>
+              <div class="stat-value"><span class="label">Exp</span><span class="value expensive" id="diesel-expensive">---</span></div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="discount-result">
-        <span class="discount-savings" id="discount-savings">Enter details above</span>
-        <span class="discount-breakdown" id="discount-breakdown">Calculate your savings</span>
+      <!-- Price Chart -->
+      <div class="chart-container">
+        <h3>Price Trends (7 Days)</h3>
+        <canvas id="priceChart"></canvas>
       </div>
-    </section>
-    <section class="calculator-section card">
-      <h3>Tank Fill Calculator</h3>
-      <div class="tank-size-buttons">
-        <button class="tank-btn" data-size="40">40L</button>
-        <button class="tank-btn" data-size="50">50L</button>
-        <button class="tank-btn" data-size="60">60L</button>
-        <button class="tank-btn" data-size="70">70L</button>
+      <!-- Discount Calculator -->
+      <div class="discount-section">
+        <h3>Discount Calculator</h3>
+        <div class="discount-inputs">
+          <div class="discount-input-group">
+            <label for="discount-amount">Discount (¢/L)</label>
+            <input type="number" id="discount-amount" placeholder="4" min="0" max="50" step="0.1">
+          </div>
+          <div class="discount-input-group">
+            <label for="fuel-amount">Litres</label>
+            <input type="number" id="fuel-amount" placeholder="50" min="1" max="200" step="1">
+          </div>
+        </div>
+        <div class="discount-result">
+          <span class="discount-savings" id="discount-savings">Enter details above</span>
+          <span class="discount-breakdown" id="discount-breakdown">Calculate your savings</span>
+        </div>
       </div>
-      <div class="cost-display">
-        <span class="cost-label">Estimated Cost</span>
-        <span class="cost-amount" id="tank-cost">Select tank size</span>
-        <span class="cost-breakdown" id="cost-breakdown"></span>
+      <!-- Tank Calculator -->
+      <div class="calculator-section">
+        <h3>Tank Fill Calculator</h3>
+        <div class="tank-size-buttons">
+          <button class="tank-btn" data-size="40">40L</button>
+          <button class="tank-btn" data-size="50">50L</button>
+          <button class="tank-btn" data-size="60">60L</button>
+          <button class="tank-btn" data-size="70">70L</button>
+        </div>
+        <div class="cost-display">
+          <span class="cost-label">Estimated Cost</span>
+          <span class="cost-amount" id="tank-cost">Select tank size</span>
+          <span class="cost-breakdown" id="cost-breakdown"></span>
+        </div>
       </div>
-    </section>
+    </div>
   </div>
 
   <!-- List Panel -->
-  <div class="panel hidden" id="list-panel">
-    <section class="list-controls card">
-      <select id="fuel-type-filter">
-        <option value="E10">E10</option>
-        <option value="91">91</option>
-        <option value="95">95</option>
-        <option value="98">98</option>
-        <option value="Diesel/Premium Diesel">Diesel</option>
-      </select>
-      <select id="distance-filter">
-        <option value="2">2km</option>
-        <option value="5" selected>5km</option>
-        <option value="10">10km</option>
-        <option value="20">20km</option>
-      </select>
-    </section>
-    <ul id="list"></ul>
+  <div class="fullscreen-panel hidden" id="list-panel">
+    <div class="panel-header">
+      <h2><i class="fas fa-list"></i> Nearby Stations</h2>
+    </div>
+    <div class="panel-content">
+      <div class="list-controls">
+        <div class="filter-controls-grid">
+          <div class="filter-group">
+            <label class="filter-label">Fuel Type</label>
+            <select class="filter-select" id="fuel-type-filter">
+              <option value="E10">E10</option>
+              <option value="91">91</option>
+              <option value="95">95</option>
+              <option value="98">98</option>
+              <option value="Diesel/Premium Diesel">Diesel</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Distance</label>
+            <select class="filter-select" id="distance-filter">
+              <option value="2">2km</option>
+              <option value="5" selected>5km</option>
+              <option value="10">10km</option>
+              <option value="20">20km</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <ul id="list"></ul>
+    </div>
   </div>
 
-  <!-- Map Panel (always visible behind) -->
-  <!-- Extra panels/cards can be added here -->
+  <!-- Bottom Feature Card (station details) -->
+  <div class="bottom-feature-card" id="bottom-feature-card"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
