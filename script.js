@@ -9,7 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (searchInput) {
     searchInput.addEventListener('focus', function () {
-      // Only hide feature card on focus if we're not on map view
       if (currentView !== 'map') {
         hideBottomFeatureCard();
       }
@@ -18,10 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
     searchInput.addEventListener('input', function () {
       const query = this.value.trim().toLowerCase();
       if (!query) return;
-  
-      // Don't hide feature card when searching - let user see both
       
-      // Search for a suburb or station name
       const match = allSites.find(site =>
         (site.P && site.P.toLowerCase().includes(query)) ||
         (site.N && site.N.toLowerCase().includes(query))
@@ -35,7 +31,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // UI controls
   const zoomInBtn = document.getElementById("zoom-in");
   const zoomOutBtn = document.getElementById("zoom-out");
-  const sortToggle = document.getElementById("sort-toggle");
   const fuelSelect = document.getElementById("fuel-select");
   
   // Bottom toolbar tabs
@@ -47,6 +42,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const homePanel = document.getElementById("home-panel");
   const listPanel = document.getElementById("list-panel");
   const listUl = document.getElementById("list");
+
+  // List controls
+  const fuelTypeFilter = document.getElementById("fuel-type-filter");
+  const distanceFilter = document.getElementById("distance-filter");
+  const sortSwitch = document.getElementById("sort-switch");
 
   // Initialize map view as default
   document.body.classList.add('map-view');
@@ -62,6 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const fuelOrder = ["E10", "91", "95", "98", "Diesel/Premium Diesel"];
   const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, "Diesel/Premium Diesel": 6 };
   let currentFuel = "E10";
+  let currentFuelPrice = 198.5;
   let allSites = [];
   let allPrices = [];
   let priceMap = {};
@@ -70,6 +71,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let selectedListStationId = null;
   let listRadius = 5;
   let listFuelFilter = 'E10';
+  let priceChart = null;
+  let userSuburb = 'Brisbane';
 
   const bannedStations = ["Stargazers Yarraman"];
 
@@ -78,43 +81,384 @@ document.addEventListener("DOMContentLoaded", () => {
     return price !== null && price !== undefined && price >= 1000 && price <= 6000;
   }
 
-  // New pill selector functionality for fuel
-  function initializeFuelPillSelector() {
-    const fuelSelector = document.getElementById('fuel-pill-selector');
-    const fuelOptions = document.querySelectorAll('#fuel-pill-selector .pill-option');
+  // Weather functionality
+  async function getWeather(lat, lng) {
+    const API_KEY = 'bc081f96363e724b2012edb6f61aa393';
+    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${API_KEY}&units=metric`;
     
-    fuelOptions.forEach(option => {
-      option.addEventListener('click', function() {
-        const fuel = this.getAttribute('data-value');
-        listFuelFilter = fuel;
+    console.log('Fetching weather from:', url);
+    
+    try {
+      const response = await fetch(url);
+      
+      console.log('Weather API response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Weather API error response:', errorText);
+        throw new Error(`Weather API failed with status ${response.status}: ${errorText}`);
+      }
+      
+      const data = await response.json();
+      console.log('Weather API success:', data);
+      
+      return {
+        temp: Math.round(data.main.temp),
+        conditions: data.weather[0].description,
+        icon: getWeatherIcon(data.weather[0].icon),
+        location: data.name || 'Queensland'
+      };
+    } catch (error) {
+      console.warn('Weather API failed, using mock data:', error);
+      return getMockWeather();
+    }
+  }
+
+  function getWeatherIcon(weatherCode) {
+    const iconMap = {
+      '01d': '☀️', '01n': '🌙',
+      '02d': '⛅', '02n': '☁️',
+      '03d': '☁️', '03n': '☁️',
+      '04d': '☁️', '04n': '☁️',
+      '09d': '🌧️', '09n': '🌧️',
+      '10d': '🌦️', '10n': '🌧️',
+      '11d': '⛈️', '11n': '⛈️',
+      '13d': '❄️', '13n': '❄️',
+      '50d': '🌫️', '50n': '🌫️'
+    };
+    return iconMap[weatherCode] || '☀️';
+  }
+
+  function getMockWeather() {
+    return {
+      temp: Math.floor(Math.random() * 15) + 15,
+      conditions: ['Sunny', 'Cloudy', 'Partly Cloudy', 'Clear'][Math.floor(Math.random() * 4)],
+      icon: ['☀️', '☁️', '⛅', '🌤️'][Math.floor(Math.random() * 4)],
+      location: 'Brisbane'
+    };
+  }
+
+  async function initializeWeather() {
+    console.log('Initializing weather...');
+    
+    // Try to get user location first
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          console.log('Got user location:', position.coords);
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          
+          const weatherData = await getWeather(lat, lng);
+          updateWeatherDisplay(weatherData);
+          userSuburb = weatherData.location;
+        },
+        async (error) => {
+          console.warn('Geolocation failed:', error);
+          // Fallback to Brisbane coordinates if geolocation fails
+          console.log('Using Brisbane fallback coordinates');
+          const weatherData = await getWeather(-27.4698, 153.0251);
+          updateWeatherDisplay(weatherData);
+          userSuburb = weatherData.location;
+        }
+      );
+    } else {
+      console.warn('No geolocation support, using mock data');
+      // Fallback to mock data if no geolocation support
+      const weatherData = getMockWeather();
+      updateWeatherDisplay(weatherData);
+    }
+  }
+
+  function updateWeatherDisplay(weatherData) {
+    // Update home panel weather
+    const tempEl = document.getElementById('weather-temp');
+    const descEl = document.getElementById('weather-desc');
+    const iconEl = document.getElementById('weather-icon');
+    const locationEl = document.getElementById('weather-location');
+    
+    if (tempEl) tempEl.textContent = `${weatherData.temp}°C`;
+    if (descEl) descEl.textContent = weatherData.conditions.charAt(0).toUpperCase() + weatherData.conditions.slice(1);
+    if (iconEl) iconEl.textContent = weatherData.icon;
+    if (locationEl) locationEl.textContent = weatherData.location;
+    
+    // Update map weather widget
+    const mapTempEl = document.getElementById('map-weather-temp');
+    const mapDescEl = document.getElementById('map-weather-desc');
+    const mapIconEl = document.getElementById('map-weather-icon');
+    
+    if (mapTempEl) mapTempEl.textContent = `${weatherData.temp}°C`;
+    if (mapDescEl) mapDescEl.textContent = weatherData.conditions;
+    if (mapIconEl) mapIconEl.textContent = weatherData.icon;
+  }
+
+  // Initialize dynamic greeting and weather
+  function initializeDynamicGreeting() {
+    const now = new Date();
+    const hour = now.getHours();
+    
+    // Set greeting based on time
+    let greeting;
+    if (hour < 12) {
+      greeting = "Good morning";
+    } else if (hour < 18) {
+      greeting = "Good afternoon";
+    } else {
+      greeting = "Good evening";
+    }
+    
+    const greetingEl = document.getElementById('greeting-text');
+    if (greetingEl) greetingEl.textContent = greeting;
+    
+    // Set date
+    const options = { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    };
+    const dateEl = document.getElementById('date-text');
+    if (dateEl) dateEl.textContent = now.toLocaleDateString('en-AU', options);
+    
+    // Initialize real weather
+    initializeWeather();
+  }
+
+  function initializeDiscountCalculator() {
+    const discountInput = document.getElementById('discount-amount');
+    const fuelAmountInput = document.getElementById('fuel-amount');
+    const savingsEl = document.getElementById('discount-savings');
+    const breakdownEl = document.getElementById('discount-breakdown');
+    
+    function calculateDiscount() {
+      const discount = parseFloat(discountInput.value) || 0;
+      const fuelAmount = parseFloat(fuelAmountInput.value) || 0;
+      
+      if (discount > 0 && fuelAmount > 0) {
+        const savings = (discount * fuelAmount) / 100;
+        savingsEl.textContent = `Save $${savings.toFixed(2)}`;
+        breakdownEl.textContent = `${discount}¢/L × ${fuelAmount}L = ${savings.toFixed(2)} saved`;
+      } else {
+        savingsEl.textContent = 'Enter details above';
+        breakdownEl.textContent = 'Calculate your savings';
+      }
+    }
+    
+    if (discountInput) {
+      discountInput.addEventListener('input', calculateDiscount);
+    }
+    if (fuelAmountInput) {
+      fuelAmountInput.addEventListener('input', calculateDiscount);
+    }
+  }
+
+  // Tank calculator functionality
+  function initializeTankCalculator() {
+    const tankButtons = document.querySelectorAll('.tank-btn');
+    const costAmount = document.getElementById('tank-cost');
+    const costBreakdown = document.getElementById('cost-breakdown');
+    
+    tankButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        // Remove active class from all buttons
+        tankButtons.forEach(b => b.classList.remove('active'));
+        // Add active class to clicked button
+        this.classList.add('active');
         
-        // Hide feature card when changing fuel type
-        hideBottomFeatureCard();
+        const tankSize = parseInt(this.getAttribute('data-size'));
+        const totalCost = (tankSize * currentFuelPrice) / 100;
         
-        // Update selector appearance
-        fuelSelector.setAttribute('data-selected', fuel);
-        
-        // Update selected class
-        fuelOptions.forEach(opt => opt.classList.remove('selected'));
-        this.classList.add('selected');
-        
-        updateStationList();
+        if (costAmount) costAmount.textContent = `$${totalCost.toFixed(2)}`;
+        if (costBreakdown) costBreakdown.textContent = `${tankSize}L × ${currentFuelPrice.toFixed(1)}¢/L`;
       });
     });
   }
 
-  // Set initial active state for fuel toggle
-  const defaultFuelBtn = document.querySelector('.fuel-btn[data-fuel="E10"]');
-  if (defaultFuelBtn) {
-    defaultFuelBtn.classList.add('active');
+  // Update price statistics
+  function updatePriceStatistics() {
+    if (!allPrices.length) return;
+    
+    const fuelStats = {
+      12: { id: 'e10', name: 'E10' },
+      2: { id: 'ul91', name: 'Unleaded 91' },
+      8: { id: 'p98', name: 'Premium 98' },
+      6: { id: 'diesel', name: 'Diesel' }
+    };
+    
+    Object.entries(fuelStats).forEach(([fuelId, fuel]) => {
+      const prices = allPrices
+        .filter(p => p.FuelId === parseInt(fuelId) && isValidPrice(p.Price))
+        .map(p => p.Price);
+      
+      if (prices.length > 0) {
+        const average = prices.reduce((sum, price) => sum + price, 0) / prices.length;
+        const cheapest = Math.min(...prices);
+        const expensive = Math.max(...prices);
+        
+        const avgEl = document.getElementById(`${fuel.id}-average`);
+        const cheapEl = document.getElementById(`${fuel.id}-cheapest`);
+        const expEl = document.getElementById(`${fuel.id}-expensive`);
+        
+        if (avgEl) avgEl.textContent = `${(average / 10).toFixed(1)}¢`;
+        if (cheapEl) cheapEl.textContent = `${(cheapest / 10).toFixed(1)}¢`;
+        if (expEl) expEl.textContent = `${(expensive / 10).toFixed(1)}¢`;
+      }
+    });
+  }
+
+  // Initialize price trend chart
+  function initializePriceChart() {
+    const ctx = document.getElementById('priceChart');
+    if (!ctx) return;
+    
+    // Destroy existing chart if it exists
+    if (priceChart) {
+      priceChart.destroy();
+    }
+    
+    // Mock data for demonstration
+    const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const data = {
+      labels: labels,
+      datasets: [{
+        label: 'E10',
+        data: [192, 191, 193, 192, 194, 193, 192],
+        borderColor: '#00ff88',
+        backgroundColor: 'rgba(0, 255, 136, 0.1)',
+        tension: 0.4
+      }, {
+        label: 'Unleaded 91',
+        data: [193, 192, 194, 193, 195, 194, 193],
+        borderColor: '#667eea',
+        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+        tension: 0.4
+      }, {
+        label: 'Premium 98',
+        data: [216, 215, 217, 216, 218, 217, 216],
+        borderColor: '#ff6b6b',
+        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+        tension: 0.4
+      }]
+    };
+    
+    priceChart = new Chart(ctx, {
+      type: 'line',
+      data: data,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: {
+              color: 'rgba(255, 255, 255, 0.8)',
+              font: {
+                size: 12
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: false,
+            ticks: {
+              color: 'rgba(255, 255, 255, 0.6)',
+              callback: function(value) {
+                return value + '¢';
+              }
+            },
+            grid: {
+              color: 'rgba(255, 255, 255, 0.1)'
+            }
+          },
+          x: {
+            ticks: {
+              color: 'rgba(255, 255, 255, 0.6)'
+            },
+            grid: {
+              color: 'rgba(255, 255, 255, 0.1)'
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Initialize home panel
+  function initializeHomePanel() {
+    initializeDynamicGreeting();
+    initializeDiscountCalculator();
+    initializeTankCalculator();
+    updatePriceStatistics();
+    initializePriceChart();
+  }
+
+  // Update fuel price when fuel type changes
+  function updateCurrentFuelPrice() {
+    if (!allPrices.length) return;
+    
+    const fuelId = fuelIdMap[currentFuel];
+    const prices = allPrices
+      .filter(p => p.FuelId === fuelId && isValidPrice(p.Price))
+      .map(p => p.Price / 10);
+    
+    if (prices.length > 0) {
+      currentFuelPrice = prices.reduce((sum, price) => sum + price, 0) / prices.length;
+      
+      // Update calculator if tank size is selected
+      const activeBtn = document.querySelector('.tank-btn.active');
+      if (activeBtn) {
+        const tankSize = parseInt(activeBtn.getAttribute('data-size'));
+        const totalCost = (tankSize * currentFuelPrice) / 100;
+        const costAmount = document.getElementById('tank-cost');
+        const costBreakdown = document.getElementById('cost-breakdown');
+        
+        if (costAmount) costAmount.textContent = `$${totalCost.toFixed(2)}`;
+        if (costBreakdown) costBreakdown.textContent = `${tankSize}L × ${currentFuelPrice.toFixed(1)}¢/L`;
+      }
+    }
+  }
+
+  // Initialize list controls
+  function initializeListControls() {
+    if (fuelTypeFilter) {
+      fuelTypeFilter.addEventListener('change', function() {
+        listFuelFilter = this.value;
+        hideBottomFeatureCard();
+        updateStationList();
+      });
+    }
+    
+    if (distanceFilter) {
+      distanceFilter.addEventListener('change', function() {
+        listRadius = parseInt(this.value);
+        hideBottomFeatureCard();
+        updateStationList();
+      });
+    }
+    
+    if (sortSwitch) {
+      sortSwitch.addEventListener('click', function() {
+        if (sortBy === 'price') {
+          sortBy = 'distance';
+          this.classList.add('distance');
+          this.querySelector('.sort-switch-slider').textContent = 'Distance';
+        } else {
+          sortBy = 'price';
+          this.classList.remove('distance');
+          this.querySelector('.sort-switch-slider').textContent = 'Price';
+        }
+        hideBottomFeatureCard();
+        updateStationList();
+      });
+    }
   }
 
   // Event listeners
   if (fuelSelect) {
     fuelSelect.addEventListener('change', (e) => {
       currentFuel = e.target.value;
-      // Hide feature card when changing fuel type on map
       hideBottomFeatureCard();
+      updateCurrentFuelPrice();
       updateVisibleStations();
       if (currentView === 'list') {
         updateStationList();
@@ -131,17 +475,14 @@ document.addEventListener("DOMContentLoaded", () => {
     listPanel.classList.add('hidden');
     listPanel.classList.remove('visible');
     
-    // Hide feature card when switching views
     hideBottomFeatureCard();
     
     currentView = viewName;
     mapTab.setAttribute('data-view', viewName);
     
-    // Update body class for styling
     document.body.classList.remove('map-view', 'list-view', 'home-view');
     document.body.classList.add(`${viewName}-view`);
     
-    // Update center button classes for icon switching
     mapTab.classList.remove('map-view');
     
     switch(viewName) {
@@ -159,29 +500,22 @@ document.addEventListener("DOMContentLoaded", () => {
         listTab.classList.add('active');
         listPanel.classList.remove('hidden');
         listPanel.classList.add('visible');
-        // Initialize pill selectors when list panel is first shown
         setTimeout(() => {
-          initializeFuelPillSelector();
-          initializeDistancePillSelector();
-          initializeSortPillSelector();
+          initializeListControls();
           setupListInteractions();
         }, 100);
         updateStationList();
         break;
     }
   }
-  
+
   // Setup list interactions
   function setupListInteractions() {
-    // Handle station clicks in list
     const setupStationClicks = () => {
       const stationElements = document.querySelectorAll('.list-station');
       stationElements.forEach(stationEl => {
         stationEl.addEventListener('click', function() {
           const siteId = this.getAttribute('data-siteid');
-          const stationIndex = parseInt(this.getAttribute('data-index'));
-          
-          // Find the station data
           const stationData = getStationDataById(siteId);
           if (stationData) {
             showBottomFeatureCardSlideUp(stationData);
@@ -190,7 +524,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     };
     
-    // Handle scroll to hide feature card
     const listContainer = document.getElementById('list');
     if (listContainer) {
       let scrollTimeout;
@@ -202,41 +535,19 @@ document.addEventListener("DOMContentLoaded", () => {
           hideBottomFeatureCard();
         }
         
-        // Clear previous timeout
         if (scrollTimeout) {
           clearTimeout(scrollTimeout);
         }
         
-        // Reset scrolling flag after scroll ends
         scrollTimeout = setTimeout(() => {
           isScrolling = false;
         }, 150);
       });
     }
     
-    // Handle page scroll to hide feature card (for main document)
-    let pageScrollTimeout;
-    let isPageScrolling = false;
-    
-    window.addEventListener('scroll', function() {
-      if (!isPageScrolling && currentView === 'list') {
-        isPageScrolling = true;
-        hideBottomFeatureCard();
-      }
-      
-      if (pageScrollTimeout) {
-        clearTimeout(pageScrollTimeout);
-      }
-      
-      pageScrollTimeout = setTimeout(() => {
-        isPageScrolling = false;
-      }, 150);
-    }, { passive: true });
-    
-    // Setup clicks after station list is updated
     setTimeout(setupStationClicks, 100);
   }
-  
+
   // Helper function to get station data by ID
   function getStationDataById(siteId) {
     const site = allSites.find(s => String(s.S) === String(siteId));
@@ -288,7 +599,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // Tab event listeners
   homeTab.addEventListener('click', () => switchToView('home'));
   listTab.addEventListener('click', () => switchToView('list'));
-
   mapTab.addEventListener('click', () => {
     if (currentView === 'map') {
       showUserLocation(true);
@@ -296,60 +606,6 @@ document.addEventListener("DOMContentLoaded", () => {
       switchToView('map');
     }
   });
-
-  // New pill selector functionality for distance
-  function initializeDistancePillSelector() {
-    const distanceSelector = document.getElementById('distance-pill-selector');
-    const distanceOptions = document.querySelectorAll('#distance-pill-selector .pill-option');
-    
-    distanceOptions.forEach(option => {
-      option.addEventListener('click', function() {
-        const radius = parseInt(this.getAttribute('data-value'));
-        listRadius = radius;
-        
-        // Hide feature card when changing distance
-        hideBottomFeatureCard();
-        
-        // Update selector appearance
-        distanceSelector.setAttribute('data-selected', radius.toString());
-        
-        // Update selected class
-        distanceOptions.forEach(opt => opt.classList.remove('selected'));
-        this.classList.add('selected');
-        
-        if (currentView === 'list') {
-          updateStationList();
-        }
-      });
-    });
-  }
-
-  // New pill selector functionality for sort
-  function initializeSortPillSelector() {
-    const sortSelector = document.getElementById('sort-pill-selector');
-    const sortOptions = document.querySelectorAll('#sort-pill-selector .pill-option');
-    
-    sortOptions.forEach(option => {
-      option.addEventListener('click', function() {
-        const newSortBy = this.getAttribute('data-value');
-        sortBy = newSortBy;
-        
-        // Hide feature card when changing sort
-        hideBottomFeatureCard();
-        
-        // Update selector appearance
-        sortSelector.setAttribute('data-selected', newSortBy);
-        
-        // Update selected class
-        sortOptions.forEach(opt => opt.classList.remove('selected'));
-        this.classList.add('selected');
-        
-        if (currentView === 'list') {
-          updateStationList();
-        }
-      });
-    });
-  }
 
   // Map initialization
   function startApp(center) {
@@ -371,16 +627,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     showUserLocation(false);
     fetchSitesAndPrices();
-
-    map.on("movestart", () => {
-      // Don't hide feature card on map move - let it stay visible
-    });
-    
-    map.on("zoomstart", () => {
-      // Don't hide feature card on zoom - let it stay visible
-    });
-
-    // Add map click handler to close feature card
     addMapClickHandler();
     
     map.on("moveend", () => {
@@ -406,8 +652,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (map) {
           userMarker = L.circleMarker(userLatLng, {
             radius: 10,
-            color: "#2196f3",
-            fillColor: "#2196f3",
+            color: "#667eea",
+            fillColor: "#667eea",
             fillOpacity: 0.85,
             weight: 3,
           }).addTo(map);
@@ -438,6 +684,7 @@ document.addEventListener("DOMContentLoaded", () => {
         priceMap[p.SiteId][p.FuelId] = p.Price;
       });
 
+      updateCurrentFuelPrice();
       updateVisibleStations();
       if (currentView === 'list') updateStationList();
     } catch (err) {
@@ -477,7 +724,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function getCombinedDieselPrice(prices) {
-    // Check for ULSD (6), Premium Diesel (14), and regular Diesel (3) in order of preference
     if (prices && typeof prices[6] !== "undefined" && prices[6] !== null && isValidPrice(prices[6])) {
       return { price: prices[6] / 10, raw: prices[6], which: 6 };
     }
@@ -623,13 +869,12 @@ document.addEventListener("DOMContentLoaded", () => {
             rawPrice = sitePrice;
           }
         }
-
         if (typeof price !== "undefined" && price !== null) {
           return {
             ...site,
             price,
             rawPrice,
-            allPrices: priceMap[site.S],
+            distance,
             brand: site.B,
             BrandId: site.BrandId,
             address: site.A,
@@ -637,604 +882,214 @@ document.addEventListener("DOMContentLoaded", () => {
             suburb: site.P,
             lat: site.Lat,
             lng: site.Lng,
-            distance: distance,
-            siteId: String(site.S)
+            siteId: String(site.S),
+            allPrices: priceMap[site.S]
           };
         }
         return null;
       })
-      .filter(Boolean)
-      .sort((a, b) => {
-        if (sortBy === "distance") {
-          return a.distance - b.distance;
-        }
-        return a.rawPrice - b.rawPrice;
-      });
+      .filter(Boolean);
 
-    if (stations.length === 0) {
-      listUl.innerHTML = `<li style="padding: 20px; text-align: center; color: #666;">No stations found within ${listRadius}km.</li>`;
-      return;
+    if (sortBy === "price") {
+      stations.sort((a, b) => a.rawPrice - b.rawPrice);
+    } else if (sortBy === "distance") {
+      stations.sort((a, b) => a.distance - b.distance);
     }
 
     const minPrice = stations.length ? Math.min(...stations.map(s => s.rawPrice)) : null;
 
-    let html = '';
-    stations.forEach((site, index) => {
-      const siteImgSrc = site.brand ? `images/${site.brand}.png` : 'images/default.png';
-      const isCheapest = minPrice !== null && site.rawPrice === minPrice;
-      const priceClass = isCheapest ? "list-price cheapest" : "list-price";
-      const direction = getDirectionForStation(site);
-      
-      html += `
-        <li class="list-station" data-siteid="${String(site.siteId)}" data-index="${index}">
-          <span class="list-logo">
-            <img
-              src="${siteImgSrc}"
-              alt="${site.name}"
-              onerror="this.onerror=null;this.src='images/default.png';"
-              style="height:40px;width:40px;border-radius:50%;background:#fff;object-fit:contain;box-shadow:0 1px 2px rgba(0,0,0,0.07);"
-            />
-          </span>
-          <span class="list-name">${site.name}<span class="list-distance">${site.distance.toFixed(1)}km ${direction}</span></span>
-          <span class="${priceClass}">${site.price.toFixed(1)}</span>
-        </li>
-      `;
-    });
+    listUl.innerHTML = stations.map(station => {
+      const isCheapest = minPrice !== null && station.rawPrice === minPrice;
+      const priceClass = isCheapest ? "cheapest-price" : "";
+      const direction = getDirectionForStation(station);
 
-    listUl.innerHTML = html;
-    
-    // Setup click handlers for new station elements
-    if (currentView === 'list') {
-      setTimeout(() => {
-        const stationElements = document.querySelectorAll('.list-station');
-        stationElements.forEach(stationEl => {
-          stationEl.addEventListener('click', function() {
-            const siteId = this.getAttribute('data-siteid');
-            const stationData = getStationDataById(siteId);
-            if (stationData) {
-              showBottomFeatureCardSlideUp(stationData);
-            }
-          });
-        });
-      }, 50);
-    }
-  }
-
-  // Home panel functions
-  function initializeHomePanel() {
-    // Calculate real QLD price statistics from current data
-    calculateQLDPriceStats();
-    
-    // Initialize calculator
-    initializeCalculator();
-    
-    // Initialize chart with QLD historical data
-    if (typeof Chart !== 'undefined') {
-      initializePriceChart();
-    }
-  }
-  
-  function calculateQLDPriceStats() {
-    if (!allPrices.length) return;
-    
-    // Group prices by fuel type - E10, 91, 98, and Diesel (4 cards total)
-    const fuelStats = {
-      12: [], // E10
-      2: [],  // 91 Unleaded
-      8: [],  // 98 Premium 
-      'diesel': [] // Combined Diesel
-    };
-    
-    // Collect all valid prices for each fuel type
-    allPrices.forEach(price => {
-      if (isValidPrice(price.Price)) {
-        // Regular fuel types
-        if (fuelStats[price.FuelId]) {
-          fuelStats[price.FuelId].push(price.Price / 10);
-        }
-        // Diesel - combine regular diesel (3) and premium diesel (14)
-        else if (price.FuelId === 3 || price.FuelId === 14) {
-          fuelStats['diesel'].push(price.Price / 10);
-        }
-      }
-    });
-    
-    // Calculate statistics for each fuel type
-    const fuelMapping = {
-      12: 'e10',
-      2: '91',
-      8: '98',
-      'diesel': 'diesel'
-    };
-    
-    Object.keys(fuelStats).forEach(fuelId => {
-      const prices = fuelStats[fuelId];
-      const fuelKey = fuelMapping[fuelId];
-      
-      if (prices.length > 0) {
-        const avg = prices.reduce((sum, price) => sum + price, 0) / prices.length;
-        const min = Math.min(...prices);
-        const max = Math.max(...prices);
-        
-        const avgEl = document.getElementById(`${fuelKey}-avg`);
-        const minEl = document.getElementById(`${fuelKey}-min`);
-        const maxEl = document.getElementById(`${fuelKey}-max`);
-        
-        if (avgEl) avgEl.textContent = avg.toFixed(1) + '¢';
-        if (minEl) minEl.textContent = min.toFixed(1) + '¢';
-        if (maxEl) maxEl.textContent = max.toFixed(1) + '¢';
-      }
-    });
-  }
-
-  function initializeCalculator() {
-    const fuelPriceInput = document.getElementById('fuel-price');
-    const discountSelect = document.getElementById('discount-amount');
-    const spendInput = document.getElementById('spend-amount');
-    const resultDisplay = document.getElementById('litres-result');
-    
-    if (!fuelPriceInput || !discountSelect || !spendInput || !resultDisplay) return;
-    
-    function calculateLitres() {
-      const fuelPrice = parseFloat(fuelPriceInput.value) || 0;
-      const discount = parseFloat(discountSelect.value) || 0;
-      const spendAmount = parseFloat(spendInput.value) || 0;
-      
-      if (fuelPrice > 0 && spendAmount > 0) {
-        const finalPrice = fuelPrice - discount;
-        const litres = (spendAmount * 100) / finalPrice;
-        resultDisplay.textContent = `${litres.toFixed(1)} L`;
-      } else {
-        resultDisplay.textContent = '0.0 L';
-      }
-    }
-    
-    fuelPriceInput.addEventListener('input', calculateLitres);
-    discountSelect.addEventListener('change', calculateLitres);
-    spendInput.addEventListener('input', calculateLitres);
-    
-    calculateLitres();
-  }
-
-  function initializePriceChart() {
-    const ctx = document.getElementById('price-chart');
-    if (!ctx || typeof Chart === 'undefined') return;
-    
-    // Generate 3 months of QLD average data based on current prices
-    const labels = [];
-    const e10Data = [];
-    const dieselData = [];
-    
-    // Calculate current average 91 price (switching from E10 due to data issues)
-    const unleaded91Prices = allPrices
-      .filter(p => p.FuelId === 2 && isValidPrice(p.Price))
-      .map(p => p.Price / 10);
-    const current91Avg = unleaded91Prices.length > 0 ? 
-      unleaded91Prices.reduce((sum, price) => sum + price, 0) / unleaded91Prices.length : 165;
-    
-    // Calculate current average 95 Premium price
-    const premium95Prices = allPrices
-      .filter(p => p.FuelId === 5 && isValidPrice(p.Price))
-      .map(p => p.Price / 10);
-    const current95Avg = premium95Prices.length > 0 ? 
-      premium95Prices.reduce((sum, price) => sum + price, 0) / premium95Prices.length : 175;
-    
-    // Calculate current average Diesel price
-    const dieselPrices = allPrices
-      .filter(p => (p.FuelId === 3 || p.FuelId === 14) && isValidPrice(p.Price))
-      .map(p => p.Price / 10);
-    const currentDieselAvg = dieselPrices.length > 0 ? 
-      dieselPrices.reduce((sum, price) => sum + price, 0) / dieselPrices.length : 185;
-    
-    const premium95Data = [];
-    
-    // Generate realistic 3-month trend data
-    for (let i = 89; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      
-      if (i % 7 === 0) { // Weekly data points
-        labels.push(date.toLocaleDateString('en-AU', { month: 'short', day: 'numeric' }));
-        
-        // Add realistic variation (±5¢ around current average)
-        const unleaded91Variation = (Math.random() - 0.5) * 10;
-        const premium95Variation = (Math.random() - 0.5) * 10;
-        const dieselVariation = (Math.random() - 0.5) * 10;
-        
-        e10Data.push(Math.max(150, Math.min(190, current91Avg + unleaded91Variation)));
-        premium95Data.push(Math.max(160, Math.min(200, current95Avg + premium95Variation)));
-        dieselData.push(Math.max(170, Math.min(210, currentDieselAvg + dieselVariation)));
-      }
-    }
-    
-    new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Unleaded 91 (¢/L)',
-          data: e10Data,
-          borderColor: 'rgba(255, 255, 255, 0.9)',
-          backgroundColor: 'rgba(255, 255, 255, 0.1)',
-          borderWidth: 3,
-          fill: false,
-          tension: 0.4,
-          pointBackgroundColor: 'rgba(255, 255, 255, 0.9)',
-          pointBorderColor: 'rgba(255, 255, 255, 0.9)',
-          pointRadius: 4
-        }, {
-          label: 'Premium 95 (¢/L)',
-          data: premium95Data,
-          borderColor: 'rgba(251, 191, 36, 0.9)',
-          backgroundColor: 'rgba(251, 191, 36, 0.1)',
-          borderWidth: 3,
-          fill: false,
-          tension: 0.4,
-          pointBackgroundColor: 'rgba(251, 191, 36, 0.9)',
-          pointBorderColor: 'rgba(251, 191, 36, 0.9)',
-          pointRadius: 4
-        }, {
-          label: 'Diesel Average (¢/L)',
-          data: dieselData,
-          borderColor: 'rgba(16, 185, 129, 0.9)',
-          backgroundColor: 'rgba(16, 185, 129, 0.1)',
-          borderWidth: 3,
-          fill: false,
-          tension: 0.4,
-          pointBackgroundColor: 'rgba(16, 185, 129, 0.9)',
-          pointBorderColor: 'rgba(16, 185, 129, 0.9)',
-          pointRadius: 4
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: {
-          intersect: false,
-          mode: 'index'
-        },
-        scales: {
-          x: {
-            ticks: {
-              color: 'rgba(255, 255, 255, 0.7)',
-              maxTicksLimit: 8
-            },
-            grid: {
-              color: 'rgba(255, 255, 255, 0.1)'
-            }
-          },
-          y: {
-            beginAtZero: false,
-            min: Math.min(...e10Data, ...premium95Data, ...dieselData) - 5,
-            max: Math.max(...e10Data, ...premium95Data, ...dieselData) + 5,
-            ticks: {
-              color: 'rgba(255, 255, 255, 0.7)',
-              callback: function(value) {
-                return value.toFixed(1) + '¢';
-              }
-            },
-            grid: {
-              color: 'rgba(255, 255, 255, 0.1)'
-            }
-          }
-        },
-        plugins: {
-          legend: {
-            display: true,
-            position: 'top',
-            labels: {
-              color: 'rgba(255, 255, 255, 0.8)',
-              usePointStyle: true,
-              padding: 20
-            }
-          },
-          tooltip: {
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            titleColor: 'rgba(255, 255, 255, 0.9)',
-            bodyColor: 'rgba(255, 255, 255, 0.8)',
-            borderColor: 'rgba(255, 255, 255, 0.2)',
-            borderWidth: 1
-          }
-        }
-      }
-    });
-  }
-
-  // Navigation function
-  function showNavigationOptions(address) {
-    const encodedAddress = encodeURIComponent(address);
-    
-    // Check if user is on mobile
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    if (isMobile) {
-      // Try to open in native maps app first
-      window.open(`maps://maps.google.com/?q=${encodedAddress}`, '_blank');
-      // Fallback to Google Maps web
-      setTimeout(() => {
-        window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank');
-      }, 1000);
-    } else {
-      // Desktop - open Google Maps
-      window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank');
-    }
-  }
-
-  // Drag functionality for feature cards
-  function initializeDragFunctionality() {
-    const featureCard = document.getElementById('bottom-feature-card');
-    const dragBar = featureCard.querySelector('.feature-card-drag-bar');
-    
-    if (!dragBar) return;
-    
-    let isDragging = false;
-    let startY = 0;
-    let startTransform = 0;
-    
-    // Touch events for mobile
-    dragBar.addEventListener('touchstart', function(e) {
-      isDragging = true;
-      startY = e.touches[0].clientY;
-      const currentTransform = getComputedStyle(featureCard).transform;
-      startTransform = currentTransform === 'none' ? 0 : parseInt(currentTransform.split(',')[5]);
-      e.preventDefault();
-    }, { passive: false });
-    
-    document.addEventListener('touchmove', function(e) {
-      if (!isDragging) return;
-      
-      const currentY = e.touches[0].clientY;
-      const deltaY = currentY - startY;
-      
-      // Only allow dragging down
-      if (deltaY > 0) {
-        const newTransform = Math.min(deltaY, 200); // Limit drag distance
-        featureCard.style.transform = `translateX(-50%) translateY(${newTransform}px)`;
-      }
-      e.preventDefault();
-    }, { passive: false });
-    
-    document.addEventListener('touchend', function(e) {
-      if (!isDragging) return;
-      isDragging = false;
-      
-      const currentTransform = getComputedStyle(featureCard).transform;
-      const currentY = currentTransform === 'none' ? 0 : parseInt(currentTransform.split(',')[5]);
-      
-      // If dragged more than 100px, hide the card
-      if (currentY > 100) {
-        hideBottomFeatureCard();
-      } else {
-        // Snap back to original position
-        featureCard.style.transform = 'translateX(-50%) translateY(0)';
-      }
-    });
-    
-    // Mouse events for desktop
-    dragBar.addEventListener('mousedown', function(e) {
-      isDragging = true;
-      startY = e.clientY;
-      const currentTransform = getComputedStyle(featureCard).transform;
-      startTransform = currentTransform === 'none' ? 0 : parseInt(currentTransform.split(',')[5]);
-      e.preventDefault();
-    });
-    
-    document.addEventListener('mousemove', function(e) {
-      if (!isDragging) return;
-      
-      const currentY = e.clientY;
-      const deltaY = currentY - startY;
-      
-      // Only allow dragging down
-      if (deltaY > 0) {
-        const newTransform = Math.min(deltaY, 200); // Limit drag distance
-        featureCard.style.transform = `translateX(-50%) translateY(${newTransform}px)`;
-      }
-    });
-    
-    document.addEventListener('mouseup', function(e) {
-      if (!isDragging) return;
-      isDragging = false;
-      
-      const currentTransform = getComputedStyle(featureCard).transform;
-      const currentY = currentTransform === 'none' ? 0 : parseInt(currentTransform.split(',')[5]);
-      
-      // If dragged more than 100px, hide the card
-      if (currentY > 100) {
-        hideBottomFeatureCard();
-      } else {
-        // Snap back to original position
-        featureCard.style.transform = 'translateX(-50%) translateY(0)';
-      }
-    });
-  }
-
-  // Bottom feature card functions
-  function hideBottomFeatureCard() {
-    const featureCard = document.getElementById('bottom-feature-card');
-    if (featureCard) {
-      featureCard.classList.remove('visible', 'slide-in', 'slide-up');
-      featureCard.classList.add('slide-down');
-      
-      // Reset transform
-      featureCard.style.transform = 'translateX(-50%) translateY(150%)';
-      
-      // Remove the card completely after animation
-      setTimeout(() => {
-        featureCard.classList.remove('slide-down');
-      }, 400);
-    }
-  }
-
-  // New slide up function for station clicks
-  function showBottomFeatureCardSlideUp(station) {
-    const featureCard = document.getElementById('bottom-feature-card');
-    
-    if (!featureCard) {
-      console.error('Bottom feature card element not found');
-      return;
-    }
-    
-    const direction = userMarker && userMarker.getLatLng ? 
-      getDirection(userMarker.getLatLng().lat, userMarker.getLatLng().lng, station.lat, station.lng) : '';
-    
-    const brandImgSrc = station.brand ? `images/${station.brand}.png` : 'images/default.png';
-    
-    const cardContent = generateGlassyFeatureCard(station, direction, brandImgSrc);
-    
-    // If card is already visible, slide it down first then slide up with new content
-    if (featureCard.classList.contains('visible')) {
-      featureCard.classList.remove('slide-up', 'slide-in');
-      featureCard.classList.add('slide-down');
-      
-      setTimeout(() => {
-        featureCard.innerHTML = `
-          <div class="feature-card-drag-bar">
-            <div class="drag-handle"></div>
-          </div>
-          ${cardContent}
-        `;
-        featureCard.classList.remove('slide-down');
-        featureCard.classList.add('visible', 'slide-up');
-        setTimeout(initializeDragFunctionality, 100);
-      }, 200);
-    } else {
-      // Card is hidden, show with slide up animation
-      featureCard.innerHTML = `
-        <div class="feature-card-drag-bar">
-          <div class="drag-handle"></div>
-        </div>
-        ${cardContent}
-      `;
-      featureCard.style.transform = 'translateX(-50%) translateY(0)';
-      featureCard.classList.remove('slide-down', 'slide-out');
-      featureCard.classList.add('visible', 'slide-up');
-      setTimeout(initializeDragFunctionality, 100);
-    }
-  }
-
-  // Add map click event to close feature card
-  function addMapClickHandler() {
-    map.on('click', function(e) {
-      const featureCard = document.getElementById('bottom-feature-card');
-      if (featureCard && featureCard.classList.contains('visible')) {
-        hideBottomFeatureCard();
-      }
-    });
-  }
-
-  // Generate glassy feature card content
-  function generateGlassyFeatureCard(station, direction, brandImgSrc) {
-    return `
-      <div class="feature-card-scale-wrapper">
-        <div class="feature-card-inner">
-          <img src="${brandImgSrc}" alt="${station.brand || 'Station'}" class="feature-station-logo" 
-               onerror="this.onerror=null;this.src='images/default.png';">
-          
-          <div class="feature-station-info">
-            <div class="feature-station-name">${station.name}</div>
-            <a class="feature-station-address" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(station.address + (station.suburb ? ', ' + station.suburb : ''))}" target="_blank">
-              ${station.address}${station.suburb ? ', ' + station.suburb : ''}
-            </a>
-            
-            <div class="feature-distance-direction">
-              <div class="feature-distance-badge">
-                <i class="fa-solid fa-location-dot"></i>
-                <span class="feature-distance-text">${station.distance ? station.distance.toFixed(1) + 'km' : ''} ${direction}</span>
+      return `
+        <li class="list-station" data-siteid="${station.siteId}">
+          <div class="station-info">
+            <div class="station-header">
+              <div class="brand-logo">
+                <img src="images/${station.brand ? station.brand : 'default'}.png" 
+                     alt="${station.brand || 'Brand'}"
+                     onerror="this.onerror=null;this.src='images/default.png';">
+              </div>
+              <div class="station-details">
+                <h3>${station.name || 'Unknown Station'}</h3>
+                <p class="address">${station.address || ''}, ${station.suburb || ''}</p>
+                <div class="location-info">
+                  <span class="distance">${station.distance?.toFixed(1) || '?'} km</span>
+                  ${direction ? `<span class="direction">${direction}</span>` : ''}
+                </div>
+              </div>
+            </div>
+            <div class="price-display">
+              <div class="main-price ${priceClass}">
+                ${station.price.toFixed(1)}
+              </div>
+              <div class="fuel-type">
+                ${listFuelFilter === "Diesel/Premium Diesel" ? "Diesel" : listFuelFilter}
               </div>
             </div>
           </div>
-          
-          <div class="feature-prices-grid">
-            ${generateGlassyPriceSlots(station)}
+        </li>
+      `;
+    }).join('');
+    
+    setupListInteractions();
+  }
+
+  // Bottom feature card functionality
+  function showBottomFeatureCardSlideUp(station) {
+    const card = document.getElementById('bottom-feature-card');
+    if (!card) return;
+    
+    const direction = getDirectionForStation(station);
+    const allPricesHTML = generateAllPricesHTML(station);
+    const fullAddress = `${station.address || station.A || ''}, ${station.suburb || station.P || ''}`;
+    
+    card.innerHTML = `
+      <div class="feature-card-drag-bar"></div>
+      <div class="feature-card-content">
+        <div class="feature-header">
+          <div class="brand-logo">
+            <img src="images/${station.brand ? station.brand : 'default'}.png" 
+                 alt="${station.brand || 'Brand'}"
+                 onerror="this.onerror=null;this.src='images/default.png';">
+          </div>
+          <div class="station-details">
+            <h3>${station.name || station.N || 'Unknown Station'}</h3>
+            <p class="address" onclick="openMapsDirections('${fullAddress}')">${fullAddress}</p>
+            <div class="location-info">
+              <span class="distance">${station.distance?.toFixed(1) || '?'} km</span>
+              ${direction ? `<span class="direction">${direction}</span>` : ''}
+            </div>
+          </div>
+        </div>
+        <div class="feature-prices">
+          <h4>All Fuel Prices</h4>
+          <div class="price-grid">
+            ${allPricesHTML}
           </div>
         </div>
       </div>
     `;
+    
+    card.classList.add('visible');
+    selectedListStationId = station.siteId;
+    
+    // Add drag functionality
+    setupDragBar();
   }
 
-  // Generate glassy price slots
-  function generateGlassyPriceSlots(site) {
-    if (!site.allPrices) return "";
+  // Function to open maps directions
+  function openMapsDirections(address) {
+    const encodedAddress = encodeURIComponent(address);
+    const userAgent = navigator.userAgent;
     
-    const fuelTypes = [
-      { key: "12", label: "E10" },
-      { key: "2", label: "U91" },
-      { key: "5", label: "P95" },
-      { key: "8", label: "P98" }
-    ];
+    if (/iPad|iPhone|iPod/.test(userAgent)) {
+      // iOS device - try Apple Maps first, fallback to Google Maps
+      window.open(`maps://maps.apple.com/?daddr=${encodedAddress}`, '_blank');
+      setTimeout(() => {
+        window.open(`https://maps.google.com/maps?daddr=${encodedAddress}`, '_blank');
+      }, 500);
+    } else if (/Android/.test(userAgent)) {
+      // Android device - use Google Maps
+      window.open(`geo:0,0?q=${encodedAddress}`, '_blank');
+    } else {
+      // Desktop - use Google Maps web
+      window.open(`https://maps.google.com/maps?daddr=${encodedAddress}`, '_blank');
+    }
+  }
+
+  function generateAllPricesHTML(station) {
+    const allPrices = station.allPrices || priceMap[station.S] || {};
+    const fuelNames = {
+      12: 'E10',
+      2: 'Unleaded 91',
+      5: 'Premium 95',
+      8: 'Premium 98',
+      3: 'Diesel',
+      14: 'Premium Diesel',
+      6: 'ULSD'
+    };
     
-    let slots = "";
-    let minPrice = null;
-    let availablePrices = [];
+    return Object.entries(allPrices)
+      .filter(([fuelId, price]) => isValidPrice(price))
+      .map(([fuelId, price]) => {
+        const fuelName = fuelNames[fuelId] || `Fuel ${fuelId}`;
+        return `
+          <div class="price-item">
+            <span class="fuel-name">${fuelName}</span>
+            <span class="price">${(price / 10).toFixed(1)}</span>
+          </div>
+        `;
+      })
+      .join('');
+  }
+
+  function setupDragBar() {
+    const dragBar = document.querySelector('.feature-card-drag-bar');
+    const card = document.getElementById('bottom-feature-card');
     
-    // Check each fuel type and collect available prices
-    fuelTypes.forEach(fuel => {
-      const price = site.allPrices[fuel.key];
-      if (price && isValidPrice(price)) {
-        const priceValue = price / 10;
-        availablePrices.push({
-          key: fuel.key,
-          label: fuel.label,
-          price: priceValue,
-          raw: price
-        });
-        
-        if (minPrice === null || price < minPrice) {
-          minPrice = price;
-        }
-      }
-    });
+    if (!dragBar || !card) return;
     
-    // Handle all diesel types (ULSD=6, Diesel=3, Premium Diesel=14)
-    const dieselResult = getCombinedDieselPrice(site.allPrices);
-    if (dieselResult) {
-      availablePrices.push({
-        key: "diesel",
-        label: "DSL",
-        price: dieselResult.price,
-        raw: dieselResult.raw
-      });
+    let isDragging = false;
+    let startY = 0;
+    let startBottom = 0;
+    
+    dragBar.addEventListener('mousedown', startDrag);
+    dragBar.addEventListener('touchstart', startDrag);
+    
+    function startDrag(e) {
+      isDragging = true;
+      startY = e.type === 'mousedown' ? e.clientY : e.touches[0].clientY;
       
-      if (minPrice === null || dieselResult.raw < minPrice) {
-        minPrice = dieselResult.raw;
+      const rect = card.getBoundingClientRect();
+      startBottom = window.innerHeight - rect.bottom;
+      
+      document.addEventListener('mousemove', drag);
+      document.addEventListener('touchmove', drag);
+      document.addEventListener('mouseup', stopDrag);
+      document.addEventListener('touchend', stopDrag);
+    }
+    
+    function drag(e) {
+      if (!isDragging) return;
+      
+      const currentY = e.type === 'mousemove' ? e.clientY : e.touches[0].clientY;
+      const deltaY = currentY - startY;
+      
+      if (deltaY > 50) { // Dragged down enough
+        hideBottomFeatureCard();
       }
     }
     
-    // Generate slots only for available fuels
-    availablePrices.forEach(fuel => {
-      const isCheapest = minPrice !== null && fuel.raw === minPrice;
-      const cheapestClass = isCheapest ? " cheapest" : "";
-      
-      slots += `
-        <div class="feature-price-slot${cheapestClass}">
-          <div class="feature-fuel-label">${fuel.label}</div>
-          <div class="feature-price-value">${fuel.price.toFixed(1)}</div>
-        </div>
-      `;
+    function stopDrag() {
+      isDragging = false;
+      document.removeEventListener('mousemove', drag);
+      document.removeEventListener('touchmove', drag);
+      document.removeEventListener('mouseup', stopDrag);
+      document.removeEventListener('touchend', stopDrag);
+    }
+  }
+
+  function hideBottomFeatureCard() {
+    const card = document.getElementById('bottom-feature-card');
+    if (card) {
+      card.classList.remove('visible');
+    }
+    selectedListStationId = null;
+  }
+
+  // Map click handler
+  function addMapClickHandler() {
+    map.on('click', function(e) {
+      hideBottomFeatureCard();
     });
-    
-    return slots;
   }
 
-  // Make functions globally available
-  window.showNavigationOptions = showNavigationOptions;
-  window.hideBottomFeatureCard = hideBottomFeatureCard;
-
-  // Start the app with default location
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        const userLatLng = [pos.coords.latitude, pos.coords.longitude];
-        startApp(userLatLng);
-      },
-      err => {
-        console.warn("Geolocation failed, using default location:", err.message);
-        startApp(defaultCenter);
-      }
-    );
-  } else {
-    startApp(defaultCenter);
-  }
-
-}); // End of DOMContentLoaded
+  // Initialize app
+  navigator.geolocation.getCurrentPosition(
+    pos => startApp([pos.coords.latitude, pos.coords.longitude]),
+    () => startApp(defaultCenter)
+  );
+});
