@@ -388,10 +388,8 @@ html, body {
   margin-right: 15px;
   border-radius: 12px;
   transition: all 0.3s ease;
-}
-
-.toolbar-side-btn:hover {
-  color: #2E5A87;
+  border: none !important;  /* Remove border */
+  box-shadow: none !important; /* Remove any shadow */
 }
 
 .toolbar-side-btn.active {
@@ -1364,4 +1362,27 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
 
 .pretty-list-controls {
   margin-bottom: 0;
+}
+@media (max-width: 600px) {
+  .dashboard-header {
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 10px 5px 10px;
+    font-size: 1em;
+    align-items: flex-start;
+  }
+  #dashboard-greeting {
+    font-size: 1.15em;
+    font-weight: 700;
+    color: #387cc2;
+  }
+  #dashboard-date {
+    font-size: 1em;
+    color: #222;
+    font-weight: 400;
+  }
+  #dashboard-weather {
+    font-size: 1em;
+    margin-top: 4px;
+  }
 }
