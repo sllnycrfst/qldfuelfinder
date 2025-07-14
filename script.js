@@ -1124,9 +1124,34 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Example: Call this when switching views
-  // updateTopToolbar('home'); // for home
-  // updateTopToolbar('list'); // for list
+  // Panel open/close logic
+  const dashboardPanel = document.getElementById('dashboard-panel');
+  const listPanel = document.getElementById('list-panel');
+  const openDashboardBtn = document.getElementById('open-dashboard');
+  const openListBtn = document.getElementById('open-list');
+  const closeDashboardBtn = document.getElementById('close-dashboard');
+  const closeListBtn = document.getElementById('close-list');
 
-  // You can call updateTopToolbar in your view-switching logic
+  openDashboardBtn.addEventListener('click', () => {
+    dashboardPanel.classList.add('open');
+  });
+  closeDashboardBtn.addEventListener('click', () => {
+    dashboardPanel.classList.remove('open');
+  });
+  openListBtn.addEventListener('click', () => {
+    listPanel.classList.add('open');
+  });
+  closeListBtn.addEventListener('click', () => {
+    listPanel.classList.remove('open');
+  });
+
+  // Optionally, close panels when clicking outside (mobile UX)
+  document.addEventListener('click', (e) => {
+    if (dashboardPanel.classList.contains('open') && !dashboardPanel.contains(e.target) && !openDashboardBtn.contains(e.target)) {
+      dashboardPanel.classList.remove('open');
+    }
+    if (listPanel.classList.contains('open') && !listPanel.contains(e.target) && !openListBtn.contains(e.target)) {
+      listPanel.classList.remove('open');
+    }
+  });
 });

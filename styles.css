@@ -1225,3 +1225,111 @@ body.map-view .top-toolbar {
   color: var(--text-secondary);
   font-weight: 500;
 }
+
+/* Side Tab Buttons */
+.side-tab {
+  position: fixed;
+  top: 50%;
+  z-index: 12000;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: var(--glass-bg);
+  box-shadow: var(--glass-shadow);
+  color: var(--text-primary);
+  font-size: 1.6em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: background 0.2s;
+}
+.left-tab { left: 18px; }
+.right-tab { right: 18px; }
+.side-tab:hover { background: var(--glass-bg-dark); }
+
+/* Side Panels */
+.side-panel {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 370px;
+  max-width: 90vw;
+  background: var(--glass-bg-dark);
+  box-shadow: 0 0 32px rgba(0,0,0,0.18);
+  z-index: 11000;
+  overflow-y: auto;
+  transition: transform 0.35s cubic-bezier(.4,0,.2,1);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  border-radius: 0 20px 20px 0;
+  border: 1.5px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+}
+.dashboard-panel {
+  left: 0;
+  transform: translateX(-100%);
+  border-radius: 0 20px 20px 0;
+}
+.dashboard-panel.open {
+  transform: translateX(0);
+}
+.list-panel {
+  right: 0;
+  transform: translateX(100%);
+  border-radius: 20px 0 0 20px;
+}
+.list-panel.open {
+  transform: translateX(0);
+}
+
+/* Close Button */
+.close-panel {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 2em;
+  cursor: pointer;
+  z-index: 1;
+}
+
+/* Map always fills the viewport */
+#map {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+}
+
+/* Panel content scrolls */
+.side-panel .panel-content {
+  padding: 32px 24px 24px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Sticky filters in list panel */
+.list-panel .sticky-list-filters {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--glass-bg-dark);
+  padding-top: 16px;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  border-radius: 0 0 16px 16px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .side-panel { width: 98vw; }
+  .dashboard-panel, .list-panel { border-radius: 0; }
+  .side-tab { width: 40px; height: 40px; font-size: 1.2em; }
+}

@@ -11,32 +11,20 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <!-- Sticky Greeting, Date, Weather -->
-    <div class="sticky-greeting">
-        <div id="greeting-text" class="greeting-text">Good afternoon</div>
-        <div id="date-text" class="date-text">Thursday 11 July 2025</div>
-        <div class="weather-info">
-            <span id="weather-icon" class="weather-icon">☀️</span>
-            <span id="weather-temp" class="weather-temp">23°C</span>
-            <span id="weather-desc" class="weather-desc">Sunny</span>
-            <span id="weather-location" class="weather-location">Brisbane</span>
-        </div>
-    </div>
+    <!-- Left Dashboard Tab Button -->
+    <button class="side-tab left-tab" id="open-dashboard" title="Dashboard">
+        <i class="fa fa-chart-bar"></i>
+    </button>
+    <!-- Right List Tab Button -->
+    <button class="side-tab right-tab" id="open-list" title="Station List">
+        <i class="fa fa-list"></i>
+    </button>
 
-    <!-- Map Container -->
-    <div id="map"></div>
-
-    <!-- Map Weather Widget -->
-    <div class="map-weather-widget" id="map-weather-widget"></div>
-
-    <!-- Search Bar -->
-    <div class="search-bar-glass"></div>
-
-    <!-- Bottom Toolbar -->
-    <div class="bottom-toolbar"></div>
-
-    <!-- Home Panel -->
-    <div class="fullscreen-panel hidden" id="home-panel">
+    <!-- Dashboard Panel (Left) -->
+    <div class="side-panel dashboard-panel" id="dashboard-panel">
+        <button class="close-panel" id="close-dashboard">&times;</button>
+        <!-- Place your dashboard content here (stats, charts, calculators) -->
+        <!-- Move your home-panel content here -->
         <div class="panel-content">
             <div class="section-description">Today's average prices across QLD:</div>
             <div class="stats-section">
@@ -112,9 +100,14 @@
         </div>
     </div>
 
-    <!-- List Panel -->
-    <div class="fullscreen-panel hidden" id="list-panel">
+    <!-- Map Container (center, always visible) -->
+    <div id="map"></div>
+
+    <!-- List Panel (Right) -->
+    <div class="side-panel list-panel" id="list-panel">
+        <button class="close-panel" id="close-list">&times;</button>
         <div class="panel-content">
+            <!-- Sticky Filters -->
             <div class="sticky-list-filters">
                 <div class="filter-controls-grid">
                     <div class="filter-group">
