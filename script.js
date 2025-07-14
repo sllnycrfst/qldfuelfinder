@@ -227,32 +227,29 @@ document.addEventListener("DOMContentLoaded", () => {
   function initializeDiscountCalculator() {
     const discountInput = document.getElementById('discount-amount');
     const fuelAmountInput = document.getElementById('fuel-amount');
-    const fuelPriceInput = document.getElementById('fuel-price');
     const savingsEl = document.getElementById('discount-savings');
     const breakdownEl = document.getElementById('discount-breakdown');
-
+    
     function calculateDiscount() {
       const discount = parseFloat(discountInput.value) || 0;
       const fuelAmount = parseFloat(fuelAmountInput.value) || 0;
-      const fuelPrice = parseFloat(fuelPriceInput.value) || 0;
-
-      if (discount > 0 && fuelAmount > 0 && fuelPrice > 0) {
+      
+      if (discount > 0 && fuelAmount > 0) {
         const savings = (discount * fuelAmount) / 100;
-        const totalCost = (fuelPrice * fuelAmount) / 100;
         savingsEl.textContent = `Save $${savings.toFixed(2)}`;
-        breakdownEl.textContent = `${discount}¢/L × ${fuelAmount}L = $${savings.toFixed(2)} saved (Total: $${totalCost.toFixed(2)})`;
+        breakdownEl.textContent = `${discount}¢/L × ${fuelAmount}L = ${savings.toFixed(2)} saved`;
       } else {
         savingsEl.textContent = 'Enter details above';
         breakdownEl.textContent = 'Calculate your savings';
       }
     }
-
-    if (discountInput) discountInput.addEventListener('input', calculateDiscount);
-    if (fuelAmountInput) fuelAmountInput.addEventListener('input', calculateDiscount);
-    if (fuelPriceInput) fuelPriceInput.addEventListener('input', calculateDiscount);
-
-    // Call once to show output by default
-    calculateDiscount();
+    
+    if (discountInput) {
+      discountInput.addEventListener('input', calculateDiscount);
+    }
+    if (fuelAmountInput) {
+      fuelAmountInput.addEventListener('input', calculateDiscount);
+    }
   }
 
   // Tank calculator functionality
@@ -260,35 +257,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const tankButtons = document.querySelectorAll('.tank-btn');
     const costAmount = document.getElementById('tank-cost');
     const costBreakdown = document.getElementById('cost-breakdown');
-    const priceInput = document.getElementById('tank-fuel-price');
-
-    function updateTankCost(tankSize) {
-      const price = parseFloat(priceInput.value) || 0;
-      if (tankSize && price) {
-        const totalCost = (tankSize * price) / 100;
-        if (costAmount) costAmount.textContent = `$${totalCost.toFixed(2)}`;
-        if (costBreakdown) costBreakdown.textContent = `${tankSize}L × ${price.toFixed(1)}¢/L`;
-      }
-    }
-
+    
     tankButtons.forEach(btn => {
       btn.addEventListener('click', function() {
+        // Remove active class from all buttons
         tankButtons.forEach(b => b.classList.remove('active'));
+        // Add active class to clicked button
         this.classList.add('active');
+        
         const tankSize = parseInt(this.getAttribute('data-size'));
-        updateTankCost(tankSize);
+        const totalCost = (tankSize * currentFuelPrice) / 100;
+        
+        if (costAmount) costAmount.textContent = `$${totalCost.toFixed(2)}`;
+        if (costBreakdown) costBreakdown.textContent = `${tankSize}L × ${currentFuelPrice.toFixed(1)}¢/L`;
       });
     });
-
-    if (priceInput) {
-      priceInput.addEventListener('input', function() {
-        const activeBtn = document.querySelector('.tank-btn.active');
-        if (activeBtn) {
-          const tankSize = parseInt(activeBtn.getAttribute('data-size'));
-          updateTankCost(tankSize);
-        }
-      });
-    }
   }
 
   // Update price statistics
@@ -323,79 +306,90 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Fuel trends data
-  const fuelTrends = {
-    E10: [192, 191, 193, 192, 194, 193, 192, 191, 192, 193, 194, 192],
-    91: [193, 192, 194, 193, 195, 194, 193, 192, 193, 194, 195, 193],
-    95: [202, 201, 203, 202, 204, 203, 202, 201, 202, 203, 204, 202],
-    98: [215, 214, 216, 215, 217, 216, 215, 214, 215, 216, 217, 215],
-    Diesel: [205, 204, 206, 205, 207, 206, 205, 204, 205, 206, 207, 205],
-    "Premium Diesel": [210, 209, 211, 210, 212, 211, 210, 209, 210, 211, 212, 210]
-  };
-  const labels = [
-    'Apr 1', 'Apr 8', 'Apr 15', 'Apr 22', 'Apr 29',
-    'May 6', 'May 13', 'May 20', 'May 27',
-    'Jun 3', 'Jun 10', 'Jun 17'
-  ];
-
-  let chartInstance;
-
-  function renderFuelChart(fuelType) {
-    const ctx = document.getElementById('priceChart').getContext('2d'); // <-- use your actual canvas ID
-    if (chartInstance) chartInstance.destroy();
-    chartInstance = new Chart(ctx, {
+  // Initialize price trend chart
+  function initializePriceChart() {
+    const ctx = document.getElementById('priceChart');
+    if (!ctx) return;
+    
+    // Destroy existing chart if it exists
+    if (priceChart) {
+      priceChart.destroy();
+    }
+    
+    // Mock data for demonstration
+    const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const data = {
+      labels: labels,
+      datasets: [{
+        label: 'E10',
+        data: [192, 191, 193, 192, 194, 193, 192],
+        borderColor: '#00ff88',
+        backgroundColor: 'rgba(0, 255, 136, 0.1)',
+        tension: 0.4
+      }, {
+        label: 'Unleaded 91',
+        data: [193, 192, 194, 193, 195, 194, 193],
+        borderColor: '#667eea',
+        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+        tension: 0.4
+      }, {
+        label: 'Premium 98',
+        data: [216, 215, 217, 216, 218, 217, 216],
+        borderColor: '#ff6b6b',
+        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+        tension: 0.4
+      }]
+    };
+    
+    priceChart = new Chart(ctx, {
       type: 'line',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: fuelType,
-          data: fuelTrends[fuelType],
-          borderColor: '#1976d2',
-          backgroundColor: 'rgba(25, 118, 210, 0.08)',
-          tension: 0.5, // smooth line
-          pointRadius: 3,
-          pointBackgroundColor: '#1976d2'
-        }]
-      },
+      data: data,
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
           legend: {
-            labels: { color: '#484848' }
+            labels: {
+              color: 'rgba(255, 255, 255, 0.8)',
+              font: {
+                size: 12
+              }
+            }
           }
         },
         scales: {
           y: {
-            ticks: { color: '#484848', callback: v => v + '¢' },
-            grid: { color: 'rgba(72,72,72,0.08)' }
+            beginAtZero: false,
+            ticks: {
+              color: 'rgba(255, 255, 255, 0.6)',
+              callback: function(value) {
+                return value + '¢';
+              }
+            },
+            grid: {
+              color: 'rgba(255, 255, 255, 0.1)'
+            }
           },
           x: {
-            ticks: { color: '#484848' },
-            grid: { color: 'rgba(72,72,72,0.08)' }
+            ticks: {
+              color: 'rgba(255, 255, 255, 0.6)'
+            },
+            grid: {
+              color: 'rgba(255, 255, 255, 0.1)'
+            }
           }
         }
       }
     });
   }
 
-  // Initial render
-  renderFuelChart('E10');
-
-  // Toggle logic
-  document.getElementById('chart-toggle').addEventListener('click', e => {
-    if (e.target.classList.contains('chart-toggle-btn')) {
-      document.querySelectorAll('.chart-toggle-btn').forEach(btn => btn.classList.remove('active'));
-      e.target.classList.add('active');
-      renderFuelChart(e.target.dataset.fuel);
-    }
-  });
-  
   // Initialize home panel
   function initializeHomePanel() {
     initializeDynamicGreeting();
     initializeDiscountCalculator();
     initializeTankCalculator();
     updatePriceStatistics();
+    initializePriceChart();
   }
 
   // Update fuel price when fuel type changes
@@ -1098,60 +1092,4 @@ document.addEventListener("DOMContentLoaded", () => {
     pos => startApp([pos.coords.latitude, pos.coords.longitude]),
     () => startApp(defaultCenter)
   );
-
-  function updateTopToolbar(view) {
-    const toolbar = document.getElementById('top-toolbar-content');
-    if (!toolbar) return;
-
-    if (view === 'home') {
-      // Greeting, date, weather
-      const greeting = document.querySelector('.greeting-text')?.textContent || '';
-      const date = document.querySelector('.date-text')?.textContent || '';
-      const weather = document.querySelector('.weather-info')?.innerHTML || '';
-      toolbar.innerHTML = `
-        <div style="display:flex; flex-direction:column; align-items:center; width:100%;">
-          <div style="font-size:1.3em; font-weight:600;">${greeting}</div>
-          <div style="font-size:0.95em; color:var(--text-secondary);">${date}</div>
-          <div class="weather-info" style="justify-content:center; margin-top:2px;">${weather}</div>
-        </div>
-      `;
-    } else if (view === 'list') {
-      // Filters
-      const filters = document.querySelector('.list-controls');
-      toolbar.innerHTML = filters ? filters.outerHTML : '';
-    } else {
-      toolbar.innerHTML = '';
-    }
-  }
-
-  // Panel open/close logic
-  const dashboardPanel = document.getElementById('dashboard-panel');
-  const listPanel = document.getElementById('list-panel');
-  const openDashboardBtn = document.getElementById('open-dashboard');
-  const openListBtn = document.getElementById('open-list');
-  const closeDashboardBtn = document.getElementById('close-dashboard');
-  const closeListBtn = document.getElementById('close-list');
-
-  openDashboardBtn.addEventListener('click', () => {
-    dashboardPanel.classList.add('open');
-  });
-  closeDashboardBtn.addEventListener('click', () => {
-    dashboardPanel.classList.remove('open');
-  });
-  openListBtn.addEventListener('click', () => {
-    listPanel.classList.add('open');
-  });
-  closeListBtn.addEventListener('click', () => {
-    listPanel.classList.remove('open');
-  });
-
-  // Optionally, close panels when clicking outside (mobile UX)
-  document.addEventListener('click', (e) => {
-    if (dashboardPanel.classList.contains('open') && !dashboardPanel.contains(e.target) && !openDashboardBtn.contains(e.target)) {
-      dashboardPanel.classList.remove('open');
-    }
-    if (listPanel.classList.contains('open') && !listPanel.contains(e.target) && !openListBtn.contains(e.target)) {
-      listPanel.classList.remove('open');
-    }
-  });
 });
