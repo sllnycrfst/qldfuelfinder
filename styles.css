@@ -1319,3 +1319,91 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
     margin-top: 4px;
   }
 }
+/* --- MOBILE: Move feature card fuel/prices down 20px --- */
+@media (max-width: 700px) {
+  .feature-card-inner {
+    padding-top: 32px !important;
+  }
+  .feature-prices-grid {
+    margin-top: 20px !important;
+  }
+}
+
+/* --- List panel: Move list down so it isn't behind top-toolbar --- */
+body.list-view #list-panel .panel-content,
+body.list-view .list-content-wrapper {
+  padding-top: 100px !important;
+}
+@media (max-width: 700px) {
+  body.list-view #list-panel .panel-content,
+  body.list-view .list-content-wrapper {
+    padding-top: 110px !important;
+  }
+}
+
+/* --- Style dropdowns (list view only) --- */
+body.list-view #toolbar-list-filters select,
+body.list-view #toolbar-list-filters select:focus,
+body.list-view #toolbar-list-filters select:active {
+  background: rgba(255,255,255,0.95);
+  border: 1.5px solid #b7cdfa;
+  color: #235390;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 8px 14px;
+  box-shadow: 0 2px 12px rgba(45,90,150,0.04);
+  margin: 0 10px 0 0;
+  appearance: none;
+  outline: none;
+  transition: border-color 0.2s;
+}
+body.list-view #toolbar-list-filters select:focus {
+  border-color: #387cc2;
+  background: #fff;
+}
+
+/* Remove filters on home tab */
+body.home-view #toolbar-list-filters {
+  display: none !important;
+}
+
+/* --- Home tab stats: readable light blue text --- */
+.stats-grid .stat-card {
+  background: rgba(46, 112, 202, 0.20) !important;
+  border: 1.5px solid #b7cdfa;
+  color: #b7cdfa !important;
+}
+.stats-grid .stat-header,
+.stats-grid .stat-header span,
+.stats-grid .stat-value .label,
+.stats-grid .stat-value .value {
+  color: #b7cdfa !important;
+}
+.stats-grid .stat-value .value.cheapest {
+  color: #4fd9ff !important;
+}
+.stats-grid .stat-value .value.expensive {
+  color: #ff8b8b !important;
+}
+.stats-grid .stat-value {
+  color: #b7cdfa !important;
+}
+.price-stats h3 {
+  color: #b7cdfa !important;
+}
+
+/* --- Weather section: always hide the old widget --- */
+#dashboard-weather img.weather-icon,
+#dashboard-weather .weather-icon,
+#map-weather-widget {
+  display: none !important;
+}
+
+/* --- Your own better weather widget (placeholder style) --- */
+#dashboard-weather {
+  color: #b7cdfa !important;
+  font-weight: 600;
+  font-size: 1.1em;
+  letter-spacing: 0.02em;
+}
