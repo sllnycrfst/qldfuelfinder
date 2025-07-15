@@ -574,7 +574,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // Home panel functions
   function initializeHomePanel() {
     calculateQLDPriceStats();
-    initializeCalculator();
     if (typeof Chart !== 'undefined') {
       initializePriceChart();
     }
@@ -619,34 +618,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-
-  function initializeCalculator() {
-    const fuelPriceInput = document.getElementById('fuel-price');
-    const discountSelect = document.getElementById('discount-amount');
-    const spendInput = document.getElementById('spend-amount');
-    const resultDisplay = document.getElementById('litres-result');
-
-    if (!fuelPriceInput || !discountSelect || !spendInput || !resultDisplay) return;
-
-    function calculateLitres() {
-      const fuelPrice = parseFloat(fuelPriceInput.value) || 0;
-      const discount = parseFloat(discountSelect.value) || 0;
-      const spendAmount = parseFloat(spendInput.value) || 0;
-      if (fuelPrice > 0 && spendAmount > 0) {
-        const finalPrice = fuelPrice - discount;
-        const litres = (spendAmount * 100) / finalPrice;
-        resultDisplay.textContent = `${litres.toFixed(1)} L`;
-      } else {
-        resultDisplay.textContent = '0.0 L';
-      }
-    }
-
-    fuelPriceInput.addEventListener('input', calculateLitres);
-    discountSelect.addEventListener('change', calculateLitres);
-    spendInput.addEventListener('input', calculateLitres);
-    calculateLitres();
-  }
-
   function initializePriceChart() {
     const ctx = document.getElementById('price-chart');
     if (!ctx || typeof Chart === 'undefined') return;
@@ -1085,34 +1056,11 @@ document.addEventListener("DOMContentLoaded", () => {
       widget.textContent = 'Weather unavailable';
     }
   }
-
-  // Full tank cost calculator
-  function initializeFullTankCalculator() {
-    const priceInput = document.getElementById('tank-fuel-price');
-    const sizeSelect = document.getElementById('tank-size');
-    const resultDisplay = document.getElementById('tank-total-cost');
-    if (!priceInput || !sizeSelect || !resultDisplay) return;
-    function updateTotal() {
-      const price = parseFloat(priceInput.value) || 0;
-      const size = parseFloat(sizeSelect.value) || 0;
-      if (price > 0 && size > 0) {
-        const total = (price * size) / 100;
-        resultDisplay.textContent = `$${total.toFixed(2)}`;
-      } else {
-        resultDisplay.textContent = '$0.00';
-      }
-    }
-    priceInput.addEventListener('input', updateTotal);
-    sizeSelect.addEventListener('change', updateTotal);
-    updateTotal();
-  }
-
   // Panel switch adjustments
   function onPanelSwitch(view) {
     showDashboardHeader(view === 'home');
     if (view === 'home') {
       updateDashboardHeader();
-      initializeFullTankCalculator();
     }
     if (view === 'map') {
       updateMapWeatherWidget();
@@ -1130,7 +1078,6 @@ document.addEventListener("DOMContentLoaded", () => {
   updateMapWeatherWidget();
   if (document.body.classList.contains('home-view')) {
     updateDashboardHeader();
-    initializeFullTankCalculator();
     showDashboardHeader(true);
   }
 
