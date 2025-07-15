@@ -524,13 +524,15 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
 }
 
 .fullscreen-panel.hidden {
+  pointer-events: none;
+  display: none;
   transform: translateY(100%);
 }
-
 .fullscreen-panel.visible {
+  pointer-events: auto;
+  display: block;
   transform: translateY(0);
 }
-
 /* --- PANEL STYLES --- */
 .panel-header {
   display: none !important;
