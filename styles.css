@@ -537,19 +537,6 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
   border-color: #387cc2;
 }
 
-.price-stats {
-  background: white !important;
-  border: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  border-radius: 20px;
-  padding: 24px;
-  margin-top: 100px;
-  margin-bottom: 28px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
-              inset 0 2px 0 rgba(255, 255, 255, 0.2);
-}
-
 .price-stats h3 {
   margin: 0 0 20px 0;
   color: rgba(255, 255, 255, 0.9);
@@ -566,7 +553,7 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
 }
 
 .stat-card {
-  background: rgba(255, 255, 255, 0.05);
+  background: mone;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   padding: 20px;
@@ -603,7 +590,7 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
 
 .stat-value .value {
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.9);
+  color: #fff;
 }
 
 .stat-value .value.cheapest {
@@ -611,11 +598,11 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
 }
 
 .stat-value .value.expensive {
-  color: #b40000 !important;
+  color: #fff !important;
 }
 
 .calculator-section {
-  background: #387CC2 !important;
+  background: none !important;
   border: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
@@ -653,7 +640,7 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
 
 .calc-input label {
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.8);
+  color: #fff;
   font-size: 0.9em;
 }
 
@@ -663,7 +650,7 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.9);
+  color: none;
   font-size: 14px;
   outline: none;
   transition: all 0.2s ease;
@@ -678,7 +665,7 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
 }
 
 .calc-input input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: #fff;
 }
 
 .calc-input select option {
