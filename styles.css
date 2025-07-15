@@ -292,9 +292,6 @@ body.home-view #toolbar-list-filters { display: none !important; }
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1),
               inset 0 2px 0 rgba(255, 255, 255, 0.4);
 }
-.bottom-toolbar, #bottom-toolbar {
-    background-color: #f0f0f0; /* Light grey */
-}
 
 .toolbar-center-btn {
   position: absolute;
@@ -949,13 +946,13 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
   width: min(380px, calc(100vw - 20px));
   z-index: 5500;
   background: rgba(56, 125, 194, 0.507);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  border: 1.3px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
   border-radius: 24px;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12),
               0 2px 8px rgba(0, 0, 0, 0.08),
-              inset 0 1.5px 0 rgba(255, 255, 255, 0.76);
+              inset 0 2.5px 0 rgba(255, 255, 255, 0.76);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   padding: 20px 20px 20px 20px;
@@ -1396,4 +1393,7 @@ body.home-view #toolbar-list-filters {
   font-weight: 600;
   font-size: 1.1em;
   letter-spacing: 0.02em;
+}
+.bottom-toolbar, #bottom-toolbar {
+    background-color: #e0f0ff; /* Light grey */
 }
