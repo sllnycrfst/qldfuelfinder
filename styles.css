@@ -91,51 +91,62 @@ body.list-view #dashboard-header { display: none !important; }
 body.home-view #dashboard-header { display: flex !important; }
 body.home-view #toolbar-list-filters { display: none !important; }
 
-/* --- PRETTY FILTERS --- */
-.pretty-list-controls {
-  background: transparent;
-  border-radius: 0;
-  box-shadow: none;
-  padding: 0;
-  margin: 0;
-  max-width: none;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  border: none;
-  height: 80px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 10001;
-  justify-content: flex-end;
-  pointer-events: auto;
-}
-.pretty-filters-row {
-  display: flex;
-  gap: 16px;
-  width: auto;
-  justify-content: flex-end;
-  align-items: center;
-  height: 80px;
-}
-.pretty-filter-group {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-  margin-right: 12px;
-}
-.pretty-filter-label {
-  font-size: 1em;
-  font-weight: 600;
-  color: transparent;
-  margin-bottom: 0;
-  margin-right: 6px;
-  letter-spacing: 0.02em;
+/* --- REMOVE BLUE BOX & BOX SHADOW FROM LIST FILTERS --- */
+.pretty-list-controls,
+.pretty-list-controls .pretty-filters-row,
+.pretty-list-controls .pretty-filter-group {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
+.pretty-filter-label {
+  color: #222 !important;
+  font-weight: 500 !important;
+  margin: 0 6px 0 0 !important;
+  letter-spacing: 0.01em !important;
+  background: transparent !important;
+}
+
+.pretty-list-controls select {
+  background: #fff !important;
+  border: 1px solid #bbb !important;
+  color: #222 !important;
+  border-radius: 8px !important;
+  font-size: 15px !important;
+  padding: 6px 12px !important;
+  margin: 0 8px 0 0 !important;
+  box-shadow: none !important;
+  min-width: 120px !important;
+  height: 38px !important;
+}
+
+.pretty-list-controls .pill-selector {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.pretty-list-controls .pill-option {
+  background: #fff !important;
+  color: #387cc2 !important;
+  border: 1px solid #bbb !important;
+  border-radius: 8px !important;
+  font-size: 15px !important;
+  padding: 6px 10px !important;
+  margin: 0 4px 0 0 !important;
+  box-shadow: none !important;
+}
+
+.pretty-list-controls .pill-option.selected {
+  background: #387cc2 !important;
+  color: #fff !important;
+  border: 1.5px solid #387cc2 !important;
+}
 /* --- SEARCH BAR --- */
 .search-bar-glass {
   position: fixed;
