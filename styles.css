@@ -951,7 +951,7 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
   bottom: 0px; /* Start fully hidden behind the bottom toolbar */
   left: 50%;
   transform: translateX(-50%) translateY(150%);
-  width: min(400px, calc(100vw - 40px));
+  width: min(400px, calc(100vw - 30px));
   max-height: 60vh;
   z-index: 5500;
   background: rgba(56, 125, 194, 0.507);
@@ -968,7 +968,7 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
 }
 
 .bottom-feature-card.visible {
-  transform: translateX(-50%) translateY(0);
+  transform: translateX(-50%) translateY(50%);
 }
 
 .bottom-feature-card.slide-in {
