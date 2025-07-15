@@ -7,51 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Search function
   const searchInput = document.getElementById('search');
 
-  if (searchInput) {
-    searchInput.addEventListener('focus', function () {
-      // Only hide feature card on focus if we're not on map view
-      if (currentView !== 'map') {
-        hideBottomFeatureCard();
-      }
-    });
-
-    searchInput.addEventListener('input', function () {
-      const query = this.value.trim().toLowerCase();
-      if (!query) return;
-
-      // Search for a suburb or station name
-      const match = allSites.find(site =>
-        (site.P && site.P.toLowerCase().includes(query)) ||
-        (site.N && site.N.toLowerCase().includes(query))
-      );
-      if (match && map) {
-        map.setView([match.Lat, match.Lng], 15, { animate: true });
-      }
-    });
-  }
-
-  // UI controls
-  const zoomInBtn = document.getElementById("zoom-in");
-  const zoomOutBtn = document.getElementById("zoom-out");
-  const sortToggle = document.getElementById("sort-toggle");
-  const fuelSelect = document.getElementById("fuel-select");
-
-  // Bottom toolbar tabs
-  const homeTab = document.getElementById("home-tab");
-  const mapTab = document.getElementById("map-tab");
-  const listTab = document.getElementById("list-tab");
-
-  // Panels
-  const homePanel = document.getElementById("home-panel");
-  const listPanel = document.getElementById("list-panel");
-  const listUl = document.getElementById("list");
-
-  // Initialize map view as default
-  document.body.classList.add('map-view');
-  if (mapTab) {
-    mapTab.classList.add('map-view');
-  }
-
+  // --- Declare all variables first to avoid hoisting issues ---
   let map, markerLayer, userMarker;
   const defaultCenter = [-27.4698, 153.0251];
   const defaultZoom = 14;
@@ -71,40 +27,80 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const bannedStations = ["Stargazers Yarraman"];
 
+  // UI controls
+  const zoomInBtn = document.getElementById("zoom-in");
+  const zoomOutBtn = document.getElementById("zoom-out");
+  const fuelSelect = document.getElementById("fuel-select");
+
+  // Bottom toolbar tabs
+  const homeTab = document.getElementById("home-tab");
+  const mapTab = document.getElementById("map-tab");
+  const listTab = document.getElementById("list-tab");
+
+  // Panels
+  const homePanel = document.getElementById("home-panel");
+  const listPanel = document.getElementById("list-panel");
+  const listUl = document.getElementById("list");
+
+  // --- INIT view state (default: map view) ---
+  document.body.classList.add('map-view');
+  if (mapTab) mapTab.classList.add('map-view');
+
+  // ---- Search bar functionality ----
+  if (searchInput) {
+    searchInput.addEventListener('focus', function () {
+      if (currentView !== 'map') {
+        hideBottomFeatureCard();
+      }
+    });
+
+    searchInput.addEventListener('input', function () {
+      const query = this.value.trim().toLowerCase();
+      if (!query) return;
+      // Search for a suburb or station name
+      const match = allSites.find(site =>
+        (site.P && site.P.toLowerCase().includes(query)) ||
+        (site.N && site.N.toLowerCase().includes(query))
+      );
+      if (match && map) {
+        map.setView([match.Lat, match.Lng], 15, { animate: true });
+      }
+    });
+  }
+
+  // --- Helper functions ---
   function isValidPrice(price) {
     return price !== null && price !== undefined && price >= 1000 && price <= 6000;
   }
 
-  // New pill selector functionality for fuel (for list panel)
+  // Fuel pill selector (list panel)
   function initializeFuelPillSelector() {
     const fuelSelector = document.getElementById('fuel-pill-selector');
     if (!fuelSelector) return;
-    fuelSelector.addEventListener('change', function () {
-      listFuelFilter = this.value;
-      hideBottomFeatureCard();
-      updateStationList();
-    });
+    fuelSelector.removeEventListener('change', fuelPillChangeHandler); // Remove duplicate
+    fuelSelector.addEventListener('change', fuelPillChangeHandler);
+  }
+  function fuelPillChangeHandler() {
+    listFuelFilter = this.value;
+    hideBottomFeatureCard();
+    updateStationList();
   }
 
   // Set initial active state for fuel toggle (map panel)
   const defaultFuelBtn = document.querySelector('.fuel-btn[data-fuel="E10"]');
-  if (defaultFuelBtn) {
-    defaultFuelBtn.classList.add('active');
-  }
+  if (defaultFuelBtn) defaultFuelBtn.classList.add('active');
 
-  // Event listeners
+  // Fuel select (map view dropdown)
   if (fuelSelect) {
     fuelSelect.addEventListener('change', (e) => {
       currentFuel = e.target.value;
       hideBottomFeatureCard();
       updateVisibleStations();
-      if (currentView === 'list') {
-        updateStationList();
-      }
+      if (currentView === 'list') updateStationList();
     });
   }
 
-  // Bottom toolbar functionality
+  // ---- Bottom toolbar tab switching ----
   function switchToView(viewName) {
     document.body.classList.remove('map-view', 'list-view', 'home-view');
     document.body.classList.add(`${viewName}-view`);
@@ -115,7 +111,6 @@ document.addEventListener("DOMContentLoaded", () => {
     homePanel.classList.remove('visible');
     listPanel.classList.add('hidden');
     listPanel.classList.remove('visible');
-    // Hide feature card when switching views
     hideBottomFeatureCard();
     currentView = viewName;
     mapTab.setAttribute('data-view', viewName);
@@ -142,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Setup list interactions
+  // List interactions (station click, scroll/hide card on scroll)
   function setupListInteractions() {
     // Handle station clicks in list
     const setupStationClicks = () => {
@@ -154,11 +149,11 @@ document.addEventListener("DOMContentLoaded", () => {
           if (stationData) {
             showBottomFeatureCardSlideUp(stationData);
           }
-        });
+        };
       });
     };
 
-    // Hide feature card on scrolling
+    // Hide feature card on list scroll
     const listContainer = document.getElementById('list');
     if (listContainer) {
       let scrollTimeout;
@@ -188,7 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(setupStationClicks, 100);
   }
 
-  // Helper function to get station data by ID
+  // Helper to get station data by ID
   function getStationDataById(siteId) {
     const site = allSites.find(s => String(s.S) === String(siteId));
     if (!site) return null;
@@ -242,40 +237,43 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // New pill selector functionality for distance
+  // Pill selectors for distance/sort
   function initializeDistancePillSelector() {
     const distanceSelector = document.getElementById('distance-pill-selector');
     if (!distanceSelector) return;
-    distanceSelector.addEventListener('click', function(e) {
-      if (e.target.classList.contains('pill-option')) {
-        listRadius = parseInt(e.target.getAttribute('data-value'));
-        hideBottomFeatureCard();
-        distanceSelector.setAttribute('data-selected', listRadius.toString());
-        const buttons = distanceSelector.querySelectorAll('.pill-option');
-        buttons.forEach(btn => btn.classList.remove('selected'));
-        e.target.classList.add('selected');
-        if (currentView === 'list') updateStationList();
-      }
-    });
+    distanceSelector.removeEventListener('click', distancePillClickHandler);
+    distanceSelector.addEventListener('click', distancePillClickHandler);
   }
-
-  // New pill selector functionality for sort
+  function distancePillClickHandler(e) {
+    if (e.target.classList.contains('pill-option')) {
+      listRadius = parseInt(e.target.getAttribute('data-value'));
+      hideBottomFeatureCard();
+      this.setAttribute('data-selected', listRadius.toString());
+      const buttons = this.querySelectorAll('.pill-option');
+      buttons.forEach(btn => btn.classList.remove('selected'));
+      e.target.classList.add('selected');
+      if (currentView === 'list') updateStationList();
+    }
+  }
   function initializeSortPillSelector() {
     const sortSelector = document.getElementById('sort-pill-selector');
     if (!sortSelector) return;
-    sortSelector.addEventListener('click', function(e) {
-      if (e.target.classList.contains('pill-option')) {
-        sortBy = e.target.getAttribute('data-value');
-        hideBottomFeatureCard();
-        sortSelector.setAttribute('data-selected', sortBy);
-        const buttons = sortSelector.querySelectorAll('.pill-option');
-        buttons.forEach(btn => btn.classList.remove('selected'));
-        e.target.classList.add('selected');
-        if (currentView === 'list') updateStationList();
-      }
-    });
+    sortSelector.removeEventListener('click', sortPillClickHandler);
+    sortSelector.addEventListener('click', sortPillClickHandler);
+  }
+  function sortPillClickHandler(e) {
+    if (e.target.classList.contains('pill-option')) {
+      sortBy = e.target.getAttribute('data-value');
+      hideBottomFeatureCard();
+      this.setAttribute('data-selected', sortBy);
+      const buttons = this.querySelectorAll('.pill-option');
+      buttons.forEach(btn => btn.classList.remove('selected'));
+      e.target.classList.add('selected');
+      if (currentView === 'list') updateStationList();
+    }
   }
 
+  // --- Map startup code ---
   function startApp(center) {
     map = L.map("map", {
       zoomControl: false,
@@ -360,20 +358,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  async function fetchAndUpdateData() {
-    try {
-      const sitesResponse = await fetch('data/sites.json?ts=' + Date.now());
-      const sites = await sitesResponse.json();
-      updateMapWithSites(sites);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  }
-
-  function updateMapWithSites(sites) {
-    // ...implement as needed
-  }
-
+  // Helper: get distance
   function getDistance(lat1, lon1, lat2, lon2) {
     if (lat1 == null || lon1 == null) return null;
     const R = 6371;
@@ -828,18 +813,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // --- Feature Card (bottom slide-up) ---
   function initializeDragFunctionality() {
     const featureCard = document.getElementById('bottom-feature-card');
     const dragBar = featureCard.querySelector('.feature-card-drag-bar');
     if (!dragBar) return;
     let isDragging = false;
     let startY = 0;
-    let startTransform = 0;
     dragBar.addEventListener('touchstart', function(e) {
       isDragging = true;
       startY = e.touches[0].clientY;
-      const currentTransform = getComputedStyle(featureCard).transform;
-      startTransform = currentTransform === 'none' ? 0 : parseInt(currentTransform.split(',')[5]);
       e.preventDefault();
     }, { passive: false });
     document.addEventListener('touchmove', function(e) {
@@ -852,11 +835,16 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       e.preventDefault();
     }, { passive: false });
-    document.addEventListener('touchend', function(e) {
+    document.addEventListener('touchend', function() {
       if (!isDragging) return;
       isDragging = false;
+      // Animate hide if dragged far enough
       const currentTransform = getComputedStyle(featureCard).transform;
-      const currentY = currentTransform === 'none' ? 0 : parseInt(currentTransform.split(',')[5]);
+      let currentY = 0;
+      if (currentTransform !== 'none' && currentTransform.indexOf(',') > -1) {
+        const matrix = currentTransform.split(',');
+        currentY = parseInt(matrix[matrix.length - 1]);
+      }
       if (currentY > 100) {
         hideBottomFeatureCard();
       } else {
@@ -866,8 +854,6 @@ document.addEventListener("DOMContentLoaded", () => {
     dragBar.addEventListener('mousedown', function(e) {
       isDragging = true;
       startY = e.clientY;
-      const currentTransform = getComputedStyle(featureCard).transform;
-      startTransform = currentTransform === 'none' ? 0 : parseInt(currentTransform.split(',')[5]);
       e.preventDefault();
     });
     document.addEventListener('mousemove', function(e) {
@@ -879,11 +865,15 @@ document.addEventListener("DOMContentLoaded", () => {
         featureCard.style.transform = `translateX(-50%) translateY(${newTransform}px)`;
       }
     });
-    document.addEventListener('mouseup', function(e) {
+    document.addEventListener('mouseup', function() {
       if (!isDragging) return;
       isDragging = false;
       const currentTransform = getComputedStyle(featureCard).transform;
-      const currentY = currentTransform === 'none' ? 0 : parseInt(currentTransform.split(',')[5]);
+      let currentY = 0;
+      if (currentTransform !== 'none' && currentTransform.indexOf(',') > -1) {
+        const matrix = currentTransform.split(',');
+        currentY = parseInt(matrix[matrix.length - 1]);
+      }
       if (currentY > 100) {
         hideBottomFeatureCard();
       } else {
@@ -943,7 +933,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function addMapClickHandler() {
-    map.on('click', function(e) {
+    map.on('click', function() {
       const featureCard = document.getElementById('bottom-feature-card');
       if (featureCard && featureCard.classList.contains('visible')) {
         hideBottomFeatureCard();
@@ -1028,6 +1018,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return slots;
   }
 
+  // Dashboard/weather widgets
   function updateDashboardHeader() {
     const header = document.getElementById('dashboard-header');
     const greetingEl = document.getElementById('dashboard-greeting');
@@ -1083,7 +1074,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function getWeatherDescription(code) {
-    // Dummy mapping for code
     if ([0, 1].includes(code)) return 'Clear';
     if ([2, 3].includes(code)) return 'Cloudy';
     if ([45, 48].includes(code)) return 'Fog';
@@ -1128,6 +1118,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Full tank cost calculator
   function initializeFullTankCalculator() {
     const priceInput = document.getElementById('tank-fuel-price');
     const sizeSelect = document.getElementById('tank-size');
@@ -1148,6 +1139,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateTotal();
   }
 
+  // Panel switch adjustments
   function onPanelSwitch(view) {
     showDashboardHeader(view === 'home');
     if (view === 'home') {
@@ -1159,7 +1151,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Patch into your view switch logic:
+  // Patch into view switch logic so onPanelSwitch always fires
   const origSwitchToView = switchToView;
   switchToView = function(viewName) {
     origSwitchToView(viewName);
@@ -1176,4 +1168,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Start the app and load all data
   startApp(defaultCenter);
-}); // End of DOMContentLoaded
+});
