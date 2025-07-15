@@ -32,7 +32,7 @@ html, body {
   transform: translateX(-50%);
   width: 100%;
   max-width: 800px;
-  height: 84px;
+  height: 100px;
   z-index: 10000;
   display: flex;
   align-items: center;
@@ -65,14 +65,14 @@ html, body {
   align-items: center;
   justify-content: space-between;
   pointer-events: auto;
-  height: 84px;
+  height: 100px;
 }
 .dashboard-header {
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
-  gap: 32px;
-  padding: 48px 42px 40px 42px;
+  gap: 20px;
+  padding: 30px 20px 20px 20px;
   border-radius: 24px;
   background: none;
   box-shadow: none;
@@ -91,62 +91,6 @@ body.list-view #dashboard-header { display: none !important; }
 body.home-view #dashboard-header { display: flex !important; }
 body.home-view #toolbar-list-filters { display: none !important; }
 
-/* --- REMOVE BLUE BOX & BOX SHADOW FROM LIST FILTERS --- */
-.pretty-list-controls,
-.pretty-list-controls .pretty-filters-row,
-.pretty-list-controls .pretty-filter-group {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
-.pretty-filter-label {
-  color: #222 !important;
-  font-weight: 500 !important;
-  margin: 0 6px 0 0 !important;
-  letter-spacing: 0.01em !important;
-  background: transparent !important;
-}
-
-.pretty-list-controls select {
-  background: #fff !important;
-  border: 1px solid #bbb !important;
-  color: #222 !important;
-  border-radius: 8px !important;
-  font-size: 15px !important;
-  padding: 6px 12px !important;
-  margin: 0 8px 0 0 !important;
-  box-shadow: none !important;
-  min-width: 120px !important;
-  height: 38px !important;
-}
-
-.pretty-list-controls .pill-selector {
-  background: transparent !important;
-  box-shadow: none !important;
-  border: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
-.pretty-list-controls .pill-option {
-  background: #fff !important;
-  color: #387cc2 !important;
-  border: 1px solid #bbb !important;
-  border-radius: 8px !important;
-  font-size: 15px !important;
-  padding: 6px 10px !important;
-  margin: 0 4px 0 0 !important;
-  box-shadow: none !important;
-}
-
-.pretty-list-controls .pill-option.selected {
-  background: #387cc2 !important;
-  color: #fff !important;
-  border: 1.5px solid #387cc2 !important;
-}
 /* --- SEARCH BAR --- */
 .search-bar-glass {
   position: fixed;
@@ -1329,8 +1273,7 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
 }
 
 /* --- LIST FILTER DROPDOWNS --- */
-.list-controls select,
-.pretty-list-controls select {
+.list-controls select {
   font-size: 1em;
   padding: 8px 16px;
   border-radius: 16px;
@@ -1347,15 +1290,14 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
   height: 40px;
   align-self: center;
 }
-.list-controls select:focus,
-.pretty-list-controls select:focus {
+.list-controls select:focus {
   border: 1.5px solid #2E5A87;
 }
 
 /* --- FULL HEIGHT LIST --- */
 #list {
   min-height: 400px;
-  height: calc(100vh - 220px);
+  height: calc(100vh - 100px);
   max-height: none;
   overflow-y: auto;
 }
@@ -1374,9 +1316,6 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
   height: 100%;
 }
 
-.pretty-list-controls {
-  margin-bottom: 0;
-}
 @media (max-width: 600px) {
   .dashboard-header {
     flex-direction: column;
@@ -1386,12 +1325,12 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
     align-items: flex-start;
   }
   #dashboard-greeting {
-    font-size: 1.15em;
+    font-size: 1.2em;
     font-weight: 700;
     color: #387cc2;
   }
   #dashboard-date {
-    font-size: 1em;
+    font-size: 0.9em;
     color: #222;
     font-weight: 400;
   }
