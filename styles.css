@@ -899,8 +899,9 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
 
 .list-logo img {
   background: white !important;
-  border-radius: 4%;
+  border-radius: 50%;
   object-fit: contain;
+  border-bottom: 3px solid rgba(255, 255, 255, 0.7);
 }
 
 .list-name {
