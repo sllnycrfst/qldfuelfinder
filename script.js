@@ -303,8 +303,4 @@ document.addEventListener("DOMContentLoaded", () => {
     origSwitchToView(viewName);
     onPanelSwitch(viewName);
   };
-
-  // Start the app and load all data and settings
-  startApp(defaultCenter);
-  startupSettings();
 });
