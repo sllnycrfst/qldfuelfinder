@@ -94,32 +94,6 @@
           </div>
           <div class="dashboard-header-weather" id="dashboard-weather"></div>
         </div>
-        <!-- Replace the pretty-filter-group selectors section in your toolbar-list-filters with this: -->
-        <div class="pretty-filter-group">
-          <span class="pretty-filter-label">Fuel</span>
-          <select id="fuel-filter-dropdown">
-            <option value="E10">E10</option>
-            <option value="91">91</option>
-            <option value="95">95</option>
-            <option value="98">98</option>
-            <option value="Diesel/Premium Diesel">DSL</option>
-          </select>
-        </div>
-        <div class="pretty-filter-group">
-          <span class="pretty-filter-label">Distance</span>
-          <select id="distance-filter-dropdown">
-            <option value="5">5km</option>
-            <option value="10">10km</option>
-            <option value="20">20km</option>
-          </select>
-        </div>
-        <div class="pretty-filter-group">
-          <span class="pretty-filter-label">Sort</span>
-          <select id="sort-filter-dropdown">
-            <option value="price">Price</option>
-            <option value="distance">Distance</option>
-          </select>
-        </div>
       </div>
     </div>
     
@@ -156,15 +130,15 @@
                         <div class="stat-values">
                             <div class="stat-value">
                                 <span class="label">Average:</span>
-                                <span class="value" id="e10-avg">--.-¢</span>
+                                <span class="value" id="e10-avg">--.-</span>
                             </div>
                             <div class="stat-value">
                                 <span class="label">Cheapest:</span>
-                                <span class="value cheapest" id="e10-min">--.-¢</span>
+                                <span class="value cheapest" id="e10-min">--.-</span>
                             </div>
                             <div class="stat-value">
                                 <span class="label">Most Expensive:</span>
-                                <span class="value expensive" id="e10-max">--.-¢</span>
+                                <span class="value expensive" id="e10-max">--.-</span>
                             </div>
                         </div>
                     </div>
@@ -176,15 +150,15 @@
                         <div class="stat-values">
                             <div class="stat-value">
                                 <span class="label">Average:</span>
-                                <span class="value" id="91-avg">--.-¢</span>
+                                <span class="value" id="91-avg">--.-</span>
                             </div>
                             <div class="stat-value">
                                 <span class="label">Cheapest:</span>
-                                <span class="value cheapest" id="91-min">--.-¢</span>
+                                <span class="value cheapest" id="91-min">--.-</span>
                             </div>
                             <div class="stat-value">
                                 <span class="label">Most Expensive:</span>
-                                <span class="value expensive" id="91-max">--.-¢</span>
+                                <span class="value expensive" id="91-max">--.-</span>
                             </div>
                         </div>
                     </div>
@@ -196,15 +170,15 @@
                         <div class="stat-values">
                             <div class="stat-value">
                                 <span class="label">Average:</span>
-                                <span class="value" id="98-avg">--.-¢</span>
+                                <span class="value" id="98-avg">--.-</span>
                             </div>
                             <div class="stat-value">
                                 <span class="label">Cheapest:</span>
-                                <span class="value cheapest" id="98-min">--.-¢</span>
+                                <span class="value cheapest" id="98-min">--.-</span>
                             </div>
                             <div class="stat-value">
                                 <span class="label">Most Expensive:</span>
-                                <span class="value expensive" id="98-max">--.-¢</span>
+                                <span class="value expensive" id="98-max">--.-</span>
                             </div>
                         </div>
                     </div>
@@ -216,43 +190,19 @@
                         <div class="stat-values">
                             <div class="stat-value">
                                 <span class="label">Average:</span>
-                                <span class="value" id="diesel-avg">--.-¢</span>
+                                <span class="value" id="diesel-avg">--.-</span>
                             </div>
                             <div class="stat-value">
                                 <span class="label">Cheapest:</span>
-                                <span class="value cheapest" id="diesel-min">--.-¢</span>
+                                <span class="value cheapest" id="diesel-min">--.-</span>
                             </div>
                             <div class="stat-value">
                                 <span class="label">Most Expensive:</span>
-                                <span class="value expensive" id="diesel-max">--.-¢</span>
+                                <span class="value expensive" id="diesel-max">--.-</span>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Replace calculator-section with full tank calculator -->
-            <div class="calculator-section">
-              <h3>Full Tank Calculator</h3>
-              <div class="calculator-grid">
-                <div class="calc-input">
-                  <label for="tank-fuel-price">Fuel Price (¢/L)</label>
-                  <input type="number" id="tank-fuel-price" step="0.1" value="160.5">
-                </div>
-                <div class="calc-input">
-                  <label for="tank-size">Tank Size</label>
-                  <select id="tank-size">
-                    <option value="40">40L</option>
-                    <option value="50">50L</option>
-                    <option value="60">60L</option>
-                    <option value="80">80L</option>
-                  </select>
-                </div>
-                <div class="calc-result">
-                  <label>Total Cost</label>
-                  <div class="result-display" id="tank-total-cost">$0.00</div>
-                </div>
-              </div>
             </div>
         </div>
     </div>
