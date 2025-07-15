@@ -181,7 +181,7 @@ body.home-view #toolbar-list-filters { display: none !important; }
   font-weight: 600;
   color: #2C3E50;
   cursor: pointer;
-  padding: 5px 8px;
+  padding: 5px 4px;
   border-radius: 8px;
   transition: all 0.2s ease;
 }
@@ -699,7 +699,7 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
 /* --- LIST PANEL STYLES --- */
 .list-content-wrapper {
   max-width: 800px;
-  margin: 20px auto;
+  margin: 10px auto;
   padding: 10px;
   padding-top: 0;
 }
@@ -709,21 +709,6 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
   border: none !important;
   box-shadow: 0 2px 10px rgba(56, 124, 194, 0.08);
   color: #fff;
-}
-
-.distance-sort-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 20px;
-  align-items: end;
-}
-
-.distance-section,
-.fuel-section,
-.sort-section {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
 }
 
 .control-label {
@@ -848,12 +833,12 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
   top: 100px;
   margin: 0;
   padding: 0;
-  max-height: calc(100vh - 300px);
+  max-height: calc(100vh - 160px);
   overflow-y: auto;
   max-width: 700px !important;
   margin: 0 auto;
   background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 20px;
