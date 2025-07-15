@@ -94,35 +94,31 @@
           </div>
           <div class="dashboard-header-weather" id="dashboard-weather"></div>
         </div>
-        <!-- List Filters: Only visible on list view -->
-        <div class="list-controls pretty-list-controls" id="toolbar-list-filters" style="display:none;">
-          <div class="pretty-filters-row">
-            <div class="pretty-filter-group">
-              <span class="pretty-filter-label">Fuel</span>
-              <select id="fuel-pill-selector">
-                <option value="E10">Unleaded E10</option>
-                <option value="91">Unleaded 91</option>
-                <option value=value="95">Premium 95</option>
-                <option value=value="98">Premium 98</option>
-                <option value="Diesel/Premium Diesel">Diesel</option>
-              </select>
-            </div>
-            <div class="pretty-filter-group">
-              <span class="pretty-filter-label">Distance</span>
-              <div class="pill-selector" id="distance-pill-selector" data-selected="5">
-                <button class="pill-option selected" data-value="5">5km</button>
-                <button class="pill-option" data-value="10">10km</button>
-                <button class="pill-option" data-value="20">20km</button>
-              </div>
-            </div>
-            <div class="pretty-filter-group">
-              <span class="pretty-filter-label">Sort</span>
-              <div class="pill-selector" id="sort-pill-selector" data-selected="price">
-                <button class="pill-option selected" data-value="price">Price</button>
-                <button class="pill-option" data-value="distance">Dist</button>
-              </div>
-            </div>
-          </div>
+        <!-- Replace the pretty-filter-group selectors section in your toolbar-list-filters with this: -->
+        <div class="pretty-filter-group">
+          <span class="pretty-filter-label">Fuel</span>
+          <select id="fuel-filter-dropdown">
+            <option value="E10">Unleaded E10</option>
+            <option value="91">Unleaded 91</option>
+            <option value="95">Premium 95</option>
+            <option value="98">Premium 98</option>
+            <option value="Diesel/Premium Diesel">Diesel</option>
+          </select>
+        </div>
+        <div class="pretty-filter-group">
+          <span class="pretty-filter-label">Distance</span>
+          <select id="distance-filter-dropdown">
+            <option value="5">5km</option>
+            <option value="10">10km</option>
+            <option value="20">20km</option>
+          </select>
+        </div>
+        <div class="pretty-filter-group">
+          <span class="pretty-filter-label">Sort</span>
+          <select id="sort-filter-dropdown">
+            <option value="price">Price</option>
+            <option value="distance">Distance</option>
+          </select>
         </div>
       </div>
     </div>
