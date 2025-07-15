@@ -298,8 +298,8 @@ body.home-view #toolbar-list-filters { display: none !important; }
   left: 50%;
   bottom: 32px;
   transform: translateX(-50%);
-  width: 60px;
-  height: 60px;
+  width: 68px;
+  height: 68px;
   border-radius: 50%;
   color: white;
   font-size: 22px;
@@ -375,7 +375,6 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
 }
 
 /* Icon switching for center button */
-.toolbar-center-btn .map-icon,
 .toolbar-center-btn .recenter-icon {
   position: absolute;
   transition: all 0.5s ease;
@@ -393,12 +392,12 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
 
 .toolbar-center-btn.map-view .map-icon {
   opacity: 0;
-  transform: rotate(0deg);
+  transform: rotate(180deg);
 }
 
 .toolbar-center-btn.map-view .recenter-icon {
   opacity: 1;
-  transform: rotate(0deg);
+  transform: rotate(360deg);
 }
 
 /* --- FUEL MARKERS --- */
@@ -901,7 +900,7 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
   background: white !important;
   border-radius: 50%;
   object-fit: contain;
-  border-bottom: 3px solid rgba(255, 255, 255, 0.7);
+  border: 3px solid rgba(255, 255, 255, 0.7);
 }
 
 .list-name {
