@@ -965,15 +965,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     return slots;
   }
-
-  // Dashboard/weather widgets
-  // REPLACE updateDashboardHeader with a static weather text or a better widget (no external API!)
   function updateDashboardHeader() {
     const header = document.getElementById('dashboard-header');
     const greetingEl = document.getElementById('dashboard-greeting');
     const dateEl = document.getElementById('dashboard-date');
-    const weatherEl = document.getElementById('dashboard-weather');
-    if (!header || !greetingEl || !dateEl || !weatherEl) return;
+    
+    if (!greetingEl || !dateEl) return;
   
     const now = new Date();
     const hour = now.getHours();
@@ -982,88 +979,28 @@ document.addEventListener("DOMContentLoaded", () => {
     else if (hour >= 18 || hour < 4) greeting = 'Good evening';
     greetingEl.textContent = greeting;
     dateEl.textContent = now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-  
-    // --- Use a static or more reliable browser-based weather widget ---
+
     // Here we'll just show a placeholder and ask for browser location permission for city name
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          // Use a browser geolocation lookup for city name (optional, not using an API)
-          // Or just show "Your Area"
-          weatherEl.textContent = "Current weather: See your local forecast";
         },
         () => {
-          weatherEl.textContent = "Weather: See your local forecast";
         }
       );
     } else {
-      weatherEl.textContent = "Weather: See your local forecast";
     }
     header.style.display = 'flex';
   }
-
-  function getWeatherIcon(code) {
-    if ([0, 1].includes(code)) return 'images/weather/sunny.png';
-    if ([2, 3].includes(code)) return 'images/weather/cloudy.png';
-    if ([45, 48].includes(code)) return 'images/weather/fog.png';
-    if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return 'images/weather/rain.png';
-    if ([71, 73, 75, 77, 85, 86].includes(code)) return 'images/weather/snow.png';
-    if ([95, 96, 99].includes(code)) return 'images/weather/thunder.png';
-    return 'images/weather/unknown.png';
-  }
-
-  function getWeatherDescription(code) {
-    if ([0, 1].includes(code)) return 'Clear';
-    if ([2, 3].includes(code)) return 'Cloudy';
-    if ([45, 48].includes(code)) return 'Fog';
-    if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return 'Rain';
-    if ([71, 73, 75, 77, 85, 86].includes(code)) return 'Snow';
-    if ([95, 96, 99].includes(code)) return 'Thunderstorm';
-    return 'Unknown';
-  }
-
   function showDashboardHeader(show) {
     const header = document.getElementById('dashboard-header');
     if (header) header.style.display = show ? 'flex' : 'none';
-  }
-
-  function updateMapWeatherWidget() {
-    const widget = document.getElementById('map-weather-widget');
-    if (!widget) return;
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(async pos => {
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
-        try {
-          const resp = await fetch(url);
-          const data = await resp.json();
-          if (data.current_weather) {
-            const temp = Math.round(data.current_weather.temperature);
-            const code = data.current_weather.weathercode;
-            const desc = getWeatherDescription(code);
-            widget.innerHTML = `<span style='font-weight:700;'>${temp}&deg;C</span> <span>${desc}</span>`;
-          } else {
-            widget.textContent = 'Weather unavailable';
-          }
-        } catch {
-          widget.textContent = 'Weather unavailable';
-        }
-      }, () => {
-        widget.textContent = 'Weather unavailable';
-      });
-    } else {
-      widget.textContent = 'Weather unavailable';
-    }
   }
   // Panel switch adjustments
   function onPanelSwitch(view) {
     showDashboardHeader(view === 'home');
     if (view === 'home') {
       updateDashboardHeader();
-    }
-    if (view === 'map') {
-      updateMapWeatherWidget();
     }
   }
 
@@ -1073,14 +1010,6 @@ document.addEventListener("DOMContentLoaded", () => {
     origSwitchToView(viewName);
     onPanelSwitch(viewName);
   };
-
-  // On load, show weather on map and dashboard if needed
-  updateMapWeatherWidget();
-  if (document.body.classList.contains('home-view')) {
-    updateDashboardHeader();
-    showDashboardHeader(true);
-  }
-
   // Start the app and load all data
   startApp(defaultCenter);
 });
