@@ -996,13 +996,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Dashboard/weather widgets
+  // REPLACE updateDashboardHeader with a static weather text or a better widget (no external API!)
   function updateDashboardHeader() {
     const header = document.getElementById('dashboard-header');
     const greetingEl = document.getElementById('dashboard-greeting');
     const dateEl = document.getElementById('dashboard-date');
     const weatherEl = document.getElementById('dashboard-weather');
     if (!header || !greetingEl || !dateEl || !weatherEl) return;
-
+  
     const now = new Date();
     const hour = now.getHours();
     let greeting = 'Good morning';
@@ -1010,32 +1011,22 @@ document.addEventListener("DOMContentLoaded", () => {
     else if (hour >= 18 || hour < 4) greeting = 'Good evening';
     greetingEl.textContent = greeting;
     dateEl.textContent = now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
+  
+    // --- Use a static or more reliable browser-based weather widget ---
+    // Here we'll just show a placeholder and ask for browser location permission for city name
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(async pos => {
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
-        try {
-          const resp = await fetch(url);
-          const data = await resp.json();
-          if (data.current_weather) {
-            const temp = Math.round(data.current_weather.temperature);
-            const code = data.current_weather.weathercode;
-            const desc = getWeatherDescription(code);
-            const icon = getWeatherIcon(code);
-            weatherEl.innerHTML = `<img class="weather-icon" src="${icon}" alt="${desc}" onerror="this.style.display='none';this.parentNode.append(' Weather icon unavailable');"><span style="font-weight:700;">${temp}&deg;C</span> <span>${desc}</span>`;
-          } else {
-            weatherEl.textContent = 'Weather unavailable';
-          }
-        } catch {
-          weatherEl.textContent = 'Weather unavailable';
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          // Use a browser geolocation lookup for city name (optional, not using an API)
+          // Or just show "Your Area"
+          weatherEl.textContent = "Current weather: See your local forecast";
+        },
+        () => {
+          weatherEl.textContent = "Weather: See your local forecast";
         }
-      }, () => {
-        weatherEl.textContent = 'Weather unavailable';
-      });
+      );
     } else {
-      weatherEl.textContent = 'Weather unavailable';
+      weatherEl.textContent = "Weather: See your local forecast";
     }
     header.style.display = 'flex';
   }
