@@ -124,13 +124,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Bottom toolbar functionality
   function switchToView(viewName) {
-    document.querySelectorAll('.toolbar-side-btn').forEach(btn => btn.classList.remove('active'));
-    
-    homePanel.classList.add('hidden');
-    homePanel.classList.remove('visible');
-    listPanel.classList.add('hidden');
-    listPanel.classList.remove('visible');
-    
+    document.body.classList.remove('map-view', 'list-view', 'home-view');
+    document.body.classList.add(`${viewName}-view`);
+    homeTab.classList.remove('active');
+    listTab.classList.remove('active');
+    if (viewName === 'home') {
+      homeTab.classList.add('active');
+      homePanel.classList.remove('hidden');
+      homePanel.classList.add('visible');
+      listPanel.classList.add('hidden');
+      listPanel.classList.remove('visible');
+    } else if (viewName === 'list') {
+      listTab.classList.add('active');
+      listPanel.classList.remove('hidden');
+      listPanel.classList.add('visible');
+      homePanel.classList.add('hidden');
+      homePanel.classList.remove('visible');
+    } else {
+      // map view logic
+      homePanel.classList.add('hidden');
+      homePanel.classList.remove('visible');
+      listPanel.classList.add('hidden');
+      listPanel.classList.remove('visible');
+    }
+  } 
     // Hide feature card when switching views
     hideBottomFeatureCard();
     
