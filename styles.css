@@ -897,7 +897,6 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
 }
 
 .list-logo img {
-  background: white !important;
   border-radius: 50%;
   object-fit: contain;
   border: 3px solid rgba(255, 255, 255, 0.7);
@@ -1274,20 +1273,22 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
     align-items: flex-start;
   }
   #dashboard-greeting {
-    font-size: 1.0em;
+    font-size: 1.2em;
     font-weight: 700;
     color: #387cc2;
   }
   #dashboard-date {
     font-size: 0.8em;
     color: #387cc2;
-    font-weight: 400;
+    font-weight: 600;
   }
 }
 /* --- MOBILE: Move feature card fuel/prices down 20px --- */
 @media (max-width: 700px) {
   .feature-card-inner {
     padding-top: 32px !important;
+    padding-left: 3px !important;
+    padding-right: 3px !important;
   }
   .feature-prices-grid {
     margin-top: 20px !important;
