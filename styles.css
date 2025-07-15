@@ -1183,24 +1183,6 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
   color: #10b981;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
 }
-
-/* --- WEATHER ICONS --- */
-.weather-icon {
-  width: 32px;
-  height: 32px;
-  vertical-align: middle;
-  margin-right: 8px;
-}
-
-.dashboard-header-weather {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 1.1em;
-  color: #387CC2;
-  font-weight: 600;
-}
-
 /* --- REGION SELECT --- */
 .price-stats-header-row {
   display: flex;
@@ -1302,10 +1284,6 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
     color: #387cc2;
     font-weight: 400;
   }
-  #dashboard-weather {
-    font-size: 1em;
-    margin-top: 4px;
-  }
 }
 /* --- MOBILE: Move feature card fuel/prices down 20px --- */
 @media (max-width: 700px) {
@@ -1379,19 +1357,4 @@ body.home-view #toolbar-list-filters {
 }
 .price-stats h3 {
   color: #b7cdfa !important;
-}
-
-/* --- Weather section: always hide the old widget --- */
-#dashboard-weather img.weather-icon,
-#dashboard-weather .weather-icon,
-#map-weather-widget {
-  display: none !important;
-}
-
-/* --- Your own better weather widget (placeholder style) --- */
-#dashboard-weather {
-  color: #b7cdfa !important;
-  font-weight: 600;
-  font-size: 1.1em;
-  letter-spacing: 0.02em;
 }
