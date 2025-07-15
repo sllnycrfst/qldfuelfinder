@@ -287,8 +287,8 @@ body.home-view #toolbar-list-filters { display: none !important; }
   border-top-left-radius: 24px;
   border-top-right-radius: 24px;
   z-index: -1;
-  -webkit-mask: radial-gradient(circle at 50% -10%%, transparent 50px, black 30px);
-  mask: radial-gradient(circle at 50% 0%, transparent 50px, black 30px);
+  -webkit-mask: radial-gradient(circle at 50% 0%%, transparent 40px, black 10px);
+  mask: radial-gradient(circle at 50% 0%, transparent 40px, black 10px);
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1),
               inset 0 2px 0 rgba(255, 255, 255, 0.2);
 }
