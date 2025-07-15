@@ -68,22 +68,36 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // --- DROPDOWN FILTERS (replace pill selectors) ---
+  const fuelFilterDropdown = document.getElementById('fuel-filter-dropdown');
+  const distanceFilterDropdown = document.getElementById('distance-filter-dropdown');
+  const sortFilterDropdown = document.getElementById('sort-filter-dropdown');
+
+  if (fuelFilterDropdown) {
+    fuelFilterDropdown.addEventListener('change', function () {
+      listFuelFilter = this.value;
+      hideBottomFeatureCard();
+      updateStationList();
+    });
+  }
+  if (distanceFilterDropdown) {
+    distanceFilterDropdown.addEventListener('change', function () {
+      listRadius = parseInt(this.value, 10);
+      hideBottomFeatureCard();
+      updateStationList();
+    });
+  }
+  if (sortFilterDropdown) {
+    sortFilterDropdown.addEventListener('change', function () {
+      sortBy = this.value;
+      hideBottomFeatureCard();
+      updateStationList();
+    });
+  }
+
   // --- Helper functions ---
   function isValidPrice(price) {
     return price !== null && price !== undefined && price >= 1000 && price <= 6000;
-  }
-
-  // Fuel pill selector (list panel)
-  function initializeFuelPillSelector() {
-    const fuelSelector = document.getElementById('fuel-pill-selector');
-    if (!fuelSelector) return;
-    fuelSelector.removeEventListener('change', fuelPillChangeHandler); // Remove duplicate
-    fuelSelector.addEventListener('change', fuelPillChangeHandler);
-  }
-  function fuelPillChangeHandler() {
-    listFuelFilter = this.value;
-    hideBottomFeatureCard();
-    updateStationList();
   }
 
   // Set initial active state for fuel toggle (map panel)
@@ -128,9 +142,6 @@ document.addEventListener("DOMContentLoaded", () => {
       listPanel.classList.remove('hidden');
       listPanel.classList.add('visible');
       setTimeout(() => {
-        initializeFuelPillSelector();
-        initializeDistancePillSelector();
-        initializeSortPillSelector();
         setupListInteractions();
       }, 100);
       updateStationList();
@@ -236,42 +247,6 @@ document.addEventListener("DOMContentLoaded", () => {
       switchToView('map');
     }
   });
-
-  // Pill selectors for distance/sort
-  function initializeDistancePillSelector() {
-    const distanceSelector = document.getElementById('distance-pill-selector');
-    if (!distanceSelector) return;
-    distanceSelector.removeEventListener('click', distancePillClickHandler);
-    distanceSelector.addEventListener('click', distancePillClickHandler);
-  }
-  function distancePillClickHandler(e) {
-    if (e.target.classList.contains('pill-option')) {
-      listRadius = parseInt(e.target.getAttribute('data-value'));
-      hideBottomFeatureCard();
-      this.setAttribute('data-selected', listRadius.toString());
-      const buttons = this.querySelectorAll('.pill-option');
-      buttons.forEach(btn => btn.classList.remove('selected'));
-      e.target.classList.add('selected');
-      if (currentView === 'list') updateStationList();
-    }
-  }
-  function initializeSortPillSelector() {
-    const sortSelector = document.getElementById('sort-pill-selector');
-    if (!sortSelector) return;
-    sortSelector.removeEventListener('click', sortPillClickHandler);
-    sortSelector.addEventListener('click', sortPillClickHandler);
-  }
-  function sortPillClickHandler(e) {
-    if (e.target.classList.contains('pill-option')) {
-      sortBy = e.target.getAttribute('data-value');
-      hideBottomFeatureCard();
-      this.setAttribute('data-selected', sortBy);
-      const buttons = this.querySelectorAll('.pill-option');
-      buttons.forEach(btn => btn.classList.remove('selected'));
-      e.target.classList.add('selected');
-      if (currentView === 'list') updateStationList();
-    }
-  }
 
   // --- Map startup code ---
   function startApp(center) {
@@ -815,6 +790,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Feature Card (bottom slide-up) ---
   function initializeDragFunctionality() {
+    // Make the card twice as high (maxDrag = 400)
+    const maxDrag = 400;
     const featureCard = document.getElementById('bottom-feature-card');
     const dragBar = featureCard.querySelector('.feature-card-drag-bar');
     if (!dragBar) return;
@@ -830,7 +807,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const currentY = e.touches[0].clientY;
       const deltaY = currentY - startY;
       if (deltaY > 0) {
-        const newTransform = Math.min(deltaY, 200);
+        const newTransform = Math.min(deltaY, maxDrag);
         featureCard.style.transform = `translateX(-50%) translateY(${newTransform}px)`;
       }
       e.preventDefault();
@@ -845,7 +822,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const matrix = currentTransform.split(',');
         currentY = parseInt(matrix[matrix.length - 1]);
       }
-      if (currentY > 100) {
+      if (currentY > (maxDrag / 2)) {
         hideBottomFeatureCard();
       } else {
         featureCard.style.transform = 'translateX(-50%) translateY(0)';
@@ -861,7 +838,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const currentY = e.clientY;
       const deltaY = currentY - startY;
       if (deltaY > 0) {
-        const newTransform = Math.min(deltaY, 200);
+        const newTransform = Math.min(deltaY, maxDrag);
         featureCard.style.transform = `translateX(-50%) translateY(${newTransform}px)`;
       }
     });
@@ -874,7 +851,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const matrix = currentTransform.split(',');
         currentY = parseInt(matrix[matrix.length - 1]);
       }
-      if (currentY > 100) {
+      if (currentY > (maxDrag / 2)) {
         hideBottomFeatureCard();
       } else {
         featureCard.style.transform = 'translateX(-50%) translateY(0)';
