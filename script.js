@@ -148,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const setupStationClicks = () => {
       const stationElements = document.querySelectorAll('.list-station');
       stationElements.forEach(stationEl => {
-        stationEl.addEventListener('click', function() {
+        stationEl.onclick = function() {
           const siteId = this.getAttribute('data-siteid');
           const stationData = getStationDataById(siteId);
           if (stationData) {
