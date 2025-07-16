@@ -17,24 +17,52 @@
   <!-- Map -->
   <div id="map"></div>
 
-  <!-- Search Bar -->
-  <div class="search-bar-glass">
-    <div class="search-container">
-      <div class="search-input-section">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" id="search" placeholder="Search location..." />
+  <!-- Glassy Floating Buttons -->
+  <button class="glassy-btn" id="search-btn" title="Search"><i class="fas fa-search"></i></button>
+  <button class="glassy-btn" id="filter-btn" title="Filters"><i class="fas fa-sliders-h"></i></button>
+  <button class="glassy-btn" id="list-btn" title="List"><i class="fas fa-bars"></i></button>
+
+  <!-- Search Panel Overlay & Panel -->
+  <div class="panel-overlay" id="search-overlay"></div>
+  <div class="sliding-panel" id="search-panel">
+    <div class="panel-drag-bar"></div>
+    <div class="panel-content">
+      <div class="search-bar-panel">
+        <i class="fas fa-search"></i>
+        <input type="text" id="search-input" placeholder="Search suburb or postcode..." autocomplete="off" />
       </div>
-      <div class="fuel-divider"></div>
-      <div class="fuel-selector-inline">
-        <i class="fas fa-gas-pump fuel-icon"></i>
-        <select id="fuel-select">
-          <option value="E10">E10</option>
-          <option value="91">91</option>
-          <option value="95">95</option>
-          <option value="98">98</option>
-          <option value="Diesel/Premium Diesel">DSL</option>
-        </select>
+      <ul class="suburb-list" id="suburb-list"></ul>
+    </div>
+  </div>
+
+  <!-- Filters Panel Overlay & Panel -->
+  <div class="panel-overlay" id="filter-overlay"></div>
+  <div class="sliding-panel" id="filter-panel">
+    <div class="panel-drag-bar"></div>
+    <div class="panel-content">
+      <div class="fuel-types-list" id="fuel-type-list">
+        <!-- Fuel type radios will be rendered by JS -->
       </div>
+    </div>
+  </div>
+
+  <!-- List Panel Overlay & Panel -->
+  <div class="panel-overlay" id="list-overlay"></div>
+  <div class="sliding-panel" id="list-panel">
+    <div class="panel-drag-bar"></div>
+    <div class="panel-content">
+      <div class="list-content-wrapper" style="height:100%;min-height:0;display:flex;flex-direction:column;">
+        <ul id="list" style="flex:1 1 auto;min-height:0;height:100%;"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature Card Panel Overlay & Panel (hidden by default, shown on list/map marker click) -->
+  <div class="panel-overlay" id="feature-overlay"></div>
+  <div class="sliding-panel" id="feature-panel">
+    <div class="panel-drag-bar"></div>
+    <div class="panel-content" id="feature-card-content">
+      <!-- Populated by JS with station details -->
     </div>
   </div>
 
@@ -44,16 +72,6 @@
       <button id="zoom-in">+</button>
       <div class="zoom-divider"></div>
       <button id="zoom-out">−</button>
-    </div>
-  </div>
-
-  
-  <!-- List Panel (No heading) -->
-  <div class="fullscreen-panel hidden" id="list-panel">
-    <div class="panel-content">
-      <div class="list-content-wrapper" style="height:100%;min-height:0;display:flex;flex-direction:column;">
-        <ul id="list" style="flex:1 1 auto;min-height:0;height:100%;"></ul>
-      </div>
     </div>
   </div>
 
