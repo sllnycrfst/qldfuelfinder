@@ -1,213 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fuel Watch QLD</title>
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="images/favicon.png">
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Quantico:wght@400;700&family=Roboto:ital,wght@0,100..900;1,100..900&family=VT323&display=swap" rel="stylesheet">
-    
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
-          crossorigin="" />
-    
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fuel Watch QLD</title>
+  <link rel="icon" type="image/png" href="images/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Quantico:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
-    <!-- Map -->
-    <div id="map"></div>
-    
-    <!-- Search Bar -->
-    <div class="search-bar-glass">
-        <div class="search-container">
-            <div class="search-input-section">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" id="search" placeholder="Search location..." />
-            </div>
-            <div class="fuel-divider"></div>
-            <div class="fuel-selector-inline">
-                <i class="fas fa-gas-pump fuel-icon"></i>
-                <select id="fuel-select">
-                    <option value="E10">E10</option>
-                    <option value="91">91</option>
-                    <option value="95">95</option>
-                    <option value="98">98</option>
-                    <option value="Diesel/Premium Diesel">DSL</option>
-                </select>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Side Controls -->
-    <div class="side-controls">
-        <div class="custom-zoom-rect">
-            <button id="zoom-in">+</button>
-            <div class="zoom-divider"></div>
-            <button id="zoom-out">−</button>
-        </div>
-    </div>
-    
-    <!-- Bottom Feature Card (initially hidden) -->
-    <div class="bottom-feature-card" id="bottom-feature-card">
-        <div class="feature-card-drag-bar">
-            <div class="drag-handle"></div>
-        </div>
-        <!-- Content will be dynamically inserted here -->
-    </div>
-    
-    <!-- Bottom Toolbar -->
-    <div class="bottom-toolbar">
-        <button class="toolbar-side-btn" id="home-tab">
-            <i class="fa-solid fa-chart-simple"></i>
-        </button>
-        <button class="toolbar-center-btn map-view" id="map-tab">
-        <i class="fas fa-map map-icon"></i>
-            <i class="fa-solid fa-location-arrow"></i>
-        </button>
-        <button class="toolbar-side-btn" id="list-tab">
-            <i class="fa-solid fa-bars"></i>
-        </button>
-    </div>
+  <!-- Map -->
+  <div id="map"></div>
 
-    <!-- Home Panel -->
-    <div class="fullscreen-panel hidden" id="home-panel">
-        <div class="panel-content">
-            <div class="price-stats">
-              <div class="price-stats-header-row">
-                <h3>Current <span id="region-label">QLD</span> Price Statistics</h3>
-                <select id="region-select" class="region-select">
-                  <option value="QLD">QLD</option>
-                  <option value="Brisbane">Brisbane</option>
-                  <option value="Gold Coast">Gold Coast</option>
-                  <option value="Sunshine Coast">Sunshine Coast</option>
-                  <option value="Toowoomba">Toowoomba</option>
-                  <option value="Bundaberg">Bundaberg</option>
-                  <option value="Rockhampton">Rockhampton</option>
-                  <option value="Mackay">Mackay</option>
-                  <option value="Townsville">Townsville</option>
-                  <option value="Cairns">Cairns</option>
-                </select>
-              </div>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <i class="fas fa-gas-pump"></i>
-                            <span>E10</span>
-                        </div>
-                        <div class="stat-values">
-                            <div class="stat-value">
-                                <span class="label">Average:</span>
-                                <span class="value" id="e10-avg">--.-</span>
-                            </div>
-                            <div class="stat-value">
-                                <span class="label">Cheapest:</span>
-                                <span class="value cheapest" id="e10-min">--.-</span>
-                            </div>
-                            <div class="stat-value">
-                                <span class="label">Most Expensive:</span>
-                                <span class="value expensive" id="e10-max">--.-</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <i class="fas fa-gas-pump"></i>
-                            <span>Unleaded 91</span>
-                        </div>
-                        <div class="stat-values">
-                            <div class="stat-value">
-                                <span class="label">Average:</span>
-                                <span class="value" id="91-avg">--.-</span>
-                            </div>
-                            <div class="stat-value">
-                                <span class="label">Cheapest:</span>
-                                <span class="value cheapest" id="91-min">--.-</span>
-                            </div>
-                            <div class="stat-value">
-                                <span class="label">Most Expensive:</span>
-                                <span class="value expensive" id="91-max">--.-</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <i class="fas fa-gas-pump"></i>
-                            <span>Premium 98</span>
-                        </div>
-                        <div class="stat-values">
-                            <div class="stat-value">
-                                <span class="label">Average:</span>
-                                <span class="value" id="98-avg">--.-</span>
-                            </div>
-                            <div class="stat-value">
-                                <span class="label">Cheapest:</span>
-                                <span class="value cheapest" id="98-min">--.-</span>
-                            </div>
-                            <div class="stat-value">
-                                <span class="label">Most Expensive:</span>
-                                <span class="value expensive" id="98-max">--.-</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <i class="fas fa-gas-pump"></i>
-                            <span>Diesel</span>
-                        </div>
-                        <div class="stat-values">
-                            <div class="stat-value">
-                                <span class="label">Average:</span>
-                                <span class="value" id="diesel-avg">--.-</span>
-                            </div>
-                            <div class="stat-value">
-                                <span class="label">Cheapest:</span>
-                                <span class="value cheapest" id="diesel-min">--.-</span>
-                            </div>
-                            <div class="stat-value">
-                                <span class="label">Most Expensive:</span>
-                                <span class="value expensive" id="diesel-max">--.-</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- Search Bar -->
+  <div class="search-bar-glass">
+    <div class="search-container">
+      <div class="search-input-section">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="search" placeholder="Search location..." />
+      </div>
+      <div class="fuel-divider"></div>
+      <div class="fuel-selector-inline">
+        <i class="fas fa-gas-pump fuel-icon"></i>
+        <select id="fuel-select">
+          <option value="E10">E10</option>
+          <option value="91">91</option>
+          <option value="95">95</option>
+          <option value="98">98</option>
+          <option value="Diesel/Premium Diesel">DSL</option>
+        </select>
+      </div>
     </div>
-    
-    <!-- List Panel -->
-    <div class="fullscreen-panel hidden" id="list-panel">
-        <div class="panel-header">
-            <h2><i class="fas fa-list"></i> Station List</h2>
-        </div>
-        <div class="panel-content">
-          <div class="list-content-wrapper" style="height:100%;min-height:0;display:flex;flex-direction:column;">
-            <ul id="list" style="flex:1 1 auto;min-height:0;height:100%;">
-            </ul>
-          </div>
-        </div>
-    </div>
-    
-    <!-- News and Settings panels removed -->
+  </div>
 
-    <!-- Scripts -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
-            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
-            crossorigin=""></script>
-    <script src="script.js"></script>
+  <!-- Side Controls -->
+  <div class="side-controls">
+    <div class="custom-zoom-rect">
+      <button id="zoom-in">+</button>
+      <div class="zoom-divider"></div>
+      <button id="zoom-out">−</button>
+    </div>
+  </div>
+
+  <!-- Bottom Feature Card -->
+  <div class="bottom-feature-card" id="bottom-feature-card">
+    <div class="feature-card-drag-bar">
+      <div class="drag-handle"></div>
+    </div>
+  </div>
+
+  <!-- Bottom Toolbar -->
+  <div class="bottom-toolbar">
+    <button class="toolbar-side-btn" id="home-tab">
+      <i class="fa-solid fa-chart-simple"></i>
+    </button>
+    <button class="toolbar-center-btn map-view" id="map-tab">
+      <i class="fas fa-map"></i>
+    </button>
+    <button class="toolbar-side-btn" id="list-tab">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </div>
+
+  <!-- Home Panel (Empty) -->
+  <div class="fullscreen-panel hidden" id="home-panel">
+    <div class="panel-content"></div>
+  </div>
+
+  <!-- List Panel (No heading) -->
+  <div class="fullscreen-panel hidden" id="list-panel">
+    <div class="panel-content">
+      <div class="list-content-wrapper" style="height:100%;min-height:0;display:flex;flex-direction:column;">
+        <ul id="list" style="flex:1 1 auto;min-height:0;height:100%;"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
