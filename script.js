@@ -32,15 +32,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const zoomOutBtn = document.getElementById("zoom-out");
   const fuelSelect = document.getElementById("fuel-select");
 
-  // Bottom toolbar tabs
-  const homeTab = document.getElementById("home-tab");
-  const mapTab = document.getElementById("map-tab");
-  const listTab = document.getElementById("list-tab");
-
-  // Panels
-  const homePanel = document.getElementById("home-panel");
-  const listPanel = document.getElementById("list-panel");
-  const listUl = document.getElementById("list");
 
   // --- INIT view state (default: map view) ---
   document.body.classList.add('map-view');
@@ -114,39 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ---- Bottom toolbar tab switching ----
-  function switchToView(viewName) {
-    document.body.classList.remove('map-view', 'list-view', 'home-view');
-    document.body.classList.add(`${viewName}-view`);
-    homeTab.classList.remove('active');
-    listTab.classList.remove('active');
-    // Hide all panels
-    homePanel.classList.add('hidden');
-    homePanel.classList.remove('visible');
-    listPanel.classList.add('hidden');
-    listPanel.classList.remove('visible');
-    hideBottomFeatureCard();
-    currentView = viewName;
-    mapTab.setAttribute('data-view', viewName);
-    mapTab.classList.remove('map-view');
-    if (viewName === 'home') {
-      homeTab.classList.add('active');
-      homePanel.classList.remove('hidden');
-      homePanel.classList.add('visible');
-      setTimeout(initializeHomePanel, 100);
-    } else if (viewName === 'map') {
-      mapTab.classList.add('map-view');
-      selectedListStationId = null;
-    } else if (viewName === 'list') {
-      listTab.classList.add('active');
-      listPanel.classList.remove('hidden');
-      listPanel.classList.add('visible');
-      setTimeout(() => {
-        setupListInteractions();
-      }, 100);
-      updateStationList();
-    }
-  }
+ 
 
   // List interactions (station click, scroll/hide card on scroll)
   function setupListInteractions() {
@@ -236,17 +195,6 @@ document.addEventListener("DOMContentLoaded", () => {
       siteId: String(site.S)
     };
   }
-
-  // Tab event listeners
-  homeTab.addEventListener('click', () => switchToView('home'));
-  listTab.addEventListener('click', () => switchToView('list'));
-  mapTab.addEventListener('click', () => {
-    if (currentView === 'map') {
-      showUserLocation(true);
-    } else {
-      switchToView('map');
-    }
-  });
 
   // --- Map startup code ---
   function startApp(center) {
@@ -571,31 +519,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Home panel functions
-  function initializeHomePanel() {
-    calculateQLDPriceStats();
-    initializeCalculator();
-    if (typeof Chart !== 'undefined') {
-      initializePriceChart();
-    }
-  }
-
-  function calculateQLDPriceStats() {
-    if (!allPrices.length) return;
-    const fuelStats = {
-      12: [], // E10
-      2: [],  // 91 Unleaded
-      8: [],  // 98 Premium 
-      'diesel': [] // Combined Diesel
-    };
-    allPrices.forEach(price => {
-      if (isValidPrice(price.Price)) {
-        if (fuelStats[price.FuelId]) {
-          fuelStats[price.FuelId].push(price.Price / 10);
-        } else if (price.FuelId === 3 || price.FuelId === 14) {
-          fuelStats['diesel'].push(price.Price / 10);
-        }
-      }
+ 
     });
     const fuelMapping = {
       12: 'e10',
@@ -603,22 +527,6 @@ document.addEventListener("DOMContentLoaded", () => {
       8: '98',
       'diesel': 'diesel'
     };
-    Object.keys(fuelStats).forEach(fuelId => {
-      const prices = fuelStats[fuelId];
-      const fuelKey = fuelMapping[fuelId];
-      if (prices.length > 0) {
-        const avg = prices.reduce((sum, price) => sum + price, 0) / prices.length;
-        const min = Math.min(...prices);
-        const max = Math.max(...prices);
-        const avgEl = document.getElementById(`${fuelKey}-avg`);
-        const minEl = document.getElementById(`${fuelKey}-min`);
-        const maxEl = document.getElementById(`${fuelKey}-max`);
-        if (avgEl) avgEl.textContent = avg.toFixed(1) + '¢';
-        if (minEl) minEl.textContent = min.toFixed(1) + '¢';
-        if (maxEl) maxEl.textContent = max.toFixed(1) + '¢';
-      }
-    });
-  }
 
   function initializeCalculator() {
     const fuelPriceInput = document.getElementById('fuel-price');
@@ -994,146 +902,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     return slots;
   }
-
-  // Dashboard/weather widgets
-  // REPLACE updateDashboardHeader with a static weather text or a better widget (no external API!)
-  function updateDashboardHeader() {
-    const header = document.getElementById('dashboard-header');
-    const greetingEl = document.getElementById('dashboard-greeting');
-    const dateEl = document.getElementById('dashboard-date');
-    const weatherEl = document.getElementById('dashboard-weather');
-    if (!header || !greetingEl || !dateEl || !weatherEl) return;
-  
-    const now = new Date();
-    const hour = now.getHours();
-    let greeting = 'Good morning';
-    if (hour >= 12 && hour < 18) greeting = 'Good afternoon';
-    else if (hour >= 18 || hour < 4) greeting = 'Good evening';
-    greetingEl.textContent = greeting;
-    dateEl.textContent = now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-  
-    // --- Use a static or more reliable browser-based weather widget ---
-    // Here we'll just show a placeholder and ask for browser location permission for city name
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          // Use a browser geolocation lookup for city name (optional, not using an API)
-          // Or just show "Your Area"
-          weatherEl.textContent = "Current weather: See your local forecast";
-        },
-        () => {
-          weatherEl.textContent = "Weather: See your local forecast";
-        }
-      );
-    } else {
-      weatherEl.textContent = "Weather: See your local forecast";
-    }
-    header.style.display = 'flex';
-  }
-
-  function getWeatherIcon(code) {
-    if ([0, 1].includes(code)) return 'images/weather/sunny.png';
-    if ([2, 3].includes(code)) return 'images/weather/cloudy.png';
-    if ([45, 48].includes(code)) return 'images/weather/fog.png';
-    if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return 'images/weather/rain.png';
-    if ([71, 73, 75, 77, 85, 86].includes(code)) return 'images/weather/snow.png';
-    if ([95, 96, 99].includes(code)) return 'images/weather/thunder.png';
-    return 'images/weather/unknown.png';
-  }
-
-  function getWeatherDescription(code) {
-    if ([0, 1].includes(code)) return 'Clear';
-    if ([2, 3].includes(code)) return 'Cloudy';
-    if ([45, 48].includes(code)) return 'Fog';
-    if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return 'Rain';
-    if ([71, 73, 75, 77, 85, 86].includes(code)) return 'Snow';
-    if ([95, 96, 99].includes(code)) return 'Thunderstorm';
-    return 'Unknown';
-  }
-
-  function showDashboardHeader(show) {
-    const header = document.getElementById('dashboard-header');
-    if (header) header.style.display = show ? 'flex' : 'none';
-  }
-
-  function updateMapWeatherWidget() {
-    const widget = document.getElementById('map-weather-widget');
-    if (!widget) return;
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(async pos => {
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
-        try {
-          const resp = await fetch(url);
-          const data = await resp.json();
-          if (data.current_weather) {
-            const temp = Math.round(data.current_weather.temperature);
-            const code = data.current_weather.weathercode;
-            const desc = getWeatherDescription(code);
-            widget.innerHTML = `<span style='font-weight:700;'>${temp}&deg;C</span> <span>${desc}</span>`;
-          } else {
-            widget.textContent = 'Weather unavailable';
-          }
-        } catch {
-          widget.textContent = 'Weather unavailable';
-        }
-      }, () => {
-        widget.textContent = 'Weather unavailable';
-      });
-    } else {
-      widget.textContent = 'Weather unavailable';
-    }
-  }
-
-  // Full tank cost calculator
-  function initializeFullTankCalculator() {
-    const priceInput = document.getElementById('tank-fuel-price');
-    const sizeSelect = document.getElementById('tank-size');
-    const resultDisplay = document.getElementById('tank-total-cost');
-    if (!priceInput || !sizeSelect || !resultDisplay) return;
-    function updateTotal() {
-      const price = parseFloat(priceInput.value) || 0;
-      const size = parseFloat(sizeSelect.value) || 0;
-      if (price > 0 && size > 0) {
-        const total = (price * size) / 100;
-        resultDisplay.textContent = `$${total.toFixed(2)}`;
-      } else {
-        resultDisplay.textContent = '$0.00';
-      }
-    }
-    priceInput.addEventListener('input', updateTotal);
-    sizeSelect.addEventListener('change', updateTotal);
-    updateTotal();
-  }
-
-  // Panel switch adjustments
-  function onPanelSwitch(view) {
-    showDashboardHeader(view === 'home');
-    if (view === 'home') {
-      updateDashboardHeader();
-      initializeFullTankCalculator();
-    }
-    if (view === 'map') {
-      updateMapWeatherWidget();
-    }
-  }
-
-  // Patch into view switch logic so onPanelSwitch always fires
-  const origSwitchToView = switchToView;
-  switchToView = function(viewName) {
-    origSwitchToView(viewName);
-    onPanelSwitch(viewName);
-  };
-
-  // On load, show weather on map and dashboard if needed
-  updateMapWeatherWidget();
-  if (document.body.classList.contains('home-view')) {
-    updateDashboardHeader();
-    initializeFullTankCalculator();
-    showDashboardHeader(true);
-  }
-
   // Start the app and load all data
   startApp(defaultCenter);
 });
