@@ -213,6 +213,7 @@ body.home-view #toolbar-list-filters { display: none !important; }
 }
 .settings-group {
   margin-bottom: 22px;
+  margin-top: 108px;
 }
 .settings-group label {
   display: block;
