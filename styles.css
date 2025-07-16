@@ -55,7 +55,7 @@ html, body {
 
 #search-btn   { top: 18px;  left: 18px; }
 #filter-btn   { top: 18px;  right: 18px; }
-#list-btn     { bottom: 28px; right: 18px; }
+#list-btn     { bottom: 28px; left: 18px; }
 
 /* --- FUEL MARKERS --- */
 .fuel-marker {
