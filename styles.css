@@ -204,9 +204,40 @@ html, body {
   border-radius: 2px;
 }
 
+/* --- FUEL MARKERS --- */
 .fuel-marker {
   background: transparent !important;
   border: none !important;
+}
+
+.marker-stack {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-marker-img {
+  position: absolute;
+  width: 72px;
+  height: 72px;
+  z-index: 2;
+}
+
+.marker-brand-img {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  top: 25px;
+  left: 51%;
+  transform: translateX(-50%);
+  z-index: 1;
+  background: white;
+  object-fit: contain;
+  border: none;
 }
 
 .marker-price {
@@ -215,10 +246,15 @@ html, body {
   color: white !important;
   font-size: 12px;
   font-weight: 700;
+  padding: 0;
+  border-radius: 0;
   bottom: 55px;
   left: 51%;
   transform: translateX(-50%);
   z-index: 3;
+  border: none !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   line-height: 1;
   width: 32px;
@@ -226,12 +262,11 @@ html, body {
 }
 
 .marker-price-cheapest {
+  background: transparent !important;
   color: #1fd916 !important;
+  border: none !important;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
-
-
-
 
 
 
