@@ -648,8 +648,8 @@ async function fetchAndRenderNewsFeed() {
   newsFeedList.innerHTML = '<div class="news-loading">Loading news…</div>';
 
   const rssUrl = 'https://www.drive.com.au/rss/news/fuel/';
-  const api = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
-
+  const api = `https://corsproxy.io/?${encodeURIComponent(rssUrl)}`;
+  
   try {
     const res = await fetch(api);
     const data = await res.json();
