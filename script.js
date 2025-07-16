@@ -648,18 +648,17 @@ function switchToView(viewName) {
     if (!newsFeedList) return;
     newsFeedList.innerHTML = '<div class="news-loading">Loading news…</div>';
   
-    // Example RSS: ABC Australia fuel news
-    const rssUrl = encodeURIComponent('https://www.abc.net.au/news/feed/52278/rss.xml');
-    const api = `https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`;
+    const rssUrl = 'https://www.abc.net.au/news/feed/52278/rss.xml';
+    const api = `https://api.feednami.com/api/v1/feeds?url=${encodeURIComponent(rssUrl)}`;
   
     try {
       const res = await fetch(api);
       const data = await res.json();
-      if (!data.items || !data.items.length) {
+      if (!data.entries || !data.entries.length) {
         newsFeedList.innerHTML = '<div class="news-loading">No news articles found.</div>';
         return;
       }
-      newsFeedList.innerHTML = data.items.slice(0, 10).map(item => `
+      newsFeedList.innerHTML = data.entries.slice(0, 10).map(item => `
         <div class="news-item">
           <div class="news-title">${item.title}</div>
           <div class="news-meta">${new Date(item.pubDate).toLocaleString()} &middot; ${item.author || ''}</div>
