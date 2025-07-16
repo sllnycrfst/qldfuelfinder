@@ -652,29 +652,6 @@ async function fetchAndRenderNewsFeed() {
   const api = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
   let xmlText = null;
 
-  // Dummy fallback in case the fetch fails
-  function getDummyRSS() {
-    return `
-      <rss version="2.0">
-        <channel>
-          <title>Dummy Fuel News</title>
-          <item>
-            <title>Fuel Prices Expected to Drop Next Month</title>
-            <link>https://example.com/dummy1</link>
-            <pubDate>Wed, 16 Jul 2025 10:00:00 GMT</pubDate>
-            <description>Industry analysts predict a significant decrease in fuel prices next month due to global market changes.</description>
-          </item>
-          <item>
-            <title>New Biofuel Station Opens in Brisbane</title>
-            <link>https://example.com/dummy2</link>
-            <pubDate>Tue, 15 Jul 2025 08:00:00 GMT</pubDate>
-            <description>A brand new biofuel station has opened in central Brisbane, offering more choices for eco-conscious drivers.</description>
-          </item>
-        </channel>
-      </rss>
-    `;
-  }
-
   try {
     // Fetch via allorigins.win proxy (works for most public RSS)
     const res = await fetch(api);
