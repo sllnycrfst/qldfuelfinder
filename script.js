@@ -158,7 +158,6 @@ function switchToView(viewName) {
     newsTab.classList.add('active');
     newsPanel.classList.remove('hidden');
     newsPanel.classList.add('visible');
-    fetchAndRenderNewsFeed();
   } else if (viewName === 'settings') {
     settingsTab.classList.add('active');
     settingsPanel.classList.remove('hidden');
@@ -259,6 +258,7 @@ function switchToView(viewName) {
   // Tab event listeners
   homeTab.addEventListener('click', () => switchToView('home'));
   listTab.addEventListener('click', () => switchToView('list'));
+  newsTab && newsTab.addEventListener('click', () => switchToView('news'));
   settingsTab && settingsTab.addEventListener('click', () => switchToView('settings'));
   mapTab.addEventListener('click', () => {
     if (currentView === 'map') {
