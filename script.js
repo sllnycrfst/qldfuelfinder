@@ -642,30 +642,38 @@ function switchToView(viewName) {
     });
   }
 
-// --- NEWS PANEL LOGIC ---
 async function fetchAndRenderNewsFeed() {
   const newsFeedList = document.getElementById('news-feed-list');
   if (!newsFeedList) return;
   newsFeedList.innerHTML = '<div class="news-loading">Loading news…</div>';
 
   const rssUrl = 'https://www.drive.com.au/rss/news/fuel/';
-  const api = `https://rss2json.io/api/v1/rss?url=${encodeURIComponent(rssUrl)}`;
+  const api = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
 
   try {
     const res = await fetch(api);
     const data = await res.json();
-    if (!data.items || !data.items.length) {
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(data.contents, "application/xml");
+    const items = [...xml.querySelectorAll("item")];
+    if (!items.length) {
       newsFeedList.innerHTML = '<div class="news-loading">No news articles found.</div>';
       return;
     }
-    newsFeedList.innerHTML = data.items.slice(0, 10).map(item => `
-      <div class="news-item">
-        <div class="news-title">${item.title}</div>
-        <div class="news-meta">${item.author ? item.author + ' &middot; ' : ''}${item.pubDate ? new Date(item.pubDate).toLocaleString() : ''}</div>
-        <div class="news-desc">${item.description ? item.description.replace(/<\/?[^>]+(>|$)/g, "").slice(0, 180) : ""}...</div>
-        <a href="${item.link}" target="_blank" class="news-link">Read more</a>
-      </div>
-    `).join('');
+    newsFeedList.innerHTML = items.slice(0, 10).map(item => {
+      const title = item.querySelector('title')?.textContent || '';
+      const link = item.querySelector('link')?.textContent || '';
+      const pubDate = item.querySelector('pubDate')?.textContent || '';
+      const desc = item.querySelector('description')?.textContent || '';
+      return `
+        <div class="news-item">
+          <div class="news-title">${title}</div>
+          <div class="news-meta">${pubDate ? new Date(pubDate).toLocaleString() : ''}</div>
+          <div class="news-desc">${desc.replace(/<\/?[^>]+(>|$)/g, "").slice(0, 180)}...</div>
+          <a href="${link}" target="_blank" class="news-link">Read more</a>
+        </div>
+      `;
+    }).join('');
   } catch (err) {
     newsFeedList.innerHTML = '<div class="news-loading">Failed to load news feed.</div>';
   }
