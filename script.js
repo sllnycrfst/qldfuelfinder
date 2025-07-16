@@ -642,42 +642,96 @@ function switchToView(viewName) {
     });
   }
 
-async function fetchAndRenderNewsFeed() {
-  const newsFeedList = document.getElementById('news-feed-list');
-  if (!newsFeedList) return;
-  newsFeedList.innerHTML = '<div class="news-loading">Loading news…</div>';
-
-  const rssUrl = 'https://www.drive.com.au/rss/news/fuel/';
-  const api = `https://corsproxy.io/?${encodeURIComponent(rssUrl)}`;
-  
-  try {
-    const res = await fetch(api);
-    const data = await res.json();
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(data.contents, "application/xml");
-    const items = [...xml.querySelectorAll("item")];
-    if (!items.length) {
-      newsFeedList.innerHTML = '<div class="news-loading">No news articles found.</div>';
-      return;
-    }
-    newsFeedList.innerHTML = items.slice(0, 10).map(item => {
-      const title = item.querySelector('title')?.textContent || '';
-      const link = item.querySelector('link')?.textContent || '';
-      const pubDate = item.querySelector('pubDate')?.textContent || '';
-      const desc = item.querySelector('description')?.textContent || '';
-      return `
-        <div class="news-item">
-          <div class="news-title">${title}</div>
-          <div class="news-meta">${pubDate ? new Date(pubDate).toLocaleString() : ''}</div>
-          <div class="news-desc">${desc.replace(/<\/?[^>]+(>|$)/g, "").slice(0, 180)}...</div>
-          <a href="${link}" target="_blank" class="news-link">Read more</a>
-        </div>
-      `;
-    }).join('');
-  } catch (err) {
-    newsFeedList.innerHTML = '<div class="news-loading">Failed to load news feed.</div>';
+  // --- Dummy RSS XML & Helper ---
+  function getDummyRSS() {
+    return `
+      <rss version="2.0">
+        <channel>
+          <title>Dummy Fuel News</title>
+          <item>
+            <title>Fuel Prices Expected to Drop Next Month</title>
+            <link>https://example.com/dummy1</link>
+            <pubDate>Wed, 16 Jul 2025 10:00:00 GMT</pubDate>
+            <description>Industry analysts predict a significant decrease in fuel prices next month due to global market changes.</description>
+          </item>
+          <item>
+            <title>New Biofuel Station Opens in Brisbane</title>
+            <link>https://example.com/dummy2</link>
+            <pubDate>Tue, 15 Jul 2025 08:00:00 GMT</pubDate>
+            <description>A brand new biofuel station has opened in central Brisbane, offering more choices for eco-conscious drivers.</description>
+          </item>
+          <item>
+            <title>Diesel vs Petrol: Which is Better for Long Trips?</title>
+            <link>https://example.com/dummy3</link>
+            <pubDate>Mon, 14 Jul 2025 06:00:00 GMT</pubDate>
+            <description>Experts weigh in on the pros and cons of diesel and petrol for long-distance travel in Queensland.</description>
+          </item>
+        </channel>
+      </rss>
+    `;
   }
-}
+
+  // --- News Feed rendering ---
+  async function fetchAndRenderNewsFeed() {
+    const newsFeedList = document.getElementById('news-feed-list');
+    if (!newsFeedList) return;
+    newsFeedList.innerHTML = '<div class="news-loading">Loading news…</div>';
+
+    const rssUrl = 'https://www.drive.com.au/rss/news/fuel/';
+    const api = `https://corsproxy.io/?${encodeURIComponent(rssUrl)}`;
+    let xmlText = null;
+
+    try {
+      // Try fetching the live feed
+      const res = await fetch(api);
+      const data = await res.json();
+      xmlText = data.contents;
+    } catch (e) {
+      // Fallback to dummy RSS if fetch fails
+      xmlText = getDummyRSS();
+    }
+
+    // Parse and render news
+    try {
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(xmlText, "application/xml");
+      const items = Array.from(xml.querySelectorAll("item"));
+      if (!items.length) throw new Error('No news');
+      newsFeedList.innerHTML = items.slice(0, 10).map(item => {
+        const title = item.querySelector('title')?.textContent || '';
+        const link = item.querySelector('link')?.textContent || '';
+        const pubDate = item.querySelector('pubDate')?.textContent || '';
+        const desc = item.querySelector('description')?.textContent || '';
+        return `
+          <div class="news-item">
+            <div class="news-title">${title}</div>
+            <div class="news-meta">${pubDate ? new Date(pubDate).toLocaleString() : ''}</div>
+            <div class="news-desc">${desc.replace(/<\/?[^>]+(>|$)/g, "").slice(0, 180)}...</div>
+            <a href="${link}" target="_blank" class="news-link">Read more</a>
+          </div>
+        `;
+      }).join('');
+    } catch (e) {
+      // Always show dummy news if parsing fails
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(getDummyRSS(), "application/xml");
+      const items = Array.from(xml.querySelectorAll("item"));
+      newsFeedList.innerHTML = items.map(item => {
+        const title = item.querySelector('title')?.textContent || '';
+        const link = item.querySelector('link')?.textContent || '';
+        const pubDate = item.querySelector('pubDate')?.textContent || '';
+        const desc = item.querySelector('description')?.textContent || '';
+        return `
+          <div class="news-item">
+            <div class="news-title">${title}</div>
+            <div class="news-meta">${pubDate ? new Date(pubDate).toLocaleString() : ''}</div>
+            <div class="news-desc">${desc.replace(/<\/?[^>]+(>|$)/g, "").slice(0, 180)}...</div>
+            <a href="${link}" target="_blank" class="news-link">Read more</a>
+          </div>
+        `;
+      }).join('');
+    }
+  }
   
 // --- SETTINGS PANEL LOGIC ---
 function saveSettings() {
