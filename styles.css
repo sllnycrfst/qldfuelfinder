@@ -24,67 +24,6 @@ html, body {
   z-index: 1;
 }
 
-/* --- TOP TOOLBAR --- */
-.top-toolbar {
-  position: fixed;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 800px;
-  height: 100px;
-  z-index: 10000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-}
-.top-toolbar::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0px;
-  border: 1px solid rgba(197, 197, 197, 0.823);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-  border-bottom-left-radius: 24px;
-  border-bottom-right-radius: 24px;
-  border-top-left-radius: 0px;
-  border-top-right-radius: 0px;
-  z-index: -1;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1),
-              inset 0 -2px 0 rgba(255, 255, 255, 0.2);
-}
-.top-toolbar-inner {
-  width: 100%;
-  max-width: 700px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  pointer-events: auto;
-  height: 100px;
-}
-.dashboard-header {
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  gap: 20px;
-  padding: 30px 20px 20px 20px;
-  border-radius: 24px;
-  background: none;
-  box-shadow: none;
-  margin: 0;
-  width: auto;
-  max-width: none;
-}
-
-/* Hide top-toolbar on map view */
-body.map-view .top-toolbar { display: none !important; }
-body.home-view .top-toolbar, body.list-view .top-toolbar { display: flex !important; }
-
 /* Show list filters only in list view, dashboard header only in home view */
 body.list-view #toolbar-list-filters { display: flex !important; }
 body.list-view #dashboard-header { display: none !important; }
@@ -1401,11 +1340,6 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
   }
 }
 
-/* --- List panel: Move list down so it isn't behind top-toolbar --- */
-body.list-view #list-panel .panel-content,
-body.list-view .list-content-wrapper {
-  padding-top: 100px !important;
-}
 @media (max-width: 700px) {
   body.list-view #list-panel .panel-content,
   body.list-view .list-content-wrapper {
