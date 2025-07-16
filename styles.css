@@ -1272,3 +1272,37 @@ body.home-view #toolbar-list-filters {
 .price-stats h3 {
   color: #b7cdfa !important;
 }
+.list-panel {
+  min-height: 400px !important; /* Same height as feature card */
+  max-height: 70vh !important; /* Adjust as needed */
+  height: auto !important;
+  position: fixed;
+  bottom: 0px;
+  left: 50%;
+  transform: translateX(-50%) translateY(150%);
+  width: min(380px, calc(100vw - 20px));
+  z-index: 5500;
+  background: rgba(56, 125, 194, 0.507); /* Feature card background */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Feature card border */
+  backdrop-filter: blur(10px); /* Blur effect */
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 24px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12),
+              0 2px 8px rgba(0, 0, 0, 0.08),
+              inset 0 1.5px 0 rgba(255, 255, 255, 0.76);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  padding: 20px;
+}
+
+.list-panel.visible {
+  transform: translateX(-50%) translateY(0%);
+}
+
+.list-panel.slide-up {
+  animation: slideUpFromBottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.list-panel.slide-down {
+  animation: slideDownToBottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
