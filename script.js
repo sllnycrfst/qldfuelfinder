@@ -642,35 +642,35 @@ function switchToView(viewName) {
     });
   }
 
-  // --- NEWS PANEL LOGIC ---
-  async function fetchAndRenderNewsFeed() {
-    const newsFeedList = document.getElementById('news-feed-list');
-    if (!newsFeedList) return;
-    newsFeedList.innerHTML = '<div class="news-loading">Loading news…</div>';
-  
-    const rssUrl = 'https://www.abc.net.au/news/feed/52278/rss.xml';
-    const api = `https://api.feednami.com/api/v1/feeds?url=${encodeURIComponent(rssUrl)}`;
-  
-    try {
-      const res = await fetch(api);
-      const data = await res.json();
-      if (!data.entries || !data.entries.length) {
-        newsFeedList.innerHTML = '<div class="news-loading">No news articles found.</div>';
-        return;
-      }
-      newsFeedList.innerHTML = data.entries.slice(0, 10).map(item => `
-        <div class="news-item">
-          <div class="news-title">${item.title}</div>
-          <div class="news-meta">${new Date(item.pubDate).toLocaleString()} &middot; ${item.author || ''}</div>
-          <div class="news-desc">${item.description.replace(/<\/?[^>]+(>|$)/g, "").slice(0, 180)}...</div>
-          <a href="${item.link}" target="_blank" class="news-link">Read more</a>
-        </div>
-      `).join('');
-    } catch (err) {
-      newsFeedList.innerHTML = '<div class="news-loading">Failed to load news feed.</div>';
-    }
-  }
+// --- NEWS PANEL LOGIC ---
+async function fetchAndRenderNewsFeed() {
+  const newsFeedList = document.getElementById('news-feed-list');
+  if (!newsFeedList) return;
+  newsFeedList.innerHTML = '<div class="news-loading">Loading news…</div>';
 
+  const rssUrl = 'https://www.drive.com.au/rss/news/fuel/';
+  const api = `https://rss2json.io/api/v1/rss?url=${encodeURIComponent(rssUrl)}`;
+
+  try {
+    const res = await fetch(api);
+    const data = await res.json();
+    if (!data.items || !data.items.length) {
+      newsFeedList.innerHTML = '<div class="news-loading">No news articles found.</div>';
+      return;
+    }
+    newsFeedList.innerHTML = data.items.slice(0, 10).map(item => `
+      <div class="news-item">
+        <div class="news-title">${item.title}</div>
+        <div class="news-meta">${item.author ? item.author + ' &middot; ' : ''}${item.pubDate ? new Date(item.pubDate).toLocaleString() : ''}</div>
+        <div class="news-desc">${item.description ? item.description.replace(/<\/?[^>]+(>|$)/g, "").slice(0, 180) : ""}...</div>
+        <a href="${item.link}" target="_blank" class="news-link">Read more</a>
+      </div>
+    `).join('');
+  } catch (err) {
+    newsFeedList.innerHTML = '<div class="news-loading">Failed to load news feed.</div>';
+  }
+}
+  
 // --- SETTINGS PANEL LOGIC ---
 function saveSettings() {
   const fuel = document.getElementById('settings-fuel-type').value;
