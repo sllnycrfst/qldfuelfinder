@@ -13,12 +13,12 @@ document.addEventListener("DOMContentLoaded", () => {
     { key: "91", id: 2, label: "Unleaded 91" },
     { key: "95", id: 5, label: "Premium 95" },
     { key: "98", id: 8, label: "Premium 98" },
-    { key: "e85", id: 9, label: "E85" },
+    { key: "E85", id: 9, label: "E85" },
     { key: "Diesel", id: 3, label: "Diesel" },
     { key: "Premium Diesel", id: 14, label: "Premium Diesel" }
   ];
 
-  // --- PANEL LOGIC ---
+  // --- Panel Logic ---
   function showPanel(panelId) {
     hidePanels();
     document.getElementById(panelId + '-overlay').classList.add('active');
@@ -33,7 +33,53 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById('filter-btn').onclick = () => showPanel('filter');
   document.getElementById('list-btn').onclick   = () => showPanel('list');
   document.querySelectorAll('.panel-overlay').forEach(o => o.onclick = hidePanels);
-  document.querySelectorAll('.panel-drag-bar').forEach(bar => bar.onclick = hidePanels);
+
+  // Drag handle logic for all sliding panels
+  document.querySelectorAll('.panel-drag-bar').forEach(bar => {
+    let isDragging = false, startY = 0, currY = 0, panel, origTransform;
+    bar.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startY = e.clientY;
+      panel = bar.closest('.sliding-panel');
+      origTransform = panel.style.transform || '';
+      document.body.style.userSelect = "none";
+    });
+    bar.addEventListener('touchstart', (e) => {
+      isDragging = true;
+      startY = e.touches[0].clientY;
+      panel = bar.closest('.sliding-panel');
+      origTransform = panel.style.transform || '';
+      document.body.style.userSelect = "none";
+    }, {passive:false});
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      currY = e.clientY;
+      let delta = Math.max(0, currY - startY);
+      panel.style.transform = `translateX(-50%) translateY(${delta}px)`;
+    });
+    window.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      currY = e.touches[0].clientY;
+      let delta = Math.max(0, currY - startY);
+      panel.style.transform = `translateX(-50%) translateY(${delta}px)`;
+    }, {passive:false});
+    function endDrag() {
+      if (!isDragging) return;
+      isDragging = false;
+      document.body.style.userSelect = "";
+      const endDelta = currY - startY;
+      if (endDelta > 80) { // drag far enough, close
+        hidePanels();
+        setTimeout(() => { if(panel) panel.style.transform = ''; }, 350);
+      } else {
+        panel.style.transform = 'translateX(-50%) translateY(0)';
+      }
+    }
+    window.addEventListener('mouseup', endDrag);
+    window.addEventListener('touchend', endDrag);
+    // Also close on tap/click
+    bar.addEventListener('click', () => { hidePanels(); });
+  });
 
   // --- MAP INIT ---
   function startMap(center) {
@@ -53,8 +99,8 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchSitesAndPrices();
     document.getElementById("zoom-in").onclick = () => map.zoomIn();
     document.getElementById("zoom-out").onclick = () => map.zoomOut();
-    map.on("moveend", updateVisibleStations);
-    map.on("zoomend", updateVisibleStations);
+    map.on("moveend", updateVisibleStationsAndList);
+    map.on("zoomend", updateVisibleStationsAndList);
     map.on('click', hideFeatureCard);
   }
 
@@ -96,8 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
       priceMap[p.SiteId][p.FuelId] = p.Price;
     });
     renderFuelTypeRadios();
-    updateVisibleStations();
-    updateStationList();
+    updateVisibleStationsAndList();
   }
 
   // --- FUEL FILTER PANEL ---
@@ -113,10 +158,14 @@ document.addEventListener("DOMContentLoaded", () => {
       inp.onchange = e => {
         currentFuel = e.target.value;
         hidePanels();
-        updateVisibleStations();
-        updateStationList();
+        updateVisibleStationsAndList();
       };
     });
+  }
+
+  function updateVisibleStationsAndList() {
+    updateVisibleStations();
+    updateStationList();
   }
 
   // --- MAP MARKERS ---
@@ -124,103 +173,80 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!allSites.length || !allPrices.length || !markerLayer || !map) return;
     markerLayer.clearLayers();
     const bounds = map.getBounds();
-    let userLat = null, userLng = null;
-    if (userMarker && userMarker.getLatLng) {
-      const pos = userMarker.getLatLng();
-      userLat = pos.lat;
-      userLng = pos.lng;
-    }
     const fuelObj = FUEL_TYPES.find(f => f.key === currentFuel);
-    const visibleStations = allSites
-      .map(site => {
-        const sitePrice = priceMap[site.S]?.[fuelObj?.id];
-        if (typeof sitePrice !== "undefined" && sitePrice !== null && isValidPrice(sitePrice) && bounds.contains([site.Lat, site.Lng])) {
-          return {
-            ...site,
-            price: sitePrice / 10,
-            rawPrice: sitePrice,
-            brand: site.B,
-            address: site.A,
-            name: site.N,
-            suburb: site.P,
-            lat: site.Lat,
-            lng: site.Lng,
-            siteId: String(site.S),
-            distance: userLat != null ? getDistance(userLat, userLng, site.Lat, site.Lng) : null,
-            allPrices: priceMap[site.S]
-          };
-        }
-        return null;
-      })
-      .filter(Boolean);
-
-    const minPrice = visibleStations.length ? Math.min(...visibleStations.map(s => s.rawPrice)) : null;
-
-    visibleStations.forEach(s => {
-      const isCheapest = minPrice !== null && s.rawPrice === minPrice;
-      const icon = L.divIcon({
-        className: "fuel-marker",
-        html: `
-          <div class="marker-stack">
-            <img src="images/${s.brand ? s.brand : 'default'}.png"
-              class="marker-brand-img"
-               onerror="this.onerror=null;this.src='images/default.png';"/>
-            <img src="images/mymarker.png" class="custom-marker-img"/>
-            <div class="marker-price${isCheapest ? " marker-price-cheapest" : ""}">
-              ${s.price.toFixed(1)}
+    allSites.forEach(site => {
+      const sitePrice = priceMap[site.S]?.[fuelObj?.id];
+      if (
+        typeof sitePrice !== "undefined" &&
+        sitePrice !== null &&
+        isValidPrice(sitePrice) &&
+        bounds.contains([site.Lat, site.Lng])
+      ) {
+        const s = {
+          ...site,
+          price: sitePrice / 10,
+          rawPrice: sitePrice,
+          brand: site.B,
+          address: site.A,
+          name: site.N,
+          suburb: site.P,
+          lat: site.Lat,
+          lng: site.Lng,
+          siteId: String(site.S),
+          allPrices: priceMap[site.S]
+        };
+        const icon = L.divIcon({
+          className: "fuel-marker",
+          html: `
+            <div class="marker-stack">
+              <img src="images/${s.brand ? s.brand : 'default'}.png"
+                class="marker-brand-img"
+                 onerror="this.onerror=null;this.src='images/default.png';"/>
+              <img src="images/mymarker.png" class="custom-marker-img"/>
+              <div class="marker-price">${s.price.toFixed(1)}</div>
             </div>
-          </div>
-        `,
-        iconSize: [72, 72],
-        iconAnchor: [36, 72],
-        popupAnchor: [0, -72]
-      });
-      const marker = L.marker([s.lat, s.lng], { icon, zIndexOffset: isCheapest ? 1000 : 0 });
-      marker.on('click', () => showFeatureCard(s));
-      markerLayer.addLayer(marker);
+          `,
+          iconSize: [72, 72],
+          iconAnchor: [36, 72],
+          popupAnchor: [0, -72]
+        });
+        const marker = L.marker([s.lat, s.lng], { icon });
+        marker.on('click', () => showFeatureCard(s));
+        markerLayer.addLayer(marker);
+      }
     });
   }
 
   // --- LIST PANEL ---
   function updateStationList() {
     const listUl = document.getElementById('list');
-    if (!listUl) return;
+    if (!listUl || !map) return;
     if (!allSites.length || !allPrices.length) {
       listUl.innerHTML = "<li>Loading…</li>";
       return;
     }
-    let userLat = null, userLng = null;
-    if (userMarker && userMarker.getLatLng) {
-      const pos = userMarker.getLatLng();
-      userLat = pos.lat;
-      userLng = pos.lng;
-    }
-    if (!userLat || !userLng) {
-      userLat = defaultCenter[0];
-      userLng = defaultCenter[1];
-    }
+    const bounds = map.getBounds();
     const fuelObj = FUEL_TYPES.find(f => f.key === currentFuel);
+    // Only stations with selected fuel, that are visible in viewport
     const stations = allSites
       .map(site => {
-        const distance = getDistance(userLat, userLng, site.Lat, site.Lng);
         const sitePrice = priceMap[site.S]?.[fuelObj?.id];
         if (
           typeof sitePrice !== "undefined" &&
           sitePrice !== null &&
-          isValidPrice(sitePrice)
+          isValidPrice(sitePrice) &&
+          bounds.contains([site.Lat, site.Lng])
         ) {
           return {
             ...site,
             price: sitePrice / 10,
             rawPrice: sitePrice,
-            allPrices: priceMap[site.S],
             brand: site.B,
             address: site.A,
             name: site.N,
             suburb: site.P,
             lat: site.Lat,
             lng: site.Lng,
-            distance,
             siteId: String(site.S)
           };
         }
@@ -233,7 +259,6 @@ document.addEventListener("DOMContentLoaded", () => {
       listUl.innerHTML = `<li style="padding: 20px; text-align: center; color: #666;">No stations found.</li>`;
       return;
     }
-    const minPrice = Math.min(...stations.map(s => s.rawPrice));
     listUl.innerHTML = stations.map((site, index) => `
       <li class="list-station" data-siteid="${site.siteId}" data-index="${index}">
         <span class="list-logo">
@@ -246,17 +271,8 @@ document.addEventListener("DOMContentLoaded", () => {
         </span>
         <span class="list-name">${site.name}
           <span class="list-address" style="display:block;font-size:0.95em;color:#555;">${site.address}${site.suburb ? ', ' + site.suburb : ''}</span>
-          <span class="list-distance" style="display:block;color:#999;font-size:0.93em;">${site.distance ? site.distance.toFixed(1) : "-"}km</span>
         </span>
-        <span class="list-price${site.rawPrice === minPrice ? " cheapest" : ""}" style="font-weight:600;">${site.price.toFixed(1)}</span>
-        <div class="list-other-prices" style="font-size:0.92em;color:#888;margin-top:2px;">
-          ${Object.entries(site.allPrices)
-            .filter(([fid, p]) => Number(fid) !== fuelObj.id && isValidPrice(p))
-            .map(([fid, p]) => {
-              const fuel = FUEL_TYPES.find(f => f.id == fid);
-              return fuel ? `<span>${fuel.label}: ${(p/10).toFixed(1)}</span>` : "";
-            }).join(" | ")}
-        </div>
+        <span class="list-price" style="font-weight:600;">${site.price.toFixed(1)}</span>
       </li>
     `).join('');
 
@@ -286,14 +302,7 @@ document.addEventListener("DOMContentLoaded", () => {
         onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(station.address + ', ' + (station.suburb || ''))}', '_blank')">
         ${station.address}${station.suburb ? ', ' + station.suburb : ''}
       </div>
-      <div class="feature-card-distance">${station.distance ? station.distance.toFixed(1) : "-"} km</div>
-      <div class="fuel-prices-list">
-        ${Object.entries(station.allPrices).map(([fid, price]) =>
-          FUEL_TYPES.find(f => f.id == fid)
-            ? `<div class="fuel-price-row"><span class="fuel-type-label">${FUEL_TYPES.find(f => f.id == fid).label}</span><span class="fuel-type-price">${(price/10).toFixed(1)}</span></div>`
-            : ""
-        ).join("")}
-      </div>
+      <div class="feature-card-distance">${station.price.toFixed(1)} (${FUEL_TYPES.find(f=>f.key===currentFuel).label})</div>
     `;
   }
   function hideFeatureCard() {
@@ -349,8 +358,7 @@ document.addEventListener("DOMContentLoaded", () => {
     fuelSelect.value = currentFuel;
     fuelSelect.onchange = (e) => {
       currentFuel = e.target.value;
-      updateVisibleStations();
-      updateStationList();
+      updateVisibleStationsAndList();
     };
   }
 
@@ -360,15 +368,5 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Helpers ---
   function isValidPrice(price) {
     return price !== null && price !== undefined && price >= 1000 && price <= 6000;
-  }
-  function getDistance(lat1, lon1, lat2, lon2) {
-    if (lat1 == null || lon1 == null) return null;
-    const R = 6371;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat / 2) ** 2 +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-      Math.sin(dLon / 2) ** 2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
 });
