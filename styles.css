@@ -30,7 +30,7 @@ html, body {
   width: 54px;
   height: 54px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.65);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   box-shadow: 0 2px 12px rgba(0,0,0,0.09);
@@ -140,7 +140,7 @@ html, body {
   width: 100vw;
   max-width: 500px;
   height: 75vh;
-  background: rgba(255,255,255,0.97);
+  background: rgba(255,255,255,0.92);
   border-radius: 24px 24px 0 0;
   box-shadow: 0 8px 32px rgba(0,0,0,0.13);
   backdrop-filter: blur(20px);
