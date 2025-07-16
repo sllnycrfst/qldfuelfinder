@@ -642,7 +642,17 @@ function switchToView(viewName) {
     });
   }
 
-  // --- Dummy RSS XML & Helper ---
+async function fetchAndRenderNewsFeed() {
+  const newsFeedList = document.getElementById('news-feed-list');
+  if (!newsFeedList) return;
+  newsFeedList.innerHTML = '<div class="news-loading">Loading news…</div>';
+
+  // Use a CORS proxy (public example) for Google News RSS
+  const rssUrl = 'https://news.google.com/rss/search?q=petrol+Australia';
+  const api = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
+  let xmlText = null;
+
+  // Dummy fallback in case the fetch fails
   function getDummyRSS() {
     return `
       <rss version="2.0">
@@ -660,78 +670,60 @@ function switchToView(viewName) {
             <pubDate>Tue, 15 Jul 2025 08:00:00 GMT</pubDate>
             <description>A brand new biofuel station has opened in central Brisbane, offering more choices for eco-conscious drivers.</description>
           </item>
-          <item>
-            <title>Diesel vs Petrol: Which is Better for Long Trips?</title>
-            <link>https://example.com/dummy3</link>
-            <pubDate>Mon, 14 Jul 2025 06:00:00 GMT</pubDate>
-            <description>Experts weigh in on the pros and cons of diesel and petrol for long-distance travel in Queensland.</description>
-          </item>
         </channel>
       </rss>
     `;
   }
 
-  // --- News Feed rendering ---
-  async function fetchAndRenderNewsFeed() {
-    const newsFeedList = document.getElementById('news-feed-list');
-    if (!newsFeedList) return;
-    newsFeedList.innerHTML = '<div class="news-loading">Loading news…</div>';
-
-    const rssUrl = 'https://www.drive.com.au/rss/news/fuel/';
-    const api = `https://corsproxy.io/?${encodeURIComponent(rssUrl)}`;
-    let xmlText = null;
-
-    try {
-      // Try fetching the live feed
-      const res = await fetch(api);
-      const data = await res.json();
-      xmlText = data.contents;
-    } catch (e) {
-      // Fallback to dummy RSS if fetch fails
-      xmlText = getDummyRSS();
-    }
-
-    // Parse and render news
-    try {
-      const parser = new DOMParser();
-      const xml = parser.parseFromString(xmlText, "application/xml");
-      const items = Array.from(xml.querySelectorAll("item"));
-      if (!items.length) throw new Error('No news');
-      newsFeedList.innerHTML = items.slice(0, 10).map(item => {
-        const title = item.querySelector('title')?.textContent || '';
-        const link = item.querySelector('link')?.textContent || '';
-        const pubDate = item.querySelector('pubDate')?.textContent || '';
-        const desc = item.querySelector('description')?.textContent || '';
-        return `
-          <div class="news-item">
-            <div class="news-title">${title}</div>
-            <div class="news-meta">${pubDate ? new Date(pubDate).toLocaleString() : ''}</div>
-            <div class="news-desc">${desc.replace(/<\/?[^>]+(>|$)/g, "").slice(0, 180)}...</div>
-            <a href="${link}" target="_blank" class="news-link">Read more</a>
-          </div>
-        `;
-      }).join('');
-    } catch (e) {
-      // Always show dummy news if parsing fails
-      const parser = new DOMParser();
-      const xml = parser.parseFromString(getDummyRSS(), "application/xml");
-      const items = Array.from(xml.querySelectorAll("item"));
-      newsFeedList.innerHTML = items.map(item => {
-        const title = item.querySelector('title')?.textContent || '';
-        const link = item.querySelector('link')?.textContent || '';
-        const pubDate = item.querySelector('pubDate')?.textContent || '';
-        const desc = item.querySelector('description')?.textContent || '';
-        return `
-          <div class="news-item">
-            <div class="news-title">${title}</div>
-            <div class="news-meta">${pubDate ? new Date(pubDate).toLocaleString() : ''}</div>
-            <div class="news-desc">${desc.replace(/<\/?[^>]+(>|$)/g, "").slice(0, 180)}...</div>
-            <a href="${link}" target="_blank" class="news-link">Read more</a>
-          </div>
-        `;
-      }).join('');
-    }
+  try {
+    // Fetch via allorigins.win proxy (works for most public RSS)
+    const res = await fetch(api);
+    const data = await res.json();
+    xmlText = data.contents;
+  } catch (e) {
+    xmlText = getDummyRSS();
   }
+
+  try {
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(xmlText, "application/xml");
+    const items = Array.from(xml.querySelectorAll("item"));
+    if (!items.length) throw new Error('No news');
+    newsFeedList.innerHTML = items.slice(0, 10).map(item => {
+      const title = item.querySelector('title')?.textContent || '';
+      const link = item.querySelector('link')?.textContent || '';
+      const pubDate = item.querySelector('pubDate')?.textContent || '';
+      const desc = item.querySelector('description')?.textContent || '';
+      return `
+        <div class="news-item">
+          <div class="news-title">${title}</div>
+          <div class="news-meta">${pubDate ? new Date(pubDate).toLocaleString() : ''}</div>
+          <div class="news-desc">${desc.replace(/<\/?[^>]+(>|$)/g, "").slice(0, 180)}...</div>
+          <a href="${link}" target="_blank" class="news-link">Read more</a>
+        </div>
+      `;
+    }).join('');
+  } catch (e) {
+    // Always show dummy news if parsing fails
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(getDummyRSS(), "application/xml");
+    const items = Array.from(xml.querySelectorAll("item"));
+    newsFeedList.innerHTML = items.map(item => {
+      const title = item.querySelector('title')?.textContent || '';
+      const link = item.querySelector('link')?.textContent || '';
+      const pubDate = item.querySelector('pubDate')?.textContent || '';
+      const desc = item.querySelector('description')?.textContent || '';
+      return `
+        <div class="news-item">
+          <div class="news-title">${title}</div>
+          <div class="news-meta">${pubDate ? new Date(pubDate).toLocaleString() : ''}</div>
+          <div class="news-desc">${desc.replace(/<\/?[^>]+(>|$)/g, "").slice(0, 180)}...</div>
+          <a href="${link}" target="_blank" class="news-link">Read more</a>
+        </div>
+      `;
+    }).join('');
+  }
+}
   
 // --- SETTINGS PANEL LOGIC ---
 function saveSettings() {
