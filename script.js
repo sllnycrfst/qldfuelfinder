@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { key: "91", id: 2, label: "Unleaded 91" },
     { key: "95", id: 5, label: "Premium 95" },
     { key: "98", id: 8, label: "Premium 98" },
-    { key: "E85", id: 9, label: "E85" },
+    { key: "e85", id: 9, label: "E85" },
     { key: "Diesel", id: 3, label: "Diesel" },
     { key: "Premium Diesel", id: 14, label: "Premium Diesel" }
   ];
