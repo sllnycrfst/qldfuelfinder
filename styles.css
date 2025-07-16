@@ -1306,3 +1306,72 @@ body.home-view #toolbar-list-filters {
 .list-panel.slide-down {
   animation: slideDownToBottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
+@media (max-width: 768px) {
+  .list-panel {
+    min-height: 300px !important; /* Adjust height for smaller screens */
+    max-height: 60vh !important; /* Adjust viewport height */
+    height: auto !important;
+    position: fixed;
+    bottom: 0px;
+    left: 50%;
+    transform: translateX(-50%) translateY(150%);
+    width: 90%; /* Take up most of the screen width */
+    z-index: 5500;
+    background: rgba(56, 125, 194, 0.507); /* Same background style */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Same border style */
+    backdrop-filter: blur(10px); /* Same blur effect */
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 16px; /* Slightly smaller radius for mobile */
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.1),
+                0 2px 6px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    padding: 16px; /* Slightly smaller padding for mobile */
+  }
+
+  .list-panel.visible {
+    transform: translateX(-50%) translateY(0%);
+  }
+
+  .list-panel.slide-up {
+    animation: slideUpFromBottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .list-panel.slide-down {
+    animation: slideDownToBottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .feature-card-drag-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    height: 20px; /* Adjust height for smaller screens */
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 0;
+    background: rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+  }
+
+  .drag-handle {
+    width: 40px; /* Smaller drag handle for mobile */
+    height: 3px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 2px;
+    transition: all 0.2s ease;
+  }
+
+  .feature-card-drag-bar:hover .drag-handle {
+    background: rgba(255, 255, 255, 1);
+    width: 40px; /* Same hover effect */
+  }
+}
