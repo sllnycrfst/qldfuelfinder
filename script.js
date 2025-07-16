@@ -11,10 +11,10 @@ document.addEventListener("DOMContentLoaded", () => {
   let map, markerLayer, userMarker;
   const defaultCenter = [-27.4698, 153.0251];
   const defaultZoom = 14;
-
+  
   // Fuel order and IDs
-  const fuelOrder = ["E10", "91", "95", "98", "Diesel/Premium Diesel"];
-  const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, "Diesel/Premium Diesel": 6 };
+  const fuelOrder = ["E10", "91", "95", "98", "E85", "Diesel", "Premium Diesel"];
+  const fuelIdMap = { E10: 12, "91": 2, "95": 5, "98": 8, "E85": 9, "Diesel": 3,"Premium Diesel": 14};
   let currentFuel = "E10";
   let allSites = [];
   let allPrices = [];
@@ -309,19 +309,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return getDirection(userPos.lat, userPos.lng, station.Lat, station.Lng);
   }
 
-  function getCombinedDieselPrice(prices) {
-    if (prices && typeof prices[6] !== "undefined" && prices[6] !== null && isValidPrice(prices[6])) {
-      return { price: prices[6] / 10, raw: prices[6], which: 6 };
-    }
-    if (prices && typeof prices[14] !== "undefined" && prices[14] !== null && isValidPrice(prices[14])) {
-      return { price: prices[14] / 10, raw: prices[14], which: 14 };
-    }
-    if (prices && typeof prices[3] !== "undefined" && prices[3] !== null && isValidPrice(prices[3])) {
-      return { price: prices[3] / 10, raw: prices[3], which: 3 };
-    }
-    return null;
-  }
-
   function updateVisibleStations() {
     if (!allSites.length || !allPrices.length || !markerLayer || !map) return;
     markerLayer.clearLayers();
@@ -332,41 +319,6 @@ document.addEventListener("DOMContentLoaded", () => {
       userLat = pos.lat;
       userLng = pos.lng;
     }
-    const isCombinedDiesel = currentFuel === "Diesel/Premium Diesel";
-    const visibleStations = allSites
-      .map(site => {
-        let price, rawPrice;
-        if (isCombinedDiesel) {
-          const dieselResult = getCombinedDieselPrice(priceMap[site.S]);
-          price = dieselResult ? dieselResult.price : undefined;
-          rawPrice = dieselResult ? dieselResult.raw : undefined;
-        } else {
-          const sitePrice = priceMap[site.S]?.[fuelIdMap[currentFuel]];
-          if (typeof sitePrice !== "undefined" && sitePrice !== null && isValidPrice(sitePrice)) {
-            price = sitePrice / 10;
-            rawPrice = sitePrice;
-          }
-        }
-        if (typeof price !== "undefined" && price !== null && bounds.contains([site.Lat, site.Lng])) {
-          return {
-            ...site,
-            price,
-            rawPrice,
-            brand: site.B,
-            BrandId: site.BrandId,
-            address: site.A,
-            name: site.N,
-            suburb: site.P,
-            lat: site.Lat,
-            lng: site.Lng,
-            siteId: String(site.S),
-            allPrices: priceMap[site.S],
-            distance: userLat != null ? getDistance(userLat, userLng, site.Lat, site.Lng) : null,
-          };
-        }
-        return null;
-      })
-      .filter(Boolean);
 
     const minPrice = visibleStations.length ? Math.min(...visibleStations.map(s => s.rawPrice)) : null;
 
@@ -515,174 +467,9 @@ document.addEventListener("DOMContentLoaded", () => {
             }
           };
         });
-      }, 50);
+      }, 
     }
   }
-
- 
-    });
-    const fuelMapping = {
-      12: 'e10',
-      2: '91',
-      8: '98',
-      'diesel': 'diesel'
-    };
-
-  function initializeCalculator() {
-    const fuelPriceInput = document.getElementById('fuel-price');
-    const discountSelect = document.getElementById('discount-amount');
-    const spendInput = document.getElementById('spend-amount');
-    const resultDisplay = document.getElementById('litres-result');
-
-    if (!fuelPriceInput || !discountSelect || !spendInput || !resultDisplay) return;
-
-    function calculateLitres() {
-      const fuelPrice = parseFloat(fuelPriceInput.value) || 0;
-      const discount = parseFloat(discountSelect.value) || 0;
-      const spendAmount = parseFloat(spendInput.value) || 0;
-      if (fuelPrice > 0 && spendAmount > 0) {
-        const finalPrice = fuelPrice - discount;
-        const litres = (spendAmount * 100) / finalPrice;
-        resultDisplay.textContent = `${litres.toFixed(1)} L`;
-      } else {
-        resultDisplay.textContent = '0.0 L';
-      }
-    }
-
-    fuelPriceInput.addEventListener('input', calculateLitres);
-    discountSelect.addEventListener('change', calculateLitres);
-    spendInput.addEventListener('input', calculateLitres);
-    calculateLitres();
-  }
-
-  function initializePriceChart() {
-    const ctx = document.getElementById('price-chart');
-    if (!ctx || typeof Chart === 'undefined') return;
-    const labels = [];
-    const e10Data = [];
-    const dieselData = [];
-    const unleaded91Prices = allPrices
-      .filter(p => p.FuelId === 2 && isValidPrice(p.Price))
-      .map(p => p.Price / 10);
-    const current91Avg = unleaded91Prices.length > 0 ?
-      unleaded91Prices.reduce((sum, price) => sum + price, 0) / unleaded91Prices.length : 165;
-    const premium95Prices = allPrices
-      .filter(p => p.FuelId === 5 && isValidPrice(p.Price))
-      .map(p => p.Price / 10);
-    const current95Avg = premium95Prices.length > 0 ?
-      premium95Prices.reduce((sum, price) => sum + price, 0) / premium95Prices.length : 175;
-    const dieselPrices = allPrices
-      .filter(p => (p.FuelId === 3 || p.FuelId === 14) && isValidPrice(p.Price))
-      .map(p => p.Price / 10);
-    const currentDieselAvg = dieselPrices.length > 0 ?
-      dieselPrices.reduce((sum, price) => sum + price, 0) / dieselPrices.length : 185;
-    const premium95Data = [];
-    for (let i = 89; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      if (i % 7 === 0) {
-        labels.push(date.toLocaleDateString('en-AU', { month: 'short', day: 'numeric' }));
-        const unleaded91Variation = (Math.random() - 0.5) * 10;
-        const premium95Variation = (Math.random() - 0.5) * 10;
-        const dieselVariation = (Math.random() - 0.5) * 10;
-        e10Data.push(Math.max(150, Math.min(190, current91Avg + unleaded91Variation)));
-        premium95Data.push(Math.max(160, Math.min(200, current95Avg + premium95Variation)));
-        dieselData.push(Math.max(170, Math.min(210, currentDieselAvg + dieselVariation)));
-      }
-    }
-    new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Unleaded 91 (¢/L)',
-          data: e10Data,
-          borderColor: 'rgba(255, 255, 255, 0.9)',
-          backgroundColor: 'rgba(255, 255, 255, 0.1)',
-          borderWidth: 3,
-          fill: false,
-          tension: 0.4,
-          pointBackgroundColor: 'rgba(255, 255, 255, 0.9)',
-          pointBorderColor: 'rgba(255, 255, 255, 0.9)',
-          pointRadius: 4
-        }, {
-          label: 'Premium 95 (¢/L)',
-          data: premium95Data,
-          borderColor: 'rgba(251, 191, 36, 0.9)',
-          backgroundColor: 'rgba(251, 191, 36, 0.1)',
-          borderWidth: 3,
-          fill: false,
-          tension: 0.4,
-          pointBackgroundColor: 'rgba(251, 191, 36, 0.9)',
-          pointBorderColor: 'rgba(251, 191, 36, 0.9)',
-          pointRadius: 4
-        }, {
-          label: 'Diesel Average (¢/L)',
-          data: dieselData,
-          borderColor: 'rgba(16, 185, 129, 0.9)',
-          backgroundColor: 'rgba(16, 185, 129, 0.1)',
-          borderWidth: 3,
-          fill: false,
-          tension: 0.4,
-          pointBackgroundColor: 'rgba(16, 185, 129, 0.9)',
-          pointBorderColor: 'rgba(16, 185, 129, 0.9)',
-          pointRadius: 4
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: {
-          intersect: false,
-          mode: 'index'
-        },
-        scales: {
-          x: {
-            ticks: {
-              color: 'rgba(255, 255, 255, 0.7)',
-              maxTicksLimit: 8
-            },
-            grid: {
-              color: 'rgba(255, 255, 255, 0.1)'
-            }
-          },
-          y: {
-            beginAtZero: false,
-            min: Math.min(...e10Data, ...premium95Data, ...dieselData) - 5,
-            max: Math.max(...e10Data, ...premium95Data, ...dieselData) + 5,
-            ticks: {
-              color: 'rgba(255, 255, 255, 0.7)',
-              callback: function(value) {
-                return value.toFixed(1) + '¢';
-              }
-            },
-            grid: {
-              color: 'rgba(255, 255, 255, 0.1)'
-            }
-          }
-        },
-        plugins: {
-          legend: {
-            display: true,
-            position: 'top',
-            labels: {
-              color: 'rgba(255, 255, 255, 0.8)',
-              usePointStyle: true,
-              padding: 20
-            }
-          },
-          tooltip: {
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            titleColor: 'rgba(255, 255, 255, 0.9)',
-            bodyColor: 'rgba(255, 255, 255, 0.8)',
-            borderColor: 'rgba(255, 255, 255, 0.2)',
-            borderWidth: 1
-          }
-        }
-      }
-    });
-  }
-
   function showNavigationOptions(address) {
     const encodedAddress = encodeURIComponent(address);
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -878,18 +665,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     });
-    const dieselResult = getCombinedDieselPrice(site.allPrices);
-    if (dieselResult) {
-      availablePrices.push({
-        key: "diesel",
-        label: "DSL",
-        price: dieselResult.price,
-        raw: dieselResult.raw
-      });
-      if (minPrice === null || dieselResult.raw < minPrice) {
-        minPrice = dieselResult.raw;
-      }
-    }
     availablePrices.forEach(fuel => {
       const isCheapest = minPrice !== null && fuel.raw === minPrice;
       const cheapestClass = isCheapest ? " cheapest" : "";
