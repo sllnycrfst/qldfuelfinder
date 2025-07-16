@@ -156,8 +156,10 @@ body.home-view #toolbar-list-filters { display: none !important; }
 /* ...existing styles... */
 
 /* === NEWS PANEL === */
-#news-panel .panel-header h2 {
+.panel-header h2 {
   color: #387CC2;
+}
+#news-panel
   padding-top: 120px;
 }
 #news-feed-list {
