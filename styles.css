@@ -92,130 +92,9 @@ body.home-view #toolbar-list-filters { display: none !important; }
 #search::placeholder, #list-search::placeholder {
   color: rgba(44, 62, 80, 0.6);
 }
-/* ...existing styles... */
-
-/* === NEWS PANEL === */
-.news-item {
-  background: rgba(255,255,255,0.08);
-  border-radius: 12px;
-  margin-bottom: 18px;
-  padding: 18px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.04);
-  transition: background 0.2s;
-}
-.news-item a {
-  color: #2196f3;
-  font-weight: bold;
-  text-decoration: none;
-  font-size: 1.1rem;
-}
-.news-item a:hover {
-  text-decoration: underline;
-}
 
 
 
-
-.panel-header h2 {
-  color: #387CC2;
-}
-#news-panel
-  padding-top: 120px;
-}
-#news-feed-list {
-  margin: 0 auto;
-  max-width: 600px;
-  padding: 0;
-}
-.news-item {
-  background: rgba(255,255,255,0.8);
-  margin-bottom: 16px;
-  border-radius: 12px;
-  padding: 18px 18px 14px 18px;
-  box-shadow: 0 4px 14px rgba(56, 124, 194, 0.08);
-  transition: box-shadow 0.2s;
-}
-.news-item:hover {
-  box-shadow: 0 8px 24px rgba(56, 124, 194, 0.16);
-}
-.news-title {
-  font-size: 1.15em;
-  font-weight: bold;
-  margin-bottom: 6px;
-  color: #387CC2;
-}
-.news-meta {
-  font-size: 0.92em;
-  color: #666;
-  margin-bottom: 8px;
-}
-.news-desc {
-  color: #222;
-  font-size: 1em;
-}
-.news-link {
-  display: inline-block;
-  margin-top: 8px;
-  color: #387CC2;
-  font-weight: 500;
-  text-decoration: underline;
-  font-size: 0.98em;
-}
-
-/* === SETTINGS PANEL === */
-#settings-panel .panel-header h2 {
-  color: #387CC2;
-  padding-top: 120px;
-}
-#settings-form {
-  max-width: 400px;
-  margin: 0 auto;
-  background: rgba(255,255,255,0.7);
-  padding: 30px 22px 18px 22px;
-  border-radius: 16px;
-  box-shadow: 0 4px 18px rgba(56, 124, 194, 0.10);
-}
-.settings-group {
-  margin-bottom: 22px;
-}
-.settings-group label {
-  display: block;
-  margin-bottom: 8px;
-  color: #333;
-  font-weight: 600;
-  font-size: 1em;
-}
-#settings-fuel-type, #settings-tank-size {
-  width: 100%;
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid #ccd;
-  font-size: 1em;
-  margin-bottom: 2px;
-}
-.settings-save-btn {
-  width: 100%;
-  background: #387CC2;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 12px 0;
-  font-size: 1.1em;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 8px;
-  transition: background 0.2s;
-}
-.settings-save-btn:hover {
-  background: #29598A;
-}
-/* Show icons for news/settings in toolbar, spacing fix */
-#news-tab, #settings-tab {
-  margin-left: 8px;
-  margin-right: 8px;
-}
-
-/* ...existing styles... */
 .fuel-divider {
   width: 1px;
   height: 24px;
@@ -548,11 +427,6 @@ body:not(.map-view) .toolbar-side-btn:not(.active):hover {
   display: block;
   transform: translateY(0);
 }
-/* --- PANEL STYLES --- */
-.panel-header {
- padding-top: 120px;
-}
-
 .panel-content {
   padding: 16px 24px 24px 24px;
   max-width: 700px;
