@@ -1,18 +1,13 @@
-// QLDFuelFinder: Minimal glassy panel UI, single-screen map, no toolbar/tabs
 document.addEventListener("DOMContentLoaded", () => {
-  // Prevent accidental page zoom from double-clicking
-  document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
-
-  // --- Map & Data Variables ---
+  // --- Variables ---
   let map, markerLayer, userMarker;
   const defaultCenter = [-27.4698, 153.0251];
   const defaultZoom = 14;
   let allSites = [];
   let allPrices = [];
   let priceMap = {};
+  let currentFuel = "E10";
   const bannedStations = ["Stargazers Yarraman"];
-
-  // Fuel types
   const FUEL_TYPES = [
     { key: "E10", id: 12, label: "Unleaded E10" },
     { key: "91", id: 2, label: "Unleaded 91" },
@@ -22,34 +17,25 @@ document.addEventListener("DOMContentLoaded", () => {
     { key: "Diesel", id: 3, label: "Diesel" },
     { key: "Premium Diesel", id: 14, label: "Premium Diesel" }
   ];
-  let currentFuel = "E10";
 
-  // ========== PANEL UI LOGIC ==========
+  // --- PANEL LOGIC ---
   function showPanel(panelId) {
     hidePanels();
-    const overlay = document.getElementById(panelId + '-overlay');
-    const panel = document.getElementById(panelId + '-panel');
-    if (overlay && panel) {
-      overlay.classList.add('active');
-      panel.classList.add('open');
-    }
+    document.getElementById(panelId + '-overlay').classList.add('active');
+    document.getElementById(panelId + '-panel').classList.add('open');
   }
   function hidePanels() {
     document.querySelectorAll('.panel-overlay').forEach(o => o.classList.remove('active'));
     document.querySelectorAll('.sliding-panel').forEach(p => p.classList.remove('open'));
   }
-  // Panel triggers (floating glassy buttons)
-  const searchBtn = document.getElementById('search-btn');
-  const filterBtn = document.getElementById('filter-btn');
-  const listBtn = document.getElementById('list-btn');
-  if (searchBtn) searchBtn.onclick = () => showPanel('search');
-  if (filterBtn) filterBtn.onclick = () => showPanel('filter');
-  if (listBtn)   listBtn.onclick   = () => showPanel('list');
-  // Panel close logic (overlay & drag bar)
+  // Panel triggers
+  document.getElementById('search-btn').onclick = () => showPanel('search');
+  document.getElementById('filter-btn').onclick = () => showPanel('filter');
+  document.getElementById('list-btn').onclick   = () => showPanel('list');
   document.querySelectorAll('.panel-overlay').forEach(o => o.onclick = hidePanels);
   document.querySelectorAll('.panel-drag-bar').forEach(bar => bar.onclick = hidePanels);
 
-  // ========== MAP INIT ==========
+  // --- MAP INIT ---
   function startMap(center) {
     map = L.map("map", {
       zoomControl: false,
@@ -57,24 +43,16 @@ document.addEventListener("DOMContentLoaded", () => {
       doubleClickZoom: false,
       minZoom: 12
     }).setView(center, defaultZoom);
-
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '<a href="https://www.sellanycarfast.com.au" target="_blank" rel="noopener" title="Sell Any Car Fast">SACF</a> | &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      attribution: '© CARTO',
       subdomains: 'abcd',
       maxZoom: 16
     }).addTo(map);
-
-    markerLayer = L.layerGroup();
-    map.addLayer(markerLayer);
-
+    markerLayer = L.layerGroup().addTo(map);
     showUserLocation(false);
     fetchSitesAndPrices();
-
-    // Zoom controls
-    const zoomInBtn = document.getElementById("zoom-in");
-    const zoomOutBtn = document.getElementById("zoom-out");
-    if (zoomInBtn) zoomInBtn.onclick = () => map && map.zoomIn();
-    if (zoomOutBtn) zoomOutBtn.onclick = () => map && map.zoomOut();
+    document.getElementById("zoom-in").onclick = () => map.zoomIn();
+    document.getElementById("zoom-out").onclick = () => map.zoomOut();
     map.on("moveend", updateVisibleStations);
     map.on("zoomend", updateVisibleStations);
     map.on('click', hideFeatureCard);
@@ -97,37 +75,51 @@ document.addEventListener("DOMContentLoaded", () => {
           }).addTo(map);
         }
       },
-      err => {
-        // Ignore location error
-      }
+      err => {}
     );
   }
 
   async function fetchSitesAndPrices() {
-    try {
-      const [siteRes, priceRes] = await Promise.all([
-        fetch("data/sites.json").then(r => r.json()),
-        fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
-      ]);
-      allSites = (Array.isArray(siteRes) ? siteRes : siteRes.S).filter(site =>
-        !bannedStations.some(b => site.N && site.N.includes(b))
-      );
-      allPrices = priceRes.SitePrices.filter(
-        p => FUEL_TYPES.some(f => f.id === p.FuelId) && isValidPrice(p.Price)
-      );
-      priceMap = {};
-      allPrices.forEach(p => {
-        if (!priceMap[p.SiteId]) priceMap[p.SiteId] = {};
-        priceMap[p.SiteId][p.FuelId] = p.Price;
-      });
-      updateVisibleStations();
-      updateStationList();
-    } catch (err) {
-      // fail silently
-    }
+    const [siteRes, priceRes] = await Promise.all([
+      fetch("data/sites.json").then(r => r.json()),
+      fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
+    ]);
+    allSites = (Array.isArray(siteRes) ? siteRes : siteRes.S).filter(site =>
+      !bannedStations.some(b => site.N && site.N.includes(b))
+    );
+    allPrices = priceRes.SitePrices.filter(
+      p => FUEL_TYPES.some(f => f.id === p.FuelId) && isValidPrice(p.Price)
+    );
+    priceMap = {};
+    allPrices.forEach(p => {
+      if (!priceMap[p.SiteId]) priceMap[p.SiteId] = {};
+      priceMap[p.SiteId][p.FuelId] = p.Price;
+    });
+    renderFuelTypeRadios();
+    updateVisibleStations();
+    updateStationList();
   }
 
-  // ========== MAP STATION & MARKER RENDER ==========
+  // --- FUEL FILTER PANEL ---
+  function renderFuelTypeRadios() {
+    const fuelTypeList = document.getElementById('fuel-type-list');
+    fuelTypeList.innerHTML = FUEL_TYPES.map(fuel =>
+      `<label class="fuel-type-radio">
+        <input type="radio" name="fuel-radio" value="${fuel.key}"${fuel.key===currentFuel ? " checked" : ""}/>
+        ${fuel.label}
+      </label>`
+    ).join('');
+    fuelTypeList.querySelectorAll('input[type="radio"]').forEach(inp => {
+      inp.onchange = e => {
+        currentFuel = e.target.value;
+        hidePanels();
+        updateVisibleStations();
+        updateStationList();
+      };
+    });
+  }
+
+  // --- MAP MARKERS ---
   function updateVisibleStations() {
     if (!allSites.length || !allPrices.length || !markerLayer || !map) return;
     markerLayer.clearLayers();
@@ -189,7 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ========== LIST PANEL ==========
+  // --- LIST PANEL ---
   function updateStationList() {
     const listUl = document.getElementById('list');
     if (!listUl) return;
@@ -253,9 +245,18 @@ document.addEventListener("DOMContentLoaded", () => {
           />
         </span>
         <span class="list-name">${site.name}
-          <span class="list-distance">${site.distance ? site.distance.toFixed(1) : "-"}km</span>
+          <span class="list-address" style="display:block;font-size:0.95em;color:#555;">${site.address}${site.suburb ? ', ' + site.suburb : ''}</span>
+          <span class="list-distance" style="display:block;color:#999;font-size:0.93em;">${site.distance ? site.distance.toFixed(1) : "-"}km</span>
         </span>
-        <span class="list-price${site.rawPrice === minPrice ? " cheapest" : ""}">${site.price.toFixed(1)}</span>
+        <span class="list-price${site.rawPrice === minPrice ? " cheapest" : ""}" style="font-weight:600;">${site.price.toFixed(1)}</span>
+        <div class="list-other-prices" style="font-size:0.92em;color:#888;margin-top:2px;">
+          ${Object.entries(site.allPrices)
+            .filter(([fid, p]) => Number(fid) !== fuelObj.id && isValidPrice(p))
+            .map(([fid, p]) => {
+              const fuel = FUEL_TYPES.find(f => f.id == fid);
+              return fuel ? `<span>${fuel.label}: ${(p/10).toFixed(1)}</span>` : "";
+            }).join(" | ")}
+        </div>
       </li>
     `).join('');
 
@@ -272,57 +273,91 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ========== SEARCH PANEL EXAMPLE (You must provide suburbs.json and search-panel HTML) ==========
-  // To implement full search panel:
-  // 1. Add a search panel to your HTML with id="search-panel" and overlay with id="search-overlay"
-  // 2. Load your suburbs.json as an array of {name, postcode}
-  // 3. On search input, filter and render a .suburb-list with .suburb-list-item
-  // 4. On click suburb, hide panel and move map
-
-  // ========== FILTER PANEL ==========
-  // To implement: add filters panel to HTML with id="filter-panel" and overlay with id="filter-overlay"
-  // Render single-select (radio) for fuel types. When changed, set currentFuel and rerender.
-
-  // ========== FEATURE CARD ==========
+  // --- FEATURE CARD PANEL ---
   function showFeatureCard(station) {
-    // You must make a sliding-panel + overlay for the feature card, like all other panels.
-    // For demo: fallback to old style if you don't have a panel yet.
-    let card = document.getElementById('bottom-feature-card');
-    if (!card) {
-      // fallback: create simple modal
-      card = document.createElement('div');
-      card.id = 'bottom-feature-card';
-      document.body.appendChild(card);
-    }
-    card.innerHTML = `
-      <div class="feature-card-drag-bar"></div>
-      <div class="feature-card-content">
-        <div class="feature-card-title">${station.name}</div>
-        <div class="feature-card-address" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(station.address + ', ' + (station.suburb || ''))}', '_blank')">
-          ${station.address}${station.suburb ? ', ' + station.suburb : ''}
-        </div>
-        <div class="feature-card-distance">${station.distance ? station.distance.toFixed(1) : "-"} km</div>
-        <div class="fuel-prices-list">
-          ${Object.entries(station.allPrices).map(([fid, price]) =>
-            FUEL_TYPES.find(f => f.id == fid)
-              ? `<div class="fuel-price-row"><span class="fuel-type-label">${FUEL_TYPES.find(f => f.id == fid).label}</span><span class="fuel-type-price">${(price/10).toFixed(1)}</span></div>`
-              : ""
-          ).join("")}
-        </div>
+    const overlay = document.getElementById('feature-overlay');
+    const panel = document.getElementById('feature-panel');
+    const content = document.getElementById('feature-card-content');
+    overlay.classList.add('active');
+    panel.classList.add('open');
+    content.innerHTML = `
+      <div class="feature-card-title">${station.name}</div>
+      <div class="feature-card-address" style="cursor:pointer;color:#387CC2;text-decoration:underline;"
+        onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(station.address + ', ' + (station.suburb || ''))}', '_blank')">
+        ${station.address}${station.suburb ? ', ' + station.suburb : ''}
+      </div>
+      <div class="feature-card-distance">${station.distance ? station.distance.toFixed(1) : "-"} km</div>
+      <div class="fuel-prices-list">
+        ${Object.entries(station.allPrices).map(([fid, price]) =>
+          FUEL_TYPES.find(f => f.id == fid)
+            ? `<div class="fuel-price-row"><span class="fuel-type-label">${FUEL_TYPES.find(f => f.id == fid).label}</span><span class="fuel-type-price">${(price/10).toFixed(1)}</span></div>`
+            : ""
+        ).join("")}
       </div>
     `;
-    card.style.display = "block";
-    setTimeout(() => card.classList.add('visible'), 20);
-    // Drag bar close (could be improved: re-use sliding-panel logic)
-    const dragBar = card.querySelector('.feature-card-drag-bar');
-    if (dragBar) dragBar.onclick = hideFeatureCard;
   }
   function hideFeatureCard() {
-    const card = document.getElementById('bottom-feature-card');
-    if (card) card.style.display = "none";
+    document.getElementById('feature-overlay').classList.remove('active');
+    document.getElementById('feature-panel').classList.remove('open');
+  }
+  document.getElementById('feature-overlay').onclick = hideFeatureCard;
+  document.querySelector('#feature-panel .panel-drag-bar').onclick = hideFeatureCard;
+
+  // --- SEARCH PANEL ---
+  // Minimal: filter allSites by suburb or postcode, show results, click to go to suburb.
+  const searchInput = document.getElementById('search-input');
+  const suburbList = document.getElementById('suburb-list');
+  searchInput.addEventListener('input', function () {
+    const query = this.value.trim().toLowerCase();
+    if (!query) {
+      suburbList.innerHTML = "";
+      return;
+    }
+    // Scan allSites for unique suburb/postcode matches
+    let matches = allSites.filter(site =>
+      (site.P && site.P.toLowerCase().includes(query)) ||
+      (site.A && site.A.toLowerCase().includes(query)) ||
+      (site.N && site.N.toLowerCase().includes(query)) ||
+      (String(site.Postcode || '').includes(query))
+    );
+    // Unique by suburb+postcode
+    const seen = new Set();
+    matches = matches.filter(site => {
+      const k = site.P + "|" + (site.Postcode || '');
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+    suburbList.innerHTML = matches.slice(0, 16).map(site =>
+      `<li class="suburb-list-item" style="padding:12px;cursor:pointer;border-bottom:1px solid #eee;" 
+        data-lat="${site.Lat}" data-lng="${site.Lng}" data-name="${site.P}">
+        <span style="font-weight:500">${site.P}</span> 
+        <span style="color:#888;">${site.Postcode || ''}</span>
+      </li>`
+    ).join('');
+    suburbList.querySelectorAll('.suburb-list-item').forEach(item => {
+      item.onclick = function() {
+        hidePanels();
+        map.setView([this.dataset.lat, this.dataset.lng], 14, { animate: true });
+      };
+    });
+  });
+
+  // --- Fuel dropdown in search bar on map ---
+  const fuelSelect = document.getElementById('fuel-select');
+  if (fuelSelect) {
+    fuelSelect.value = currentFuel;
+    fuelSelect.onchange = (e) => {
+      currentFuel = e.target.value;
+      updateVisibleStations();
+      updateStationList();
+    };
   }
 
-  // ========== HELPERS ==========
+  // --- Map startup ---
+  startMap(defaultCenter);
+
+  // --- Helpers ---
   function isValidPrice(price) {
     return price !== null && price !== undefined && price >= 1000 && price <= 6000;
   }
@@ -335,19 +370,5 @@ document.addEventListener("DOMContentLoaded", () => {
       Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
       Math.sin(dLon / 2) ** 2;
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  }
-
-  // Map init
-  startMap(defaultCenter);
-
-  // Fuel selector on map
-  const fuelSelect = document.getElementById('fuel-select');
-  if (fuelSelect) {
-    fuelSelect.value = currentFuel;
-    fuelSelect.onchange = (e) => {
-      currentFuel = e.target.value;
-      updateVisibleStations();
-      updateStationList();
-    };
   }
 });
