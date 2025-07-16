@@ -124,7 +124,6 @@ function switchToView(viewName) {
   document.body.classList.add(`${viewName}-view`);
   homeTab && homeTab.classList.remove('active');
   listTab && listTab.classList.remove('active');
-  newsTab && newsTab.classList.remove('active');
   settingsTab && settingsTab.classList.remove('active');
   // Hide all panels
   homePanel && homePanel.classList.add('hidden');
@@ -260,7 +259,6 @@ function switchToView(viewName) {
   // Tab event listeners
   homeTab.addEventListener('click', () => switchToView('home'));
   listTab.addEventListener('click', () => switchToView('list'));
-  newsTab && newsTab.addEventListener('click', () => switchToView('news'));
   settingsTab && settingsTab.addEventListener('click', () => switchToView('settings'));
   mapTab.addEventListener('click', () => {
     if (currentView === 'map') {
@@ -642,66 +640,7 @@ function switchToView(viewName) {
     });
   }
 
-async function fetchAndRenderNewsFeed() {
-  const newsFeedList = document.getElementById('news-feed-list');
-  if (!newsFeedList) return;
-  newsFeedList.innerHTML = '<div class="news-loading">Loading news…</div>';
 
-  // Use a CORS proxy (public example) for Google News RSS
-  const rssUrl = 'https://news.google.com/rss/search?q=petrol+Australia';
-  const api = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
-  let xmlText = null;
-
-  try {
-    // Fetch via allorigins.win proxy (works for most public RSS)
-    const res = await fetch(api);
-    const data = await res.json();
-    xmlText = data.contents;
-  } catch (e) {
-    xmlText = getDummyRSS();
-  }
-
-  try {
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(xmlText, "application/xml");
-    const items = Array.from(xml.querySelectorAll("item"));
-    if (!items.length) throw new Error('No news');
-    newsFeedList.innerHTML = items.slice(0, 10).map(item => {
-      const title = item.querySelector('title')?.textContent || '';
-      const link = item.querySelector('link')?.textContent || '';
-      const pubDate = item.querySelector('pubDate')?.textContent || '';
-      const desc = item.querySelector('description')?.textContent || '';
-      return `
-        <div class="news-item">
-          <div class="news-title">${title}</div>
-          <div class="news-meta">${pubDate ? new Date(pubDate).toLocaleString() : ''}</div>
-          <div class="news-desc">${desc.replace(/<\/?[^>]+(>|$)/g, "").slice(0, 180)}...</div>
-          <a href="${link}" target="_blank" class="news-link">Read more</a>
-        </div>
-      `;
-    }).join('');
-  } catch (e) {
-    // Always show dummy news if parsing fails
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(getDummyRSS(), "application/xml");
-    const items = Array.from(xml.querySelectorAll("item"));
-    newsFeedList.innerHTML = items.map(item => {
-      const title = item.querySelector('title')?.textContent || '';
-      const link = item.querySelector('link')?.textContent || '';
-      const pubDate = item.querySelector('pubDate')?.textContent || '';
-      const desc = item.querySelector('description')?.textContent || '';
-      return `
-        <div class="news-item">
-          <div class="news-title">${title}</div>
-          <div class="news-meta">${pubDate ? new Date(pubDate).toLocaleString() : ''}</div>
-          <div class="news-desc">${desc.replace(/<\/?[^>]+(>|$)/g, "").slice(0, 180)}...</div>
-          <a href="${link}" target="_blank" class="news-link">Read more</a>
-        </div>
-      `;
-    }).join('');
-  }
-}
-  
 // --- SETTINGS PANEL LOGIC ---
 function saveSettings() {
   const fuel = document.getElementById('settings-fuel-type').value;
