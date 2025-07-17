@@ -25,7 +25,7 @@ html, body {
 }
 
 #apple-map {
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 /* ========== GLASSY FLOATING BUTTONS ========== */
