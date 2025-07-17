@@ -81,29 +81,27 @@ document.addEventListener("DOMContentLoaded", () => {
     bar.addEventListener('click', () => { hidePanels(); });
   });
 
-  // --- MAP INIT ---
-  function startMap(center) {
-    map = L.map("map", {
-      zoomControl: false,
-      attributionControl: true,
-      doubleClickZoom: false,
-      minZoom: 12
-    }).setView(center, defaultZoom);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '© CARTO',
-      subdomains: 'abcd',
-      maxZoom: 16
-    }).addTo(map);
-    markerLayer = L.layerGroup().addTo(map);
-    showUserLocation(false);
-    fetchSitesAndPrices();
-    document.getElementById("zoom-in").onclick = () => map.zoomIn();
-    document.getElementById("zoom-out").onclick = () => map.zoomOut();
-    map.on("moveend", updateVisibleStationsAndList);
-    map.on("zoomend", updateVisibleStationsAndList);
-    map.on('click', hideFeatureCard);
-  }
-
+  // Replace with your real token
+  const APPLE_MAPS_TOKEN = "eyJraWQiOiJHRzdDODlGSlQ5IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUyNzE2NDEyLCJleHAiOjE3NTMzNDAzOTl9.kR2EAjIdFvID72QaCY2zMFIAp7jJqhUit4w0s6z5P67WEvTcDw6wlbF8fbtOcRHwzIYvyQL15zaZRGbADLJ16g";
+  
+  // Initialize Apple Maps
+  mapkit.init({
+    authorizationCallback: function(done) {
+      done(APPLE_MAPS_TOKEN);
+    }
+  });
+  
+  // Create the map with only the map view
+  const myMap = new mapkit.Map("apple-map", {
+    center: new mapkit.Coordinate(-27.4698, 153.0251), // Brisbane
+    zoomRange: new mapkit.ZoomRange(8, 8), // Fixed zoom level
+    showsCompass: false,
+    showsScale: false,
+    showsMapTypeControl: false,
+    showsZoomControl: false,
+    showsUserLocationControl: false
+  });
+  
   function showUserLocation(setView) {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
