@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
           </div>
           <div style="margin-left:auto;font-weight:700;font-size:1.18em;color:#1b9b57;">
-            ${site.price.toFixed(1)}
+            ${s.price.toFixed(1)}
           </div>
         </div>
         <div style="color:#6b7689;font-size:0.95em;">
@@ -311,7 +311,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const annotation = new mapkit.MarkerAnnotation(
           new mapkit.Coordinate(site.lat, site.lng),
           {
-            subtitle: `${site.price.toFixed(1)} (${fuelObj.label})`,
+            subtitle: `${s.price.toFixed(1)} (${fuelObj.label})`,
             color: null, // transparent pin
             glyphImage: "images/mymarker.png", // your custom marker
             // glyphText: "BP" // Optionally, brand as text
@@ -319,7 +319,6 @@ document.addEventListener("DOMContentLoaded", () => {
         );
         myMap.addAnnotation(annotation);
         annotation.addEventListener("select", () => showFeatureCard(s));
-        myMap.addAnnotation(annotation);
       }
     });
   }
@@ -377,7 +376,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <span class="list-name">${site.name}
           <span class="list-address" style="display:block;font-size:0.95em;color:#555;">${site.address}${site.suburb ? ', ' + site.suburb : ''}</span>
         </span>
-        <span class="list-price" style="font-weight:600;">${site.price.toFixed(1)}</span>
+        <span class="list-price" style="font-weight:600;">${s.price.toFixed(1)}</span>
       </li>
     `).join('');
 
