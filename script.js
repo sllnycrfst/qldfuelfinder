@@ -94,8 +94,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Create the map with only the map view
   const myMap = new mapkit.Map("apple-map", {
     center: new mapkit.Coordinate(-27.4698, 153.0251), // Brisbane
-    showsCompass: false,
-    showsScale: false,
+    showsCompass: mapkit.FeatureVisibility.Hidden,
+    showsScale: mapkit.FeatureVisibility.Hidden,
     showsMapTypeControl: false,
     showsZoomControl: false,
     showsUserLocationControl: false
