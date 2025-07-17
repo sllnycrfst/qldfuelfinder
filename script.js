@@ -208,6 +208,21 @@ document.addEventListener("DOMContentLoaded", () => {
     showsUserLocationControl: false
   });
 
+  document.getElementById('recenter-btn').onclick = () => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(pos => {
+      const userCoord = new mapkit.Coordinate(pos.coords.latitude, pos.coords.longitude);
+      myMap.setCenterAnimated(userCoord, true);
+      // Optionally add a blue user location marker
+      const userAnnotation = new mapkit.MarkerAnnotation(userCoord, {
+        color: "#2196f3",
+        glyphText: "●",
+        title: "You"
+      });
+      myMap.addAnnotation(userAnnotation);
+    });
+  };  
+
   // --- User location (Apple Maps) ---
   function showUserLocation() {
     if (!navigator.geolocation) return;
