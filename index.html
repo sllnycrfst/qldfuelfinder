@@ -29,26 +29,6 @@
 </head>
 
 <body>
-  <!-- Apple Map -->
-  <div id="apple-map"></div>
-
-  <!-- Glassy Floating Buttons -->
-  <button class="glassy-btn" id="search-btn" title="Search"><i class="fas fa-search"></i></button>
-  <button class="glassy-btn" id="filter-btn" title="Filters"><i class="fas fa-sliders-h"></i></button>
-  <button class="glassy-btn" id="list-btn" title="List"><i class="fas fa-bars"></i></button>
-
-  <!-- Search Panel Overlay & Panel -->
-  <div class="panel-overlay" id="search-overlay"></div>
-  <div class="sliding-panel" id="search-panel">
-    <div class="panel-drag-bar"></div>
-    <div class="panel-content">
-      <div class="search-bar-panel">
-        <i class="fas fa-search"></i>
-        <input type="text" id="search-input" placeholder="Search suburb or postcode..." autocomplete="off" />
-      </div>
-      <ul class="suburb-list" id="suburb-list"></ul>
-    </div>
-  </div>
 
   <!-- Filters Panel Overlay & Panel -->
   <div class="panel-overlay" id="filter-overlay"></div>
@@ -89,23 +69,6 @@
   </div>
 
   <!-- Apple MapKit JS Init Script -->
-  <script>
-    mapkit.init({
-      authorizationCallback: function(done) {
-        done("eyJraWQiOiJHRzdDODlGSlQ5IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUyNzE2NDEyLCJleHAiOjE3NTMzNDAzOTl9.kR2EAjIdFvID72QaCY2zMFIAp7jJqhUit4w0s6z5P67WEvTcDw6wlbF8fbtOcRHwzIYvyQL15zaZRGbADLJ16g");
-      }
-    });
-
-    // Replace with your desired initial location and zoom (Brisbane example)
-    const map = new mapkit.Map("apple-map", {
-      center: new mapkit.Coordinate(-27.4698, 153.0251), // Brisbane
-      showsCompass: false,
-      showsScale: false,
-      showsMapTypeControl: false,
-      showsZoomControl: false,
-      showsUserLocationControl: false
-    });
-  </script>
   <script src="script.js" defer></script>
 </body>
 </html>
