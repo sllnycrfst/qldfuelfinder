@@ -92,14 +92,30 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   
   // Create the map with only the map view
+  const region = new mapkit.CoordinateRegion(
+    new mapkit.Coordinate(-27.4698, 153.0251), // Brisbane
+    new mapkit.CoordinateSpan(0.1, 0.1)        // Controls zoom (smaller = closer)
+  );
+  
   const myMap = new mapkit.Map("apple-map", {
-    center: new mapkit.Coordinate(-27.4698, 153.0251), // Brisbane
+    region: region,
     showsCompass: mapkit.FeatureVisibility.Hidden,
     showsScale: mapkit.FeatureVisibility.Hidden,
     showsMapTypeControl: false,
     showsZoomControl: false,
     showsUserLocationControl: false
   });
+
+  const marker = new mapkit.MarkerAnnotation(
+    new mapkit.Coordinate(station.lat, station.lng),
+    {
+      title: station.name,
+      subtitle: `Price: ${station.price}`,
+      color: "#2196f3",          // Custom marker color
+      glyphText: `${station.price}`, // Show price as glyph
+      selectedGlyphImage: "images/mymarker.png" // Custom glyph image
+    }
+  );
   
   function showUserLocation(setView) {
     if (!navigator.geolocation) return;
