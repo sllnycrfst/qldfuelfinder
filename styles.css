@@ -56,7 +56,7 @@ html, body {
 #search-btn   { top: 18px;  left: 18px; }
 #filter-btn   { top: 18px;  right: 18px; }
 #list-btn     { bottom: 28px; right: 18px; }
-#recenter-btn     { bottom: 60px; right: 18px; }
+#recenter-btn     { bottom: 120px; right: 18px; }
 
 /* --- FUEL MARKERS --- */
 .fuel-marker {
@@ -217,7 +217,9 @@ html, body {
   font-weight: 500;
   padding: 6px 0;
 }
-#search-input::placeholder { color: #7e7e7e; }
+
+#search-input::placeholder { color: #7e7e7e; {
+}
 
 .suburb-list {
   width: 100%;
