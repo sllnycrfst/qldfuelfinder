@@ -8,14 +8,29 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Quantico:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="styles.css" />
+
+  <!-- Apple MapKit JS -->
+  <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
+  <style>
+    #apple-map {
+      width: 100vw;
+      height: 100vh;
+      min-height: 320px;
+      border-radius: 0;
+      z-index: 1;
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none; /* disables all map interaction */
+    }
+    body { margin: 0; }
+  </style>
 </head>
 
 <body>
-  <!-- Map -->
-  <div id="map"></div>
+  <!-- Apple Map -->
+  <div id="apple-map"></div>
 
   <!-- Glassy Floating Buttons -->
   <button class="glassy-btn" id="search-btn" title="Search"><i class="fas fa-search"></i></button>
@@ -40,9 +55,7 @@
   <div class="sliding-panel" id="filter-panel">
     <div class="panel-drag-bar"></div>
     <div class="panel-content">
-      <div class="fuel-types-list" id="fuel-type-list">
-        <!-- Fuel type radios will be rendered by JS -->
-      </div>
+      <div class="fuel-types-list" id="fuel-type-list"></div>
     </div>
   </div>
 
@@ -75,8 +88,24 @@
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="script.js"></script>
+  <!-- Apple MapKit JS Init Script -->
+  <script>
+    mapkit.init({
+      authorizationCallback: function(done) {
+        done("eyJraWQiOiJHRzdDODlGSlQ5IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUyNzE2NDEyLCJleHAiOjE3NTMzNDAzOTl9.kR2EAjIdFvID72QaCY2zMFIAp7jJqhUit4w0s6z5P67WEvTcDw6wlbF8fbtOcRHwzIYvyQL15zaZRGbADLJ16g");
+      }
+    });
+
+    // Replace with your desired initial location and zoom (Brisbane example)
+    const map = new mapkit.Map("apple-map", {
+      center: new mapkit.Coordinate(-27.4698, 153.0251), // Brisbane
+      zoomRange: new mapkit.ZoomRange(8, 8),
+      showsCompass: false,
+      showsScale: false,
+      showsMapTypeControl: false,
+      showsZoomControl: false,
+      showsUserLocationControl: false
+    });
+  </script>
 </body>
 </html>
