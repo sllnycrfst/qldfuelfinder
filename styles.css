@@ -24,6 +24,10 @@ html, body {
   z-index: 1;
 }
 
+#apple-map {
+  pointer-events: auto;
+}
+
 /* ========== GLASSY FLOATING BUTTONS ========== */
 .glassy-btn {
   position: fixed;
