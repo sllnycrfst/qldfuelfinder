@@ -15,7 +15,161 @@ document.addEventListener("DOMContentLoaded", () => {
     { key: "Diesel", id: 3, label: "Diesel" },
     { key: "Premium Diesel", id: 14, label: "Premium Diesel" }
   ];
-
+  let sortMode = "price"; // 'price' or 'distance'
+  // Add Sort Toggle to List Panel
+  function renderSortToggle() {
+    const listUl = document.getElementById('list');
+    if (!listUl) return;
+    let sortHtml = `
+      <div style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:10px;gap:12px;">
+        <label><input type="radio" name="sort-mode" value="price" ${sortMode==="price"?"checked":""}> Sort by Price</label>
+        <label><input type="radio" name="sort-mode" value="distance" ${sortMode==="distance"?"checked":""}> Sort by Distance</label>
+      </div>
+    `;
+    listUl.insertAdjacentHTML('beforebegin', sortHtml);
+    document.querySelectorAll('input[name="sort-mode"]').forEach(radio => {
+      radio.onchange = e => {
+        sortMode = e.target.value;
+        updateStationList();
+      };
+    });
+  }
+  function getDistance(lat1, lng1, lat2, lng2) {
+    // Haversine formula
+    function toRad(d) { return d * Math.PI / 180; }
+    const R = 6371; // km
+    const dLat = toRad(lat2-lat1), dLng = toRad(lng2-lng1);
+    const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLng/2)**2;
+    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+  }
+  
+  // Update station list with styling and sort
+  function updateStationList() {
+    const listUl = document.getElementById('list');
+    if (!listUl || !myMap) return;
+    listUl.innerHTML = "";
+    // Remove old sort toggle
+    const oldSort = document.querySelector('input[name="sort-mode"]')?.parentElement?.parentElement;
+    if (oldSort) oldSort.remove();
+    renderSortToggle();
+  
+    if (!allSites.length || !allPrices.length) {
+      listUl.innerHTML = "<li>Loading…</li>";
+      return;
+    }
+    const fuelObj = FUEL_TYPES.find(f => f.key === currentFuel);
+  
+    // Get user position for distance sorting
+    let userCoord = myMap.center;
+    const stations = allSites
+      .map(site => {
+        const sitePrice = priceMap[site.S]?.[fuelObj?.id];
+        if (
+          typeof sitePrice !== "undefined" &&
+          sitePrice !== null &&
+          isValidPrice(sitePrice)
+        ) {
+          const distance = userCoord ? getDistance(userCoord.latitude, userCoord.longitude, site.Lat, site.Lng) : null;
+          return {
+            ...site,
+            price: sitePrice / 10,
+            rawPrice: sitePrice,
+            brand: site.B,
+            address: site.A,
+            name: site.N,
+            suburb: site.P,
+            lat: site.Lat,
+            lng: site.Lng,
+            siteId: String(site.S),
+            distance
+          };
+        }
+        return null;
+      })
+      .filter(Boolean)
+      .sort((a, b) => sortMode === "price" ? a.rawPrice - b.rawPrice : a.distance - b.distance);
+  
+    if (stations.length === 0) {
+      listUl.innerHTML = `<li style="padding: 20px; text-align: center; color: #666;">No stations found.</li>`;
+      return;
+    }
+    listUl.innerHTML = stations.map(site => `
+      <li class="station-list-item" data-siteid="${site.siteId}">
+        <div style="display:flex;align-items:center;">
+          <img src="images/${site.brand ? site.brand : 'default'}.png"
+            alt="${site.name}" style="height:48px;width:48px;border-radius:50%;background:#fff;object-fit:contain;margin-right:14px;box-shadow:0 1px 2px rgba(0,0,0,0.07);">
+          <div style="flex:1;">
+            <div class="station-list-title">${site.name}</div>
+            <div class="station-list-address" style="color:#387CC2;text-decoration:underline;cursor:pointer;"
+              onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.address + ', ' + (site.suburb || ''))}', '_blank')">
+              ${site.address}${site.suburb ? ', ' + site.suburb : ''}
+            </div>
+          </div>
+          <div style="margin-left:auto;font-weight:700;font-size:1.18em;color:#1b9b57;">
+            ${site.price.toFixed(1)}
+          </div>
+        </div>
+        <div style="color:#6b7689;font-size:0.95em;">
+          ${site.distance ? `${site.distance.toFixed(1)} km` : ""}
+        </div>
+      </li>
+    `).join('');
+    document.querySelectorAll('.station-list-item').forEach(stationEl => {
+      stationEl.onclick = function () {
+        const siteId = this.getAttribute('data-siteid');
+        const stationData = stations.find(s => s.siteId === siteId);
+        if (stationData) {
+          hidePanels();
+          showFeatureCard(stationData);
+          myMap.setCenterAnimated(
+            new mapkit.Coordinate(stationData.lat, stationData.lng), true
+          );
+        }
+      };
+    });
+  }
+  
+  // Map marker click: ensure feature panel shows
+  function updateVisibleStations() {
+    if (!allSites.length || !allPrices.length || !myMap) return;
+    myMap.removeAnnotations(myMap.annotations);
+    const fuelObj = FUEL_TYPES.find(f => f.key === currentFuel);
+    allSites.forEach(site => {
+      const sitePrice = priceMap[site.S]?.[fuelObj?.id];
+      if (
+        typeof sitePrice !== "undefined" &&
+        sitePrice !== null &&
+        isValidPrice(sitePrice)
+      ) {
+        const s = {
+          ...site,
+          price: sitePrice / 10,
+          rawPrice: sitePrice,
+          brand: site.B,
+          address: site.A,
+          name: site.N,
+          suburb: site.P,
+          lat: site.Lat,
+          lng: site.Lng,
+          siteId: String(site.S),
+          allPrices: priceMap[site.S]
+        };
+        const annotation = new mapkit.MarkerAnnotation(
+          new mapkit.Coordinate(s.lat, s.lng),
+          {
+            title: s.name,
+            subtitle: `${s.price.toFixed(1)} (${fuelObj.label})`,
+            color: "#2196f3",
+            glyphText: s.price.toFixed(1)
+          }
+        );
+        annotation.addEventListener("select", function() {
+          showFeatureCard(s);
+        });
+        myMap.addAnnotation(annotation);
+      }
+    });
+  }
   // --- Panel Logic (unchanged) ---
   function showPanel(panelId) {
     hidePanels();
