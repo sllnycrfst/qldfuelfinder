@@ -309,15 +309,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Apple Maps annotation
         const annotation = new mapkit.MarkerAnnotation(
-          new mapkit.Coordinate(s.lat, s.lng),
+          new mapkit.Coordinate(site.lat, site.lng),
           {
-            title: s.name,
-            subtitle: `${s.price.toFixed(1)} (${fuelObj.label})`,
-            color: "#2196f3",
-            glyphText: s.price.toFixed(1)
-            // Optionally, use glyphImage for custom images
+            subtitle: `${site.price.toFixed(1)} (${fuelObj.label})`,
+            color: null, // transparent pin
+            glyphImage: "images/mymarker.png", // your custom marker
+            // glyphText: "BP" // Optionally, brand as text
           }
         );
+        myMap.addAnnotation(annotation);
         annotation.addEventListener("select", () => showFeatureCard(s));
         myMap.addAnnotation(annotation);
       }
