@@ -11,7 +11,6 @@ document.addEventListener("DOMContentLoaded", () => {
     { key: "91", id: 2, label: "U91" },
     { key: "95", id: 5, label: "P95" },
     { key: "98", id: 8, label: "P98" },
-    { key: "E85", id: 9, label: "E85" },
     { key: "Diesel", id: 3, label: "DSL" },
     { key: "Premium Diesel", id: 14, label: "PDSL" }
   ];
@@ -430,11 +429,28 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
       <div class="feature-card-distance">${station.price.toFixed(1)} (${FUEL_TYPES.find(f=>f.key===currentFuel).label})</div>
     `;
+
+    // Render all fuel prices
+    const pricesDiv = panel.querySelector('.feature-card-prices');
+    pricesDiv.innerHTML = FUEL_TYPES.map(fuel => {
+      const price = station.allPrices?.[fuel.id];
+      if (price && isValidPrice(price)) {
+        return `<div class="fuel-price-row">
+          <span class="fuel-type-label">${fuel.label}</span>
+          <span class="fuel-type-price">${(price/10).toFixed(1)}</span>
+        </div>`;
+      }
+      return '';
+    }).join('');
+
+    overlay.classList.add('active');
+    panel.classList.add('open');
   }
   
   function hideFeatureCard() {
     document.getElementById('feature-overlay').classList.remove('active');
     document.getElementById('feature-panel').classList.remove('open');
+    setToolbarToMapIcon();
   }
   
   document.getElementById('feature-overlay').onclick = hideFeatureCard;
@@ -570,4 +586,12 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchSitesAndPrices().then(() => {
     showUserLocation();
   });
+
+  function setToolbarToMapIcon() {
+    document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));
+    const mapIcon = document.querySelector('.sc-menu-item[data-action="map"]');
+    if (mapIcon) mapIcon.classList.add('sc-current');
+    // Optionally update indicator position if you use one
+    if (typeof updateToolbarIndicator === 'function') updateToolbarIndicator();
+  }
 });
