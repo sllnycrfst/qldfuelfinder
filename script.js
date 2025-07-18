@@ -247,10 +247,34 @@ document.addEventListener("DOMContentLoaded", () => {
       if (
         typeof sitePrice !== "undefined" &&
         sitePrice !== null &&
-        isValidPrice(sitePrice) &&
-        sitePrice < lowestPrice
+        isValidPrice(sitePrice)
       ) {
-        lowestPrice = sitePrice;
+        const isCheapest = cheapestStations.includes(site.S);
+        const coordinate = new mapkit.Coordinate(site.Lat, site.Lng);
+        const priceText = (sitePrice / 10).toFixed(1);
+    
+        const annotation = new mapkit.MarkerAnnotation(coordinate, {
+          glyphText: priceText,
+          color: isCheapest ? "#00C851" : "#387CC2",
+          title: site.N,
+          subtitle: `${site.N} (${fuelObj.label})`
+        });
+    
+        annotation.addEventListener("select", () => showFeatureCard({
+          ...site,
+          price: sitePrice / 10,
+          rawPrice: sitePrice,
+          brand: site.B,
+          address: site.A,
+          name: site.N,
+          suburb: site.P,
+          lat: site.Lat,
+          lng: site.Lng,
+          siteId: String(site.S),
+          allPrices: priceMap[site.S]
+        }));
+    
+        myMap.addAnnotation(annotation);
       }
     });
 
