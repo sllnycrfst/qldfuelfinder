@@ -1,4 +1,52 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // --- Weather API ---
+  async function fetchWeather() {
+    try {
+      const weatherIcons = {
+        '0': '☀️', // Clear sky
+        '1': '🌤️', // Mainly clear
+        '2': '⛅', // Partly cloudy
+        '3': '☁️', // Overcast
+        '45': '🌫️', // Fog
+        '48': '🌫️', // Depositing rime fog
+        '51': '🌦️', // Light drizzle
+        '53': '🌦️', // Moderate drizzle
+        '55': '🌦️', // Dense drizzle
+        '61': '🌧️', // Slight rain
+        '63': '🌧️', // Moderate rain
+        '65': '🌧️', // Heavy rain
+        '71': '🌨️', // Slight snow
+        '73': '🌨️', // Moderate snow
+        '75': '🌨️', // Heavy snow
+        '77': '🌨️', // Snow grains
+        '80': '🌦️', // Slight rain showers
+        '81': '🌦️', // Moderate rain showers
+        '82': '🌧️', // Violent rain showers
+        '85': '🌨️', // Slight snow showers
+        '86': '🌨️', // Heavy snow showers
+        '95': '⛈️', // Thunderstorm
+        '96': '⛈️', // Thunderstorm with slight hail
+        '99': '⛈️' // Thunderstorm with heavy hail
+      };
+
+      // Brisbane coordinates
+      const lat = -27.4698;
+      const lng = 153.0251;
+      
+      const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current_weather=true`);
+      const data = await response.json();
+      
+      const temp = Math.round(data.current_weather.temperature);
+      const weatherCode = data.current_weather.weathercode.toString();
+      const icon = weatherIcons[weatherCode] || '☀️';
+      
+      document.getElementById('weather-temp').textContent = `${temp}°`;
+      document.getElementById('weather-icon').textContent = icon;
+    } catch (error) {
+      console.error('Weather fetch error:', error);
+    }
+  }
+
   // --- Variables ---
   let myMap;
   let allSites = [];
@@ -138,28 +186,35 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     
-    listUl.innerHTML = stations.map(site => `
-      <li class="station-list-item" data-siteid="${site.siteId}">
-        <div style="display:flex;align-items:center;">
-          <img class="station-logo" src="images/${site.brand || 'default'}.png"
-            alt="${site.name}" 
-            onerror="this.src='images/default.png'">
+    listUl.innerHTML = stations.map(site => {
+      const currentTime = new Date();
+      const updateTime = new Date(currentTime - 5 * 60 * 60 * 1000); // 5 hours ago
+      const hoursAgo = Math.floor((currentTime - updateTime) / (1000 * 60 * 60));
+      
+      return `
+      <li class="station-list-item" data-siteid="${site.siteId}" style="padding:16px;border-bottom:1px solid #f0f0f0;cursor:pointer;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
           <div style="flex:1;">
-            <div class="station-list-title">${site.name}</div>
-            <div class="station-list-address" style="color:#387CC2;text-decoration:underline;cursor:pointer;"
-              onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.address + ', ' + (site.suburb || ''))}', '_blank')">
-              ${site.address}${site.suburb ? ', ' + site.suburb : ''}
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;">
+              <img class="station-logo" src="images/${site.brand || 'default'}.png"
+                alt="${site.name}" 
+                onerror="this.src='images/default.png'"
+                style="width:40px;height:40px;border-radius:50%;object-fit:contain;background:white;">
+              <div style="font-weight:600;color:#1a1a1a;font-size:16px;">${site.name}</div>
             </div>
+            <div style="color:#666;font-size:14px;margin-left:52px;">${site.address}</div>
+            <div style="color:#387CC2;font-size:14px;margin-left:52px;">${site.distance ? site.distance.toFixed(1) + ' km' : ''}</div>
           </div>
-          <div style="margin-left:auto;font-weight:700;font-size:1.18em;color:${site.isCheapest ? '#00C851' : '#387cc2'};">
-            ${site.price.toFixed(1)}
+          <div style="text-align:right;">
+            <div style="font-size:10px;color:#999;margin-bottom:2px;">${currentFuel}</div>
+            <div style="font-weight:700;font-size:24px;color:${site.isCheapest ? '#00C851' : '#1a1a1a'};">
+              ${site.price.toFixed(1)}<span style="font-size:16px;font-weight:500;">/L</span>
+            </div>
+            <div style="font-size:12px;color:#999;">${hoursAgo}h ago</div>
           </div>
-        </div>
-        <div style="color:#6b7689;font-size:0.95em;">
-          ${site.distance ? `${site.distance.toFixed(1)} km` : ""}
         </div>
       </li>
-    `).join('');
+    `}).join('');
     
     document.querySelectorAll('.station-list-item').forEach(stationEl => {
       stationEl.onclick = function () {
@@ -234,15 +289,44 @@ document.addEventListener("DOMContentLoaded", () => {
         // Is this one of the cheapest?
         const isCheapest = cheapestStations.includes(site.S);
 
-        const annotation = new mapkit.MarkerAnnotation(
-          new mapkit.Coordinate(s.lat, s.lng),
-          {
-            title: s.price.toFixed(1),
-            subtitle: `${s.name} (${fuelObj.label})`,
-            color: isCheapest ? "#00C851" : "#007AFF",
-            animates: isCheapest // Only animate the cheapest stations
-          }
-        );
+        // Create custom annotation
+        const coordinate = new mapkit.Coordinate(s.lat, s.lng);
+        const annotation = new mapkit.Annotation(coordinate);
+        
+        // Create custom callout with price and petrol emoji
+        const calloutElement = document.createElement('div');
+        calloutElement.style.cssText = `
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 4px;
+        `;
+        
+        const priceElement = document.createElement('div');
+        priceElement.style.cssText = `
+          background: ${isCheapest ? '#00C851' : '#000000'};
+          color: white;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 14px;
+          font-weight: 600;
+          white-space: nowrap;
+        `;
+        priceElement.textContent = s.price.toFixed(1);
+        
+        const emojiElement = document.createElement('div');
+        emojiElement.style.cssText = `
+          font-size: 28px;
+        `;
+        emojiElement.textContent = '⛽';
+        
+        calloutElement.appendChild(priceElement);
+        calloutElement.appendChild(emojiElement);
+        
+        annotation.element = calloutElement;
+        annotation.title = s.name;
+        annotation.subtitle = `${s.name} (${fuelObj.label})`;
+        annotation.animates = isCheapest; // Only animate the cheapest stations
         annotation.addEventListener("select", () => showFeatureCard(s));
         myMap.addAnnotation(annotation);
       }
@@ -414,13 +498,14 @@ document.addEventListener("DOMContentLoaded", () => {
     showsUserLocationControl: true
   });
 
-  // Position compass in top left and location button to bottom right
+  // Position compass in top right and location button to bottom right
   setTimeout(() => {
     const compassElement = document.querySelector('.mk-compass-control');
     if (compassElement) {
       compassElement.style.position = 'fixed';
       compassElement.style.top = '20px';
-      compassElement.style.left = '20px';
+      compassElement.style.right = '20px';
+      compassElement.style.left = 'auto';
       compassElement.style.zIndex = '10001';
     }
     
@@ -428,7 +513,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const locationButton = document.querySelector('.mk-user-location-control');
     if (locationButton) {
       locationButton.style.position = 'fixed';
-      locationButton.style.bottom = '270px'; // Above zoom controls
+      locationButton.style.bottom = '200px'; // Above zoom controls
       locationButton.style.right = '20px';
       locationButton.style.left = 'auto';
       locationButton.style.top = 'auto';
@@ -489,6 +574,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const content = document.getElementById('feature-card-content');
     overlay.classList.add('active');
     panel.classList.add('open');
+    
+    // Calculate distance if not already present
+    if (!station.distance && myMap && myMap.center) {
+      station.distance = getDistance(myMap.center.latitude, myMap.center.longitude, station.lat, station.lng);
+    }
+    
     // Build fuel prices HTML
     const fuelPricesHtml = FUEL_TYPES.map(fuel => {
       const price = station.allPrices?.[fuel.id];
@@ -501,22 +592,166 @@ document.addEventListener("DOMContentLoaded", () => {
       return '';
     }).join('');
     
+    // Build get directions button HTML
+    const getDirectionsHtml = `
+      <button id="get-directions-btn" style="
+        width: 100%;
+        padding: 12px;
+        margin-top: 20px;
+        background: #387CC2;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      " onclick="showDirectionsOptions('${station.lat}', '${station.lng}', '${encodeURIComponent(station.name)}')">
+        <i class="fas fa-route"></i>
+        Get directions
+      </button>
+    `;
+    
     content.innerHTML = `
-      <div class="feature-card-title">${station.name}</div>
-      <div class="feature-card-address" style="cursor:pointer;color:#387CC2;text-decoration:underline;"
-        onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(station.address + ', ' + (station.suburb || ''))}', '_blank')">
-        ${station.address}${station.suburb ? ', ' + station.suburb : ''}
+      <div style="text-align:center;margin-bottom:20px;">
+        <img src="images/${station.brand || 'default'}.png" 
+          alt="${station.name}" 
+          onerror="this.src='images/default.png'"
+          style="width:60px;height:60px;border-radius:50%;object-fit:contain;background:white;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
       </div>
-      <div class="feature-card-distance">${station.price.toFixed(1)} (${FUEL_TYPES.find(f=>f.key===currentFuel).label})</div>
-      <div class="fuel-prices-list">
-        ${fuelPricesHtml}
+      <div class="feature-card-title" style="font-size:20px;font-weight:700;color:#1a1a1a;margin-bottom:8px;">${station.name}</div>
+      <div class="feature-card-address" style="color:#666;font-size:14px;margin-bottom:4px;">
+        ${station.address}
       </div>
+      <div style="color:#387CC2;font-size:14px;margin-bottom:20px;">${station.distance ? station.distance.toFixed(1) + ' km' : ''}</div>
+      
+      <div style="background:#f5f5f5;padding:16px;border-radius:8px;margin-bottom:20px;">
+        ${fuelPricesHtml || '<div style="color:#666;">No prices available</div>'}
+      </div>
+      
+      <div style="text-align:center;margin-bottom:12px;">
+        <div style="font-size:12px;color:#999;">Updated 5h ago via QLD Gov</div>
+      </div>
+      
+      ${getDirectionsHtml}
+      
+      <button style="
+        width: 100%;
+        padding: 12px;
+        margin-top: 12px;
+        background: white;
+        color: #ff3b30;
+        border: 1px solid #ff3b30;
+        border-radius: 8px;
+        font-size: 14px;
+        cursor: pointer;
+      ">Report station</button>
     `;
 
     overlay.classList.add('active');
     panel.classList.add('open');
   }
   
+  
+  // Get directions function
+  window.showDirectionsOptions = function(lat, lng, name) {
+    const destination = `${lat},${lng}`;
+    const encodedName = name;
+    
+    // Create modal
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20000;
+    `;
+    
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      width: 90%;
+      max-width: 320px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    `;
+    
+    modalContent.innerHTML = `
+      <h3 style="margin:0 0 20px 0;font-size:18px;font-weight:600;">Open directions in:</h3>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <button onclick="window.open('https://maps.apple.com/?daddr=${destination}', '_blank'); document.body.removeChild(this.closest('div').parentElement);" style="
+          padding: 16px;
+          background: #007AFF;
+          color: white;
+          border: none;
+          border-radius: 12px;
+          font-size: 16px;
+          font-weight: 500;
+          cursor: pointer;
+        ">
+          <i class="fas fa-map"></i> Apple Maps
+        </button>
+        <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${destination}', '_blank'); document.body.removeChild(this.closest('div').parentElement);" style="
+          padding: 16px;
+          background: #4285F4;
+          color: white;
+          border: none;
+          border-radius: 12px;
+          font-size: 16px;
+          font-weight: 500;
+          cursor: pointer;
+        ">
+          <i class="fas fa-map-marked-alt"></i> Google Maps
+        </button>
+        <button onclick="window.open('https://waze.com/ul?ll=${destination}&navigate=yes', '_blank'); document.body.removeChild(this.closest('div').parentElement);" style="
+          padding: 16px;
+          background: #32CCFE;
+          color: white;
+          border: none;
+          border-radius: 12px;
+          font-size: 16px;
+          font-weight: 500;
+          cursor: pointer;
+        ">
+          <i class="fas fa-directions"></i> Waze
+        </button>
+        <button onclick="document.body.removeChild(this.closest('div').parentElement);" style="
+          padding: 16px;
+          background: #f0f0f0;
+          color: #333;
+          border: none;
+          border-radius: 12px;
+          font-size: 16px;
+          font-weight: 500;
+          cursor: pointer;
+          margin-top: 8px;
+        ">
+          Cancel
+        </button>
+      </div>
+    `;
+    
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+    
+    // Close modal when clicking outside
+    modal.onclick = function(e) {
+      if (e.target === modal) {
+        document.body.removeChild(modal);
+      }
+    };
+  };
+
   function hideFeatureCard() {
     document.getElementById('feature-overlay').classList.remove('active');
     document.getElementById('feature-panel').classList.remove('open');
@@ -529,55 +764,20 @@ document.addEventListener("DOMContentLoaded", () => {
   // ---bottom toolbar---
   var menu_bar = document.querySelector('.sc-bottom-bar');
   var menu_item = document.querySelectorAll('.sc-menu-item');
-  var menu_indicator = document.querySelector('.sc-nav-indicator');
   var menu_current_item = document.querySelector('.sc-current');
 
-  function updateToolbarIndicator() {
-    if (!menu_current_item || !menu_indicator || !menu_bar) return;
-    
-    const currentIndex = Array.from(menu_item).indexOf(menu_current_item);
-    const itemWidth = 56;
-    const totalItems = menu_item.length;
-    const barWidth = menu_bar.offsetWidth;
-    const spacing = (barWidth - (totalItems * itemWidth)) / (totalItems + 1);
-    
-    const indicatorX = spacing + (currentIndex * (itemWidth + spacing)) + (itemWidth / 2) - 28;
-    const cutoutX = spacing + (currentIndex * (itemWidth + spacing)) + (itemWidth / 2);
-    
-    // Update indicator position
-    menu_indicator.style.left = indicatorX + "px";
-    
-    // Update CSS custom properties for cutout position
-    menu_bar.style.setProperty('--indicator-x', indicatorX + 'px');
-    menu_bar.style.setProperty('--cutout-x', cutoutX + 'px');
-    
-    // Update background with new cutout position
-    menu_bar.style.background = `radial-gradient(circle at ${cutoutX}px 20px, transparent 32px, #ffffff 33px)`;
-  }
-
-  // Initialize toolbar
-  if (menu_current_item && menu_indicator && menu_bar) {
-    updateToolbarIndicator();
-    
-    menu_item.forEach(function(select_menu_item, index) {
-      select_menu_item.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        // Remove current class from all items
-        menu_item.forEach(item => item.classList.remove('sc-current'));
-        
-        // Add current class to clicked item
-        this.classList.add('sc-current');
-        menu_current_item = this;
-        
-        // Update indicator position
-        updateToolbarIndicator();
-      });
+  // Simple toolbar without indicator
+  menu_item.forEach(function(select_menu_item) {
+    select_menu_item.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      // Remove current class from all items
+      menu_item.forEach(item => item.classList.remove('sc-current'));
+      
+      // Add current class to clicked item
+      this.classList.add('sc-current');
     });
-    
-    // Update on window resize
-    window.addEventListener('resize', updateToolbarIndicator);
-  }
+  });
 
   // Add zoom control functionality
   document.getElementById('zoom-in').addEventListener('click', () => {
@@ -625,10 +825,51 @@ document.addEventListener("DOMContentLoaded", () => {
     'woolworths': [13, 'Woolworths', 'WOW']
   };
   
-  searchInput.addEventListener('input', function () {
-    const query = this.value.trim().toLowerCase();
+  // Function to get user's current suburb
+  async function getCurrentSuburb() {
+    try {
+      const position = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject);
+      });
+      
+      // Find closest suburb
+      const userLat = position.coords.latitude;
+      const userLng = position.coords.longitude;
+      
+      let closestSuburb = null;
+      let minDistance = Infinity;
+      
+      allSites.forEach(site => {
+        if (site.P) {
+          const distance = getDistance(userLat, userLng, site.Lat, site.Lng);
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestSuburb = site.P;
+          }
+        }
+      });
+      
+      return closestSuburb || 'Brisbane';
+    } catch (error) {
+      return 'Brisbane';
+    }
+  }
+  
+  // Function to show search suggestions
+  async function showSearchSuggestions(query) {
+    const currentSuburb = await getCurrentSuburb();
+    
     if (!query) {
-      suburbList.innerHTML = "";
+      // Show only current location option when search is empty
+      suburbList.innerHTML = `
+        <li class="suburb-list-item" style="padding:12px;cursor:pointer;border-bottom:1px solid #eee;background:#f0f7ff;" 
+          onclick="useCurrentLocation()">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <i class="fas fa-location-arrow" style="color:#387CC2;"></i>
+            <span style="font-weight:500">Use current location (${currentSuburb})</span>
+          </div>
+        </li>
+      `;
       return;
     }
     
@@ -732,7 +973,30 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       };
     });
+  }
+  
+  searchInput.addEventListener('input', function () {
+    const query = this.value.trim().toLowerCase();
+    showSearchSuggestions(query);
   });
+  
+  // Show current location option when search panel opens
+  searchInput.addEventListener('focus', function () {
+    if (!this.value.trim()) {
+      showSearchSuggestions('');
+    }
+  });
+  
+  // Function to use current location
+  window.useCurrentLocation = function() {
+    hidePanels();
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        const userCoord = new mapkit.Coordinate(pos.coords.latitude, pos.coords.longitude);
+        myMap.setCenterAnimated(userCoord, true);
+      });
+    }
+  };
 
   // --- Helpers ---
   function isValidPrice(price) {
@@ -746,15 +1010,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Map startup ---
   initializeFuelDropdown(); // Initialize the fuel dropdown
+  fetchWeather(); // Fetch weather
   fetchSitesAndPrices().then(() => {
     showUserLocation();
   });
 
   function setToolbarToMapIcon() {
     document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));
-    const mapIcon = document.querySelector('.sc-menu-item[data-action="map"]');
+    const mapIcon = document.getElementById('toolbar-map-btn');
     if (mapIcon) mapIcon.classList.add('sc-current');
-    // Optionally update indicator position if you use one
-    if (typeof updateToolbarIndicator === 'function') updateToolbarIndicator();
   }
 });

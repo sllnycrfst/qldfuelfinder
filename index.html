@@ -18,6 +18,12 @@
 <body>
   <div id="apple-map"></div>
 
+  <!-- Weather Display -->
+  <div class="weather-display" id="weather-display">
+    <span class="weather-icon" id="weather-icon">☀️</span>
+    <span class="weather-temp" id="weather-temp">--°</span>
+  </div>
+
   <!-- Fuel Selector Dropdown -->
   <div class="fuel-selector">
     <div class="fuel-dropdown">
@@ -35,8 +41,6 @@
     </a>
     <a class="sc-menu-item sc-current" id="toolbar-map-btn">
       <i class="fas fa-map"></i>
-    </a>
-    <a class="sc-nav-indicator">
     </a>
     <a class="sc-menu-item" id="toolbar-list-btn">
       <i class="fas fa-list"></i>
@@ -83,11 +87,6 @@
       <div class="zoom-divider"></div>
       <button id="zoom-out">−</button>
     </div>
-  </div>
-
-  <!-- Apple Maps Attribution -->
-  <div class="apple-maps-attribution">
-    Apple Maps
   </div>
 
   <script src="script.js" defer></script>
