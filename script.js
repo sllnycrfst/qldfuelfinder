@@ -460,18 +460,18 @@ document.getElementById(‘feature-overlay’).onclick = hideFeatureCard;
 document.querySelector(’#feature-panel .panel-drag-bar’).onclick = hideFeatureCard;
 
 // —bottom toolbar—
-var menu_bar = document.querySelector(’.sc-bottom-bar’);
-var menu_item = document.querySelectorAll(’.sc-menu-item’);
-var menu_indicator = document.querySelector(’.sc-nav-indicator’);
-var menu_current_item = document.querySelector(’.sc-current’);
-
 function updateToolbarIndicator() {
-if (!menu_current_item || !menu_indicator || !menu_bar) return;
+const menu_bar = document.querySelector(’.sc-bottom-bar’);
+const menu_indicator = document.querySelector(’.sc-nav-indicator’);
+const menu_current_item = document.querySelector(’.sc-current’);
 
 ```
-const currentIndex = Array.from(menu_item).indexOf(menu_current_item);
+if (!menu_current_item || !menu_indicator || !menu_bar) return;
+
+const menuItems = document.querySelectorAll('.sc-menu-item');
+const currentIndex = Array.from(menuItems).indexOf(menu_current_item);
 const itemWidth = 56;
-const totalItems = menu_item.length;
+const totalItems = menuItems.length;
 const barWidth = menu_bar.offsetWidth;
 const spacing = (barWidth - (totalItems * itemWidth)) / (totalItems + 1);
 
@@ -481,10 +481,6 @@ const cutoutX = spacing + (currentIndex * (itemWidth + spacing)) + (itemWidth / 
 // Update indicator position
 menu_indicator.style.left = indicatorX + "px";
 
-// Update CSS custom properties for cutout position
-menu_bar.style.setProperty('--indicator-x', indicatorX + 'px');
-menu_bar.style.setProperty('--cutout-x', cutoutX + 'px');
-
 // Update background with new cutout position
 menu_bar.style.background = `radial-gradient(circle at ${cutoutX}px 20px, transparent 32px, #ffffff 33px)`;
 ```
@@ -492,11 +488,16 @@ menu_bar.style.background = `radial-gradient(circle at ${cutoutX}px 20px, transp
 }
 
 // Initialize toolbar
+const menu_bar = document.querySelector(’.sc-bottom-bar’);
+const menu_item = document.querySelectorAll(’.sc-menu-item’);
+const menu_indicator = document.querySelector(’.sc-nav-indicator’);
+const menu_current_item = document.querySelector(’.sc-current’);
+
 if (menu_current_item && menu_indicator && menu_bar) {
 updateToolbarIndicator();
 
 ```
-menu_item.forEach(function(select_menu_item, index) {
+menu_item.forEach(function(select_menu_item) {
   select_menu_item.addEventListener('click', function(e) {
     e.preventDefault();
     
@@ -505,7 +506,6 @@ menu_item.forEach(function(select_menu_item, index) {
     
     // Add current class to clicked item
     this.classList.add('sc-current');
-    menu_current_item = this;
     
     // Update indicator position
     updateToolbarIndicator();
