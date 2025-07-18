@@ -327,7 +327,7 @@ document.addEventListener("DOMContentLoaded", () => {
         annotation.title = s.name;
         annotation.subtitle = `${s.name} (${fuelObj.label})`;
         annotation.animates = isCheapest; // Only animate the cheapest stations
-        annotation.addEventListener("select", () => showFeatureCard(s));
+        calloutElement.addEventListener("click", () => showFeatureCard(s));
         myMap.addAnnotation(annotation);
       }
     });
