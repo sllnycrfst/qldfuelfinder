@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -12,47 +13,57 @@
   <link rel="stylesheet" href="styles.css" />
 
   <!-- Apple MapKit JS -->
+
   <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
-  <style>
-    #apple-map {
-      width: 100vw;
-      height: 100vh;
-      min-height: 320px;
-      border-radius: 0;
-      z-index: 1;
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      pointer-events: auto; /* disables all map interaction */
-    }
-    body { margin: 0; }
-  </style>
+
 </head>
 
 <body>
   <div id="apple-map"></div>
-  <button class="glassy-btn" id="search-btn" title="Search"><i class="fas fa-search"></i></button>
-  <button class="glassy-btn" id="filter-btn" title="Filters"><i class="fas fa-sliders-h"></i></button>
-  <button class="glassy-btn" id="list-btn" title="List"><i class="fas fa-bars"></i></button>
-  <button class="glassy-btn" id="recenter-btn" title="Recenter"><i class="fas fa-crosshairs"></i></button>
-  <!-- Search Panel Overlay & Panel -->
+
+  <!-- Fuel Selector Dropdown -->
+
+  <div class="fuel-selector">
+    <div class="fuel-dropdown">
+      <button class="fuel-dropdown-btn" id="fuel-dropdown-btn">E10</button>
+      <div class="fuel-dropdown-content" id="fuel-dropdown-content">
+        <!-- Populated by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!--Bottom Toolbar-->
+
+  <div class="sc-bottom-bar">
+    <a class="sc-menu-item" id="toolbar-search-btn">
+      <i class="fas fa-search"></i>
+    </a>
+    <a class="sc-menu-item sc-current" id="toolbar-map-btn">
+      <i class="fas fa-map"></i>
+    </a>
+    <a class="sc-nav-indicator">
+    </a>
+    <a class="sc-menu-item" id="toolbar-list-btn">
+      <i class="fas fa-list"></i>
+    </a>
+  </div>
+
+  <!-- Search Panel -->
+
   <div class="panel-overlay" id="search-overlay"></div>
   <div class="sliding-panel" id="search-panel">
     <div class="panel-drag-bar"></div>
     <div class="panel-content">
-      <input type="text" id="search-input" placeholder="Search suburb, address, or station name" />
-      <ul id="suburb-list"></ul>
-    </div>
-  </div>
-  <!-- Filters Panel Overlay & Panel -->
-  <div class="panel-overlay" id="filter-overlay"></div>
-  <div class="sliding-panel" id="filter-panel">
-    <div class="panel-drag-bar"></div>
-    <div class="panel-content">
-      <div class="fuel-types-list" id="fuel-type-list"></div>
+      <div class="search-bar-panel">
+        <i class="fas fa-search"></i>
+        <input type="text" id="search-input" placeholder="Search suburb, address, brand" />
+      </div>
+      <ul id="suburb-list" class="suburb-list"></ul>
     </div>
   </div>
 
-  <!-- List Panel Overlay & Panel -->
+  <!-- List Panel -->
+
   <div class="panel-overlay" id="list-overlay"></div>
   <div class="sliding-panel" id="list-panel">
     <div class="panel-drag-bar"></div>
@@ -63,7 +74,8 @@
     </div>
   </div>
 
-  <!-- Feature Card Panel Overlay & Panel (hidden by default, shown on list/map marker click) -->
+  <!-- Feature Card Panel -->
+
   <div class="panel-overlay" id="feature-overlay"></div>
   <div class="sliding-panel" id="feature-panel">
     <div class="panel-drag-bar"></div>
@@ -73,6 +85,7 @@
   </div>
 
   <!-- Side Controls -->
+
   <div class="side-controls">
     <div class="custom-zoom-rect">
       <button id="zoom-in">+</button>
@@ -81,7 +94,7 @@
     </div>
   </div>
 
-  <!-- Apple MapKit JS Init Script -->
   <script src="script.js" defer></script>
+
 </body>
 </html>
