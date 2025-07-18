@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   // --- Constants & Config ---
-  const APPLE_MAPS_TOKEN = "<YOUR_APPLE_MAPS_TOKEN>";
+  const APPLE_MAPS_TOKEN = "eyJraWQiOiI4Wk44NTZHUjI0IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUwMTQ2NDkyLCJvcmlnaW4iOiJzbGxueWNyZnN0LmdpdGh1Yi5pbyJ9.ylKRmHZvXgB5qbDr_6niDFpT4wAlGItM7TsNDUHqQOOyKoxGMNbYbgI5cv2cW0iyh6BlnazJ_cYTCef1VNnr2g";
   const BRISBANE_COORDS = { lat: -27.4698, lng: 153.0251 };
   const FUEL_TYPES = [
     { key: "E10", id: 12, label: "E10" },
