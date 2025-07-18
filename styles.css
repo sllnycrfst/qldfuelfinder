@@ -28,9 +28,10 @@ html, body {
 }
 
 /* ========== MAP CONTROLS ========== */
-.map-controls {
+/* Side Controls Container - Bottom Right */
+.side-controls {
   position: fixed;
-  top: 20px;
+  bottom: 110px; /* Above toolbar */
   right: 20px;
   z-index: 10001;
   display: flex;
@@ -38,7 +39,8 @@ html, body {
   gap: 12px;
 }
 
-.zoom-controls {
+/* Zoom Controls */
+.custom-zoom-rect {
   display: flex;
   flex-direction: column;
   background: rgba(255,255,255,0.9);
@@ -49,7 +51,7 @@ html, body {
   overflow: hidden;
 }
 
-.zoom-btn {
+.custom-zoom-rect button {
   width: 44px;
   height: 44px;
   border: none;
@@ -64,11 +66,11 @@ html, body {
   transition: background 0.15s;
 }
 
-.zoom-btn:hover {
+.custom-zoom-rect button:hover {
   background: rgba(0,0,0,0.05);
 }
 
-.zoom-btn:active {
+.custom-zoom-rect button:active {
   background: rgba(0,0,0,0.1);
 }
 
@@ -78,11 +80,17 @@ html, body {
   margin: 0;
 }
 
-.compass-control {
+/* Apple Maps Attribution */
+.apple-maps-attribution {
   position: fixed;
-  top: 20px;
+  bottom: 20px;
   left: 20px;
-  z-index: 10001;
+  font-size: 11px;
+  color: #666;
+  background: rgba(255,255,255,0.8);
+  padding: 4px 8px;
+  border-radius: 4px;
+  z-index: 10000;
 }
 
 /* ========== FUEL SELECTOR DROPDOWN (Apple Style) ========== */

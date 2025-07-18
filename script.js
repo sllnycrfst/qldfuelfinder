@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { key: "Diesel", id: 3, label: "DSL" },
     { key: "Premium Diesel", id: 14, label: "PDSL" }
   ];
-  let sortMode = "price"; // 'price' or 'distance'
+  // Sort by price only - no toggle needed
 
   // Create a cache for loaded images to avoid reloading
   const imageCache = new Map();
@@ -75,24 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
   }
 
-  // Add Sort Toggle to List Panel
-  function renderSortToggle() {
-    const listUl = document.getElementById('list');
-    if (!listUl) return;
-    let sortHtml = `
-      <div style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:10px;gap:12px;">
-        <label><input type="radio" name="sort-mode" value="price" ${sortMode==="price"?"checked":""}> Sort by Price</label>
-        <label><input type="radio" name="sort-mode" value="distance" ${sortMode==="distance"?"checked":""}> Sort by Distance</label>
-      </div>
-    `;
-    listUl.insertAdjacentHTML('beforebegin', sortHtml);
-    document.querySelectorAll('input[name="sort-mode"]').forEach(radio => {
-      radio.onchange = e => {
-        sortMode = e.target.value;
-        updateStationList();
-      };
-    });
-  }
+  // Removed sort toggle - sorting by price only
 
   function getDistance(lat1, lng1, lat2, lng2) {
     function toRad(d) { return d * Math.PI / 180; }
@@ -108,9 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!listUl || !myMap) return;
     listUl.innerHTML = "";
     
-    const oldSort = document.querySelector('input[name="sort-mode"]')?.parentElement?.parentElement;
-    if (oldSort) oldSort.remove();
-    renderSortToggle();
+    // Sorting by price only
   
     if (!allSites.length || !allPrices.length) {
       listUl.innerHTML = "<li>Loading…</li>";
@@ -150,7 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return null;
       })
       .filter(Boolean)
-      .sort((a, b) => sortMode === "price" ? a.rawPrice - b.rawPrice : a.distance - b.distance);
+      .sort((a, b) => a.rawPrice - b.rawPrice); // Sort by price only
   
     if (stations.length === 0) {
       listUl.innerHTML = `<li style="padding: 20px; text-align: center; color: #666;">No stations found in current view.</li>`;
@@ -333,6 +314,82 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById('toolbar-list-btn').onclick = () => showPanel('list');
   document.getElementById('toolbar-map-btn').onclick = () => hidePanels();
   document.querySelectorAll('.panel-overlay').forEach(o => o.onclick = hidePanels);
+  
+  // Add drag functionality to panels
+  function addPanelDragFunctionality(panelId) {
+    const panel = document.getElementById(panelId + '-panel');
+    const dragBar = panel.querySelector('.panel-drag-bar');
+    let isDragging = false;
+    let startY = 0;
+    let startTranslateY = 0;
+    let panelHeight = 0;
+    
+    function getTranslateY(element) {
+      const transform = window.getComputedStyle(element).transform;
+      if (transform === 'none') return 0;
+      const matrix = transform.match(/matrix.*\((.+)\)/);
+      if (matrix) {
+        const values = matrix[1].split(', ');
+        return parseFloat(values[5] || 0);
+      }
+      return 0;
+    }
+    
+    dragBar.addEventListener('touchstart', (e) => {
+      isDragging = true;
+      startY = e.touches[0].clientY;
+      panelHeight = panel.offsetHeight;
+      startTranslateY = getTranslateY(panel);
+      panel.style.transition = 'none';
+    });
+    
+    dragBar.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startY = e.clientY;
+      panelHeight = panel.offsetHeight;
+      startTranslateY = getTranslateY(panel);
+      panel.style.transition = 'none';
+      e.preventDefault();
+    });
+    
+    const handleMove = (clientY) => {
+      if (!isDragging) return;
+      const deltaY = clientY - startY;
+      const newTranslateY = Math.max(0, deltaY);
+      panel.style.transform = `translateX(-50%) translateY(${newTranslateY}px)`;
+    };
+    
+    document.addEventListener('touchmove', (e) => {
+      if (isDragging) handleMove(e.touches[0].clientY);
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+      if (isDragging) handleMove(e.clientY);
+    });
+    
+    const handleEnd = () => {
+      if (!isDragging) return;
+      isDragging = false;
+      const currentTranslateY = getTranslateY(panel);
+      panel.style.transition = '';
+      
+      // If dragged more than 30% down, close the panel
+      if (currentTranslateY > panelHeight * 0.3) {
+        hidePanels();
+      } else {
+        // Snap back to open position
+        panel.style.transform = 'translateX(-50%) translateY(0)';
+      }
+    };
+    
+    document.addEventListener('touchend', handleEnd);
+    document.addEventListener('mouseup', handleEnd);
+  }
+  
+  // Initialize drag functionality for all panels
+  addPanelDragFunctionality('search');
+  addPanelDragFunctionality('list');
+  addPanelDragFunctionality('feature');
 
   // Apple Maps token
   const APPLE_MAPS_TOKEN = "eyJraWQiOiJHRzdDODlGSlQ5IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUyNzE2NDEyLCJleHAiOjE3NTMzNDAzOTl9.kR2EAjIdFvID72QaCY2zMFIAp7jJqhUit4w0s6z5P67WEvTcDw6wlbF8fbtOcRHwzIYvyQL15zaZRGbADLJ16g";
@@ -357,7 +414,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showsUserLocationControl: true
   });
 
-  // Position compass in top left
+  // Position compass in top left and location button to bottom right
   setTimeout(() => {
     const compassElement = document.querySelector('.mk-compass-control');
     if (compassElement) {
@@ -365,6 +422,17 @@ document.addEventListener("DOMContentLoaded", () => {
       compassElement.style.top = '20px';
       compassElement.style.left = '20px';
       compassElement.style.zIndex = '10001';
+    }
+    
+    // Position Apple location button to bottom right above zoom controls
+    const locationButton = document.querySelector('.mk-user-location-control');
+    if (locationButton) {
+      locationButton.style.position = 'fixed';
+      locationButton.style.bottom = '270px'; // Above zoom controls
+      locationButton.style.right = '20px';
+      locationButton.style.left = 'auto';
+      locationButton.style.top = 'auto';
+      locationButton.style.zIndex = '10001';
     }
   }, 1000);
 
@@ -421,18 +489,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const content = document.getElementById('feature-card-content');
     overlay.classList.add('active');
     panel.classList.add('open');
-    content.innerHTML = `
-      <div class="feature-card-title">${station.name}</div>
-      <div class="feature-card-address" style="cursor:pointer;color:#387CC2;text-decoration:underline;"
-        onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(station.address + ', ' + (station.suburb || ''))}', '_blank')">
-        ${station.address}${station.suburb ? ', ' + station.suburb : ''}
-      </div>
-      <div class="feature-card-distance">${station.price.toFixed(1)} (${FUEL_TYPES.find(f=>f.key===currentFuel).label})</div>
-    `;
-
-    // Render all fuel prices
-    const pricesDiv = panel.querySelector('.feature-card-prices');
-    pricesDiv.innerHTML = FUEL_TYPES.map(fuel => {
+    // Build fuel prices HTML
+    const fuelPricesHtml = FUEL_TYPES.map(fuel => {
       const price = station.allPrices?.[fuel.id];
       if (price && isValidPrice(price)) {
         return `<div class="fuel-price-row">
@@ -442,6 +500,18 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       return '';
     }).join('');
+    
+    content.innerHTML = `
+      <div class="feature-card-title">${station.name}</div>
+      <div class="feature-card-address" style="cursor:pointer;color:#387CC2;text-decoration:underline;"
+        onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(station.address + ', ' + (station.suburb || ''))}', '_blank')">
+        ${station.address}${station.suburb ? ', ' + station.suburb : ''}
+      </div>
+      <div class="feature-card-distance">${station.price.toFixed(1)} (${FUEL_TYPES.find(f=>f.key===currentFuel).label})</div>
+      <div class="fuel-prices-list">
+        ${fuelPricesHtml}
+      </div>
+    `;
 
     overlay.classList.add('active');
     panel.classList.add('open');
@@ -535,38 +605,131 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- SEARCH PANEL ---
   const searchInput = document.getElementById('search-input');
   const suburbList = document.getElementById('suburb-list');
+  
+  // Brand name mappings for search
+  const brandMappings = {
+    'caltex': [1, 'Caltex'],
+    'ampol': [1, 'Ampol', 'Caltex'], // Caltex rebranded to Ampol
+    'bp': [2, 'BP'],
+    'shell': [3, 'Shell', 'Coles Express'],
+    'coles express': [3, 'Coles Express', 'Shell'],
+    '7-eleven': [4, '7-Eleven', '7 Eleven'],
+    'puma': [5, 'Puma'],
+    'metro': [6, 'Metro'],
+    'united': [7, 'United'],
+    'freedom': [8, 'Freedom'],
+    'pacific': [9, 'Pacific'],
+    'pearl': [10, 'Pearl'],
+    'costco': [11, 'Costco'],
+    'speedway': [12, 'Speedway'],
+    'woolworths': [13, 'Woolworths', 'WOW']
+  };
+  
   searchInput.addEventListener('input', function () {
     const query = this.value.trim().toLowerCase();
     if (!query) {
       suburbList.innerHTML = "";
       return;
     }
-    let matches = allSites.filter(site =>
-      (site.P && site.P.toLowerCase().includes(query)) ||
-      (site.A && site.A.toLowerCase().includes(query)) ||
-      (site.N && site.N.toLowerCase().includes(query)) ||
-      (String(site.Postcode || '').includes(query))
-    );
-    const seen = new Set();
-    matches = matches.filter(site => {
-      const k = site.P + "|" + (site.Postcode || '');
-      if (seen.has(k)) return false;
-      seen.add(k);
-      return true;
-    });
-    suburbList.innerHTML = matches.slice(0, 16).map(site =>
-      `<li class="suburb-list-item" style="padding:12px;cursor:pointer;border-bottom:1px solid #eee;" 
-        data-lat="${site.Lat}" data-lng="${site.Lng}" data-name="${site.P}">
-        <span style="font-weight:500">${site.P}</span> 
-        <span style="color:#888;">${site.Postcode || ''}</span>
-      </li>`
-    ).join('');
+    
+    // Check if searching for a brand
+    let isBrandSearch = false;
+    let brandIds = [];
+    for (const [key, values] of Object.entries(brandMappings)) {
+      if (query.includes(key) || values.some(v => query.includes(v.toLowerCase()))) {
+        isBrandSearch = true;
+        brandIds.push(values[0]);
+        break;
+      }
+    }
+    
+    if (isBrandSearch && myMap && myMap.center) {
+      // Search for brand stations closest to user
+      const userLat = myMap.center.latitude;
+      const userLng = myMap.center.longitude;
+      
+      let brandStations = allSites
+        .filter(site => brandIds.includes(site.B))
+        .map(site => ({
+          ...site,
+          distance: getDistance(userLat, userLng, site.Lat, site.Lng)
+        }))
+        .sort((a, b) => a.distance - b.distance)
+        .slice(0, 10);
+      
+      suburbList.innerHTML = brandStations.map(site =>
+        `<li class="suburb-list-item" style="padding:12px;cursor:pointer;border-bottom:1px solid #eee;" 
+          data-lat="${site.Lat}" data-lng="${site.Lng}" data-siteid="${site.S}">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <span style="font-weight:500">${site.N}</span><br>
+              <span style="color:#888;font-size:0.9em;">${site.A}${site.P ? ', ' + site.P : ''}</span>
+            </div>
+            <span style="color:#666;font-size:0.9em;">${site.distance.toFixed(1)} km</span>
+          </div>
+        </li>`
+      ).join('');
+    } else {
+      // Search for suburbs
+      let matches = allSites.filter(site =>
+        (site.P && site.P.toLowerCase().includes(query)) ||
+        (String(site.Postcode || '').includes(query))
+      );
+      
+      // Group by suburb to avoid duplicates
+      const suburbMap = new Map();
+      matches.forEach(site => {
+        const key = site.P + "|" + (site.Postcode || '');
+        if (!suburbMap.has(key)) {
+          suburbMap.set(key, site);
+        }
+      });
+      
+      const uniqueSuburbs = Array.from(suburbMap.values()).slice(0, 10);
+      
+      suburbList.innerHTML = uniqueSuburbs.map(site =>
+        `<li class="suburb-list-item" style="padding:12px;cursor:pointer;border-bottom:1px solid #eee;" 
+          data-lat="${site.Lat}" data-lng="${site.Lng}" data-name="${site.P}">
+          <span style="font-weight:500">${site.P}</span> 
+          <span style="color:#888;">${site.Postcode || ''}</span>
+        </li>`
+      ).join('');
+    }
+    
     suburbList.querySelectorAll('.suburb-list-item').forEach(item => {
       item.onclick = function() {
+        const lat = Number(this.dataset.lat);
+        const lng = Number(this.dataset.lng);
+        const siteId = this.dataset.siteid;
+        
         hidePanels();
-        myMap.setCenterAnimated(
-          new mapkit.Coordinate(Number(this.dataset.lat), Number(this.dataset.lng)), true
-        );
+        myMap.setCenterAnimated(new mapkit.Coordinate(lat, lng), true);
+        
+        // If it's a specific station, show its feature card
+        if (siteId) {
+          setTimeout(() => {
+            const station = allSites.find(s => s.S == siteId);
+            if (station) {
+              const fuelObj = FUEL_TYPES.find(f => f.key === currentFuel);
+              const sitePrice = priceMap[station.S]?.[fuelObj?.id];
+              if (sitePrice && isValidPrice(sitePrice)) {
+                showFeatureCard({
+                  ...station,
+                  price: sitePrice / 10,
+                  rawPrice: sitePrice,
+                  brand: station.B,
+                  address: station.A,
+                  name: station.N,
+                  suburb: station.P,
+                  lat: station.Lat,
+                  lng: station.Lng,
+                  siteId: String(station.S),
+                  allPrices: priceMap[station.S]
+                });
+              }
+            }
+          }, 500);
+        }
       };
     });
   });
