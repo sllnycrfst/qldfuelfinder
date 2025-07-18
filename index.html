@@ -21,15 +21,32 @@
 <body>
   <div id="apple-map"></div>
 
-  <!-- Fuel Selector Dropdown -->
+  <!-- Map Controls -->
 
-  <div class="fuel-selector">
+  <div class="map-controls">
+    <!-- Fuel Selector Dropdown -->
     <div class="fuel-dropdown">
       <button class="fuel-dropdown-btn" id="fuel-dropdown-btn">E10</button>
       <div class="fuel-dropdown-content" id="fuel-dropdown-content">
         <!-- Populated by JavaScript -->
       </div>
     </div>
+
+```
+<!-- Zoom Controls -->
+<div class="zoom-controls">
+  <button class="zoom-btn" id="zoom-in">+</button>
+  <div class="zoom-divider"></div>
+  <button class="zoom-btn" id="zoom-out">−</button>
+</div>
+```
+
+  </div>
+
+  <!-- Compass Control -->
+
+  <div class="compass-control" id="compass-control">
+    <!-- Apple Maps will automatically place compass here -->
   </div>
 
   <!--Bottom Toolbar-->
@@ -41,11 +58,10 @@
     <a class="sc-menu-item sc-current" id="toolbar-map-btn">
       <i class="fas fa-map"></i>
     </a>
-    <a class="sc-nav-indicator">
-    </a>
     <a class="sc-menu-item" id="toolbar-list-btn">
       <i class="fas fa-list"></i>
     </a>
+    <div class="sc-nav-indicator"></div>
   </div>
 
   <!-- Search Panel -->
@@ -81,16 +97,6 @@
     <div class="panel-drag-bar"></div>
     <div class="panel-content" id="feature-card-content">
       <!-- Populated by JS with station details -->
-    </div>
-  </div>
-
-  <!-- Side Controls -->
-
-  <div class="side-controls">
-    <div class="custom-zoom-rect">
-      <button id="zoom-in">+</button>
-      <div class="zoom-divider"></div>
-      <button id="zoom-out">−</button>
     </div>
   </div>
 
