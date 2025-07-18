@@ -40,10 +40,10 @@ document.addEventListener("DOMContentLoaded", () => {
       new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng),
       new mapkit.CoordinateSpan(0.1, 0.1)
     ),
-    showsCompass: mapkit.FeatureVisibility.Hidden,
+    showsCompass: mapkit.FeatureVisibility.Visible,
     showsScale: mapkit.FeatureVisibility.Hidden,
-    showsMapTypeControl: false,
-    showsZoomControl: false,
+    showsMapTypeControl: true,
+    showsZoomControl: true,
     showsUserLocationControl: true
   });
 
