@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showsScale: mapkit.FeatureVisibility.Hidden,
     showsMapTypeControl: true,
     showsZoomControl: true,
-    showsUserLocationControl: false,
+    showsUserLocationControl: true,
   });
 
   // --- Weather API ---
