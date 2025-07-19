@@ -1,3 +1,6 @@
+// Import suburb data
+import { QLD_SUBURBS } from './data/qld-suburbs.js';
+
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Script loaded!");
   
@@ -31,6 +34,21 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentFuel = localStorage.getItem('preferredFuel') || "E10";
   let userLocation = null;
   let cheapestStationId = null;
+  
+  // Create postcode to suburb mapping
+  const postcodeToSuburb = {};
+  QLD_SUBURBS.forEach(suburb => {
+    if (!postcodeToSuburb[suburb.postcode]) {
+      postcodeToSuburb[suburb.postcode] = [];
+    }
+    postcodeToSuburb[suburb.postcode].push(suburb.suburb);
+  });
+  
+  // Helper function to get suburb name from postcode
+  const getSuburbName = (postcode) => {
+    const suburbs = postcodeToSuburb[postcode];
+    return suburbs ? suburbs[0] : postcode; // Return first suburb or postcode if not found
+  };
   
   // --- User Preferences ---
   function savePreferences() {
@@ -222,7 +240,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #eee;">
           <div style="flex:1;">
             <div style="font-weight:600;color:#333;">${site.N} ${isCheapest ? '💚' : ''}</div>
-            <div style="font-size:12px;color:#666;">${site.A}, ${site.P}</div>
+            <div style="font-size:12px;color:#666;">${site.A}, ${getSuburbName(site.P)}</div>
             <div style="font-size:11px;color:#999;">${distance} km away</div>
           </div>
           <div style="text-align:right;">
@@ -259,7 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     content.innerHTML = `
       <h3 class="feature-card-title">${site.N} ${isCheapest ? '💚 CHEAPEST' : ''}</h3>
-      <p class="feature-card-address">${site.A}, ${site.P}</p>
+      <p class="feature-card-address">${site.A}, ${getSuburbName(site.P)}</p>
       <div class="fuel-prices-list">${allPrices}</div>
       <div style="margin-top:12px;display:flex;justify-content:center;">
         <button onclick="navigate(${site.Lat}, ${site.Lng})" style="padding:12px 24px;background:#007AFF;color:white;border:none;border-radius:24px;font-size:24px;cursor:pointer;">
@@ -319,21 +337,21 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       
-      // Get unique suburbs
-      const suburbs = [...new Set(allSites.map(s => s.P))]
-        .filter(suburb => suburb.toLowerCase().includes(query))
-        .sort()
+      // Search through suburb names
+      const matchingSuburbs = QLD_SUBURBS
+        .filter(suburb => suburb.suburb.toLowerCase().includes(query))
+        .sort((a, b) => a.suburb.localeCompare(b.suburb))
         .slice(0, 20);
       
-      suburbList.innerHTML = suburbs.map(suburb => 
-        `<li class="suburb-list-item" onclick="searchSuburb('${suburb}')">${suburb}</li>`
+      suburbList.innerHTML = matchingSuburbs.map(suburb => 
+        `<li class="suburb-list-item" onclick="searchSuburb('${suburb.suburb}', '${suburb.postcode}')">${suburb.suburb}</li>`
       ).join('');
     });
   }
   
   // Global search function
-  window.searchSuburb = function(suburb) {
-    const sites = allSites.filter(s => s.P === suburb);
+  window.searchSuburb = function(suburbName, postcode) {
+    const sites = allSites.filter(s => s.P === postcode);
     if (sites.length > 0) {
       const avgLat = sites.reduce((sum, s) => sum + s.Lat, 0) / sites.length;
       const avgLng = sites.reduce((sum, s) => sum + s.Lng, 0) / sites.length;
@@ -343,6 +361,17 @@ document.addEventListener("DOMContentLoaded", () => {
         new mapkit.CoordinateSpan(0.05, 0.05)
       );
       closeAllPanels();
+    } else {
+      // If no sites found with exact postcode, try to find the suburb in our mapping
+      const suburbData = QLD_SUBURBS.find(s => s.suburb.toLowerCase() === suburbName.toLowerCase());
+      if (suburbData) {
+        myMap.setCenterAnimated(new mapkit.Coordinate(suburbData.lat, suburbData.lng), true);
+        myMap.region = new mapkit.CoordinateRegion(
+          new mapkit.Coordinate(suburbData.lat, suburbData.lng),
+          new mapkit.CoordinateSpan(0.05, 0.05)
+        );
+        closeAllPanels();
+      }
     }
   };
   
