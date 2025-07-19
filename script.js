@@ -1,5 +1,6 @@
-// Import suburb data
+// Import suburb data and brand logos
 import { QLD_SUBURBS } from './data/qld-suburbs.js';
+import { BRAND_LOGOS } from './data/brand-logos.js';
 
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Script loaded!");
@@ -200,15 +201,22 @@ document.addEventListener("DOMContentLoaded", () => {
         
         visibleStations.push({ site, price });
         
-        // Create marker with brand logo instead of price
+        // Create marker with brand logo SVG
         const coord = new mapkit.Coordinate(lat, lng);
         const isCheapest = site.S === cheapestStationId;
-        const brandName = BRAND_NAMES[site.B] || 'Independent';
+        const brandId = site.B;
+        
+        // Get SVG logo or fallback to default
+        const logoSvg = BRAND_LOGOS[brandId] || BRAND_LOGOS[0];
         
         const marker = new mapkit.MarkerAnnotation(coord, {
           title: `${(price / 10).toFixed(1)}`,
           color: isCheapest ? "#00FF00" : "#007AFF",
-          glyphText: brandName.charAt(0), // First letter of brand
+          glyphImage: {
+            1: logoSvg,
+            url: logoSvg,
+            size: { width: 20, height: 20 }
+          },
           calloutEnabled: true,
           animates: isCheapest
         });
