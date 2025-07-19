@@ -677,6 +677,3 @@ export const QLD_SUBURBS = [
   { suburb: "Koumala", postcode: "4738", lat: -21.5646, lng: 149.2843 },
   { suburb: "Carmila", postcode: "4739", lat: -21.9179, lng: 149.4193 }
 ];
-
-// Export for ES6 modules
-export { QLD_SUBURBS };
