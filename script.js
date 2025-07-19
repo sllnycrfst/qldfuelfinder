@@ -213,11 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const marker = new mapkit.MarkerAnnotation(coord, {
           title: `${(price / 10).toFixed(1)}`,
           color: isCheapest ? "#00FF00" : "#007AFF",
-          glyphImage: {
-            1: logoSvg,
-            url: logoSvg,
-            size: { width: 20, height: 20 }
-          },
+          glyphText: `${(price / 10).toFixed(1)}`,
           calloutEnabled: true,
           animates: isCheapest
         });
