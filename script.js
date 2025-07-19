@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("Script loaded!");
   
   // --- Constants & Config ---
-  const APPLE_MAPS_TOKEN = "eyJraWQiOiJOMzdCREtUVTYzIiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUwMTQ2NDkyLCJvcmlnaW4iOiIqLnNsbG55Y3Jmc3QuZ2l0aHViLmlvIn0.SFWIIu1llhoUGje7X9Na3xSVsrgQe7ZPMzIODovkvOL1bU_nGxQtCgFVu9TwLHFqRJoN40kVp-2Jtv4oWLAU6Q";
+  const APPLE_MAPS_TOKEN = "eyJraWQiOiJHRzdDODlGSlQ5IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUyNzE2NDEyLCJleHAiOjE3NTMzNDAzOTl9.kR2EAjIdFvID72QaCY2zMFIAp7jJqhUit4w0s6z5P67WEvTcDw6wlbF8fbtOcRHwzIYvyQL15zaZRGbADLJ16g";
   
   const BRISBANE_COORDS = { lat: -27.4698, lng: 153.0251 };
   
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // --- MapKit Initialization ---
   mapkit.init({
-    authorizationCallback: done => done("eyJraWQiOiJOMzdCREtUVTYzIiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUwMTQ2NDkyLCJvcmlnaW4iOiIqLnNsbG55Y3Jmc3QuZ2l0aHViLmlvIn0.SFWIIu1llhoUGje7X9Na3xSVsrgQe7ZPMzIODovkvOL1bU_nGxQtCgFVu9TwLHFqRJoN40kVp-2Jtv4oWLAU6Q")
+    authorizationCallback: done => done(APPLE_MAPS_TOKEN)
   });
   
   myMap = new mapkit.Map("apple-map", {
