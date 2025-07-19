@@ -55,12 +55,43 @@ html, body {
   font-weight: 600;
 }
 
-/* ========== FUEL SELECTOR DROPDOWN (Top Right) ========== */
+/* ========== FUEL SELECTOR DROPDOWN ========== */
 .fuel-selector {
   position: fixed;
-  top: 80px;
+  top: 140px; /* Moved lower to be under map controls */
   right: 20px;
   z-index: 10001;
+}
+
+/* ========== APPLE MAP CONTROLS CUSTOMIZATION ========== */
+/* Make Apple's map type button bigger and move it down */
+#apple-map .mk-map-type-control {
+  transform: scale(1.3) !important; /* 30% bigger */
+  transform-origin: top right !important;
+  margin-top: 15% !important; /* Move down 15% */
+}
+
+/* Alternative selectors for Apple's map controls */
+#apple-map .mapkit-control,
+#apple-map .mk-control-set,
+#apple-map .mk-map-type-button {
+  transform: scale(1.3) !important;
+  transform-origin: top right !important;
+  margin-top: 15% !important;
+}
+
+/* Ensure map controls are properly positioned */
+#apple-map .mk-control-set {
+  top: 20px !important;
+  right: 20px !important;
+}
+
+/* ========== ADDRESS STYLING ========== */
+/* Remove underlines from all addresses */
+.feature-card-address,
+p[class*="address"],
+div[class*="address"] {
+  text-decoration: none !important;
 }
 
 .fuel-dropdown {

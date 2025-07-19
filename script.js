@@ -78,11 +78,12 @@ document.addEventListener("DOMContentLoaded", () => {
       new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng),
       new mapkit.CoordinateSpan(0.1, 0.1)
     ),
-    showsCompass: mapkit.FeatureVisibility.Hidden,
+    showsCompass: mapkit.FeatureVisibility.Visible,
     showsScale: mapkit.FeatureVisibility.Hidden,
     showsMapTypeControl: true,
     showsZoomControl: true,
-    showsUserLocationControl: false,
+    showsUserLocationControl: true,
+    compassIsInset: false
   });
 
   // --- Weather API ---
@@ -244,7 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
           <div style="text-align:right;">
             <div style="font-size:20px;font-weight:700;color:${isCheapest ? '#00AA00' : '#007AFF'};">
-              ${(price / 10).toFixed(1)}¢
+              ${(price / 10).toFixed(1)}
             </div>
           </div>
         </div>
@@ -269,20 +270,20 @@ document.addEventListener("DOMContentLoaded", () => {
       return p ? `
         <div class="fuel-price-row">
           <span class="fuel-type-label">${fuel.label}</span>
-          <span class="fuel-type-price">${(p / 10).toFixed(1)}¢/L</span>
+          <span class="fuel-type-price">${(p / 10).toFixed(1)}</span>
         </div>
       ` : '';
     }).filter(Boolean).join('');
     
     content.innerHTML = `
       <h3 class="feature-card-title">${site.N} ${isCheapest ? '💚 CHEAPEST' : ''}</h3>
-      <p class="feature-card-address">${site.A}, ${getSuburbName(site.P)}</p>
-      <div class="fuel-prices-list">${allPrices}</div>
-      <div style="margin-top:12px;display:flex;justify-content:center;">
-        <button onclick="navigate(${site.Lat}, ${site.Lng})" style="padding:12px 24px;background:#007AFF;color:white;border:none;border-radius:24px;font-size:24px;cursor:pointer;">
+      <div style="display:flex;align-items:center;margin-bottom:15px;">
+        <p class="feature-card-address" style="margin:0;flex:1;text-decoration:none;">${site.A}, ${getSuburbName(site.P)}</p>
+        <button onclick="navigate(${site.Lat}, ${site.Lng})" style="margin-left:8px;padding:8px;background:#007AFF;color:white;border:none;border-radius:6px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
           <i class="fas fa-location-arrow"></i>
         </button>
       </div>
+      <div class="fuel-prices-list">${allPrices}</div>
     `;
     
     openPanel('feature');
