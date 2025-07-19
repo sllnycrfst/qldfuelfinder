@@ -215,6 +215,123 @@ div[class*="address"] {
   transform: translateX(-50%) translateY(0);
 }
 
+/* Drag bar styling */
+.panel-drag-bar {
+  width: 40px;
+  height: 4px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 2px;
+  margin: 8px auto 16px;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y;
+}
+
+.panel-drag-bar:active {
+  cursor: grabbing;
+}
+
+/* Panel content */
+.panel-content {
+  flex: 1;
+  padding: 0 20px 20px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Fuel price styling */
+.fuel-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.6);
+  border-radius: 8px;
+  margin-bottom: 4px;
+}
+
+.fuel-type-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}
+
+.fuel-type-price {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* Search list styling */
+.suburb-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.suburb-list-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: background 0.15s;
+  font-size: 14px;
+  color: #333;
+}
+
+.suburb-list-item:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.suburb-list-item:last-child {
+  border-bottom: none;
+}
+
+/* Station list styling */
+.station-item {
+  list-style: none;
+  margin: 0;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.station-item:hover {
+  background: rgba(0,0,0,0.02);
+}
+
+#list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
+  height: 100%;
+}
+
+/* Search bar styling */
+.search-bar-panel {
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,0.8);
+  border-radius: 12px;
+  padding: 8px 12px;
+  margin-bottom: 16px;
+  gap: 8px;
+}
+
+.search-bar-panel input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 16px;
+  color: #333;
+}
+
+.search-bar-panel input::placeholder {
+  color: #666;
+}
+
 @media (min-width: 600px) {
   .sliding-panel {
     left: 50%;

@@ -19,9 +19,22 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
   
   const BRAND_NAMES = {
-    1: "Caltex", 2: "BP", 3: "Shell", 4: "7-Eleven", 5: "Puma",
-    6: "Metro", 7: "United", 8: "Freedom", 9: "Pacific", 10: "Pearl",
-    11: "Costco", 12: "Speedway", 13: "Woolworths", 14: "Ampol"
+    2: "Caltex", 5: "BP", 7: "Budget", 12: "Independent", 16: "Mobil", 20: "Shell", 
+    23: "United", 27: "Unbranded", 51: "Apco", 57: "Metro", 65: "Petrogas", 72: "Gull", 
+    86: "Liberty", 87: "AM/PM", 105: "Better Choice", 110: "Freedom", 111: "Coles", 
+    113: "7-Eleven", 114: "Astron", 115: "Prime", 167: "Speedway", 169: "OTR", 
+    2301: "Choice", 4896: "Mogas", 5094: "Puma", 2031031: "Costco", 2418994: "Pacific", 
+    2418995: "Vibe", 2419007: "Lowes", 2419008: "Westside", 2419037: "Enhance", 
+    2459022: "FuelXpress", 3421028: "X Convenience", 3421066: "Ampol", 3421073: "EG Ampol", 
+    3421074: "Perrys", 3421075: "IOR", 3421139: "Pearl", 3421162: "Pacific Fuel", 
+    3421183: "U-Go", 3421193: "Reddy Express", 3421195: "Ultra", 3421196: "Bennetts", 
+    3421202: "Atlas", 3421204: "Woodham", 3421207: "Tas Petroleum"
+  };
+  
+  // Device detection for navigation
+  const isAppleDevice = () => {
+    return /iPad|iPhone|iPod|Mac/.test(navigator.userAgent) || 
+           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   };
   
   const bannedStations = ["Stargazers Yarraman"];
@@ -76,13 +89,16 @@ document.addEventListener("DOMContentLoaded", () => {
   myMap = new mapkit.Map("apple-map", {
     region: new mapkit.CoordinateRegion(
       new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng),
-      new mapkit.CoordinateSpan(0.1, 0.1)
+      new mapkit.CoordinateSpan(0.02, 0.02) // More zoomed in
     ),
-    showsCompass: mapkit.FeatureVisibility.Visible,
+    showsCompass: mapkit.FeatureVisibility.Hidden,
     showsScale: mapkit.FeatureVisibility.Hidden,
     showsMapTypeControl: true,
     showsZoomControl: true,
-    showsUserLocationControl: true,
+    showsUserLocationControl: false,
+    compassIsInset: false,
+    minCameraDistance: 1000, // Prevent zooming in too much
+    maxCameraDistance: 50000 // Prevent zooming out too far
   });
 
   // --- Weather API ---
@@ -184,22 +200,15 @@ document.addEventListener("DOMContentLoaded", () => {
         
         visibleStations.push({ site, price });
         
-        // Create marker with brand logo
+        // Create marker with brand logo instead of price
         const coord = new mapkit.Coordinate(lat, lng);
         const isCheapest = site.S === cheapestStationId;
-        
-        // Try to use brand image as glyph
-        const brandName = BRAND_NAMES[site.B];
-        const glyphImage = brandName ? {
-          1: "🟦", // Will use blue marker with text instead
-          url: `images/brands/${brandName.toLowerCase()}.png`,
-          size: { width: 20, height: 20 }
-        } : null;
+        const brandName = BRAND_NAMES[site.B] || 'Independent';
         
         const marker = new mapkit.MarkerAnnotation(coord, {
-          title: `${(price / 10).toFixed(1)}¢`,
-          color: isCheapest ? "#00FF00" : "#007AFF", // Green for cheapest, blue for others
-          glyphText: `${(price / 10).toFixed(0)}`,
+          title: `${(price / 10).toFixed(1)}`,
+          color: isCheapest ? "#00FF00" : "#007AFF",
+          glyphText: brandName.charAt(0), // First letter of brand
           calloutEnabled: true,
           animates: isCheapest
         });
@@ -267,22 +276,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const allPrices = FUEL_TYPES.map(fuel => {
       const p = priceMap[site.S]?.[fuel.id];
       return p ? `
-        <div class="fuel-price-row">
+        <div class="fuel-price-row" style="width:50%;">
           <span class="fuel-type-label">${fuel.label}</span>
-          <span class="fuel-type-price">${(p / 10).toFixed(1)}</span>
+          <span class="fuel-type-price" style="color:#387cc2;">${(p / 10).toFixed(1)}</span>
         </div>
       ` : '';
     }).filter(Boolean).join('');
     
+    const brandName = BRAND_NAMES[site.B] || 'Independent';
+    
     content.innerHTML = `
-      <h3 class="feature-card-title">${site.N} ${isCheapest ? '💚 CHEAPEST' : ''}</h3>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:15px;">
+        <h3 class="feature-card-title" style="margin:0;flex:1;">${site.N} ${isCheapest ? '💚 CHEAPEST' : ''}</h3>
+        <div class="brand-logo" style="width:40px;height:40px;background:#f0f0f0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:12px;color:#666;">
+          ${brandName.substring(0,3).toUpperCase()}
+        </div>
+      </div>
       <div style="display:flex;align-items:center;margin-bottom:15px;">
         <p class="feature-card-address" style="margin:0;flex:1;text-decoration:none;">${site.A}, ${getSuburbName(site.P)}</p>
-        <button onclick="navigate(${site.Lat}, ${site.Lng})" style="margin-left:8px;padding:8px;background:#007AFF;color:white;border:none;border-radius:6px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
-          <i class="fas fa-location-arrow"></i>
+        <button onclick="navigate(${site.Lat}, ${site.Lng})" style="margin-left:8px;padding:8px;background:#007AFF;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+          <i class="fa-solid fa-diamond-turn-right"></i>
         </button>
       </div>
-      <div class="fuel-prices-list">${allPrices}</div>
+      <div class="fuel-prices-list" style="display:flex;flex-wrap:wrap;gap:8px;">${allPrices}</div>
     `;
     
     openPanel('feature');
@@ -290,13 +306,11 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // --- Navigation ---
   window.navigate = function(lat, lng) {
-    const choice = confirm('Open in Apple Maps?\n\nOK = Apple Maps\nCancel = Google Maps');
-    
-    if (choice) {
-      // Apple Maps
+    if (isAppleDevice()) {
+      // Apple Maps for Apple devices
       window.open(`maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`);
     } else {
-      // Google Maps
+      // Google Maps for other devices
       window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
     }
   };
@@ -314,12 +328,81 @@ document.addEventListener("DOMContentLoaded", () => {
     if (panel && overlay) {
       panel.classList.add('open');
       overlay.classList.add('active');
+      initializeDrag(panel);
     }
   }
   
   function closeAllPanels() {
     document.querySelectorAll('.sliding-panel').forEach(p => p.classList.remove('open'));
     document.querySelectorAll('.panel-overlay').forEach(o => o.classList.remove('active'));
+  }
+  
+  // --- Drag Functionality ---
+  function initializeDrag(panel) {
+    const dragBar = panel.querySelector('.panel-drag-bar');
+    if (!dragBar) return;
+    
+    let isDragging = false;
+    let startY = 0;
+    let currentY = 0;
+    let initialTranslateY = 0;
+    
+    function handleStart(e) {
+      isDragging = true;
+      const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+      startY = clientY;
+      
+      const transform = getComputedStyle(panel).transform;
+      const matrix = new DOMMatrix(transform);
+      initialTranslateY = matrix.m42;
+      
+      panel.style.transition = 'none';
+      e.preventDefault();
+    }
+    
+    function handleMove(e) {
+      if (!isDragging) return;
+      
+      const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+      currentY = clientY - startY;
+      
+      const newTranslateY = Math.max(-window.innerHeight * 0.4, initialTranslateY + currentY);
+      panel.style.transform = `translateX(-50%) translateY(${newTranslateY}px)`;
+      
+      e.preventDefault();
+    }
+    
+    function handleEnd(e) {
+      if (!isDragging) return;
+      isDragging = false;
+      
+      panel.style.transition = 'transform 0.35s cubic-bezier(.25,.8,.25,1)';
+      
+      const threshold = window.innerHeight * 0.2;
+      
+      if (currentY > threshold) {
+        // Drag down - close panel
+        closeAllPanels();
+      } else if (currentY < -threshold) {
+        // Drag up - expand to top
+        panel.style.transform = 'translateX(-50%) translateY(-40vh)';
+      } else {
+        // Snap back to normal position
+        panel.style.transform = 'translateX(-50%) translateY(0)';
+      }
+      
+      currentY = 0;
+    }
+    
+    // Touch events
+    dragBar.addEventListener('touchstart', handleStart, { passive: false });
+    document.addEventListener('touchmove', handleMove, { passive: false });
+    document.addEventListener('touchend', handleEnd);
+    
+    // Mouse events
+    dragBar.addEventListener('mousedown', handleStart);
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('mouseup', handleEnd);
   }
   
   // --- Event Listeners ---
