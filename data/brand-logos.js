@@ -79,6 +79,3 @@ export const MARKER_SIZES = {
   medium: { width: 32, height: 40 },
   large: { width: 40, height: 50 }
 };
-
-// Export for ES6 modules
-export { BRAND_LOGOS };
