@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // --- MapKit Initialization ---
   mapkit.init({
-    authorizationCallback: done => done(APPLE_MAPS_TOKEN)
+    authorizationCallback: done => done(eyJraWQiOiJOMzdCREtUVTYzIiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUwMTQ2NDkyLCJvcmlnaW4iOiIqLnNsbG55Y3Jmc3QuZ2l0aHViLmlvIn0.SFWIIu1llhoUGje7X9Na3xSVsrgQe7ZPMzIODovkvOL1bU_nGxQtCgFVu9TwLHFqRJoN40kVp-2Jtv4oWLAU6Q)
   });
   
   myMap = new mapkit.Map("apple-map", {
