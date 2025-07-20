@@ -536,7 +536,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   
   // Toolbar buttons
-  document.getElementById('toolbar-home-btn')?.addEventListener('click', () => {
+  document.getElementById('toolbar-search-btn')?.addEventListener('click', () => {
+    openPanel('search');
+    document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));
+    document.getElementById('toolbar-search-btn').classList.add('sc-current');
+  });
+  
+  document.getElementById('toolbar-center-btn')?.addEventListener('click', () => {
     // Navigate to user's location or default Brisbane location
     if (userLocation) {
       myMap.setCenterAnimated(
@@ -551,19 +557,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     closeAllPanels();
     document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));
-    document.getElementById('toolbar-home-btn').classList.add('sc-current');
-  });
-  
-  document.getElementById('toolbar-center-btn')?.addEventListener('click', () => {
-    openPanel('search');
-    document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));
     document.getElementById('toolbar-center-btn').classList.add('sc-current');
   });
   
-  document.getElementById('toolbar-garage-btn')?.addEventListener('click', () => {
+  document.getElementById('toolbar-list-btn')?.addEventListener('click', () => {
     openPanel('list');
     document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));
-    document.getElementById('toolbar-garage-btn').classList.add('sc-current');
+    document.getElementById('toolbar-list-btn').classList.add('sc-current');
   });
   
   // Overlays close panels
