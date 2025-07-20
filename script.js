@@ -54,45 +54,22 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // Create custom marker with mymarker.png base, station logo, and price in black box
   function createCustomMarker(price, brandId, isCheapest = false) {
-    const priceText = (price / 10).toFixed(1); // e.g. "123.4"
+    const priceText = Math.round(price / 10).toString(); // 3 digits, no decimal
     const logoUrl = getBrandLogo(brandId);
     
     // Create a custom marker element
     const markerDiv = document.createElement('div');
-    markerDiv.style.cssText = `
-      position: relative;
-      width: 50px;
-      height: 60px;
-      cursor: pointer;
-    `;
+    markerDiv.className = `custom-marker ${isCheapest ? 'cheapest' : ''}`;
     
     // Base marker image (mymarker.png)
     const baseMarker = document.createElement('img');
     baseMarker.src = 'images/mymarker.png';
-    baseMarker.style.cssText = `
-      width: 50px;
-      height: 50px;
-      position: absolute;
-      top: 0;
-      left: 0;
-      filter: ${isCheapest ? 'hue-rotate(120deg) saturate(1.2)' : 'none'};
-    `;
+    baseMarker.className = `marker-base ${isCheapest ? 'cheapest' : ''}`;
     
     // Station logo on top of marker
     const stationLogo = document.createElement('img');
     stationLogo.src = logoUrl;
-    stationLogo.style.cssText = `
-      width: 24px;
-      height: 24px;
-      position: absolute;
-      top: 8px;
-      left: 50%;
-      transform: translateX(-50%);
-      border-radius: 50%;
-      background: white;
-      padding: 2px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-    `;
+    stationLogo.className = 'marker-logo';
     
     // Error handling for logo loading
     stationLogo.onerror = function() {
@@ -102,22 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Price box (black background with white text)
     const priceBox = document.createElement('div');
     priceBox.textContent = priceText;
-    priceBox.style.cssText = `
-      position: absolute;
-      bottom: 5px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #000;
-      color: white;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: bold;
-      font-family: 'Roboto', sans-serif;
-      min-width: 20px;
-      text-align: center;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.5);
-    `;
+    priceBox.className = 'marker-price';
     
     markerDiv.appendChild(baseMarker);
     markerDiv.appendChild(stationLogo);
