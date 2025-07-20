@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // Create custom marker with mymarker.png base, station logo, and price in black box
   function createCustomMarker(price, brandId, isCheapest = false) {
-    const priceText = (price / 10).toFixed(1);
+    const priceText = Math.round(price / 10).toString(); // 3 digits, no decimal
     const logoUrl = getBrandLogo(brandId);
     
     // Create a custom marker element
@@ -156,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
   myMap = new google.maps.Map(document.getElementById("google-map"), {
     center: BRISBANE_COORDS,
     zoom: 15,
-    mapId: "AIzaSyAQ0Ba7zICGUy5zCVijkkDNrNVdKAG1FGU", // Enable 3D buildings and advanced features
+    mapId: "DEMO_MAP_ID", // Enable 3D buildings and advanced features
     tilt: 45, // Enable 3D tilt
     heading: 0, // Initial compass heading
     styles: [
@@ -166,25 +166,41 @@ document.addEventListener("DOMContentLoaded", () => {
         stylers: [{ visibility: "off" }]
       }
     ],
-    disableDefaultUI: true,
-    zoomControl: true,
-    zoomControlOptions: {
-      position: google.maps.ControlPosition.RIGHT_CENTER,
-      style: google.maps.ZoomControlStyle.SMALL
-    },
-    mapTypeControl: true,
-    mapTypeControlOptions: {
-      position: google.maps.ControlPosition.TOP_RIGHT,
-      style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
-      mapTypeIds: ['roadmap', 'satellite', 'hybrid', 'terrain']
-    },
+    disableDefaultUI: true, // Disable all default controls
+    zoomControl: false,
+    mapTypeControl: false,
     scaleControl: false,
-    streetViewControl: true,
-    streetViewControlOptions: {
-      position: google.maps.ControlPosition.RIGHT_BOTTOM
-    },
-    rotateControl: true,
+    streetViewControl: false,
+    rotateControl: false,
     fullscreenControl: false
+  });
+  
+  // Custom control functions
+  window.changeMapType = function(type) {
+    myMap.setMapTypeId(type);
+    document.getElementById('maptype-dropdown').classList.remove('show');
+  };
+  
+  window.toggleStreetView = function() {
+    const streetView = myMap.getStreetView();
+    const visible = streetView.getVisible();
+    streetView.setVisible(!visible);
+  };
+  
+  window.rotateMap = function() {
+    const currentHeading = myMap.getHeading() || 0;
+    myMap.setHeading(currentHeading + 90);
+  };
+  
+  // Map type dropdown toggle
+  document.getElementById('maptype-btn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    document.getElementById('maptype-dropdown').classList.toggle('show');
+  });
+  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function() {
+    document.getElementById('maptype-dropdown').classList.remove('show');
   });
   
   // Initialize Directions Service and Renderer
