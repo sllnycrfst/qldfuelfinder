@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("Script loaded!");
   
   // --- Constants & Config ---
-  const APPLE_MAPS_TOKEN = "eyJraWQiOiJHRzdDODlGSlQ5IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUyNzE2NDEyLCJleHAiOjE3NTMzNDAzOTl9.kR2EAjIdFvID72QaCY2zMFIAp7jJqhUit4w0s6z5P67WEvTcDw6wlbF8fbtOcRHwzIYvyQL15zaZRGbADLJ16g";
+  const APPLE_MAPS_TOKEN = "eyJraWQiOiJHMzNGWlVCNThXIiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUyOTg1OTAwLCJvcmlnaW4iOiIqLnNsbG55Y3Jmc3QuZ2l0aHViLmlvIn0.6jL0I8wNB32FgbxJvHrHzK3DKOmNBDsTeVna7fuwpPLWmMLlCeiBrcgri9W8AIURaVfM6cbPEDb5r_pE65UP8A";
   
   const BRISBANE_COORDS = { lat: -27.4698, lng: 153.0251 };
   
@@ -47,6 +47,35 @@ document.addEventListener("DOMContentLoaded", () => {
     return BRAND_COLORS[brandId] || BRAND_COLORS[0];
   };
   
+  // Create custom marker SVG for Apple Maps
+  function createCustomMarker(price, brandId, isCheapest = false) {
+    const priceText = (price / 10).toFixed(1);
+    const markerColor = isCheapest ? '#22C55E' : '#3B82F6';
+    
+    // Create SVG that Apple Maps can properly render
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80" width="60" height="80">
+        <!-- Drop shadow -->
+        <ellipse cx="32" cy="77" rx="15" ry="3" fill="rgba(0,0,0,0.2)"/>
+        
+        <!-- Main pin shape -->
+        <path d="M30 5 C40 5, 50 15, 50 25 C50 35, 30 65, 30 65 C30 65, 10 35, 10 25 C10 15, 20 5, 30 5 Z" 
+              fill="${markerColor}" stroke="white" stroke-width="2"/>
+        
+        <!-- Price circle background -->
+        <circle cx="30" cy="25" r="18" fill="white" stroke="${markerColor}" stroke-width="2"/>
+        
+        <!-- Price text -->
+        <text x="30" y="30" text-anchor="middle" font-family="Arial, sans-serif" 
+              font-size="11" font-weight="bold" fill="${markerColor}">${priceText}</text>
+        
+        ${isCheapest ? '<text x="30" y="15" text-anchor="middle" font-size="8" fill="#22C55E">★</text>' : ''}
+      </svg>
+    `;
+    
+    return 'data:image/svg+xml;base64,' + btoa(svg);
+  }
+  
   const BRAND_NAMES = {
     2: "Caltex", 5: "BP", 7: "Budget", 12: "Independent", 16: "Mobil", 20: "Shell", 
     23: "United", 27: "Unbranded", 51: "Apco", 57: "Metro", 65: "Petrogas", 72: "Gull", 
@@ -76,6 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentFuel = localStorage.getItem('preferredFuel') || "E10";
   let userLocation = null;
   let cheapestStationId = null;
+  let currentMarkers = []; // Track current markers for cleanup
   
   // Create postcode to suburb mapping
   const postcodeToSuburb = {};
@@ -127,7 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showsUserLocationControl: mapkit.FeatureVisibility.Hidden
   });
   
-  // Add custom Leaflet zoom controls
+  // Add custom zoom controls
   const mapElement = document.getElementById('apple-map');
   const zoomInBtn = document.createElement('div');
   const zoomOutBtn = document.createElement('div');
@@ -296,8 +326,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateVisibleStationsAndList() {
     console.log("Updating stations and list...");
     
-    // Clear existing markers
-    myMap.removeAnnotations(myMap.annotations);
+    // Clear existing markers properly
+    if (currentMarkers.length > 0) {
+      myMap.removeAnnotations(currentMarkers);
+      currentMarkers = [];
+    }
     
     const mapBounds = myMap.region.toBoundingRegion();
     const visibleStations = [];
@@ -314,19 +347,22 @@ document.addEventListener("DOMContentLoaded", () => {
         
         visibleStations.push({ site, price });
         
-        // Create marker with custom SVG pin design
+        // Create marker with custom SVG design for Apple Maps
         const coord = new mapkit.Coordinate(lat, lng);
         const isCheapest = site.S === cheapestStationId;
         const brandId = site.B;
         
-        // Get custom SVG marker from BRAND_LOGOS
-        const markerSvg = BRAND_LOGOS[brandId] || BRAND_LOGOS[0];
+        // Create the custom marker image
+        const markerImage = createCustomMarker(price, brandId, isCheapest);
         
         const marker = new mapkit.MarkerAnnotation(coord, {
-          title: `${(price / 10).toFixed(1)}`,
+          title: `${site.N}`,
+          subtitle: `${(price / 10).toFixed(1)}¢`,
           glyphImage: {
-            url: markerSvg
+            url: markerImage
           },
+          size: { width: 60, height: 80 },
+          anchorOffset: new DOMPoint(0, -40), // Anchor at bottom of pin
           calloutEnabled: true,
           animates: isCheapest
         });
@@ -336,6 +372,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         
         myMap.addAnnotation(marker);
+        currentMarkers.push(marker); // Track for cleanup
       }
     });
     
