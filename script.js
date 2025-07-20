@@ -120,11 +120,11 @@ document.addEventListener("DOMContentLoaded", () => {
       new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng),
       new mapkit.CoordinateSpan(0.02, 0.02) // More zoomed in
     ),
-    showsCompass: mapkit.FeatureVisibility.Visible,
+    showsCompass: mapkit.FeatureVisibility.Hidden,
     showsScale: mapkit.FeatureVisibility.Hidden,
     showsMapTypeControl: mapkit.FeatureVisibility.Visible,
     showsZoomControl: mapkit.FeatureVisibility.Visible,
-    showsUserLocationControl: mapkit.FeatureVisibility.Visible
+    showsUserLocationControl: mapkit.FeatureVisibility.Hidden
   });
 
   // --- Weather API ---
