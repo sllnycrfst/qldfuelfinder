@@ -321,6 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function findCheapestStation() {
     const fuelId = FUEL_TYPES.find(f => f.key === currentFuel).id;
     let cheapestPrice = Infinity;
+    cheapestStationId = null; // Reset cheapest station
     
     allSites.forEach(site => {
       const price = priceMap[site.S]?.[fuelId];
@@ -346,6 +347,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const mapBounds = myMap.region.toBoundingRegion();
     const visibleStations = [];
     
+    // Find cheapest station among visible ones
+    let cheapestVisiblePrice = Infinity;
+    let cheapestVisibleStationId = null;
+    
+    // First pass: find all visible stations and their cheapest price
     allSites.forEach(site => {
       const lat = site.Lat;
       const lng = site.Lng;
@@ -358,29 +364,38 @@ document.addEventListener("DOMContentLoaded", () => {
         
         visibleStations.push({ site, price });
         
-        // Create marker with custom SVG design for Apple Maps
-        const coord = new mapkit.Coordinate(lat, lng);
-        const isCheapest = site.S === cheapestStationId;
-        const brandId = site.B;
-        
-        // Create the custom marker image with brand styling
-        const markerImage = createCustomMarker(price, brandId, isCheapest);
-        
-        const marker = new mapkit.MarkerAnnotation(coord, {
-          glyphImage: {
-            url: markerImage
-          },
-          anchorOffset: new DOMPoint(0, -20),
-          calloutEnabled: false
-        });
-        
-        marker.addEventListener("select", e => {
-          showFeatureCard(site, price);
-        });
-        
-        myMap.addAnnotation(marker);
-        currentMarkers.push(marker); // Track for cleanup
+        if (price < cheapestVisiblePrice) {
+          cheapestVisiblePrice = price;
+          cheapestVisibleStationId = site.S;
+        }
       }
+    });
+    
+    // Second pass: create markers with correct cheapest highlighting
+    visibleStations.forEach(({ site, price }) => {
+      const coord = new mapkit.Coordinate(site.Lat, site.Lng);
+      const isCheapest = site.S === cheapestVisibleStationId;
+      const brandId = site.B;
+      
+      console.log(`Station ${site.N}: Price ${price}, isCheapest: ${isCheapest}`);
+      
+      // Create the custom marker image with correct colors
+      const markerImage = createCustomMarker(price, brandId, isCheapest);
+      
+      const marker = new mapkit.MarkerAnnotation(coord, {
+        glyphImage: {
+          url: markerImage
+        },
+        anchorOffset: new DOMPoint(0, -20),
+        calloutEnabled: false
+      });
+      
+      marker.addEventListener("select", e => {
+        showFeatureCard(site, price);
+      });
+      
+      myMap.addAnnotation(marker);
+      currentMarkers.push(marker); // Track for cleanup
     });
     
     updateList(visibleStations);
@@ -475,7 +490,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Panel Management ---
   function openPanel(panelName) {
     // Close all panels first
-    document.querySelectorAll('.sliding-panel').forEach(p => p.classList.remove('open'));
+    document.querySelectorAll('.sliding-panel').forEach(p => {
+      p.classList.remove('open');
+      p.style.transform = 'translateX(-50%) translateY(130%)'; // Reset position
+    });
     document.querySelectorAll('.panel-overlay').forEach(o => o.classList.remove('active'));
     
     // Open the requested panel
@@ -485,12 +503,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if (panel && overlay) {
       panel.classList.add('open');
       overlay.classList.add('active');
+      panel.style.transform = 'translateX(-50%) translateY(0)'; // Ensure it's visible
       initializeDrag(panel);
     }
   }
   
   function closeAllPanels() {
-    document.querySelectorAll('.sliding-panel').forEach(p => p.classList.remove('open'));
+    document.querySelectorAll('.sliding-panel').forEach(p => {
+      p.classList.remove('open');
+      p.style.transform = 'translateX(-50%) translateY(130%)'; // Reset to hidden position
+    });
     document.querySelectorAll('.panel-overlay').forEach(o => o.classList.remove('active'));
   }
   
