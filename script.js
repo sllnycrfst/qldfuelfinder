@@ -126,6 +126,94 @@ document.addEventListener("DOMContentLoaded", () => {
     showsZoomControl: mapkit.FeatureVisibility.Hidden,
     showsUserLocationControl: mapkit.FeatureVisibility.Hidden
   });
+  
+  // Add custom Leaflet zoom controls
+  const mapElement = document.getElementById('apple-map');
+  const zoomInBtn = document.createElement('div');
+  const zoomOutBtn = document.createElement('div');
+  
+  // Create zoom control container
+  const zoomControl = document.createElement('div');
+  zoomControl.className = 'leaflet-control-zoom';
+  
+  // Zoom in button
+  zoomInBtn.className = 'leaflet-control-zoom-in';
+  zoomInBtn.innerHTML = '+';
+  zoomInBtn.style.cssText = `
+    width: 36px !important;
+    height: 36px !important;
+    line-height: 34px !important;
+    font-size: 18px !important;
+    background: rgba(255,255,255,0.9) !important;
+    backdrop-filter: blur(10px) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15) !important;
+    margin-bottom: 8px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    color: #333;
+    font-weight: bold;
+    text-decoration: none;
+  `;
+  
+  // Zoom out button
+  zoomOutBtn.className = 'leaflet-control-zoom-out';
+  zoomOutBtn.innerHTML = '−';
+  zoomOutBtn.style.cssText = `
+    width: 36px !important;
+    height: 36px !important;
+    line-height: 34px !important;
+    font-size: 18px !important;
+    background: rgba(255,255,255,0.9) !important;
+    backdrop-filter: blur(10px) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    color: #333;
+    font-weight: bold;
+    text-decoration: none;
+  `;
+  
+  // Add click events
+  zoomInBtn.addEventListener('click', () => {
+    const currentRegion = myMap.region;
+    const newSpan = new mapkit.CoordinateSpan(
+      currentRegion.span.latitudeDelta * 0.5,
+      currentRegion.span.longitudeDelta * 0.5
+    );
+    myMap.region = new mapkit.CoordinateRegion(currentRegion.center, newSpan);
+  });
+  
+  zoomOutBtn.addEventListener('click', () => {
+    const currentRegion = myMap.region;
+    const newSpan = new mapkit.CoordinateSpan(
+      currentRegion.span.latitudeDelta * 2,
+      currentRegion.span.longitudeDelta * 2
+    );
+    myMap.region = new mapkit.CoordinateRegion(currentRegion.center, newSpan);
+  });
+  
+  // Position and add to DOM
+  zoomControl.style.cssText = `
+    position: fixed !important;
+    top: 45% !important;
+    right: 20px !important;
+    transform: translateY(-50%) !important;
+    z-index: 10000 !important;
+    display: flex;
+    flex-direction: column;
+  `;
+  
+  zoomControl.appendChild(zoomInBtn);
+  zoomControl.appendChild(zoomOutBtn);
+  document.body.appendChild(zoomControl);
 
   // --- Weather API ---
   async function fetchWeather() {
@@ -231,13 +319,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const isCheapest = site.S === cheapestStationId;
         const brandId = site.B;
         
-        // Get custom SVG pin design
-        const pinSvg = BRAND_LOGOS[brandId] || BRAND_LOGOS[0];
+        // Get custom SVG marker from BRAND_LOGOS
+        const markerSvg = BRAND_LOGOS[brandId] || BRAND_LOGOS[0];
         
         const marker = new mapkit.MarkerAnnotation(coord, {
           title: `${(price / 10).toFixed(1)}`,
           glyphImage: {
-            url: pinSvg
+            url: markerSvg
           },
           calloutEnabled: true,
           animates: isCheapest
