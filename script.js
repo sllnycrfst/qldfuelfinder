@@ -181,26 +181,33 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('maptype-dropdown').classList.remove('show');
   };
   
-  window.toggleStreetView = function() {
-    const streetView = myMap.getStreetView();
-    const visible = streetView.getVisible();
-    streetView.setVisible(!visible);
-  };
-  
-  window.rotateMap = function() {
-    const currentHeading = myMap.getHeading() || 0;
-    myMap.setHeading(currentHeading + 90);
+  window.toggleTilt = function() {
+    const tiltBtn = document.getElementById('tilt-btn');
+    const currentTilt = myMap.getTilt();
+    
+    if (currentTilt === 0) {
+      // Enable 3D view
+      myMap.setTilt(45);
+      tiltBtn.classList.add('active');
+    } else {
+      // Disable 3D view
+      myMap.setTilt(0);
+      tiltBtn.classList.remove('active');
+    }
   };
   
   // Map type dropdown toggle
   document.getElementById('maptype-btn').addEventListener('click', function(e) {
     e.stopPropagation();
     document.getElementById('maptype-dropdown').classList.toggle('show');
+    // Close fuel dropdown if open
+    document.getElementById('fuel-dropdown-content').classList.remove('show');
   });
   
-  // Close dropdown when clicking outside
+  // Close dropdowns when clicking outside
   document.addEventListener('click', function() {
     document.getElementById('maptype-dropdown').classList.remove('show');
+    document.getElementById('fuel-dropdown-content').classList.remove('show');
   });
   
   // Initialize Directions Service and Renderer
@@ -746,10 +753,8 @@ document.addEventListener("DOMContentLoaded", () => {
     fuelBtn.addEventListener('click', e => {
       e.stopPropagation();
       fuelContent.classList.toggle('show');
-    });
-    
-    document.addEventListener('click', () => {
-      fuelContent.classList.remove('show');
+      // Close map type dropdown if open
+      document.getElementById('maptype-dropdown').classList.remove('show');
     });
   }
   
