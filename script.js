@@ -47,29 +47,64 @@ document.addEventListener("DOMContentLoaded", () => {
     return BRAND_COLORS[brandId] || BRAND_COLORS[0];
   };
   
-  // Create custom marker SVG for Apple Maps
+  // Helper function to get brand initial for recognition
+  function getBrandInitial(brandId) {
+    switch(brandId) {
+      case 2: return 'C';      // Caltex
+      case 5: return 'BP';     // BP
+      case 20: return 'S';     // Shell
+      case 113: return '7';    // 7-Eleven
+      case 5094: return 'P';   // Puma
+      case 57: return 'M';     // Metro
+      case 23: return 'U';     // United
+      case 110: return 'F';    // Freedom
+      case 111: return 'C';    // Coles
+      case 86: return 'L';     // Liberty
+      case 3421066: return 'A'; // Ampol
+      case 2031031: return '$'; // Costco
+      default: return (BRAND_NAMES[brandId] || 'U').charAt(0);
+    }
+  }
+  
+  // Create custom marker with brand styling for Apple Maps
   function createCustomMarker(price, brandId, isCheapest = false) {
     const priceText = (price / 10).toFixed(1);
-    const markerColor = isCheapest ? '#22C55E' : '#3B82F6';
+    const brandColor = getBrandColor(brandId);
+    const accentColor = isCheapest ? '#22C55E' : brandColor;
     
-    // Create SVG that Apple Maps can properly render
+    // Create pin with brand-specific colors and patterns
     const svg = `
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80" width="60" height="80">
+        <defs>
+          <!-- Brand-specific gradient -->
+          <radialGradient id="brand-grad-${brandId}" cx="50%" cy="30%" r="60%">
+            <stop offset="0%" stop-color="${brandColor}" stop-opacity="1"/>
+            <stop offset="100%" stop-color="${brandColor}" stop-opacity="0.8"/>
+          </radialGradient>
+        </defs>
+        
         <!-- Drop shadow -->
         <ellipse cx="32" cy="77" rx="15" ry="3" fill="rgba(0,0,0,0.2)"/>
         
-        <!-- Main pin shape -->
+        <!-- Main pin shape with brand gradient -->
         <path d="M30 5 C40 5, 50 15, 50 25 C50 35, 30 65, 30 65 C30 65, 10 35, 10 25 C10 15, 20 5, 30 5 Z" 
-              fill="${markerColor}" stroke="white" stroke-width="2"/>
+              fill="url(#brand-grad-${brandId})" stroke="white" stroke-width="2"/>
+        
+        <!-- Brand identifier ring -->
+        <circle cx="30" cy="25" r="19" fill="none" stroke="${brandColor}" stroke-width="1" opacity="0.6"/>
         
         <!-- Price circle background -->
-        <circle cx="30" cy="25" r="18" fill="white" stroke="${markerColor}" stroke-width="2"/>
+        <circle cx="30" cy="25" r="15" fill="white" stroke="${accentColor}" stroke-width="2"/>
         
         <!-- Price text -->
         <text x="30" y="30" text-anchor="middle" font-family="Arial, sans-serif" 
-              font-size="11" font-weight="bold" fill="${markerColor}">${priceText}</text>
+              font-size="8" font-weight="bold" fill="${accentColor}">${priceText}</text>
         
-        ${isCheapest ? '<text x="30" y="15" text-anchor="middle" font-size="8" fill="#22C55E">★</text>' : ''}
+        ${isCheapest ? '<text x="30" y="18" text-anchor="middle" font-size="6" fill="#22C55E">★</text>' : ''}
+        
+        <!-- Brand initial letter overlay for recognition -->
+        <text x="30" y="40" text-anchor="middle" font-family="Arial, sans-serif" 
+              font-size="5" font-weight="bold" fill="${brandColor}" opacity="0.7">${getBrandInitial(brandId)}</text>
       </svg>
     `;
     
@@ -352,7 +387,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const isCheapest = site.S === cheapestStationId;
         const brandId = site.B;
         
-        // Create the custom marker image
+        // Create the custom marker image with brand styling
         const markerImage = createCustomMarker(price, brandId, isCheapest);
         
         const marker = new mapkit.MarkerAnnotation(coord, {
@@ -361,7 +396,6 @@ document.addEventListener("DOMContentLoaded", () => {
           glyphImage: {
             url: markerImage
           },
-          size: { width: 60, height: 80 },
           anchorOffset: new DOMPoint(0, -40), // Anchor at bottom of pin
           calloutEnabled: true,
           animates: isCheapest
