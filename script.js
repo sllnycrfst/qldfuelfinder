@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // Create custom marker with mymarker.png base, station logo, and price in black box
   function createCustomMarker(price, brandId, isCheapest = false) {
-    const priceText = Math.round(price / 10).toString(); // 3 digits, no decimal
+    const priceText = (price / 10).toFixed(1); // e.g. "123.4"
     const logoUrl = getBrandLogo(brandId);
     
     // Create a custom marker element
