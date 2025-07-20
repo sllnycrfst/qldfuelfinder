@@ -789,7 +789,7 @@ html, body {
   }
   
   .marker-price {
-    font-size: 10px;
+    font-size: 9px !important;
     padding: 1px 5px;
     bottom: 37px;
   }
