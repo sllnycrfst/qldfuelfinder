@@ -155,7 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Google Maps Initialization ---
   myMap = new google.maps.Map(document.getElementById("google-map"), {
     center: BRISBANE_COORDS,
-    zoom: 15,
+    zoom: 12,
     mapId: "AIzaSyAQ0Ba7zICGUy5zCVijkkDNrNVdKAG1FGU",
     tilt: 45,
     heading: 0,
@@ -437,12 +437,12 @@ document.addEventListener("DOMContentLoaded", () => {
         <div style="display:flex;align-items:center;padding:12px;border-bottom:1px solid #eee;gap:12px;">
           <img src="${brandLogo}" style="width:40px;height:40px;object-fit:contain;flex-shrink:0;" onerror="this.src='images/default.png'" />
           <div style="flex:1;min-width:0;">
-            <div style="font-weight:600;color:${isCheapest ? '#387CC2' : '#333'};">${site.N}</div>
+            <div style="font-weight:600;color:#333;">${site.N}</div>
             <div style="font-size:12px;color:#666;">${site.A}, ${getSuburbName(site.P)} ${site.P}</div>
             <div style="font-size:11px;color:#999;">${distance} km away</div>
           </div>
           <div style="text-align:right;">
-            <div style="font-size:20px;font-weight:700;color:${isCheapest ? '#387CC2' : '#007AFF'};">
+            <div style="font-size:20px;font-weight:700;color:${isCheapest ? '#22C55E' : '#007AFF'};">
               ${(price / 10).toFixed(1)}
             </div>
           </div>
@@ -483,18 +483,12 @@ document.addEventListener("DOMContentLoaded", () => {
       <div style="margin-bottom:15px;">
         <p class="feature-card-address" style="margin:0 0 10px 0;text-decoration:none;">${site.A}, ${getSuburbName(site.P)} ${site.P}</p>
         <div style="display:flex;flex-direction:column;gap:8px;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span style="font-size:14px;color:#666;">Directions:</span>
-            <button onclick="getDirections(${site.Lat}, ${site.Lng})" style="padding:6px 12px;background:#387CC2;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;" title="Get Directions">
-              <i class="fas fa-route"></i> Get Directions
-            </button>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span style="font-size:14px;color:#666;">Navigate:</span>
-            <button onclick="navigateExternal(${site.Lat}, ${site.Lng})" style="padding:6px 12px;background:#007AFF;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;" title="Open in Maps App">
-              <i class="fa-solid fa-diamond-turn-right"></i> Open Maps
-            </button>
-          </div>
+          <button onclick="getDirections(${site.Lat}, ${site.Lng})" style="padding:8px 12px;background:#387CC2;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;width:fit-content;" title="Get Directions">
+            <i class="fas fa-route"></i> Get Directions
+          </button>
+          <button onclick="navigateExternal(${site.Lat}, ${site.Lng})" style="padding:8px 12px;background:#007AFF;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;width:fit-content;" title="Open in Maps App">
+            <i class="fa-solid fa-diamond-turn-right"></i> Open in Maps App
+          </button>
         </div>
       </div>
       <div class="fuel-prices-list" style="display:flex;flex-wrap:wrap;gap:8px;">${allPrices}</div>
@@ -723,7 +717,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function showPresetLocations() {
       suburbList.innerHTML = PRESET_LOCATIONS.map(location => {
         if (location.action === 'current') {
-          return `<li class="suburb-list-item" onclick="goToCurrentLocation()">${location.name}</li>`;
+          return `<li class="suburb-list-item" onclick="goToCurrentLocation()"><i class="fas fa-location-arrow" style="color:#387CC2;margin-right:8px;font-size:12px;"></i>${location.name}</li>`;
         } else {
           return `<li class="suburb-list-item" onclick="goToLocation(${location.lat}, ${location.lng}, '${location.name}')">${location.name}</li>`;
         }
