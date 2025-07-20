@@ -219,7 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const directionsRenderer = new google.maps.DirectionsRenderer({
     suppressMarkers: true,
     polylineOptions: {
-      strokeColor: '#4F46E5',
+      strokeColor: '#387CC2',
       strokeOpacity: 0.8,
       strokeWeight: 6
     }
@@ -437,12 +437,12 @@ document.addEventListener("DOMContentLoaded", () => {
         <div style="display:flex;align-items:center;padding:12px;border-bottom:1px solid #eee;gap:12px;">
           <img src="${brandLogo}" style="width:40px;height:40px;object-fit:contain;flex-shrink:0;" onerror="this.src='images/default.png'" />
           <div style="flex:1;min-width:0;">
-            <div style="font-weight:600;color:${isCheapest ? '#00AA00' : '#333'};">${site.N} ${isCheapest ? '💚' : ''}</div>
+            <div style="font-weight:600;color:${isCheapest ? '#387CC2' : '#333'};">${site.N}</div>
             <div style="font-size:12px;color:#666;">${site.A}, ${getSuburbName(site.P)} ${site.P}</div>
             <div style="font-size:11px;color:#999;">${distance} km away</div>
           </div>
           <div style="text-align:right;">
-            <div style="font-size:20px;font-weight:700;color:${isCheapest ? '#00AA00' : '#007AFF'};">
+            <div style="font-size:20px;font-weight:700;color:${isCheapest ? '#387CC2' : '#007AFF'};">
               ${(price / 10).toFixed(1)}
             </div>
           </div>
@@ -477,7 +477,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     content.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:15px;">
-        <h3 class="feature-card-title" style="margin:0;flex:1;">${site.N} ${isCheapest ? '💚 CHEAPEST' : ''}</h3>
+        <h3 class="feature-card-title" style="margin:0;flex:1;">${site.N} ${isCheapest ? 'CHEAPEST' : ''}</h3>
         <img src="${brandLogo}" style="width:40px;height:40px;object-fit:contain;margin-left:12px;" onerror="this.src='images/default.png'" />
       </div>
       <div style="margin-bottom:15px;">
@@ -485,7 +485,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div style="display:flex;flex-direction:column;gap:8px;">
           <div style="display:flex;align-items:center;gap:8px;">
             <span style="font-size:14px;color:#666;">Directions:</span>
-            <button onclick="getDirections(${site.Lat}, ${site.Lng})" style="padding:6px 12px;background:#4F46E5;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;" title="Get Directions">
+            <button onclick="getDirections(${site.Lat}, ${site.Lng})" style="padding:6px 12px;background:#387CC2;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;" title="Get Directions">
               <i class="fas fa-route"></i> Get Directions
             </button>
           </div>
@@ -655,8 +655,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
       currentY = clientY - startY;
       
-      const newTranslateY = Math.max(-window.innerHeight * 0.4, initialTranslateY + currentY);
-      panel.style.transform = `translateX(-50%) translateY(${newTranslateY}px)`;
+      // Only allow dragging downward (positive currentY)
+      if (currentY > 0) {
+        const newTranslateY = initialTranslateY + currentY;
+        panel.style.transform = `translateX(-50%) translateY(${newTranslateY}px)`;
+      }
       
       e.preventDefault();
     }
@@ -669,11 +672,11 @@ document.addEventListener("DOMContentLoaded", () => {
       
       const threshold = window.innerHeight * 0.2;
       
+      // Only allow closing panels by dragging down
       if (currentY > threshold) {
         closeAllPanels();
-      } else if (currentY < -threshold) {
-        panel.style.transform = 'translateX(-50%) translateY(-40vh)';
       } else {
+        // Snap back to normal position
         panel.style.transform = 'translateX(-50%) translateY(0)';
       }
       
