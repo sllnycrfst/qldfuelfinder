@@ -66,121 +66,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
   
-  // Create custom marker with brand diagonal patterns for Apple Maps
+  // Create simple blue/green markers with price inside
   function createCustomMarker(price, brandId, isCheapest = false) {
-    const priceText = (price / 10).toFixed(1);
-    const brandColor = getBrandColor(brandId);
-    const priceColor = isCheapest ? '#22C55E' : '#000000';
+    const priceText = Math.round(price / 10).toString(); // 3 digits, no decimal
+    const markerColor = isCheapest ? '#22C55E' : '#3B82F6';
     
-    // Get diagonal stripe patterns based on brand
-    let patternFill = '';
-    switch(brandId) {
-      case 2: // Caltex - Red with white and blue stripes
-        patternFill = `
-          <pattern id="brand-pattern-${brandId}" patternUnits="userSpaceOnUse" width="20" height="20" patternTransform="rotate(45)">
-            <rect width="20" height="12" fill="#DC2626"/>
-            <rect y="12" width="20" height="3" fill="white"/>
-            <rect y="15" width="20" height="5" fill="#1E40AF"/>
-          </pattern>`;
-        break;
-      case 5: // BP - Green with yellow and white stripes
-        patternFill = `
-          <pattern id="brand-pattern-${brandId}" patternUnits="userSpaceOnUse" width="20" height="20" patternTransform="rotate(30)">
-            <rect width="20" height="8" fill="#00A651"/>
-            <rect y="8" width="20" height="5" fill="#FFE500"/>
-            <rect y="13" width="20" height="2" fill="white"/>
-            <rect y="15" width="20" height="5" fill="#7CB342"/>
-          </pattern>`;
-        break;
-      case 20: // Shell - Yellow with red stripes
-        patternFill = `
-          <pattern id="brand-pattern-${brandId}" patternUnits="userSpaceOnUse" width="20" height="20" patternTransform="rotate(45)">
-            <rect width="20" height="12" fill="#FFD500"/>
-            <rect y="12" width="20" height="8" fill="#E31E24"/>
-          </pattern>`;
-        break;
-      case 113: // 7-Eleven - Orange/red with green and white
-        patternFill = `
-          <pattern id="brand-pattern-${brandId}" patternUnits="userSpaceOnUse" width="20" height="20" patternTransform="rotate(-30)">
-            <rect width="20" height="8" fill="#E31E24"/>
-            <rect y="8" width="20" height="2" fill="white"/>
-            <rect y="10" width="20" height="8" fill="#FF6B35"/>
-            <rect y="18" width="20" height="2" fill="#00A651"/>
-          </pattern>`;
-        break;
-      case 57: // Metro - Purple with white stripes
-        patternFill = `
-          <pattern id="brand-pattern-${brandId}" patternUnits="userSpaceOnUse" width="20" height="20" patternTransform="rotate(60)">
-            <rect width="20" height="15" fill="#7B3F99"/>
-            <rect y="15" width="20" height="2" fill="white"/>
-            <rect y="17" width="20" height="3" fill="#6A2B8C"/>
-          </pattern>`;
-        break;
-      case 23: // United - Blue with red and white stripes
-        patternFill = `
-          <pattern id="brand-pattern-${brandId}" patternUnits="userSpaceOnUse" width="20" height="20" patternTransform="rotate(25)">
-            <rect width="20" height="10" fill="#1E40AF"/>
-            <rect y="10" width="20" height="2" fill="white"/>
-            <rect y="12" width="20" height="8" fill="#DC2626"/>
-          </pattern>`;
-        break;
-      case 110: // Freedom - Red and blue diagonal
-        patternFill = `
-          <pattern id="brand-pattern-${brandId}" patternUnits="userSpaceOnUse" width="25" height="25" patternTransform="rotate(45)">
-            <rect width="25" height="12" fill="#DC2626"/>
-            <rect y="12" width="25" height="13" fill="#1E40AF"/>
-          </pattern>`;
-        break;
-      case 111: // Coles - Red with yellow accent
-        patternFill = `
-          <pattern id="brand-pattern-${brandId}" patternUnits="userSpaceOnUse" width="20" height="20" patternTransform="rotate(45)">
-            <rect width="20" height="15" fill="#DC2626"/>
-            <rect y="15" width="20" height="2" fill="white"/>
-            <rect y="17" width="20" height="3" fill="#FCD34D"/>
-          </pattern>`;
-        break;
-      case 86: // Liberty - Blue with white stripes
-        patternFill = `
-          <pattern id="brand-pattern-${brandId}" patternUnits="userSpaceOnUse" width="20" height="20" patternTransform="rotate(45)">
-            <rect width="20" height="15" fill="#0066CC"/>
-            <rect y="15" width="20" height="2" fill="white"/>
-            <rect y="17" width="20" height="3" fill="#004499"/>
-          </pattern>`;
-        break;
-      case 3421066: // Ampol - Red with blue accent
-        patternFill = `
-          <pattern id="brand-pattern-${brandId}" patternUnits="userSpaceOnUse" width="20" height="20" patternTransform="rotate(30)">
-            <rect width="20" height="10" fill="#DC2626"/>
-            <rect y="10" width="20" height="2" fill="white"/>
-            <rect y="12" width="20" height="8" fill="#1E40AF"/>
-          </pattern>`;
-        break;
-      default: // Default - Gray with diagonal stripes
-        patternFill = `
-          <pattern id="brand-pattern-${brandId}" patternUnits="userSpaceOnUse" width="20" height="20" patternTransform="rotate(45)">
-            <rect width="20" height="10" fill="#808080"/>
-            <rect y="10" width="20" height="2" fill="white"/>
-            <rect y="12" width="20" height="8" fill="#666666"/>
-          </pattern>`;
-    }
-    
-    // Create circle marker with diagonal brand pattern
     const svg = `
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 70" width="50" height="70">
-        <defs>
-          ${patternFill}
-        </defs>
-        
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">
         <!-- Drop shadow -->
-        <ellipse cx="27" cy="65" rx="12" ry="3" fill="rgba(0,0,0,0.2)"/>
+        <ellipse cx="22" cy="37" rx="8" ry="2" fill="rgba(0,0,0,0.2)"/>
         
-        <!-- Main circle with brand pattern -->
-        <circle cx="25" cy="35" r="20" fill="url(#brand-pattern-${brandId})" stroke="white" stroke-width="2"/>
+        <!-- Main circle -->
+        <circle cx="20" cy="20" r="18" fill="${markerColor}" stroke="white" stroke-width="2"/>
         
-        <!-- Price text above circle -->
-        <rect x="10" y="8" width="30" height="12" rx="6" fill="white" stroke="${priceColor}" stroke-width="1"/>
-        <text x="25" y="17" text-anchor="middle" font-family="Arial, sans-serif" 
-              font-size="9" font-weight="bold" fill="${priceColor}">${priceText}</text>
+        <!-- Price text inside -->
+        <text x="20" y="25" text-anchor="middle" font-family="Arial, sans-serif" 
+              font-size="10" font-weight="bold" fill="white">${priceText}</text>
       </svg>
     `;
     
@@ -265,7 +166,8 @@ document.addEventListener("DOMContentLoaded", () => {
     showsScale: mapkit.FeatureVisibility.Hidden,
     showsMapTypeControl: mapkit.FeatureVisibility.Visible,
     showsZoomControl: mapkit.FeatureVisibility.Hidden,
-    showsUserLocationControl: mapkit.FeatureVisibility.Hidden
+    showsUserLocationControl: mapkit.FeatureVisibility.Hidden,
+    showsPointsOfInterest: false
   });
   
   // Add custom zoom controls
@@ -344,7 +246,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Position and add to DOM
   zoomControl.style.cssText = `
     position: fixed !important;
-    top: 45% !important;
+    top: 25% !important;
     right: 20px !important;
     transform: translateY(-50%) !important;
     z-index: 10000 !important;
@@ -467,14 +369,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const markerImage = createCustomMarker(price, brandId, isCheapest);
         
         const marker = new mapkit.MarkerAnnotation(coord, {
-          title: `${site.N}`,
-          subtitle: `${(price / 10).toFixed(1)}¢`,
           glyphImage: {
             url: markerImage
           },
-          anchorOffset: new DOMPoint(0, -40), // Anchor at bottom of pin
-          calloutEnabled: true,
-          animates: isCheapest
+          anchorOffset: new DOMPoint(0, -20),
+          calloutEnabled: false
         });
         
         marker.addEventListener("select", e => {
