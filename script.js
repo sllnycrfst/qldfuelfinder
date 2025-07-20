@@ -69,9 +69,13 @@ document.addEventListener("DOMContentLoaded", () => {
   if (searchInput && suburbList) {
     // Show preset locations when panel opens or input is empty
     function showPresetLocations() {
-      suburbList.innerHTML = PRESET_LOCATIONS.map(location => 
-        `<li class="suburb-list-item" onclick="${location.action === 'current' ? 'goToCurrentLocation()' : `goToLocation(${location.lat}, ${location.lng}, '${location.name}')`}">${location.name}</li>`
-      ).join('');
+      suburbList.innerHTML = PRESET_LOCATIONS.map(location => {
+        if (location.action === 'current') {
+          return `<li class="suburb-list-item" onclick="goToCurrentLocation()">${location.name}</li>`;
+        } else {
+          return `<li class="suburb-list-item" onclick="goToLocation(${location.lat}, ${location.lng}, '${location.name}')">${location.name}</li>`;
+        }
+      }).join('');
     }
     
     // Show presets initially
