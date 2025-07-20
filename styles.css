@@ -46,6 +46,13 @@ html, body {
   color: #3b4664;
 }
 
+@media (max-width: 599px) {
+  .weather-display {
+    top: 10px;
+    left: 10px;
+  }
+}
+
 .weather-icon {
   font-size: 20px;
 }
@@ -419,6 +426,65 @@ html, body {
   color: #4F46E5;
 }
 
+/* ========== DIRECTIONS INFO PANEL ========== */
+.directions-info {
+  position: fixed;
+  top: 80px;
+  left: 20px;
+  z-index: 10001;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  display: none;
+  min-width: 200px;
+}
+
+.directions-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  gap: 12px;
+}
+
+.directions-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.directions-time {
+  font-size: 16px;
+  font-weight: 600;
+  color: #4F46E5;
+}
+
+.directions-distance {
+  font-size: 14px;
+  color: #666;
+}
+
+.directions-close {
+  background: rgba(0,0,0,0.1);
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.directions-close:hover {
+  background: rgba(0,0,0,0.2);
+  color: #333;
+}
+
 /* ========== RESPONSIVE DESIGN ========== */
 @media (max-width: 599px) {
   .fuel-dropdown-btn {
@@ -426,5 +492,11 @@ html, body {
     height: 25px;
     border-radius: 10px;
     font-size: 12px;
+  }
+  
+  .directions-info {
+    left: 10px;
+    right: 10px;
+    min-width: auto;
   }
 }

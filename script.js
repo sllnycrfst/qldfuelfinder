@@ -193,7 +193,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Google Maps Initialization ---
   myMap = new google.maps.Map(document.getElementById("google-map"), {
     center: BRISBANE_COORDS,
-    zoom: 12,
+    zoom: 15,
+    mapId: "DEMO_MAP_ID", // Enable 3D buildings and advanced features
+    tilt: 45, // Enable 3D tilt
+    heading: 0, // Initial compass heading
     styles: [
       {
         featureType: "poi",
@@ -207,12 +210,32 @@ document.addEventListener("DOMContentLoaded", () => {
       position: google.maps.ControlPosition.RIGHT_CENTER,
       style: google.maps.ZoomControlStyle.SMALL
     },
-    mapTypeControl: false,
+    mapTypeControl: true,
+    mapTypeControlOptions: {
+      position: google.maps.ControlPosition.TOP_RIGHT,
+      style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+      mapTypeIds: ['roadmap', 'satellite', 'hybrid', 'terrain']
+    },
     scaleControl: false,
-    streetViewControl: false,
-    rotateControl: false,
+    streetViewControl: true,
+    streetViewControlOptions: {
+      position: google.maps.ControlPosition.RIGHT_BOTTOM
+    },
+    rotateControl: true,
     fullscreenControl: false
   });
+  
+  // Initialize Directions Service and Renderer
+  const directionsService = new google.maps.DirectionsService();
+  const directionsRenderer = new google.maps.DirectionsRenderer({
+    suppressMarkers: true, // Don't show default markers
+    polylineOptions: {
+      strokeColor: '#4F46E5',
+      strokeOpacity: 0.8,
+      strokeWeight: 6
+    }
+  });
+  directionsRenderer.setMap(myMap);
 
   // --- Weather API ---
   async function fetchWeather() {
@@ -454,9 +477,14 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
       <div style="display:flex;align-items:center;margin-bottom:15px;">
         <p class="feature-card-address" style="margin:0;flex:1;text-decoration:none;">${site.A}, ${getSuburbName(site.P)}</p>
-        <button onclick="navigate(${site.Lat}, ${site.Lng})" style="margin-left:8px;padding:8px;background:#007AFF;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
-          <i class="fa-solid fa-diamond-turn-right"></i>
-        </button>
+        <div style="display:flex;gap:8px;">
+          <button onclick="navigate(${site.Lat}, ${site.Lng})" style="padding:8px;background:#4F46E5;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;" title="Get Directions">
+            <i class="fas fa-route"></i>
+          </button>
+          <button onclick="navigateExternal(${site.Lat}, ${site.Lng})" style="padding:8px;background:#007AFF;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;" title="Open in Maps App">
+            <i class="fa-solid fa-diamond-turn-right"></i>
+          </button>
+        </div>
       </div>
       <div class="fuel-prices-list" style="display:flex;flex-wrap:wrap;gap:8px;">${allPrices}</div>
     `;
@@ -464,16 +492,107 @@ document.addEventListener("DOMContentLoaded", () => {
     openPanel('feature');
   }
   
-  // --- Navigation ---
-  window.navigate = function(lat, lng) {
+  // --- Navigation Functions ---
+  let currentDirections = null;
+  
+  // Get directions to a station
+  function getDirections(destinationLat, destinationLng) {
+    if (!userLocation) {
+      // Fallback to external navigation if no user location
+      navigateExternal(destinationLat, destinationLng);
+      return;
+    }
+    
+    const origin = new google.maps.LatLng(userLocation.lat, userLocation.lng);
+    const destination = new google.maps.LatLng(destinationLat, destinationLng);
+    
+    const request = {
+      origin: origin,
+      destination: destination,
+      travelMode: google.maps.TravelMode.DRIVING,
+      unitSystem: google.maps.UnitSystem.METRIC,
+      avoidHighways: false,
+      avoidTolls: false
+    };
+    
+    directionsService.route(request, (result, status) => {
+      if (status === 'OK') {
+        directionsRenderer.setDirections(result);
+        currentDirections = result;
+        
+        // Show directions info
+        const route = result.routes[0];
+        const leg = route.legs[0];
+        showDirectionsInfo(leg.duration.text, leg.distance.text);
+        
+        // Fit map to show entire route
+        const bounds = new google.maps.LatLngBounds();
+        route.overview_path.forEach(point => bounds.extend(point));
+        myMap.fitBounds(bounds);
+      } else {
+        console.error('Directions request failed:', status);
+        // Fallback to external navigation
+        navigateExternal(destinationLat, destinationLng);
+      }
+    });
+  }
+  
+  // Clear current directions
+  function clearDirections() {
+    directionsRenderer.setDirections({routes: []});
+    currentDirections = null;
+    hideDirectionsInfo();
+  }
+  
+  // External navigation fallback
+  function navigateExternal(lat, lng) {
     if (isAppleDevice()) {
-      // Apple Maps for Apple devices
       window.open(`maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`);
     } else {
-      // Google Maps for other devices
       window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
     }
+  }
+  
+  // Show directions info panel
+  function showDirectionsInfo(duration, distance) {
+    let directionsInfo = document.getElementById('directions-info');
+    if (!directionsInfo) {
+      directionsInfo = document.createElement('div');
+      directionsInfo.id = 'directions-info';
+      directionsInfo.className = 'directions-info';
+      document.body.appendChild(directionsInfo);
+    }
+    
+    directionsInfo.innerHTML = `
+      <div class="directions-content">
+        <div class="directions-text">
+          <div class="directions-time">${duration}</div>
+          <div class="directions-distance">${distance}</div>
+        </div>
+        <button class="directions-close" onclick="clearDirections()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    `;
+    directionsInfo.style.display = 'block';
+  }
+  
+  // Hide directions info panel
+  function hideDirectionsInfo() {
+    const directionsInfo = document.getElementById('directions-info');
+    if (directionsInfo) {
+      directionsInfo.style.display = 'none';
+    }
+  }
+  
+  // Main navigation function (called from feature cards)
+  window.navigate = function(lat, lng) {
+    getDirections(lat, lng);
   };
+  
+  // Make functions global
+  window.clearDirections = clearDirections;
+  window.getDirections = getDirections;
   
   // --- Panel Management ---
   function openPanel(panelName) {
@@ -711,6 +830,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // Make functions global for onclick handlers
   window.showFeatureCard = showFeatureCard;
+  window.navigateExternal = navigateExternal;
   
   // Initialize
   fetchSitesAndPrices();
