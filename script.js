@@ -164,6 +164,14 @@ document.addEventListener("DOMContentLoaded", () => {
         featureType: "poi",
         elementType: "labels",
         stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "poi.business",
+        stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "poi.attraction",
+        stylers: [{ visibility: "off" }]
       }
     ],
     disableDefaultUI: true, // Disable all default controls
@@ -181,7 +189,17 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('maptype-dropdown').classList.remove('show');
   };
   
-
+  window.zoomIn = function() {
+    if (myMap) {
+      myMap.setZoom(myMap.getZoom() + 1);
+    }
+  };
+  
+  window.zoomOut = function() {
+    if (myMap) {
+      myMap.setZoom(myMap.getZoom() - 1);
+    }
+  };
   
   // Map type dropdown toggle
   document.getElementById('maptype-btn').addEventListener('click', function(e) {
@@ -286,6 +304,31 @@ document.addEventListener("DOMContentLoaded", () => {
     
     console.log("Cheapest station:", cheapestStationId, "Price:", cheapestPrice);
   }
+  
+  // Find all stations with cheapest price
+  function findAllCheapestStations() {
+    const fuelId = FUEL_TYPES.find(f => f.key === currentFuel).id;
+    let cheapestPrice = Infinity;
+    let cheapestStations = [];
+    
+    // First pass: find the cheapest price
+    allSites.forEach(site => {
+      const price = priceMap[site.S]?.[fuelId];
+      if (price && price < cheapestPrice) {
+        cheapestPrice = price;
+      }
+    });
+    
+    // Second pass: find all stations with that price
+    allSites.forEach(site => {
+      const price = priceMap[site.S]?.[fuelId];
+      if (price === cheapestPrice) {
+        cheapestStations.push(site.S);
+      }
+    });
+    
+    return { cheapestPrice, cheapestStations };
+  }
 
   // --- Map Markers ---
   function updateVisibleStationsAndList() {
@@ -304,9 +347,9 @@ document.addEventListener("DOMContentLoaded", () => {
     
     const visibleStations = [];
     
-    // Find cheapest station among visible ones
+    // Find all cheapest stations among visible ones
     let cheapestVisiblePrice = Infinity;
-    let cheapestVisibleStationId = null;
+    let cheapestVisibleStations = [];
     
     // First pass: find all visible stations and their cheapest price
     allSites.forEach(site => {
@@ -319,19 +362,21 @@ document.addEventListener("DOMContentLoaded", () => {
       
       if (price < cheapestVisiblePrice) {
         cheapestVisiblePrice = price;
-        cheapestVisibleStationId = site.S;
+        cheapestVisibleStations = [site.S];
+      } else if (price === cheapestVisiblePrice) {
+        cheapestVisibleStations.push(site.S);
       }
     });
     
     // Second pass: create markers with correct cheapest highlighting
     visibleStations.forEach(({ site, price }) => {
       const position = new google.maps.LatLng(site.Lat, site.Lng);
-      const isCheapest = site.S === cheapestVisibleStationId;
+      const isCheapest = cheapestVisibleStations.includes(site.S);
       const brandId = site.B;
       
       console.log(`Station ${site.N}: Price ${price}, isCheapest: ${isCheapest}`);
       
-      // Create the custom marker
+      // Create the custom marker (without animation)
       const markerElement = createCustomMarker(price, brandId, isCheapest);
       
       // Create marker using OverlayView for custom HTML content
@@ -381,11 +426,11 @@ document.addEventListener("DOMContentLoaded", () => {
       currentMarkers.push(marker);
     });
     
-    updateList(visibleStations);
+    updateList(visibleStations, cheapestVisibleStations);
   }
   
   // --- List Panel ---
-  function updateList(stations) {
+  function updateList(stations, cheapestStations = []) {
     const list = document.getElementById('list');
     if (!list) return;
     
@@ -402,13 +447,15 @@ document.addEventListener("DOMContentLoaded", () => {
         getDistance(userLocation.lat, userLocation.lng, site.Lat, site.Lng).toFixed(1) : 
         '?';
       
-      const isCheapest = site.S === cheapestStationId;
+      const isCheapest = cheapestStations.includes(site.S);
+      const brandLogo = getBrandLogo(site.B);
       
       li.innerHTML = `
-        <div style="display:flex;align-items:center;padding:12px;border-bottom:1px solid #eee;">
-          <div style="flex:1;">
-            <div style="font-weight:600;color:#333;">${site.N} ${isCheapest ? '💚' : ''}</div>
-            <div style="font-size:12px;color:#666;">${site.A}, ${getSuburbName(site.P)}</div>
+        <div style="display:flex;align-items:center;padding:12px;border-bottom:1px solid #eee;gap:12px;">
+          <img src="${brandLogo}" style="width:40px;height:40px;object-fit:contain;flex-shrink:0;" onerror="this.src='images/default.png'" />
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:600;color:${isCheapest ? '#00AA00' : '#333'};">${site.N} ${isCheapest ? '💚' : ''}</div>
+            <div style="font-size:12px;color:#666;">${site.A}, ${getSuburbName(site.P)} ${site.P}</div>
             <div style="font-size:11px;color:#999;">${distance} km away</div>
           </div>
           <div style="text-align:right;">
@@ -431,7 +478,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Feature Card ---
   function showFeatureCard(site, price) {
     const content = document.getElementById('feature-card-content');
-    const isCheapest = site.S === cheapestStationId;
+    const { cheapestStations } = findAllCheapestStations();
+    const isCheapest = cheapestStations.includes(site.S);
+    const brandLogo = getBrandLogo(site.B);
     
     const allPrices = FUEL_TYPES.map(fuel => {
       const p = priceMap[site.S]?.[fuel.id];
@@ -446,16 +495,23 @@ document.addEventListener("DOMContentLoaded", () => {
     content.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:15px;">
         <h3 class="feature-card-title" style="margin:0;flex:1;">${site.N} ${isCheapest ? '💚 CHEAPEST' : ''}</h3>
+        <img src="${brandLogo}" style="width:40px;height:40px;object-fit:contain;margin-left:12px;" onerror="this.src='images/default.png'" />
       </div>
-      <div style="display:flex;align-items:center;margin-bottom:15px;">
-        <p class="feature-card-address" style="margin:0;flex:1;text-decoration:none;">${site.A}, ${getSuburbName(site.P)}</p>
-        <div style="display:flex;gap:8px;">
-          <button onclick="navigate(${site.Lat}, ${site.Lng})" style="padding:8px;background:#4F46E5;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;" title="Get Directions">
-            <i class="fas fa-route"></i>
-          </button>
-          <button onclick="navigateExternal(${site.Lat}, ${site.Lng})" style="padding:8px;background:#007AFF;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;" title="Open in Maps App">
-            <i class="fa-solid fa-diamond-turn-right"></i>
-          </button>
+      <div style="margin-bottom:15px;">
+        <p class="feature-card-address" style="margin:0 0 10px 0;text-decoration:none;">${site.A}, ${getSuburbName(site.P)} ${site.P}</p>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:14px;color:#666;">Directions:</span>
+            <button onclick="getDirections(${site.Lat}, ${site.Lng})" style="padding:6px 12px;background:#4F46E5;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;" title="Get Directions">
+              <i class="fas fa-route"></i> Get Directions
+            </button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:14px;color:#666;">Navigate:</span>
+            <button onclick="navigateExternal(${site.Lat}, ${site.Lng})" style="padding:6px 12px;background:#007AFF;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;" title="Open in Maps App">
+              <i class="fa-solid fa-diamond-turn-right"></i> Open Maps
+            </button>
+          </div>
         </div>
       </div>
       <div class="fuel-prices-list" style="display:flex;flex-wrap:wrap;gap:8px;">${allPrices}</div>
@@ -467,8 +523,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Navigation Functions ---
   let currentDirections = null;
   
-  // Get directions to a station
+  // Get directions to a station and close feature card
   function getDirections(destinationLat, destinationLng) {
+    // Close the feature card first
+    closeAllPanels();
+    
     if (!userLocation) {
       // Fallback to external navigation if no user location
       navigateExternal(destinationLat, destinationLng);
@@ -598,7 +657,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Drag Functionality ---
   function initializeDrag(panel) {
     const dragBar = panel.querySelector('.panel-drag-bar');
-    if (!dragBar) return;
+    const panelContent = panel.querySelector('.panel-content');
+    
+    if (!dragBar || !panelContent) return;
     
     let isDragging = false;
     let startY = 0;
@@ -639,6 +700,32 @@ document.addEventListener("DOMContentLoaded", () => {
       const threshold = window.innerHeight * 0.2;
       
       if (currentY > threshold) {
+        closeAllPanels();
+      } else if (currentY < -threshold) {
+        panel.style.transform = 'translateX(-50%) translateY(-40vh)';
+      } else {
+        panel.style.transform = 'translateX(-50%) translateY(0)';
+      }
+      
+      currentY = 0;
+    }
+    
+    // Touch events for drag bar
+    dragBar.addEventListener('touchstart', handleStart, { passive: false });
+    document.addEventListener('touchmove', handleMove, { passive: false });
+    document.addEventListener('touchend', handleEnd);
+    
+    // Mouse events for drag bar
+    dragBar.addEventListener('mousedown', handleStart);
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('mouseup', handleEnd);
+    
+    // Touch events for panel content (swipe anywhere)
+    panelContent.addEventListener('touchstart', handleStart, { passive: false });
+    
+    // Mouse events for panel content (drag anywhere)
+    panelContent.addEventListener('mousedown', handleStart);
+  }
         // Drag down - close panel
         closeAllPanels();
       } else if (currentY < -threshold) {
@@ -665,15 +752,38 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // --- Event Listeners ---
   
+  // Preset locations
+  const PRESET_LOCATIONS = [
+    { name: "Current Location", action: "current" },
+    { name: "Brisbane", lat: -27.4698, lng: 153.0251 },
+    { name: "Gold Coast", lat: -28.0167, lng: 153.4000 },
+    { name: "Sunshine Coast", lat: -26.6500, lng: 153.0667 },
+    { name: "Toowoomba", lat: -27.5598, lng: 151.9507 },
+    { name: "Rockhampton", lat: -23.3781, lng: 150.5069 },
+    { name: "Mackay", lat: -21.1558, lng: 149.1692 },
+    { name: "Townsville", lat: -19.2590, lng: 146.8169 },
+    { name: "Cairns", lat: -16.9186, lng: 145.7781 }
+  ];
+  
   // Search functionality
   const searchInput = document.getElementById('search-input');
   const suburbList = document.getElementById('suburb-list');
   
   if (searchInput && suburbList) {
+    // Show preset locations when panel opens or input is empty
+    function showPresetLocations() {
+      suburbList.innerHTML = PRESET_LOCATIONS.map(location => 
+        `<li class="suburb-list-item" onclick="${location.action === 'current' ? 'goToCurrentLocation()' : `goToLocation(${location.lat}, ${location.lng}, '${location.name}')`}">${location.name}</li>`
+      ).join('');
+    }
+    
+    // Show presets initially
+    showPresetLocations();
+    
     searchInput.addEventListener('input', e => {
       const query = e.target.value.toLowerCase();
       if (query.length < 2) {
-        suburbList.innerHTML = '';
+        showPresetLocations();
         return;
       }
       
@@ -686,6 +796,13 @@ document.addEventListener("DOMContentLoaded", () => {
       suburbList.innerHTML = matchingSuburbs.map(suburb => 
         `<li class="suburb-list-item" onclick="searchSuburb('${suburb.suburb}', '${suburb.postcode}')">${suburb.suburb}</li>`
       ).join('');
+    });
+    
+    // Reset to presets when input is cleared
+    searchInput.addEventListener('focus', () => {
+      if (!searchInput.value) {
+        showPresetLocations();
+      }
     });
   }
   
@@ -708,6 +825,39 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   };
+  
+  // Go to preset location
+  window.goToLocation = function(lat, lng, name) {
+    myMap.setCenter(new google.maps.LatLng(lat, lng));
+    myMap.setZoom(12);
+    closeAllPanels();
+  };
+  
+  // Go to current location
+  window.goToCurrentLocation = function() {
+    if (userLocation) {
+      myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
+      myMap.setZoom(15);
+    } else {
+      // Try to get location again
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            userLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
+            myMap.setZoom(15);
+          },
+          error => {
+            console.log("Location error:", error);
+            alert("Unable to get your current location");
+          }
+        );
+      }
+    }
+    closeAllPanels();
   
   // Fuel selector dropdown
   const fuelBtn = document.getElementById('fuel-dropdown-btn');
