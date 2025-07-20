@@ -512,10 +512,9 @@ html, body {
   width: 24px;
   height: 24px;
   position: absolute;
-  top: 34px;
+  top: 30px;
   left: 50%;
   transform: translateX(-50%);
-  border-radius: 50%;
   background: none !important;
   padding: 0px;
   object-fit: contain;
@@ -523,7 +522,7 @@ html, body {
 
 .marker-price {
   position: absolute;
-  bottom: 45px;
+  bottom: 44px;
   left: 50%;
   transform: translateX(-50%);
   color: white;
@@ -539,10 +538,6 @@ html, body {
 
 .custom-marker:hover .marker-logo {
   transform: translateX(-50%) scale(1.05);
-}
-
-.custom-marker:hover .marker-price {
-  background: #333;
 }
 
 /* Active/click state */
