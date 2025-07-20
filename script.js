@@ -20,6 +20,33 @@ document.addEventListener("DOMContentLoaded", () => {
     { key: "Premium Diesel", id: 14, label: "PDSL" }
   ];
   
+  // Brand colors for map markers
+  const BRAND_COLORS = {
+    2: "#E4002B",     // Caltex - Red
+    5: "#009B3A",     // BP - Green  
+    20: "#FFD500",    // Shell - Yellow
+    113: "#FF6600",   // 7-Eleven - Orange/Red
+    5094: "#003087",  // Puma - Blue
+    57: "#7B3F99",    // Metro - Purple
+    23: "#005BAC",    // United - Blue
+    110: "#FF6B00",   // Freedom - Orange
+    2418994: "#00529F", // Pacific - Blue
+    3421139: "#00A19C", // Pearl - Teal
+    2031031: "#005DAA", // Costco - Blue
+    167: "#C8102E",   // Speedway - Red
+    111: "#178841",   // Coles - Green
+    86: "#0066CC",    // Liberty - Blue
+    3421066: "#E4002B", // Ampol - Red
+    3421073: "#E4002B", // EG Ampol - Red
+    3421193: "#FFD500", // Reddy Express (Shell) - Yellow
+    0: "#808080"      // Default - Gray
+  };
+  
+  // Helper function to get brand color
+  const getBrandColor = (brandId) => {
+    return BRAND_COLORS[brandId] || BRAND_COLORS[0];
+  };
+  
   const BRAND_NAMES = {
     2: "Caltex", 5: "BP", 7: "Budget", 12: "Independent", 16: "Mobil", 20: "Shell", 
     23: "United", 27: "Unbranded", 51: "Apco", 57: "Metro", 65: "Petrogas", 72: "Gull", 
@@ -93,11 +120,11 @@ document.addEventListener("DOMContentLoaded", () => {
       new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng),
       new mapkit.CoordinateSpan(0.02, 0.02) // More zoomed in
     ),
-    showsCompass: mapkit.FeatureVisibility.Hidden,
+    showsCompass: mapkit.FeatureVisibility.Visible,
     showsScale: mapkit.FeatureVisibility.Hidden,
-    showsMapTypeControl: true,
-    showsZoomControl: true,
-    showsUserLocationControl: false,
+    showsMapTypeControl: mapkit.FeatureVisibility.Visible,
+    showsZoomControl: mapkit.FeatureVisibility.Visible,
+    showsUserLocationControl: mapkit.FeatureVisibility.Visible,
     compassIsInset: false,
     minCameraDistance: 1000, // Prevent zooming in too much
     maxCameraDistance: 50000 // Prevent zooming out too far
@@ -202,17 +229,17 @@ document.addEventListener("DOMContentLoaded", () => {
         
         visibleStations.push({ site, price });
         
-        // Create marker with brand logo SVG
+        // Create marker with brand color
         const coord = new mapkit.Coordinate(lat, lng);
         const isCheapest = site.S === cheapestStationId;
         const brandId = site.B;
         
-        // Get SVG logo or fallback to default
-        const logoSvg = BRAND_LOGOS[brandId] || BRAND_LOGOS[0];
+        // Get brand color
+        const brandColor = getBrandColor(brandId);
         
         const marker = new mapkit.MarkerAnnotation(coord, {
           title: `${(price / 10).toFixed(1)}`,
-          color: isCheapest ? "#00FF00" : "#007AFF",
+          color: brandColor,
           glyphText: `${(price / 10).toFixed(1)}`,
           calloutEnabled: true,
           animates: isCheapest
@@ -511,22 +538,34 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   
   // Toolbar buttons
-  document.getElementById('toolbar-search-btn')?.addEventListener('click', () => {
-    openPanel('search');
-    document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));
-    document.getElementById('toolbar-search-btn').classList.add('sc-current');
-  });
-  
-  document.getElementById('toolbar-map-btn')?.addEventListener('click', () => {
+  document.getElementById('toolbar-home-btn')?.addEventListener('click', () => {
+    // Navigate to user's location or default Brisbane location
+    if (userLocation) {
+      myMap.setCenterAnimated(
+        new mapkit.Coordinate(userLocation.lat, userLocation.lng),
+        true
+      );
+    } else {
+      myMap.setCenterAnimated(
+        new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng),
+        true
+      );
+    }
     closeAllPanels();
     document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));
-    document.getElementById('toolbar-map-btn').classList.add('sc-current');
+    document.getElementById('toolbar-home-btn').classList.add('sc-current');
   });
   
-  document.getElementById('toolbar-list-btn')?.addEventListener('click', () => {
+  document.getElementById('toolbar-center-btn')?.addEventListener('click', () => {
+    openPanel('search');
+    document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));
+    document.getElementById('toolbar-center-btn').classList.add('sc-current');
+  });
+  
+  document.getElementById('toolbar-garage-btn')?.addEventListener('click', () => {
     openPanel('list');
     document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));
-    document.getElementById('toolbar-list-btn').classList.add('sc-current');
+    document.getElementById('toolbar-garage-btn').classList.add('sc-current');
   });
   
   // Overlays close panels

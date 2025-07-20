@@ -18,7 +18,7 @@ html, body {
 /* ========== MAP ========== */
 #apple-map {
   width: 100vw;
-  height: calc(100vh - 56px); /* End above toolbar */
+  height: calc(100vh - 80px); /* Updated for new toolbar height */
   min-height: 320px;
   border-radius: 0;
   z-index: 1;
@@ -58,32 +58,42 @@ html, body {
 /* ========== FUEL SELECTOR DROPDOWN ========== */
 .fuel-selector {
   position: fixed;
-  top: 140px; /* Moved lower to be under map controls */
+  top: 50%;
   right: 20px;
+  transform: translateY(-50%);
   z-index: 10001;
 }
 
 /* ========== APPLE MAP CONTROLS CUSTOMIZATION ========== */
-/* Make Apple's map type button bigger and move it down */
-#apple-map .mk-map-type-control {
-  transform: scale(1.3) !important; /* 30% bigger */
-  transform-origin: top right !important;
-  margin-top: 15% !important; /* Move down 15% */
-}
-
-/* Alternative selectors for Apple's map controls */
-#apple-map .mapkit-control,
-#apple-map .mk-control-set,
-#apple-map .mk-map-type-button {
-  transform: scale(1.3) !important;
-  transform-origin: top right !important;
-  margin-top: 15% !important;
-}
-
-/* Ensure map controls are properly positioned */
+/* Position Apple's map controls in middle-right stacked vertically */
 #apple-map .mk-control-set {
-  top: 20px !important;
+  position: fixed !important;
+  top: 45% !important;
   right: 20px !important;
+  transform: translateY(-50%) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+}
+
+/* Make controls bigger and properly styled */
+#apple-map .mk-map-type-control,
+#apple-map .mk-zoom-control,
+#apple-map .mk-user-location-control {
+  transform: scale(1.2) !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15) !important;
+  border-radius: 8px !important;
+}
+
+/* Position compass in bottom left */
+#apple-map .mk-compass {
+  position: fixed !important;
+  bottom: 100px !important;
+  left: 20px !important;
+  top: auto !important;
+  right: auto !important;
+  transform: scale(1.1) !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15) !important;
 }
 
 /* ========== ADDRESS STYLING ========== */
@@ -514,22 +524,23 @@ div[class*="address"] {
   border-radius: 47px;
 }
 
-/* ========== BOTTOM TOOLBAR (SIMPLIFIED) ========== */
+/* ========== BOTTOM TOOLBAR (NEW DESIGN) ========== */
 .sc-bottom-bar{
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   display: flex;
-  padding: 12px 0 28px 0;
-  justify-content: space-around;
+  padding: 12px 20px 28px 20px;
+  justify-content: space-between;
   align-items: center;
   width: 100%;
-  height: 56px;
-  font-size: 22px;
-  background: #ffffff;
-  border-top: 1px solid rgba(0,0,0,0.1);
-  box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+  height: 80px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(0,0,0,0.05);
+  box-shadow: 0 -2px 20px rgba(0,0,0,0.1);
   z-index: 15000;
 }
 
@@ -538,19 +549,58 @@ div[class*="address"] {
   transition: all 0.2s ease;
   cursor: pointer;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
   z-index: 15002;
   position: relative;
-  border-radius: 50%;
+  text-decoration: none;
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.sc-menu-item span {
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 4px;
+  color: #666;
+}
+
+.sc-menu-item i {
+  font-size: 22px;
 }
 
 .sc-menu-item:hover {
   background: rgba(0,0,0,0.05);
 }
 
+/* Center plus button */
+.sc-center-btn {
+  width: 56px !important;
+  height: 56px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+  padding: 0 !important;
+  margin: 0 20px;
+}
+
+.sc-center-btn i {
+  font-size: 28px !important;
+  color: white !important;
+}
+
+.sc-center-btn:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%) !important;
+  transform: scale(1.05);
+  box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
+}
+
 .sc-current{
-  color: #387cc2;
+  color: #5a6fd8;
+}
+
+.sc-current span {
+  color: #5a6fd8;
 }
