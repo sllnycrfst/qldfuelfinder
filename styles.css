@@ -566,6 +566,7 @@ html, body {
 .maptype-btn,
 .streetview-btn,
 .fuel-dropdown-btn,
+.fuel-selector,
 .rotate-btn {
   width: 44px;
   height: 44px;
