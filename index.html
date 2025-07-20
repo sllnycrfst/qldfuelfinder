@@ -15,47 +15,45 @@
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAQ0Ba7zICGUy5zCVijkkDNrNVdKAG1FGU&libraries=geometry&map_ids=DEMO_MAP_ID"></script>
 </head>
 
-<body>
-  <div id="google-map" style="width: 100vw; height: 100vh;"></div>
+<div id="google-map" style="width: 100vw; height: 100vh;"></div>
 
-    <!-- Map Type Control -->
-    <div class="custom-maptype-control">
-      <button class="maptype-btn" id="maptype-btn">
-        <i class="fas fa-layer-group"></i>
-      </button>
-      <div class="maptype-dropdown" id="maptype-dropdown">
-        <div class="maptype-item" onclick="changeMapType('roadmap')">
-          <i class="fas fa-road"></i> Map
-        </div>
-        <div class="maptype-item" onclick="changeMapType('satellite')">
-          <i class="fas fa-satellite"></i> Satellite
-        </div>
-        <div class="maptype-item" onclick="changeMapType('hybrid')">
-          <i class="fas fa-globe"></i> Hybrid
-        </div>
-        <div class="maptype-item" onclick="changeMapType('terrain')">
-          <i class="fas fa-mountain"></i> Terrain
-        </div>
-        
-  <!-- Custom Google Maps Controls -->
-  <div class="custom-map-controls">
-    <!-- Zoom Controls -->
-    <div class="custom-zoom-control">
-      <button class="zoom-in-btn" onclick="myMap.setZoom(myMap.getZoom() + 1)">
-        <i class="fas fa-plus"></i>
-      </button>
-      <button class="zoom-out-btn" onclick="myMap.setZoom(myMap.getZoom() - 1)">
-        <i class="fas fa-minus"></i>
-      </button>
+<!-- Custom Map Controls Wrapper -->
+<div class="map-ui-wrapper">
+
+  <!-- Map Type Control -->
+  <div class="custom-maptype-control">
+    <button class="maptype-btn" id="maptype-btn">
+      <i class="fas fa-layer-group"></i>
+    </button>
+    <div class="maptype-dropdown" id="maptype-dropdown">
+      <div class="maptype-item" onclick="changeMapType('roadmap')"><i class="fas fa-road"></i> Map</div>
+      <div class="maptype-item" onclick="changeMapType('satellite')"><i class="fas fa-satellite"></i> Satellite</div>
+      <div class="maptype-item" onclick="changeMapType('hybrid')"><i class="fas fa-globe"></i> Hybrid</div>
+      <div class="maptype-item" onclick="changeMapType('terrain')"><i class="fas fa-mountain"></i> Terrain</div>
     </div>
-    
+  </div>
 
- 
-      <!-- Fuel Selector Dropdown -->
-       <div class="fuel-selector">
-         <div class="fuel-dropdown">
-           <button class="fuel-dropdown-btn" id="fuel-dropdown-btn">E10</button>
-           <div class="fuel-dropdown-content" id="fuel-dropdown-content">
+  <!-- Fuel Selector -->
+  <div class="fuel-selector">
+    <div class="fuel-dropdown">
+      <button class="fuel-dropdown-btn" id="fuel-dropdown-btn">E10</button>
+      <div class="fuel-dropdown-content" id="fuel-dropdown-content">
+        <!-- Populated by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Zoom Controls -->
+  <div class="custom-zoom-control">
+    <button class="zoom-in-btn" onclick="myMap.setZoom(myMap.getZoom() + 1)">
+      <i class="fas fa-plus"></i>
+    </button>
+    <button class="zoom-out-btn" onclick="myMap.setZoom(myMap.getZoom() - 1)">
+      <i class="fas fa-minus"></i>
+    </button>
+  </div>
+
+</div>
       
         <!-- Populated by JavaScript -->
       </div>
