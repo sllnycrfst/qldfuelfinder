@@ -811,4 +811,44 @@ html, body {
     right: 10px;
     min-width: auto;
   }
+  .map-ui-wrapper {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 1000;
+}
+
+/* Basic button styling — adjust to suit your theme */
+.map-ui-wrapper button {
+  background: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  cursor: pointer;
+  margin-top: 38px;
+}
+
+/* Map type dropdown */
+.maptype-dropdown, .fuel-dropdown-content {
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  margin-top: 8px;
+  display: none;
+  position: absolute;
+  z-index: 1001;
+}
+
+.maptype-item, .fuel-dropdown-content div {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.maptype-item:hover, .fuel-dropdown-content div:hover {
+  background: #f0f0f0;
+}
 }
