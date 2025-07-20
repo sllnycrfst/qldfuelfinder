@@ -284,11 +284,10 @@ html, body {
   background: #f2f3fa;
 }
 
-/* ====marker==== */
 /* ========== CUSTOM MARKER STYLES ========== */
 .custom-marker {
   position: relative;
-  width: 50px;
+  width: 60px;
   height: 60px;
   cursor: pointer;
   user-select: none;
@@ -313,10 +312,10 @@ html, body {
 }
 
 .marker-logo {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   position: absolute;
-  top: 8px;
+  top: 12px;
   left: 50%;
   transform: translateX(-50%);
   border-radius: 50%;
