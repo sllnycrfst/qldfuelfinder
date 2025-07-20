@@ -488,7 +488,7 @@ html, body {
 /* ========== CUSTOM MARKER STYLES ========== */
 .custom-marker {
   position: relative;
-  width: 50px;
+  width: 60px;
   height: 60px;
   cursor: pointer;
   user-select: none;
@@ -513,10 +513,10 @@ html, body {
 }
 
 .marker-logo {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   position: absolute;
-  top: 8px;
+  top: 20px;
   left: 50%;
   transform: translateX(-50%);
   border-radius: 50%;
@@ -528,14 +528,13 @@ html, body {
 
 .marker-price {
   position: absolute;
-  bottom: 5px;
+  bottom: 45px;
   left: 50%;
   transform: translateX(-50%);
-  background: #000;
   color: white;
   padding: 2px 6px;
   border-radius: 4px;
-  font-size: 11px;
+  font-size: 9px;
   font-weight: bold;
   font-family: 'Roboto', 'Inter', Arial, sans-serif;
   min-width: 20px;
@@ -616,7 +615,7 @@ html, body {
   .marker-price {
     font-size: 10px;
     padding: 1px 5px;
-    bottom: 4px;
+    bottom: 34px;
   }
 }
 
