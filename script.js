@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("Script loaded!");
   
   // --- Constants & Config ---
-  const APPLE_MAPS_TOKEN = "eyJraWQiOiJHMzNGWlVCNThXIiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUyOTg1OTAwLCJvcmlnaW4iOiIqLnNsbG55Y3Jmc3QuZ2l0aHViLmlvIn0.6jL0I8wNB32FgbxJvHrHzK3DKOmNBDsTeVna7fuwpPLWmMLlCeiBrcgri9W8AIURaVfM6cbPEDb5r_pE65UP8A";
+  const APPLE_MAPS_TOKEN = "eyJraWQiOiJCTVQ1NzVTUFc5IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUyOTg5NjYyLCJvcmlnaW4iOiJzbGxueWNyZnN0LmdpdGh1Yi5pbyJ9.dF_WYx3PZly0Fo1dec9KYc1ZJAxRS_WO7pvyXq04Fr7kWVXGGuRFYgzeA3K7DvH2JZEwgB6V-gidn3HfPIXpQQ";
   
   const BRISBANE_COORDS = { lat: -27.4698, lng: 153.0251 };
   
