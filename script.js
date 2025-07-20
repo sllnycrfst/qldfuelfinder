@@ -47,6 +47,62 @@ document.addEventListener("DOMContentLoaded", () => {
     12: "images/default.png" // Default for Independent/Unknown
   };
   
+  // --- Event Listeners ---
+  
+  // Preset locations
+  const PRESET_LOCATIONS = [
+    { name: "Current Location", action: "current" },
+    { name: "Brisbane", lat: -27.4698, lng: 153.0251 },
+    { name: "Gold Coast", lat: -28.0167, lng: 153.4000 },
+    { name: "Sunshine Coast", lat: -26.6500, lng: 153.0667 },
+    { name: "Toowoomba", lat: -27.5598, lng: 151.9507 },
+    { name: "Rockhampton", lat: -23.3781, lng: 150.5069 },
+    { name: "Mackay", lat: -21.1558, lng: 149.1692 },
+    { name: "Townsville", lat: -19.2590, lng: 146.8169 },
+    { name: "Cairns", lat: -16.9186, lng: 145.7781 }
+  ];
+  
+  // Search functionality
+  const searchInput = document.getElementById('search-input');
+  const suburbList = document.getElementById('suburb-list');
+  
+  if (searchInput && suburbList) {
+    // Show preset locations when panel opens or input is empty
+    function showPresetLocations() {
+      suburbList.innerHTML = PRESET_LOCATIONS.map(location => 
+        `<li class="suburb-list-item" onclick="${location.action === 'current' ? 'goToCurrentLocation()' : `goToLocation(${location.lat}, ${location.lng}, '${location.name}')`}">${location.name}</li>`
+      ).join('');
+    }
+    
+    // Show presets initially
+    showPresetLocations();
+    
+    searchInput.addEventListener('input', e => {
+      const query = e.target.value.toLowerCase();
+      if (query.length < 2) {
+        showPresetLocations();
+        return;
+      }
+      
+      // Search through suburb names
+      const matchingSuburbs = QLD_SUBURBS
+        .filter(suburb => suburb.suburb.toLowerCase().includes(query))
+        .sort((a, b) => a.suburb.localeCompare(b.suburb))
+        .slice(0, 20);
+      
+      suburbList.innerHTML = matchingSuburbs.map(suburb => 
+        `<li class="suburb-list-item" onclick="searchSuburb('${suburb.suburb}', '${suburb.postcode}')">${suburb.suburb}</li>`
+      ).join('');
+    });
+    
+    // Reset to presets when input is cleared
+    searchInput.addEventListener('focus', () => {
+      if (!searchInput.value) {
+        showPresetLocations();
+      }
+    });
+  }
+  
   // Helper function to get brand logo
   const getBrandLogo = (brandId) => {
     return BRAND_LOGOS[brandId] || BRAND_LOGOS[12]; // Default to generic logo
@@ -858,6 +914,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
     closeAllPanels();
+  };
   
   // Fuel selector dropdown
   const fuelBtn = document.getElementById('fuel-dropdown-btn');
