@@ -1,4 +1,4 @@
- // Import suburb data
+// Import suburb data
 import { QLD_SUBURBS } from './data/qld-suburbs.js';
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -46,66 +46,6 @@ document.addEventListener("DOMContentLoaded", () => {
     3421202: "images/3421202.png",
     12: "images/default.png" // Default for Independent/Unknown
   };
-  
-  // --- Event Listeners ---
-  
-  // Preset locations
-  const PRESET_LOCATIONS = [
-    { name: "Current Location", action: "current" },
-    { name: "Brisbane", lat: -27.4698, lng: 153.0251 },
-    { name: "Gold Coast", lat: -28.0167, lng: 153.4000 },
-    { name: "Sunshine Coast", lat: -26.6500, lng: 153.0667 },
-    { name: "Toowoomba", lat: -27.5598, lng: 151.9507 },
-    { name: "Rockhampton", lat: -23.3781, lng: 150.5069 },
-    { name: "Mackay", lat: -21.1558, lng: 149.1692 },
-    { name: "Townsville", lat: -19.2590, lng: 146.8169 },
-    { name: "Cairns", lat: -16.9186, lng: 145.7781 }
-  ];
-  
-  // Search functionality
-  const searchInput = document.getElementById('search-input');
-  const suburbList = document.getElementById('suburb-list');
-  
-  if (searchInput && suburbList) {
-    // Show preset locations when panel opens or input is empty
-    function showPresetLocations() {
-      suburbList.innerHTML = PRESET_LOCATIONS.map(location => {
-        if (location.action === 'current') {
-          return `<li class="suburb-list-item" onclick="goToCurrentLocation()">${location.name}</li>`;
-        } else {
-          return `<li class="suburb-list-item" onclick="goToLocation(${location.lat}, ${location.lng}, '${location.name}')">${location.name}</li>`;
-        }
-      }).join('');
-    }
-    
-    // Show presets initially
-    showPresetLocations();
-    
-    searchInput.addEventListener('input', e => {
-      const query = e.target.value.toLowerCase();
-      if (query.length < 2) {
-        showPresetLocations();
-        return;
-      }
-      
-      // Search through suburb names
-      const matchingSuburbs = QLD_SUBURBS
-        .filter(suburb => suburb.suburb.toLowerCase().includes(query))
-        .sort((a, b) => a.suburb.localeCompare(b.suburb))
-        .slice(0, 20);
-      
-      suburbList.innerHTML = matchingSuburbs.map(suburb => 
-        `<li class="suburb-list-item" onclick="searchSuburb('${suburb.suburb}', '${suburb.postcode}')">${suburb.suburb}</li>`
-      ).join('');
-    });
-    
-    // Reset to presets when input is cleared
-    searchInput.addEventListener('focus', () => {
-      if (!searchInput.value) {
-        showPresetLocations();
-      }
-    });
-  }
   
   // Helper function to get brand logo
   const getBrandLogo = (brandId) => {
@@ -216,9 +156,9 @@ document.addEventListener("DOMContentLoaded", () => {
   myMap = new google.maps.Map(document.getElementById("google-map"), {
     center: BRISBANE_COORDS,
     zoom: 15,
-    mapId: "AIzaSyAQ0Ba7zICGUy5zCVijkkDNrNVdKAG1FGU", // Enable 3D buildings and advanced features
-    tilt: 45, // Enable 3D tilt
-    heading: 0, // Initial compass heading
+    mapId: "AIzaSyAQ0Ba7zICGUy5zCVijkkDNrNVdKAG1FGU",
+    tilt: 45,
+    heading: 0,
     styles: [
       {
         featureType: "poi",
@@ -234,7 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
         stylers: [{ visibility: "off" }]
       }
     ],
-    disableDefaultUI: true, // Disable all default controls
+    disableDefaultUI: true,
     zoomControl: false,
     mapTypeControl: false,
     scaleControl: false,
@@ -265,7 +205,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById('maptype-btn').addEventListener('click', function(e) {
     e.stopPropagation();
     document.getElementById('maptype-dropdown').classList.toggle('show');
-    // Close fuel dropdown if open
     document.getElementById('fuel-dropdown-content').classList.remove('show');
   });
   
@@ -278,7 +217,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize Directions Service and Renderer
   const directionsService = new google.maps.DirectionsService();
   const directionsRenderer = new google.maps.DirectionsRenderer({
-    suppressMarkers: true, // Don't show default markers
+    suppressMarkers: true,
     polylineOptions: {
       strokeColor: '#4F46E5',
       strokeOpacity: 0.8,
@@ -314,7 +253,6 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       console.log("Fetching sites and prices...");
       
-      // QLD data only
       const [siteRes, priceRes] = await Promise.all([
         fetch("data/sites.json").then(r => r.json()),
         fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
@@ -336,7 +274,6 @@ document.addEventListener("DOMContentLoaded", () => {
         priceMap[p.SiteId][p.FuelId] = p.Price;
       });
       
-      // Find cheapest station
       findCheapestStation();
       
       console.log("Data processed. Sites:", allSites.length, "Prices:", allPrices.length);
@@ -352,7 +289,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function findCheapestStation() {
     const fuelId = FUEL_TYPES.find(f => f.key === currentFuel).id;
     let cheapestPrice = Infinity;
-    cheapestStationId = null; // Reset cheapest station
+    cheapestStationId = null;
     
     allSites.forEach(site => {
       const price = priceMap[site.S]?.[fuelId];
@@ -371,7 +308,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let cheapestPrice = Infinity;
     let cheapestStations = [];
     
-    // First pass: find the cheapest price
     allSites.forEach(site => {
       const price = priceMap[site.S]?.[fuelId];
       if (price && price < cheapestPrice) {
@@ -379,7 +315,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
     
-    // Second pass: find all stations with that price
     allSites.forEach(site => {
       const price = priceMap[site.S]?.[fuelId];
       if (price === cheapestPrice) {
@@ -394,7 +329,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateVisibleStationsAndList() {
     console.log("Updating stations and list...");
     
-    // Clear existing markers
     currentMarkers.forEach(marker => {
       if (marker.setMap) {
         marker.setMap(null);
@@ -406,12 +340,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!bounds) return;
     
     const visibleStations = [];
-    
-    // Find all cheapest stations among visible ones
     let cheapestVisiblePrice = Infinity;
     let cheapestVisibleStations = [];
     
-    // First pass: find all visible stations and their cheapest price
     allSites.forEach(site => {
       const position = new google.maps.LatLng(site.Lat, site.Lng);
       const price = priceMap[site.S]?.[FUEL_TYPES.find(f => f.key === currentFuel).id];
@@ -428,18 +359,13 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
     
-    // Second pass: create markers with correct cheapest highlighting
     visibleStations.forEach(({ site, price }) => {
       const position = new google.maps.LatLng(site.Lat, site.Lng);
       const isCheapest = cheapestVisibleStations.includes(site.S);
       const brandId = site.B;
       
-      console.log(`Station ${site.N}: Price ${price}, isCheapest: ${isCheapest}`);
-      
-      // Create the custom marker (without animation)
       const markerElement = createCustomMarker(price, brandId, isCheapest);
       
-      // Create marker using OverlayView for custom HTML content
       class CustomMarker extends google.maps.OverlayView {
         constructor(position, content, map) {
           super();
@@ -478,7 +404,6 @@ document.addEventListener("DOMContentLoaded", () => {
       
       const marker = new CustomMarker(position, markerElement, myMap);
       
-      // Add click listener
       markerElement.addEventListener('click', () => {
         showFeatureCard(site, price);
       });
@@ -495,8 +420,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!list) return;
     
     list.innerHTML = '';
-    
-    // Sort by price
     stations.sort((a, b) => a.price - b.price);
     
     stations.slice(0, 50).forEach(({ site, price }) => {
@@ -583,13 +506,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Navigation Functions ---
   let currentDirections = null;
   
-  // Get directions to a station and close feature card
   function getDirections(destinationLat, destinationLng) {
-    // Close the feature card first
     closeAllPanels();
     
     if (!userLocation) {
-      // Fallback to external navigation if no user location
       navigateExternal(destinationLat, destinationLng);
       return;
     }
@@ -611,31 +531,26 @@ document.addEventListener("DOMContentLoaded", () => {
         directionsRenderer.setDirections(result);
         currentDirections = result;
         
-        // Show directions info
         const route = result.routes[0];
         const leg = route.legs[0];
         showDirectionsInfo(leg.duration.text, leg.distance.text);
         
-        // Fit map to show entire route
         const bounds = new google.maps.LatLngBounds();
         route.overview_path.forEach(point => bounds.extend(point));
         myMap.fitBounds(bounds);
       } else {
         console.error('Directions request failed:', status);
-        // Fallback to external navigation
         navigateExternal(destinationLat, destinationLng);
       }
     });
   }
   
-  // Clear current directions
   function clearDirections() {
     directionsRenderer.setDirections({routes: []});
     currentDirections = null;
     hideDirectionsInfo();
   }
   
-  // External navigation fallback
   function navigateExternal(lat, lng) {
     if (isAppleDevice()) {
       window.open(`maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`);
@@ -644,7 +559,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
   
-  // Show directions info panel
   function showDirectionsInfo(duration, distance) {
     let directionsInfo = document.getElementById('directions-info');
     if (!directionsInfo) {
@@ -668,7 +582,6 @@ document.addEventListener("DOMContentLoaded", () => {
     directionsInfo.style.display = 'block';
   }
   
-  // Hide directions info panel
   function hideDirectionsInfo() {
     const directionsInfo = document.getElementById('directions-info');
     if (directionsInfo) {
@@ -676,32 +589,29 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
   
-  // Main navigation function (called from feature cards)
+  // Make navigation functions global
   window.navigate = function(lat, lng) {
     getDirections(lat, lng);
   };
   
-  // Make functions global
   window.clearDirections = clearDirections;
   window.getDirections = getDirections;
   
   // --- Panel Management ---
   function openPanel(panelName) {
-    // Close all panels first
     document.querySelectorAll('.sliding-panel').forEach(p => {
       p.classList.remove('open');
-      p.style.transform = 'translateX(-50%) translateY(130%)'; // Reset position
+      p.style.transform = 'translateX(-50%) translateY(130%)';
     });
     document.querySelectorAll('.panel-overlay').forEach(o => o.classList.remove('active'));
     
-    // Open the requested panel
     const panel = document.getElementById(`${panelName}-panel`);
     const overlay = document.getElementById(`${panelName}-overlay`);
     
     if (panel && overlay) {
       panel.classList.add('open');
       overlay.classList.add('active');
-      panel.style.transform = 'translateX(-50%) translateY(0)'; // Ensure it's visible
+      panel.style.transform = 'translateX(-50%) translateY(0)';
       initializeDrag(panel);
     }
   }
@@ -709,7 +619,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function closeAllPanels() {
     document.querySelectorAll('.sliding-panel').forEach(p => {
       p.classList.remove('open');
-      p.style.transform = 'translateX(-50%) translateY(130%)'; // Reset to hidden position
+      p.style.transform = 'translateX(-50%) translateY(130%)';
     });
     document.querySelectorAll('.panel-overlay').forEach(o => o.classList.remove('active'));
   }
@@ -786,29 +696,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Mouse events for panel content (drag anywhere)
     panelContent.addEventListener('mousedown', handleStart);
   }
-        // Drag down - close panel
-        closeAllPanels();
-      } else if (currentY < -threshold) {
-        // Drag up - expand to top
-        panel.style.transform = 'translateX(-50%) translateY(-40vh)';
-      } else {
-        // Snap back to normal position
-        panel.style.transform = 'translateX(-50%) translateY(0)';
-      }
-      
-      currentY = 0;
-    }
-    
-    // Touch events
-    dragBar.addEventListener('touchstart', handleStart, { passive: false });
-    document.addEventListener('touchmove', handleMove, { passive: false });
-    document.addEventListener('touchend', handleEnd);
-    
-    // Mouse events
-    dragBar.addEventListener('mousedown', handleStart);
-    document.addEventListener('mousemove', handleMove);
-    document.addEventListener('mouseup', handleEnd);
-  }
   
   // --- Event Listeners ---
   
@@ -830,14 +717,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const suburbList = document.getElementById('suburb-list');
   
   if (searchInput && suburbList) {
-    // Show preset locations when panel opens or input is empty
     function showPresetLocations() {
-      suburbList.innerHTML = PRESET_LOCATIONS.map(location => 
-        `<li class="suburb-list-item" onclick="${location.action === 'current' ? 'goToCurrentLocation()' : `goToLocation(${location.lat}, ${location.lng}, '${location.name}')`}">${location.name}</li>`
-      ).join('');
+      suburbList.innerHTML = PRESET_LOCATIONS.map(location => {
+        if (location.action === 'current') {
+          return `<li class="suburb-list-item" onclick="goToCurrentLocation()">${location.name}</li>`;
+        } else {
+          return `<li class="suburb-list-item" onclick="goToLocation(${location.lat}, ${location.lng}, '${location.name}')">${location.name}</li>`;
+        }
+      }).join('');
     }
     
-    // Show presets initially
     showPresetLocations();
     
     searchInput.addEventListener('input', e => {
@@ -847,7 +736,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       
-      // Search through suburb names
       const matchingSuburbs = QLD_SUBURBS
         .filter(suburb => suburb.suburb.toLowerCase().includes(query))
         .sort((a, b) => a.suburb.localeCompare(b.suburb))
@@ -858,7 +746,6 @@ document.addEventListener("DOMContentLoaded", () => {
       ).join('');
     });
     
-    // Reset to presets when input is cleared
     searchInput.addEventListener('focus', () => {
       if (!searchInput.value) {
         showPresetLocations();
@@ -876,7 +763,6 @@ document.addEventListener("DOMContentLoaded", () => {
       myMap.setZoom(14);
       closeAllPanels();
     } else {
-      // If no sites found with exact postcode, try to find the suburb in our mapping
       const suburbData = QLD_SUBURBS.find(s => s.suburb.toLowerCase() === suburbName.toLowerCase());
       if (suburbData) {
         myMap.setCenter(new google.maps.LatLng(suburbData.lat, suburbData.lng));
@@ -899,7 +785,6 @@ document.addEventListener("DOMContentLoaded", () => {
       myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
       myMap.setZoom(15);
     } else {
-      // Try to get location again
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           position => {
@@ -925,7 +810,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const fuelContent = document.getElementById('fuel-dropdown-content');
   
   if (fuelBtn && fuelContent) {
-    // Populate fuel types
     FUEL_TYPES.forEach(fuel => {
       const item = document.createElement('div');
       item.className = 'fuel-dropdown-item';
@@ -951,7 +835,6 @@ document.addEventListener("DOMContentLoaded", () => {
     fuelBtn.addEventListener('click', e => {
       e.stopPropagation();
       fuelContent.classList.toggle('show');
-      // Close map type dropdown if open
       document.getElementById('maptype-dropdown').classList.remove('show');
     });
   }
@@ -964,7 +847,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   
   document.getElementById('toolbar-center-btn')?.addEventListener('click', () => {
-    // Navigate to user's location or default Brisbane location
     if (userLocation) {
       myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
     } else {
@@ -988,7 +870,6 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // Map events
   myMap.addListener('bounds_changed', () => {
-    // Debounce the update to avoid too many calls
     clearTimeout(window.boundsUpdateTimeout);
     window.boundsUpdateTimeout = setTimeout(() => {
       updateVisibleStationsAndList();
