@@ -793,7 +793,7 @@ html, body {
   .marker-price {
     font-size: 10px !important;
     padding: 1px 5px;
-    font-weight: 500 !important;
+    font-weight: 600 !important;
     bottom: 37px;
   }
 }
