@@ -18,7 +18,17 @@
 </head>
 
 <body>
-  <div id="apple-map"></div>
+  <div id="apple-map" style="width: 600px; height: 400px;"></div>
+  <script>
+    mapkit.init({authorizationCallback: done => done("YOUR_TOKEN")});
+    var myMap = new mapkit.Map("apple-map", {
+      showsCompass: mapkit.FeatureVisibility.Hidden,
+      showsScale: mapkit.FeatureVisibility.Hidden,
+      showsMapTypeControl: mapkit.FeatureVisibility.Visible,
+      showsZoomControl: mapkit.FeatureVisibility.Hidden,
+      showsUserLocationControl: mapkit.FeatureVisibility.Hidden
+    });
+  </script>
 
   <!-- Weather Display -->
   <div class="weather-display" id="weather-display">
