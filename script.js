@@ -123,7 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showsCompass: mapkit.FeatureVisibility.Hidden,
     showsScale: mapkit.FeatureVisibility.Hidden,
     showsMapTypeControl: mapkit.FeatureVisibility.Visible,
-    showsZoomControl: mapkit.FeatureVisibility.Visible,
+    showsZoomControl: mapkit.FeatureVisibility.Hidden,
     showsUserLocationControl: mapkit.FeatureVisibility.Hidden
   });
 
