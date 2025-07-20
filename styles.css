@@ -500,29 +500,24 @@ html, body {
 }
 
 .marker-base {
-  width: 50px;
-  height: 50px;
+  width: 66px;
+  height: 66px;
   position: absolute;
   top: 0;
   left: 0;
   transition: filter 0.3s ease;
 }
 
-.marker-base.cheapest {
-  filter: hue-rotate(120deg) saturate(1.2);
-}
-
 .marker-logo {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   position: absolute;
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
   border-radius: 50%;
   background: white;
-  padding: 2px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  padding: 0px;
   object-fit: contain;
 }
 
@@ -539,27 +534,15 @@ html, body {
   font-family: 'Roboto', 'Inter', Arial, sans-serif;
   min-width: 20px;
   text-align: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.5);
   line-height: 1.2;
 }
 
-/* Hover effects for markers */
-.custom-marker:hover .marker-base {
-  filter: brightness(1.1) saturate(1.1);
-}
-
-.custom-marker:hover .marker-base.cheapest {
-  filter: hue-rotate(120deg) saturate(1.2) brightness(1.1);
-}
-
 .custom-marker:hover .marker-logo {
-  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
   transform: translateX(-50%) scale(1.05);
 }
 
 .custom-marker:hover .marker-price {
   background: #333;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
 }
 
 /* Active/click state */
@@ -569,13 +552,8 @@ html, body {
 
 /* Special styling for cheapest marker price box */
 .custom-marker.cheapest .marker-price {
-  background: #22C55E;
-  color: white;
+  color: #22C55E;
   font-weight: 700;
-}
-
-.custom-marker.cheapest:hover .marker-price {
-  background: #16A34A;
 }
 
 /* Animation for marker appearance */
@@ -597,13 +575,13 @@ html, body {
 /* Responsive adjustments for smaller screens */
 @media (max-width: 768px) {
   .custom-marker {
-    width: 45px;
+    width: 55px;
     height: 55px;
   }
   
   .marker-base {
-    width: 45px;
-    height: 45px;
+    width: 55px;
+    height: 55px;
   }
   
   .marker-logo {
