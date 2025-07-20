@@ -541,8 +541,6 @@ div[class*="address"] {
 /* ========== BOTTOM TOOLBAR (NEW DESIGN) ========== */
 .sc-bottom-bar{
   position: fixed;
-  margin-right: 4px;
-  margin-left: 4px;
   bottom: 24px;
   left: 50%;
   transform: translateX(-50%);
@@ -551,7 +549,7 @@ div[class*="address"] {
   justify-content: space-between;
   align-items: center;
   gap: 20px;
-  width: 100%;
+  width: 95%;
   max-width: 100%;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
