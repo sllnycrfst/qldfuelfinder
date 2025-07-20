@@ -67,7 +67,7 @@ html, body {
   top: 20%;
   right: 20px;
   transform: translateY(-50%);
-  z-index: 10001;
+  z-index: 10005;
 }
 
 .fuel-dropdown {
@@ -565,6 +565,7 @@ html, body {
 .custom-zoom-control button,
 .maptype-btn,
 .streetview-btn,
+.fuel-dropdown-btn,
 .rotate-btn {
   width: 44px;
   height: 44px;
@@ -645,6 +646,7 @@ html, body {
 
 .maptype-dropdown.show {
   display: block;
+  z-index: 11000;
 }
 
 @keyframes dropdownSlideIn {
@@ -789,8 +791,9 @@ html, body {
   }
   
   .marker-price {
-    font-size: 9px !important;
+    font-size: 10px !important;
     padding: 1px 5px;
+    font-weight: 500 !important;
     bottom: 37px;
   }
 }
