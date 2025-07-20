@@ -512,7 +512,7 @@ html, body {
   width: 24px;
   height: 24px;
   position: absolute;
-  top: 24px;
+  top: 25px;
   left: 50%;
   transform: translateX(-50%);
   background: none !important;
@@ -550,7 +550,210 @@ html, body {
   color: #22C55E;
   font-weight: 700;
 }
+/* ========== CUSTOM MAP CONTROLS ========== */
+.custom-map-controls {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
+/* ========== SHARED BUTTON STYLES ========== */
+.custom-zoom-control button,
+.maptype-btn,
+.streetview-btn,
+.rotate-btn {
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #4a5568;
+  font-size: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.custom-zoom-control button:hover,
+.maptype-btn:hover,
+.streetview-btn:hover,
+.rotate-btn:hover {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+  color: #2d3748;
+}
+
+.custom-zoom-control button:active,
+.maptype-btn:active,
+.streetview-btn:active,
+.rotate-btn:active {
+  transform: translateY(0) scale(0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* ========== ZOOM CONTROLS ========== */
+.custom-zoom-control {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 2px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.zoom-in-btn {
+  border-radius: 12px 12px 6px 6px !important;
+}
+
+.zoom-out-btn {
+  border-radius: 6px 6px 12px 12px !important;
+}
+
+/* ========== MAP TYPE CONTROL ========== */
+.custom-maptype-control {
+  position: relative;
+}
+
+.maptype-dropdown {
+  position: absolute;
+  top: 52px;
+  right: 0;
+  min-width: 140px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+  display: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: dropdownSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.maptype-dropdown.show {
+  display: block;
+}
+
+@keyframes dropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.maptype-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.maptype-item:hover {
+  background: rgba(79, 70, 229, 0.1);
+  color: #4F46E5;
+}
+
+.maptype-item i {
+  width: 16px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* ========== STREET VIEW CONTROL ========== */
+.custom-streetview-control .streetview-btn.active {
+  background: rgba(79, 70, 229, 0.9);
+  color: white;
+}
+
+.custom-streetview-control .streetview-btn.active:hover {
+  background: rgba(79, 70, 229, 1);
+}
+
+/* ========== ROTATE CONTROL ========== */
+.rotate-btn i {
+  transition: transform 0.3s ease;
+}
+
+.rotate-btn:active i {
+  transform: rotate(90deg);
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+@media (max-width: 768px) {
+  .custom-map-controls {
+    top: 15px;
+    right: 15px;
+    gap: 10px;
+  }
+  
+  .custom-zoom-control button,
+  .maptype-btn,
+  .streetview-btn,
+  .rotate-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+  }
+  
+  .maptype-dropdown {
+    min-width: 120px;
+    top: 48px;
+  }
+  
+  .maptype-item {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .custom-map-controls {
+    top: 10px;
+    right: 10px;
+    gap: 8px;
+  }
+  
+  .custom-zoom-control button,
+  .maptype-btn,
+  .streetview-btn,
+  .rotate-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+  
+  .zoom-in-btn {
+    border-radius: 10px 10px 5px 5px !important;
+  }
+  
+  .zoom-out-btn {
+    border-radius: 5px 5px 10px 10px !important;
+  }
+}
 /* Animation for marker appearance */
 @keyframes markerAppear {
   from {
