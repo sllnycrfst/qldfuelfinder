@@ -75,7 +75,6 @@ html, body {
 /* ========== SHARED BUTTON STYLES ========== */
 .custom-zoom-control button,
 .maptype-btn,
-.tilt-btn,
 .fuel-dropdown-btn {
   width: 44px;
   height: 44px;
@@ -98,7 +97,6 @@ html, body {
 
 .custom-zoom-control button:hover,
 .maptype-btn:hover,
-.tilt-btn:hover,
 .fuel-dropdown-btn:hover {
   background: rgba(255, 255, 255, 0.95);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
@@ -108,7 +106,6 @@ html, body {
 
 .custom-zoom-control button:active,
 .maptype-btn:active,
-.tilt-btn:active,
 .fuel-dropdown-btn:active {
   transform: translateY(0) scale(0.95);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
@@ -384,7 +381,7 @@ html, body {
   border-radius: 47px;
 }
 
-/* ========== BOTTOM TOOLBAR ========== */
+/* ========== BOTTOM TOOLBAR WITH CIRCULAR CUTOUT ========== */
 .sc-bottom-bar {
   position: fixed;
   bottom: 24px;
@@ -403,6 +400,9 @@ html, body {
   border-radius: 50px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.1);
   z-index: 15000;
+  /* Create circular cutout using radial gradient mask */
+  mask: radial-gradient(circle 38px at 50% 0px, transparent 38px, black 40px);
+  -webkit-mask: radial-gradient(circle 38px at 50% 0px, transparent 38px, black 40px);
 }
 
 .sc-menu-item {
@@ -436,6 +436,8 @@ html, body {
   color: white !important;
   box-shadow: 0 4px 20px rgba(79, 70, 229, 0.4);
   margin-top: -20px;
+  position: relative;
+  z-index: 15001;
 }
 
 .sc-center-btn i {
@@ -577,14 +579,13 @@ html, body {
   color: #22C55E;
   font-weight: 700;
 }
-/* ========== TILT/3D CONTROL ========== */
-.tilt-btn.active {
-  background: rgba(79, 70, 229, 0.9);
-  color: white;
-}
-
-.tilt-btn.active:hover {
-  background: rgba(79, 70, 229, 1);
+/* ========== ZOOM CONTROLS CONTAINER ========== */
+.zoom-controls-container {
+  position: fixed;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  z-index: 10000;
 }
 
 /* ========== ZOOM CONTROLS ========== */
@@ -669,11 +670,14 @@ html, body {
   
   .custom-zoom-control button,
   .maptype-btn,
-  .tilt-btn,
   .fuel-dropdown-btn {
     width: 40px;
     height: 40px;
     font-size: 14px;
+  }
+  
+  .zoom-controls-container {
+    right: 15px;
   }
   
   .maptype-dropdown,
@@ -698,12 +702,15 @@ html, body {
   
   .custom-zoom-control button,
   .maptype-btn,
-  .tilt-btn,
   .fuel-dropdown-btn {
     width: 36px;
     height: 36px;
     font-size: 13px;
     border-radius: 10px;
+  }
+  
+  .zoom-controls-container {
+    right: 10px;
   }
   
   .zoom-in-btn {

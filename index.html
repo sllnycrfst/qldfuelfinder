@@ -19,6 +19,16 @@
 
 <!-- Custom Map Controls -->
 <div class="custom-map-controls">
+  <!-- Fuel Selector -->
+  <div class="fuel-selector">
+    <div class="fuel-dropdown">
+      <button class="fuel-dropdown-btn" id="fuel-dropdown-btn">E10</button>
+      <div class="fuel-dropdown-content" id="fuel-dropdown-content">
+        <!-- Populated by JavaScript -->
+      </div>
+    </div>
+  </div>
+
   <!-- Map Type Control -->
   <div class="custom-maptype-control">
     <button class="maptype-btn" id="maptype-btn">
@@ -31,25 +41,10 @@
       <div class="maptype-item" onclick="changeMapType('terrain')"><i class="fas fa-mountain"></i> Terrain</div>
     </div>
   </div>
+</div>
 
-  <!-- Fuel Selector -->
-  <div class="fuel-selector">
-    <div class="fuel-dropdown">
-      <button class="fuel-dropdown-btn" id="fuel-dropdown-btn">E10</button>
-      <div class="fuel-dropdown-content" id="fuel-dropdown-content">
-        <!-- Populated by JavaScript -->
-      </div>
-    </div>
-  </div>
-
-  <!-- 3D/Tilt Toggle -->
-  <div class="custom-tilt-control">
-    <button class="tilt-btn" id="tilt-btn" onclick="toggleTilt()">
-      <i class="fas fa-cube"></i>
-    </button>
-  </div>
-
-  <!-- Zoom Controls -->
+<!-- Zoom Controls (positioned at 50% height) -->
+<div class="zoom-controls-container">
   <div class="custom-zoom-control">
     <button class="zoom-in-btn" onclick="myMap.setZoom(myMap.getZoom() + 1)">
       <i class="fas fa-plus"></i>

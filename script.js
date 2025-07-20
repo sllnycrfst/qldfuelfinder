@@ -181,20 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('maptype-dropdown').classList.remove('show');
   };
   
-  window.toggleTilt = function() {
-    const tiltBtn = document.getElementById('tilt-btn');
-    const currentTilt = myMap.getTilt();
-    
-    if (currentTilt === 0) {
-      // Enable 3D view
-      myMap.setTilt(45);
-      tiltBtn.classList.add('active');
-    } else {
-      // Disable 3D view
-      myMap.setTilt(0);
-      tiltBtn.classList.remove('active');
-    }
-  };
+
   
   // Map type dropdown toggle
   document.getElementById('maptype-btn').addEventListener('click', function(e) {
