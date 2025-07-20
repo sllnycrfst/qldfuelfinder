@@ -1,7 +1,5 @@
- // Import suburb data and brand logos
+ // Import suburb data
 import { QLD_SUBURBS } from './data/qld-suburbs.js';
-import { BRAND_LOGOS } from './data/brand-logos.js';
-import { getBrandLogoFile, getBrandWithLogo } from './data/brand-logo-files.js';
 
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Script loaded!");
@@ -407,16 +405,9 @@ document.addEventListener("DOMContentLoaded", () => {
         '?';
       
       const isCheapest = site.S === cheapestStationId;
-      const brandInfo = getBrandWithLogo(site.B, BRAND_NAMES[site.B]);
       
       li.innerHTML = `
         <div style="display:flex;align-items:center;padding:12px;border-bottom:1px solid #eee;">
-          <div class="station-logo" style="width:50px;height:50px;margin-right:12px;display:flex;align-items:center;justify-content:center;">
-            <img src="${brandInfo.logo}" 
-                 alt="${brandInfo.name}" 
-                 style="max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;"
-                 onerror="this.src='images/default.png'">
-          </div>
           <div style="flex:1;">
             <div style="font-weight:600;color:#333;">${site.N} ${isCheapest ? '💚' : ''}</div>
             <div style="font-size:12px;color:#666;">${site.A}, ${getSuburbName(site.P)}</div>
@@ -454,17 +445,9 @@ document.addEventListener("DOMContentLoaded", () => {
       ` : '';
     }).filter(Boolean).join('');
     
-    const brandInfo = getBrandWithLogo(site.B, BRAND_NAMES[site.B]);
-    
     content.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:15px;">
         <h3 class="feature-card-title" style="margin:0;flex:1;">${site.N} ${isCheapest ? '💚 CHEAPEST' : ''}</h3>
-        <div class="brand-logo" style="width:60px;height:40px;margin-left:12px;display:flex;align-items:center;justify-content:center;">
-          <img src="${brandInfo.logo}" 
-               alt="${brandInfo.name}" 
-               style="max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;"
-               onerror="this.src='images/default.png'">
-        </div>
       </div>
       <div style="display:flex;align-items:center;margin-bottom:15px;">
         <p class="feature-card-address" style="margin:0;flex:1;text-decoration:none;">${site.A}, ${getSuburbName(site.P)}</p>
