@@ -156,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
   myMap = new google.maps.Map(document.getElementById("google-map"), {
     center: BRISBANE_COORDS,
     zoom: 15,
-    mapId: "DEMO_MAP_ID", // Enable 3D buildings and advanced features
+    mapId: "AIzaSyAQ0Ba7zICGUy5zCVijkkDNrNVdKAG1FGU", // Enable 3D buildings and advanced features
     tilt: 45, // Enable 3D tilt
     heading: 0, // Initial compass heading
     styles: [
