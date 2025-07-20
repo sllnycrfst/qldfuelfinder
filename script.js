@@ -1,4 +1,4 @@
-// Import suburb data and brand logos
+ // Import suburb data and brand logos
 import { QLD_SUBURBS } from './data/qld-suburbs.js';
 import { BRAND_LOGOS } from './data/brand-logos.js';
 import { getBrandLogoFile, getBrandWithLogo } from './data/brand-logo-files.js';
@@ -124,10 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showsScale: mapkit.FeatureVisibility.Hidden,
     showsMapTypeControl: mapkit.FeatureVisibility.Visible,
     showsZoomControl: mapkit.FeatureVisibility.Visible,
-    showsUserLocationControl: mapkit.FeatureVisibility.Visible,
-    compassIsInset: false,
-    minCameraDistance: 1000, // Prevent zooming in too much
-    maxCameraDistance: 50000 // Prevent zooming out too far
+    showsUserLocationControl: mapkit.FeatureVisibility.Visible
   });
 
   // --- Weather API ---
@@ -229,18 +226,19 @@ document.addEventListener("DOMContentLoaded", () => {
         
         visibleStations.push({ site, price });
         
-        // Create marker with brand color
+        // Create marker with custom SVG pin design
         const coord = new mapkit.Coordinate(lat, lng);
         const isCheapest = site.S === cheapestStationId;
         const brandId = site.B;
         
-        // Get brand color
-        const brandColor = getBrandColor(brandId);
+        // Get custom SVG pin design
+        const pinSvg = BRAND_LOGOS[brandId] || BRAND_LOGOS[0];
         
         const marker = new mapkit.MarkerAnnotation(coord, {
           title: `${(price / 10).toFixed(1)}`,
-          color: brandColor,
-          glyphText: `${(price / 10).toFixed(1)}`,
+          glyphImage: {
+            url: pinSvg
+          },
           calloutEnabled: true,
           animates: isCheapest
         });
