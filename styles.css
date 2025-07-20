@@ -512,7 +512,7 @@ html, body {
   width: 24px;
   height: 24px;
   position: absolute;
-  top: 30px;
+  top: 24px;
   left: 50%;
   transform: translateX(-50%);
   background: none !important;
@@ -536,7 +536,7 @@ html, body {
   line-height: 1.2;
 }
 
-.custom-marker:hover .marker-logo {
+.custom-marker:hover .marker-price {
   transform: translateX(-50%) scale(1.05);
 }
 
