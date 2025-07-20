@@ -785,13 +785,13 @@ html, body {
   .marker-logo {
     width: 22px;
     height: 22px;
-    top: 25px;
+    top: 23px;
   }
   
   .marker-price {
     font-size: 10px;
     padding: 1px 5px;
-    bottom: 35px;
+    bottom: 36px;
   }
 }
 
