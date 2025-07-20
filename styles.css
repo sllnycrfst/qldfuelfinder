@@ -488,8 +488,8 @@ html, body {
 /* ========== CUSTOM MARKER STYLES ========== */
 .custom-marker {
   position: relative;
-  width: 60px;
-  height: 60px;
+  width: 66px;
+  height: 66px;
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
