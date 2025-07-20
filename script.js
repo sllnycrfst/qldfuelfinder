@@ -5,8 +5,6 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("Script loaded!");
   
   // --- Constants & Config ---
-  const APPLE_MAPS_TOKEN = "eyJraWQiOiJCTVQ1NzVTUFc5IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUyOTg5NjYyLCJvcmlnaW4iOiJzbGxueWNyZnN0LmdpdGh1Yi5pbyJ9.dF_WYx3PZly0Fo1dec9KYc1ZJAxRS_WO7pvyXq04Fr7kWVXGGuRFYgzeA3K7DvH2JZEwgB6V-gidn3HfPIXpQQ";
-  
   const BRISBANE_COORDS = { lat: -27.4698, lng: 153.0251 };
   
   const FUEL_TYPES = [
@@ -18,72 +16,114 @@ document.addEventListener("DOMContentLoaded", () => {
     { key: "Premium Diesel", id: 14, label: "PDSL" }
   ];
   
-  // Brand colors for map markers
-  const BRAND_COLORS = {
-    2: "#E4002B",     // Caltex - Red
-    5: "#009B3A",     // BP - Green  
-    20: "#FFD500",    // Shell - Yellow
-    113: "#FF6600",   // 7-Eleven - Orange/Red
-    5094: "#003087",  // Puma - Blue
-    57: "#7B3F99",    // Metro - Purple
-    23: "#005BAC",    // United - Blue
-    110: "#FF6B00",   // Freedom - Orange
-    2418994: "#00529F", // Pacific - Blue
-    3421139: "#00A19C", // Pearl - Teal
-    2031031: "#005DAA", // Costco - Blue
-    167: "#C8102E",   // Speedway - Red
-    111: "#178841",   // Coles - Green
-    86: "#0066CC",    // Liberty - Blue
-    3421066: "#E4002B", // Ampol - Red
-    3421073: "#E4002B", // EG Ampol - Red
-    3421193: "#FFD500", // Reddy Express (Shell) - Yellow
-    0: "#808080"      // Default - Gray
+  // Brand logos for stations
+  const BRAND_LOGOS = {
+    2: "images/2.png",       // Caltex
+    5: "images/5.png",       // BP
+    20: "images/20.png",     // Shell
+    113: "images/113.png",   // 7-Eleven
+    5094: "images/5094.png", // Puma
+    57: "images/57.png",     // Metro
+    23: "images/23.png",     // United
+    110: "images/110.png",   // Freedom
+    111: "images/111.png",   // Coles
+    86: "images/86.png",     // Liberty
+    3421066: "images/3421066.png", // Ampol
+    3421073: "images/3421073.png", // EG Ampol
+    3421139: "images/3421139.png", // Pearl
+    3421193: "images/3421193.png", // Reddy Express
+    2031031: "images/2031031.png", // Costco
+    2418994: "images/2418994.png", // Pacific
+    169: "images/169.png",   // OTR
+    16: "images/16.png",     // Mobil
+    26: "images/26.png",
+    114: "images/114.png",
+    167: "images/167.png",
+    2419037: "images/2419037.png",
+    3421028: "images/3421028.png",
+    3421162: "images/3421162.png",
+    3421183: "images/3421183.png",
+    3421202: "images/3421202.png",
+    12: "images/default.png" // Default for Independent/Unknown
   };
   
-  // Helper function to get brand color
-  const getBrandColor = (brandId) => {
-    return BRAND_COLORS[brandId] || BRAND_COLORS[0];
+  // Helper function to get brand logo
+  const getBrandLogo = (brandId) => {
+    return BRAND_LOGOS[brandId] || BRAND_LOGOS[12]; // Default to generic logo
   };
   
-  // Helper function to get brand initial for recognition
-  function getBrandInitial(brandId) {
-    switch(brandId) {
-      case 2: return 'C';      // Caltex
-      case 5: return 'BP';     // BP
-      case 20: return 'S';     // Shell
-      case 113: return '7';    // 7-Eleven
-      case 5094: return 'P';   // Puma
-      case 57: return 'M';     // Metro
-      case 23: return 'U';     // United
-      case 110: return 'F';    // Freedom
-      case 111: return 'C';    // Coles
-      case 86: return 'L';     // Liberty
-      case 3421066: return 'A'; // Ampol
-      case 2031031: return '$'; // Costco
-      default: return (BRAND_NAMES[brandId] || 'U').charAt(0);
-    }
-  }
-  
-  // Create simple blue/green markers with price inside
+  // Create custom marker with mymarker.png base, station logo, and price in black box
   function createCustomMarker(price, brandId, isCheapest = false) {
     const priceText = Math.round(price / 10).toString(); // 3 digits, no decimal
-    const markerColor = isCheapest ? '#22C55E' : '#3B82F6';
+    const logoUrl = getBrandLogo(brandId);
     
-    const svg = `
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">
-        <!-- Drop shadow -->
-        <ellipse cx="22" cy="37" rx="8" ry="2" fill="rgba(0,0,0,0.2)"/>
-        
-        <!-- Main circle -->
-        <circle cx="20" cy="20" r="18" fill="${markerColor}" stroke="white" stroke-width="2"/>
-        
-        <!-- Price text inside -->
-        <text x="20" y="25" text-anchor="middle" font-family="Arial, sans-serif" 
-              font-size="10" font-weight="bold" fill="white">${priceText}</text>
-      </svg>
+    // Create a custom marker element
+    const markerDiv = document.createElement('div');
+    markerDiv.style.cssText = `
+      position: relative;
+      width: 50px;
+      height: 60px;
+      cursor: pointer;
     `;
     
-    return 'data:image/svg+xml;base64,' + btoa(svg);
+    // Base marker image (mymarker.png)
+    const baseMarker = document.createElement('img');
+    baseMarker.src = 'images/mymarker.png';
+    baseMarker.style.cssText = `
+      width: 50px;
+      height: 50px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      filter: ${isCheapest ? 'hue-rotate(120deg) saturate(1.2)' : 'none'};
+    `;
+    
+    // Station logo on top of marker
+    const stationLogo = document.createElement('img');
+    stationLogo.src = logoUrl;
+    stationLogo.style.cssText = `
+      width: 24px;
+      height: 24px;
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: white;
+      padding: 2px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    `;
+    
+    // Error handling for logo loading
+    stationLogo.onerror = function() {
+      this.src = 'images/default.png';
+    };
+    
+    // Price box (black background with white text)
+    const priceBox = document.createElement('div');
+    priceBox.textContent = priceText;
+    priceBox.style.cssText = `
+      position: absolute;
+      bottom: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #000;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: bold;
+      font-family: 'Roboto', sans-serif;
+      min-width: 20px;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    `;
+    
+    markerDiv.appendChild(baseMarker);
+    markerDiv.appendChild(stationLogo);
+    markerDiv.appendChild(priceBox);
+    
+    return markerDiv;
   }
   
   const BRAND_NAMES = {
@@ -150,111 +190,29 @@ document.addEventListener("DOMContentLoaded", () => {
     return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
   };
   
-  // --- MapKit Initialization ---
-  mapkit.init({
-    authorizationCallback: done => done(APPLE_MAPS_TOKEN)
+  // --- Google Maps Initialization ---
+  myMap = new google.maps.Map(document.getElementById("google-map"), {
+    center: BRISBANE_COORDS,
+    zoom: 12,
+    styles: [
+      {
+        featureType: "poi",
+        elementType: "labels",
+        stylers: [{ visibility: "off" }]
+      }
+    ],
+    disableDefaultUI: true,
+    zoomControl: true,
+    zoomControlOptions: {
+      position: google.maps.ControlPosition.RIGHT_CENTER,
+      style: google.maps.ZoomControlStyle.SMALL
+    },
+    mapTypeControl: false,
+    scaleControl: false,
+    streetViewControl: false,
+    rotateControl: false,
+    fullscreenControl: false
   });
-  
-  myMap = new mapkit.Map("apple-map", {
-    region: new mapkit.CoordinateRegion(
-      new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng),
-      new mapkit.CoordinateSpan(0.02, 0.02) // More zoomed in
-    ),
-    showsCompass: mapkit.FeatureVisibility.Hidden,
-    showsScale: mapkit.FeatureVisibility.Hidden,
-    showsMapTypeControl: mapkit.FeatureVisibility.Visible,
-    showsZoomControl: mapkit.FeatureVisibility.Hidden,
-    showsUserLocationControl: mapkit.FeatureVisibility.Hidden,
-    showsPointsOfInterest: false
-  });
-  
-  // Add custom zoom controls
-  const mapElement = document.getElementById('apple-map');
-  const zoomInBtn = document.createElement('div');
-  const zoomOutBtn = document.createElement('div');
-  
-  // Create zoom control container
-  const zoomControl = document.createElement('div');
-  zoomControl.className = 'leaflet-control-zoom';
-  
-  // Zoom in button
-  zoomInBtn.className = 'leaflet-control-zoom-in';
-  zoomInBtn.innerHTML = '+';
-  zoomInBtn.style.cssText = `
-    width: 36px !important;
-    height: 36px !important;
-    line-height: 34px !important;
-    font-size: 18px !important;
-    background: rgba(255,255,255,0.9) !important;
-    backdrop-filter: blur(10px) !important;
-    border-radius: 8px !important;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.15) !important;
-    margin-bottom: 8px !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    border: none;
-    color: #333;
-    font-weight: bold;
-    text-decoration: none;
-  `;
-  
-  // Zoom out button
-  zoomOutBtn.className = 'leaflet-control-zoom-out';
-  zoomOutBtn.innerHTML = '−';
-  zoomOutBtn.style.cssText = `
-    width: 36px !important;
-    height: 36px !important;
-    line-height: 34px !important;
-    font-size: 18px !important;
-    background: rgba(255,255,255,0.9) !important;
-    backdrop-filter: blur(10px) !important;
-    border-radius: 8px !important;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.15) !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    border: none;
-    color: #333;
-    font-weight: bold;
-    text-decoration: none;
-  `;
-  
-  // Add click events
-  zoomInBtn.addEventListener('click', () => {
-    const currentRegion = myMap.region;
-    const newSpan = new mapkit.CoordinateSpan(
-      currentRegion.span.latitudeDelta * 0.5,
-      currentRegion.span.longitudeDelta * 0.5
-    );
-    myMap.region = new mapkit.CoordinateRegion(currentRegion.center, newSpan);
-  });
-  
-  zoomOutBtn.addEventListener('click', () => {
-    const currentRegion = myMap.region;
-    const newSpan = new mapkit.CoordinateSpan(
-      currentRegion.span.latitudeDelta * 2,
-      currentRegion.span.longitudeDelta * 2
-    );
-    myMap.region = new mapkit.CoordinateRegion(currentRegion.center, newSpan);
-  });
-  
-  // Position and add to DOM
-  zoomControl.style.cssText = `
-    position: fixed !important;
-    top: 25% !important;
-    right: 20px !important;
-    transform: translateY(-50%) !important;
-    z-index: 10000 !important;
-    display: flex;
-    flex-direction: column;
-  `;
-  
-  zoomControl.appendChild(zoomInBtn);
-  zoomControl.appendChild(zoomOutBtn);
-  document.body.appendChild(zoomControl);
 
   // --- Weather API ---
   async function fetchWeather() {
@@ -338,13 +296,17 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateVisibleStationsAndList() {
     console.log("Updating stations and list...");
     
-    // Clear existing markers properly
-    if (currentMarkers.length > 0) {
-      myMap.removeAnnotations(currentMarkers);
-      currentMarkers = [];
-    }
+    // Clear existing markers
+    currentMarkers.forEach(marker => {
+      if (marker.setMap) {
+        marker.setMap(null);
+      }
+    });
+    currentMarkers = [];
     
-    const mapBounds = myMap.region.toBoundingRegion();
+    const bounds = myMap.getBounds();
+    if (!bounds) return;
+    
     const visibleStations = [];
     
     // Find cheapest station among visible ones
@@ -353,49 +315,75 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // First pass: find all visible stations and their cheapest price
     allSites.forEach(site => {
-      const lat = site.Lat;
-      const lng = site.Lng;
+      const position = new google.maps.LatLng(site.Lat, site.Lng);
       const price = priceMap[site.S]?.[FUEL_TYPES.find(f => f.key === currentFuel).id];
       
-      if (!price) return;
+      if (!price || !bounds.contains(position)) return;
       
-      if (lat >= mapBounds.southLatitude && lat <= mapBounds.northLatitude &&
-          lng >= mapBounds.westLongitude && lng <= mapBounds.eastLongitude) {
-        
-        visibleStations.push({ site, price });
-        
-        if (price < cheapestVisiblePrice) {
-          cheapestVisiblePrice = price;
-          cheapestVisibleStationId = site.S;
-        }
+      visibleStations.push({ site, price });
+      
+      if (price < cheapestVisiblePrice) {
+        cheapestVisiblePrice = price;
+        cheapestVisibleStationId = site.S;
       }
     });
     
     // Second pass: create markers with correct cheapest highlighting
     visibleStations.forEach(({ site, price }) => {
-      const coord = new mapkit.Coordinate(site.Lat, site.Lng);
+      const position = new google.maps.LatLng(site.Lat, site.Lng);
       const isCheapest = site.S === cheapestVisibleStationId;
       const brandId = site.B;
       
       console.log(`Station ${site.N}: Price ${price}, isCheapest: ${isCheapest}`);
       
-      // Create the custom marker image with correct colors
-      const markerImage = createCustomMarker(price, brandId, isCheapest);
+      // Create the custom marker
+      const markerElement = createCustomMarker(price, brandId, isCheapest);
       
-      const marker = new mapkit.MarkerAnnotation(coord, {
-        glyphImage: {
-          url: markerImage
-        },
-        anchorOffset: new DOMPoint(0, -20),
-        calloutEnabled: false
-      });
+      // Create marker using OverlayView for custom HTML content
+      class CustomMarker extends google.maps.OverlayView {
+        constructor(position, content, map) {
+          super();
+          this.position = position;
+          this.content = content;
+          this.div = null;
+          this.setMap(map);
+        }
+        
+        onAdd() {
+          this.div = document.createElement('div');
+          this.div.style.position = 'absolute';
+          this.div.appendChild(this.content);
+          
+          const panes = this.getPanes();
+          panes.overlayMouseTarget.appendChild(this.div);
+        }
+        
+        draw() {
+          const overlayProjection = this.getProjection();
+          const sw = overlayProjection.fromLatLngToDivPixel(this.position);
+          
+          if (this.div) {
+            this.div.style.left = (sw.x - 25) + 'px';
+            this.div.style.top = (sw.y - 50) + 'px';
+          }
+        }
+        
+        onRemove() {
+          if (this.div) {
+            this.div.parentNode.removeChild(this.div);
+            this.div = null;
+          }
+        }
+      }
       
-      marker.addEventListener("select", e => {
+      const marker = new CustomMarker(position, markerElement, myMap);
+      
+      // Add click listener
+      markerElement.addEventListener('click', () => {
         showFeatureCard(site, price);
       });
       
-      myMap.addAnnotation(marker);
-      currentMarkers.push(marker); // Track for cleanup
+      currentMarkers.push(marker);
     });
     
     updateList(visibleStations);
@@ -616,21 +604,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (sites.length > 0) {
       const avgLat = sites.reduce((sum, s) => sum + s.Lat, 0) / sites.length;
       const avgLng = sites.reduce((sum, s) => sum + s.Lng, 0) / sites.length;
-      myMap.setCenterAnimated(new mapkit.Coordinate(avgLat, avgLng), true);
-      myMap.region = new mapkit.CoordinateRegion(
-        new mapkit.Coordinate(avgLat, avgLng),
-        new mapkit.CoordinateSpan(0.05, 0.05)
-      );
+      myMap.setCenter(new google.maps.LatLng(avgLat, avgLng));
+      myMap.setZoom(14);
       closeAllPanels();
     } else {
       // If no sites found with exact postcode, try to find the suburb in our mapping
       const suburbData = QLD_SUBURBS.find(s => s.suburb.toLowerCase() === suburbName.toLowerCase());
       if (suburbData) {
-        myMap.setCenterAnimated(new mapkit.Coordinate(suburbData.lat, suburbData.lng), true);
-        myMap.region = new mapkit.CoordinateRegion(
-          new mapkit.Coordinate(suburbData.lat, suburbData.lng),
-          new mapkit.CoordinateSpan(0.05, 0.05)
-        );
+        myMap.setCenter(new google.maps.LatLng(suburbData.lat, suburbData.lng));
+        myMap.setZoom(14);
         closeAllPanels();
       }
     }
@@ -684,15 +666,9 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById('toolbar-center-btn')?.addEventListener('click', () => {
     // Navigate to user's location or default Brisbane location
     if (userLocation) {
-      myMap.setCenterAnimated(
-        new mapkit.Coordinate(userLocation.lat, userLocation.lng),
-        true
-      );
+      myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
     } else {
-      myMap.setCenterAnimated(
-        new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng),
-        true
-      );
+      myMap.setCenter(new google.maps.LatLng(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng));
     }
     closeAllPanels();
     document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));
@@ -710,9 +686,13 @@ document.addEventListener("DOMContentLoaded", () => {
     overlay.addEventListener('click', closeAllPanels);
   });
   
-  // Map region change
-  myMap.addEventListener('region-change-end', () => {
-    updateVisibleStationsAndList();
+  // Map events
+  myMap.addListener('bounds_changed', () => {
+    // Debounce the update to avoid too many calls
+    clearTimeout(window.boundsUpdateTimeout);
+    window.boundsUpdateTimeout = setTimeout(() => {
+      updateVisibleStationsAndList();
+    }, 300);
   });
   
   // Get user location
@@ -723,10 +703,7 @@ document.addEventListener("DOMContentLoaded", () => {
           lat: position.coords.latitude,
           lng: position.coords.longitude
         };
-        myMap.setCenterAnimated(
-          new mapkit.Coordinate(userLocation.lat, userLocation.lng),
-          true
-        );
+        myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
       },
       error => console.log("Location error:", error)
     );
