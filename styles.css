@@ -547,7 +547,6 @@ margin-bottom: max(70px, env(safe-area-inset-bottom, 0px) + 50px); /* iOS safe a
   position: absolute;
   top: 25px;
   left: 50%;
-  transform: translateX(-50%);
   background: none !important;
   padding: 0px;
   object-fit: contain;
@@ -557,7 +556,6 @@ margin-bottom: max(70px, env(safe-area-inset-bottom, 0px) + 50px); /* iOS safe a
   position: absolute;
   bottom: 44px;
   left: 50%;
-  transform: translateX(-50%);
   color: white;
   padding: 2px 6px;
   border-radius: 4px;
@@ -567,10 +565,6 @@ margin-bottom: max(70px, env(safe-area-inset-bottom, 0px) + 50px); /* iOS safe a
   min-width: 20px;
   text-align: center;
   line-height: 1.2;
-}
-
-.custom-marker:hover .marker-price {
-  transform: translateX(-50%) scale(1.05);
 }
 
 /* Active/click state */
@@ -650,11 +644,11 @@ margin-bottom: max(70px, env(safe-area-inset-bottom, 0px) + 50px); /* iOS safe a
 }
 
 .zoom-in-btn {
-  border-radius: 12px 12px 6px 6px !important;
+  border-radius: 2px 2px 2px 2px !important;
 }
 
 .zoom-out-btn {
-  border-radius: 6px 6px 12px 12px !important;
+  border-radius: 2px 2px 2px 2px !important;
 }
 
 /* ========== MAP TYPE CONTROL ========== */
@@ -986,7 +980,7 @@ margin-bottom: max(70px, env(safe-area-inset-bottom, 0px) + 50px); /* iOS safe a
 .right-controls-container {
   position: fixed;
   right: 20px;
-  top: 20px;
+  top: 0px;
   z-index: 10000;
   display: flex;
   flex-direction: column;
@@ -996,13 +990,13 @@ margin-bottom: max(70px, env(safe-area-inset-bottom, 0px) + 50px); /* iOS safe a
 .fuel-selector-right {
   position: fixed;
   right: 20px;
-  top: 20px;
+  top: 0px;
   z-index: 10001;
 }
 
 .map-type-control-right {
   position: fixed;
-  right: 20px;
+  right: 0px;
   top: 80px;
   z-index: 10001;
 }
@@ -1010,7 +1004,7 @@ margin-bottom: max(70px, env(safe-area-inset-bottom, 0px) + 50px); /* iOS safe a
 .zoom-control-right {
   position: fixed;
   right: 20px;
-  top: 140px;
+  top: 70%;
   z-index: 10001;
 }
 
