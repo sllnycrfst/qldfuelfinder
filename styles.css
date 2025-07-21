@@ -233,10 +233,33 @@ html, body {
   user-select: none;
   -webkit-user-select: none;
   touch-action: pan-y;
+  flex-shrink: 0; /* Prevent shrinking */
+  position: relative;
+  z-index: 9025;
 }
 
 .panel-drag-bar:active {
   cursor: grabbing;
+}
+
+/* Create a larger touch area for mobile but only at the top */
+.panel-drag-bar::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: -30px;
+  right: -30px;
+  bottom: -10px;
+  z-index: 9026;
+}
+
+@media (max-width: 768px) {
+  .panel-drag-bar::before {
+    top: -25px;
+    left: -50px;
+    right: -50px;
+    bottom: -15px;
+  }
 }
 
 /* ========== PANEL CONTENT ========== */
@@ -412,6 +435,9 @@ html, body {
   border-radius: 50px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.1);
   z-index: 15000;
+  /* iOS safe area adjustments */
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  margin-bottom: env(safe-area-inset-bottom);
 }
 
 .sc-menu-item {
@@ -766,7 +792,59 @@ html, body {
   }
 
   .sc-bottom-bar {
-    bottom: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    margin-bottom: 0;
+  }
+  
+  /* Adjust panel content bottom margin for mobile */
+  .panel-content {
+    margin-bottom: max(70px, calc(70px + env(safe-area-inset-bottom)));
+  }
+}
+
+/* ========== USER LOCATION MARKER ========== */
+.user-location-marker {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+
+.user-location-dot {
+  width: 16px;
+  height: 16px;
+  background: #007AFF;
+  border: 3px solid white;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.4);
+  z-index: 2;
+}
+
+.user-location-pulse {
+  width: 30px;
+  height: 30px;
+  background: rgba(0, 122, 255, 0.2);
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: userLocationPulse 2s infinite;
+  z-index: 1;
+}
+
+@keyframes userLocationPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.5);
+    opacity: 0;
   }
 }
 

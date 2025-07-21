@@ -198,6 +198,18 @@ document.addEventListener("DOMContentLoaded", () => {
       {
         featureType: "poi.sports_complex",
         stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "transit",
+        stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "transit.station",
+        stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "transit.line",
+        stylers: [{ visibility: "off" }]
       }
     ],
     disableDefaultUI: true, // Disable all default controls
@@ -698,6 +710,17 @@ document.addEventListener("DOMContentLoaded", () => {
     getDirections(lat, lng);
   };
   
+  // Zoom functions
+  window.zoomIn = function() {
+    const currentZoom = myMap.getZoom();
+    myMap.setZoom(Math.min(currentZoom + 1, 16)); // Max zoom 16
+  };
+  
+  window.zoomOut = function() {
+    const currentZoom = myMap.getZoom();
+    myMap.setZoom(Math.max(currentZoom - 1, 12)); // Min zoom 12
+  };
+  
   // Make functions global
   window.clearDirections = clearDirections;
   window.getDirections = getDirections;
@@ -732,6 +755,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   
   // --- Drag Functionality ---
+  let currentDragPanel = null;
+  let dragHandlers = { start: null, move: null, end: null };
+  
   function initializeDrag(panel) {
     const dragBar = panel.querySelector('.panel-drag-bar');
     if (!dragBar) return;
@@ -742,11 +768,33 @@ document.addEventListener("DOMContentLoaded", () => {
     let initialTranslateY = 0;
     
     function handleStart(e) {
-      // Only start dragging if the target is the drag bar itself
-      if (!e.target.classList.contains('panel-drag-bar')) return;
+      // Only handle if this panel is currently open
+      if (!panel.classList.contains('open')) return;
       
-      isDragging = true;
+      // Check if the touch/click is within the drag bar area
+      const rect = dragBar.getBoundingClientRect();
       const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+      const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+      
+      // Extended touch area for mobile (30px above, 15px below drag bar)
+      const extendedTop = rect.top - 30;
+      const extendedBottom = rect.bottom + 15;
+      const extendedLeft = rect.left - 50;
+      const extendedRight = rect.right + 50;
+      
+      // Only start dragging if touch/click is in the extended drag bar area
+      if (clientY < extendedTop || clientY > extendedBottom || 
+          clientX < extendedLeft || clientX > extendedRight) {
+        return;
+      }
+      
+      // Clean up any existing drag handlers
+      if (currentDragPanel && currentDragPanel !== panel) {
+        cleanupDragHandlers();
+      }
+      
+      currentDragPanel = panel;
+      isDragging = true;
       startY = clientY;
       
       const transform = getComputedStyle(panel).transform;
@@ -759,7 +807,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     
     function handleMove(e) {
-      if (!isDragging) return;
+      if (!isDragging || currentDragPanel !== panel) return;
       
       const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
       currentY = clientY - startY;
@@ -771,8 +819,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     
     function handleEnd(e) {
-      if (!isDragging) return;
+      if (!isDragging || currentDragPanel !== panel) return;
       isDragging = false;
+      currentDragPanel = null;
       
       panel.style.transition = 'transform 0.35s cubic-bezier(.25,.8,.25,1)';
       
@@ -792,23 +841,77 @@ document.addEventListener("DOMContentLoaded", () => {
       currentY = 0;
     }
     
-    // Touch events - only on drag bar
-    dragBar.addEventListener('touchstart', handleStart, { passive: false });
-    document.addEventListener('touchmove', handleMove, { passive: false });
-    document.addEventListener('touchend', handleEnd);
+    // Store handlers for cleanup
+    dragHandlers = { start: handleStart, move: handleMove, end: handleEnd };
     
-    // Mouse events - only on drag bar
-    dragBar.addEventListener('mousedown', handleStart);
-    document.addEventListener('mousemove', handleMove);
-    document.addEventListener('mouseup', handleEnd);
-    
-    // Prevent scrolling on panel content from interfering with drag
+    // Prevent content scrolling from interfering
     const panelContent = panel.querySelector('.panel-content');
     if (panelContent) {
       panelContent.addEventListener('touchstart', (e) => {
-        e.stopPropagation();
+        // Only stop propagation if not in drag bar area
+        const rect = dragBar.getBoundingClientRect();
+        const clientY = e.touches[0].clientY;
+        if (clientY > rect.bottom + 15) {
+          e.stopPropagation();
+        }
       }, { passive: true });
     }
+  }
+  
+  function cleanupDragHandlers() {
+    if (dragHandlers.start) {
+      document.removeEventListener('touchstart', dragHandlers.start);
+      document.removeEventListener('mousedown', dragHandlers.start);
+    }
+    if (dragHandlers.move) {
+      document.removeEventListener('touchmove', dragHandlers.move);
+      document.removeEventListener('mousemove', dragHandlers.move);
+    }
+    if (dragHandlers.end) {
+      document.removeEventListener('touchend', dragHandlers.end);
+      document.removeEventListener('mouseup', dragHandlers.end);
+    }
+  }
+  
+  // Set up global drag event listeners
+  function setupGlobalDragListeners() {
+    document.addEventListener('touchstart', (e) => {
+      const openPanel = document.querySelector('.sliding-panel.open');
+      if (openPanel && dragHandlers.start) {
+        dragHandlers.start(e);
+      }
+    }, { passive: false });
+    
+    document.addEventListener('touchmove', (e) => {
+      if (dragHandlers.move) {
+        dragHandlers.move(e);
+      }
+    }, { passive: false });
+    
+    document.addEventListener('touchend', (e) => {
+      if (dragHandlers.end) {
+        dragHandlers.end(e);
+      }
+    });
+    
+    document.addEventListener('mousedown', (e) => {
+      const openPanel = document.querySelector('.sliding-panel.open');
+      if (openPanel && dragHandlers.start) {
+        dragHandlers.start(e);
+      }
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+      if (dragHandlers.move) {
+        dragHandlers.move(e);
+      }
+    });
+    
+    document.addEventListener('mouseup', (e) => {
+      if (dragHandlers.end) {
+        dragHandlers.end(e);
+      }
+    });
   }
   
   // --- Event Listeners ---
@@ -1032,13 +1135,18 @@ document.addEventListener("DOMContentLoaded", () => {
     clearTimeout(window.boundsUpdateTimeout);
     window.boundsUpdateTimeout = setTimeout(() => {
       updateVisibleStationsAndList();
-      
-      // Update weather based on map center
+    }, 300);
+  });
+  
+  // Update weather when map center changes (less frequent than bounds)
+  myMap.addListener('center_changed', () => {
+    clearTimeout(window.weatherUpdateTimeout);
+    window.weatherUpdateTimeout = setTimeout(() => {
       const center = myMap.getCenter();
       if (center) {
         fetchWeather(center.lat(), center.lng());
       }
-    }, 300);
+    }, 1000); // Longer delay for weather updates
   });
   
   // Get user location
@@ -1059,6 +1167,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Make functions global for onclick handlers
   window.showFeatureCard = showFeatureCard;
   window.navigateExternal = navigateExternal;
+  
+  // Initialize drag functionality
+  setupGlobalDragListeners();
   
   // Initialize
   fetchSitesAndPrices();
