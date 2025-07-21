@@ -194,6 +194,11 @@ html, body {
   touch-action: none;
 }
 
+/* Search panel specific height */
+#search-panel {
+  height: 35vh;
+}
+
 .sliding-panel.open {
   transform: translateX(-50%) translateY(0);
 }
@@ -291,6 +296,17 @@ margin-bottom: max(70px, env(safe-area-inset-bottom, 0px) + 50px); /* iOS safe a
 
 .suburb-list-item:hover {
   background: #f2f3fa;
+}
+
+.current-location-item {
+  font-weight: 600;
+  color: #007AFF !important;
+  border-bottom: 1px solid #e0e3ed;
+  margin-bottom: 8px;
+}
+
+.current-location-item:hover {
+  background: rgba(0, 122, 255, 0.1) !important;
 }
 
 /* ========== LIST PANEL ========== */
@@ -475,7 +491,7 @@ margin-bottom: max(70px, env(safe-area-inset-bottom, 0px) + 50px); /* iOS safe a
 .directions-time {
   font-size: 16px;
   font-weight: 600;
-  color: #4F46E5;
+  color: #007AFF;
 }
 
 .directions-distance {

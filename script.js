@@ -240,7 +240,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const directionsRenderer = new google.maps.DirectionsRenderer({
     suppressMarkers: true, // Don't show default markers
     polylineOptions: {
-      strokeColor: '#4F46E5',
+      strokeColor: '#007AFF',
       strokeOpacity: 0.8,
       strokeWeight: 6
     }
@@ -552,14 +552,16 @@ document.addEventListener("DOMContentLoaded", () => {
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:15px;">
         <h3 class="feature-card-title" style="margin:0;flex:1;">${site.N} ${isCheapest ? '💚 CHEAPEST' : ''}</h3>
       </div>
-      <div style="display:flex;align-items:center;margin-bottom:15px;">
-        <p class="feature-card-address" style="margin:0;flex:1;text-decoration:none;">${site.A}, ${getSuburbName(site.P)}</p>
-        <div style="display:flex;gap:8px;">
-          <button class="directions-btn" data-lat="${site.Lat}" data-lng="${site.Lng}" style="padding:8px;background:#4F46E5;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;" title="Get Directions">
+      <div style="margin-bottom:15px;">
+        <p class="feature-card-address" style="margin:0 0 12px 0;text-decoration:none;">${site.A}, ${getSuburbName(site.P)}</p>
+        <div style="display:flex;gap:12px;">
+          <button class="directions-btn" data-lat="${site.Lat}" data-lng="${site.Lng}" style="padding:10px 16px;background:#007AFF;color:white;border:none;border-radius:8px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:500;" title="Get Directions">
             <i class="fas fa-route"></i>
+            Get Directions
           </button>
-          <button class="external-nav-btn" data-lat="${site.Lat}" data-lng="${site.Lng}" style="padding:8px;background:#007AFF;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;" title="Open in Maps App">
+          <button class="external-nav-btn" data-lat="${site.Lat}" data-lng="${site.Lng}" style="padding:10px 16px;background:#34C759;color:white;border:none;border-radius:8px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:500;" title="Open in Maps App">
             <i class="fa-solid fa-diamond-turn-right"></i>
+            Open in Maps
           </button>
         </div>
       </div>
@@ -578,6 +580,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const lat = parseFloat(e.target.closest('button').dataset.lat);
           const lng = parseFloat(e.target.closest('button').dataset.lng);
           navigate(lat, lng);
+          closeAllPanels(); // Close feature card when directions are requested
         });
       }
       
@@ -812,11 +815,50 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById('search-input');
   const suburbList = document.getElementById('suburb-list');
   
+  // Function to show current location option
+  function showCurrentLocationOption() {
+    suburbList.innerHTML = '';
+    const currentLocationLi = document.createElement('li');
+    currentLocationLi.className = 'suburb-list-item current-location-item';
+    currentLocationLi.innerHTML = '<i class="fas fa-location-arrow" style="margin-right: 8px; color: #007AFF;"></i>Current Location';
+    currentLocationLi.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      // Center on user location
+      if (userLocation) {
+        myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
+        myMap.setZoom(15);
+        createUserLocationMarker(userLocation.lat, userLocation.lng);
+      } else {
+        // Try to get location
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            position => {
+              userLocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+              };
+              myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
+              myMap.setZoom(15);
+              createUserLocationMarker(userLocation.lat, userLocation.lng);
+            },
+            error => console.log("Location error:", error)
+          );
+        }
+      }
+      closeAllPanels();
+    });
+    suburbList.appendChild(currentLocationLi);
+  }
+  
   if (searchInput && suburbList) {
+    // Show current location option by default
+    showCurrentLocationOption();
+    
     searchInput.addEventListener('input', e => {
       const query = e.target.value.toLowerCase();
       if (query.length < 2) {
-        suburbList.innerHTML = '';
+        showCurrentLocationOption();
         return;
       }
       
@@ -827,6 +869,39 @@ document.addEventListener("DOMContentLoaded", () => {
         .slice(0, 20);
       
       suburbList.innerHTML = '';
+      
+      // Add current location option first
+      const currentLocationLi = document.createElement('li');
+      currentLocationLi.className = 'suburb-list-item current-location-item';
+      currentLocationLi.innerHTML = '<i class="fas fa-location-arrow" style="margin-right: 8px; color: #007AFF;"></i>Current Location';
+      currentLocationLi.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (userLocation) {
+          myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
+          myMap.setZoom(15);
+          createUserLocationMarker(userLocation.lat, userLocation.lng);
+        } else {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              position => {
+                userLocation = {
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude
+                };
+                myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
+                myMap.setZoom(15);
+                createUserLocationMarker(userLocation.lat, userLocation.lng);
+              },
+              error => console.log("Location error:", error)
+            );
+          }
+        }
+        closeAllPanels();
+      });
+      suburbList.appendChild(currentLocationLi);
+      
+      // Add matching suburbs
       matchingSuburbs.forEach(suburb => {
         const li = document.createElement('li');
         li.className = 'suburb-list-item';
