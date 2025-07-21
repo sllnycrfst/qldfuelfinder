@@ -201,7 +201,7 @@ html, body {
   position: fixed;
   left: 50%; 
   bottom: 0;
-  transform: translateX(-50%) translateY(130%);
+  transform: translateX(-50%) translateY(101%);
   width: 100vw;
   max-width: 500px;
   height: 80vh;
