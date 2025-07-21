@@ -981,3 +981,70 @@ margin-bottom: max(70px, env(safe-area-inset-bottom, 0px) + 50px); /* iOS safe a
 .maptype-item:hover, .fuel-dropdown-content div:hover {
   background: #f0f0f0;
 }
+
+/* ========== RIGHT-SIDE CONTROLS POSITIONING ========== */
+.right-controls-container {
+  position: fixed;
+  right: 20px;
+  top: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fuel-selector-right {
+  position: fixed;
+  right: 20px;
+  top: 20px;
+  z-index: 10001;
+}
+
+.map-type-control-right {
+  position: fixed;
+  right: 20px;
+  top: 80px;
+  z-index: 10001;
+}
+
+.zoom-control-right {
+  position: fixed;
+  right: 20px;
+  top: 140px;
+  z-index: 10001;
+}
+
+/* Responsive adjustments for right controls */
+@media (max-width: 768px) {
+  .right-controls-container,
+  .fuel-selector-right,
+  .map-type-control-right,
+  .zoom-control-right {
+    right: 15px;
+  }
+  
+  .map-type-control-right {
+    top: 75px;
+  }
+  
+  .zoom-control-right {
+    top: 130px;
+  }
+}
+
+@media (max-width: 480px) {
+  .right-controls-container,
+  .fuel-selector-right,
+  .map-type-control-right,
+  .zoom-control-right {
+    right: 10px;
+  }
+  
+  .map-type-control-right {
+    top: 70px;
+  }
+  
+  .zoom-control-right {
+    top: 120px;
+  }
+}
