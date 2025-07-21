@@ -525,6 +525,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div style="display:flex;align-items:center;padding:12px;border-bottom:1px solid #eee;">
           <img src="${getBrandLogo(site.B)}" alt="Station Logo" style="width:32px;height:32px;object-fit:contain;border-radius:6px;margin-right:12px;" onerror="this.src='images/default.png'">
           <div style="flex:1;">
+            <div style="font-size:14px;font-weight:600;color:#2a2d3f;">${site.N}</div>
             <div style="font-size:12px;color:#666;">${site.A}, ${getSuburbName(site.P)}</div>
             <div style="font-size:11px;color:#999;">${distance} km away</div>
           </div>
@@ -563,22 +564,23 @@ document.addEventListener("DOMContentLoaded", () => {
     }).filter(Boolean).join('');
     
     content.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:15px;">
-        <h3 class="feature-card-title" style="margin:0;flex:1;">${site.N} ${isCheapest ? '💚 CHEAPEST' : ''}</h3>
+      <h3 class="panel-title">Station Details</h3>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+        <div style="flex:1;">
+          <h3 class="feature-card-title" style="margin:0;">${site.N} ${isCheapest ? '💚 CHEAPEST' : ''}</h3>
+          <p class="feature-card-address" style="margin:0;">${site.A}, ${getSuburbName(site.P)}</p>
+        </div>
         <img src="${getBrandLogo(site.B)}" alt="Station Logo" style="width:40px;height:40px;object-fit:contain;border-radius:8px;" onerror="this.src='images/default.png'">
       </div>
-      <div style="margin-bottom:15px;">
-        <p class="feature-card-address" style="margin:0 0 12px 0;text-decoration:none;">${site.A}, ${getSuburbName(site.P)}</p>
-        <div class="feature-card-actions">
-          <button class="feature-card-btn directions-btn" data-lat="${site.Lat}" data-lng="${site.Lng}" title="Get Directions">
-            <i class="fas fa-route"></i>
-          </button>
-          <button class="feature-card-btn open-maps-btn" data-lat="${site.Lat}" data-lng="${site.Lng}" title="Open in Maps App">
-            <i class="fa-solid fa-diamond-turn-right"></i>
-          </button>
-        </div>
+      <div class="feature-card-actions">
+        <button class="feature-card-btn directions-btn" data-lat="${site.Lat}" data-lng="${site.Lng}" title="Get Directions">
+          <i class="fas fa-route"></i>
+        </button>
+        <button class="feature-card-btn open-maps-btn" data-lat="${site.Lat}" data-lng="${site.Lng}" title="Open in Maps App">
+          <i class="fa-solid fa-diamond-turn-right"></i>
+        </button>
       </div>
-      <div class="fuel-prices-list">${allPrices}</div>
+      <div class="fuel-prices-list" style="margin-top:20px;">${allPrices}</div>
     `;
     
     // Add event listeners for navigation buttons
@@ -592,7 +594,7 @@ document.addEventListener("DOMContentLoaded", () => {
           e.stopPropagation();
           const lat = parseFloat(e.target.closest('button').dataset.lat);
           const lng = parseFloat(e.target.closest('button').dataset.lng);
-          navigate(lat, lng);
+          getDirections(lat, lng);
           closeAllPanels(); // Close feature card when directions are requested
         });
       }
@@ -921,52 +923,42 @@ document.addEventListener("DOMContentLoaded", () => {
   
   
   
+  // Show all suburbs by default
+  function showAllSuburbs() {
+    const sortedSuburbs = QLD_SUBURBS
+      .sort((a, b) => a.suburb.localeCompare(b.suburb));
+    
+    suburbList.innerHTML = '';
+    sortedSuburbs.forEach(suburb => {
+      const li = document.createElement('li');
+      li.className = 'suburb-list-item';
+      li.textContent = suburb.suburb;
+      li.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        searchSuburb(suburb.suburb, suburb.postcode);
+      });
+      suburbList.appendChild(li);
+    });
+  }
+  
   if (searchInput && suburbList) {
+    // Show all suburbs initially
+    showAllSuburbs();
+    
     searchInput.addEventListener('input', e => {
       const query = e.target.value.toLowerCase();
-      if (query.length < 2) {
-        showCurrentLocationOption();
+      if (query.length === 0) {
+        showAllSuburbs();
         return;
       }
       
       // Search through suburb names
       const matchingSuburbs = QLD_SUBURBS
         .filter(suburb => suburb.suburb.toLowerCase().includes(query))
-        .sort((a, b) => a.suburb.localeCompare(b.suburb))
-        .slice(0, 20);
+        .sort((a, b) => a.suburb.localeCompare(b.suburb));
       
       suburbList.innerHTML = '';
-      
-      // Add current location option first
-      const currentLocationLi = document.createElement('li');
-      currentLocationLi.className = 'suburb-list-item current-location-item';
-      currentLocationLi.innerHTML = '<i class="fas fa-location-arrow" style="margin-right: 8px; color: #007AFF;"></i>Current Location';
-      currentLocationLi.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (userLocation) {
-          myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
-          myMap.setZoom(15);
-          createUserLocationMarker(userLocation.lat, userLocation.lng);
-        } else {
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-              position => {
-                userLocation = {
-                  lat: position.coords.latitude,
-                  lng: position.coords.longitude
-                };
-                myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
-                myMap.setZoom(15);
-                createUserLocationMarker(userLocation.lat, userLocation.lng);
-              },
-              error => console.log("Location error:", error)
-            );
-          }
-        }
-        closeAllPanels();
-      });
-      suburbList.appendChild(currentLocationLi);
       
       // Add matching suburbs
       matchingSuburbs.forEach(suburb => {

@@ -104,6 +104,20 @@ html, body {
 .fuel-dropdown-btn {
   width: 48px;
   height: 48px;
+}
+
+/* Desktop larger buttons */
+@media (min-width: 1024px) {
+  .maptype-btn,
+  .fuel-dropdown-btn {
+    width: 56px;
+    height: 56px;
+    font-size: 20px;
+  }
+}
+
+.maptype-btn,
+.fuel-dropdown-btn {
   border: none;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.25);
@@ -266,7 +280,7 @@ html, body {
 
 /* Search panel specific height */
 #search-panel {
-  height: 60vh !important;
+  height: 75vh !important;
 }
 
 /* ========== PANEL DRAG BAR ========== */
@@ -327,6 +341,13 @@ html, body {
   background: transparent;
 }
 
+.panel-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2a2d3f;
+  margin: 0 0 12px 0;
+}
+
 /* Panel content divider */
 .panel-content::before {
   content: '';
@@ -378,7 +399,7 @@ html, body {
 
 .suburb-list {
   width: 100%;
-  max-height: 35vh;
+  height: calc(100% - 80px);
   overflow-y: auto;
   list-style: none;
   padding: 0;
@@ -425,7 +446,9 @@ html, body {
 }
 
 .feature-card-address {
-  top: 12px;
+  margin-top: 4px !important;
+  font-size: 14px;
+  color: #666;
 }
 
 .fuel-prices-list {
@@ -473,7 +496,7 @@ html, body {
   display: flex;
   gap: 12px;
   margin-top: 16px;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .feature-card-btn {
@@ -571,8 +594,9 @@ html, body {
   z-index: 15000;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
+  gap: 60px;
   padding: 0 30px;
   padding-bottom: env(safe-area-inset-bottom);
 }
@@ -623,11 +647,10 @@ html, body {
     0 3px 10px rgba(0, 0, 0, 0.4),
     inset 0 2px 4px rgba(255, 255, 255, 0.3),
     inset 0 -2px 4px rgba(0, 0, 0, 0.2);
-  z-index: 15020;
+  z-index: 20000;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   color: #ffffff;
-  position: relative;
   overflow: hidden;
 }
 
@@ -829,7 +852,7 @@ html, body {
   flex-direction: column;
   gap: 2px;
   background: rgba(255, 255, 255, 0.15);
-  border-radius: 24px;
+  border-radius: 14px;
   padding: 2px;
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
@@ -841,15 +864,15 @@ html, body {
 
 .custom-zoom-control button {
   height: 48px !important;
-  border-radius: 50% !important;
+  border-radius: 12px !important;
 }
 
 .zoom-in-btn {
-  margin-bottom: 2px;
+  border-radius: 12px 12px 6px 6px !important;
 }
 
 .zoom-out-btn {
-  margin-top: 2px;
+  border-radius: 6px 6px 12px 12px !important;
 }
 
 /* ========== MAP TYPE CONTROL ========== */
@@ -1034,6 +1057,7 @@ html, body {
     transform: none;
     width: 100%;
     max-width: none;
+    gap: 40px;
     padding: 0 25px;
   }
   
