@@ -98,7 +98,7 @@ html, body {
 .custom-zoom-control button:hover,
 .maptype-btn:hover,
 .fuel-dropdown-btn:hover {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.65);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
   transform: translateY(-1px);
   color: #2d3748;
@@ -128,8 +128,8 @@ html, body {
 .fuel-dropdown-content {
   display: none;
   position: absolute;
-  top: 52px;
-  right: 0;
+  top: 42px;
+  right: 30px;
   min-width: 120px;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(20px);
@@ -393,10 +393,10 @@ html, body {
   border-radius: 47px;
 }
 
-/* ========== BOTTOM TOOLBAR WITH CURVED DIP ========== */
+/* ========== BOTTOM TOOLBAR  ========== */
 .sc-bottom-bar {
   position: fixed;
-  bottom: 24px;
+  bottom: 18px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -406,7 +406,7 @@ html, body {
   gap: 20px;
   width: 95%;
   max-width: 600px;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.65);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 50px;
@@ -593,7 +593,7 @@ html, body {
 /* ========== ZOOM CONTROLS CONTAINER ========== */
 .zoom-controls-container {
   position: fixed;
-  top: 50%;
+  top: 65%;
   right: 20px;
   transform: translateY(-50%);
   z-index: 10000;
