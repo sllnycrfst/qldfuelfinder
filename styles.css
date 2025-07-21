@@ -432,7 +432,7 @@ html, body {
   border-radius: 12px 12px 0 0;
   width: 100%;
   max-width: 600px;
-  height: calc(60px + env(safe-area-inset-bottom));
+  height: calc(80px + env(safe-area-inset-bottom));
   background: linear-gradient(185deg, #ffffff 0%, #f3f3f3 100%);
   
   /* Ultra-smooth clip-path - much better curve */
@@ -473,6 +473,19 @@ html, body {
     100% 100%,
     0% 100%
   );
+  
+  box-shadow: 
+    0 -8px 32px rgba(0, 188, 212, 0.25),
+    0 -4px 16px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  z-index: 15000;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 30px;
+  padding-bottom: env(safe-area-inset-bottom);
+}
 
 .sc-menu-item {
   width: 48px;
@@ -511,7 +524,10 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.4);
+  box-shadow: 
+    0 12px 40px rgba(255, 193, 7, 0.4),
+    0 6px 20px rgba(0, 0, 0, 0.15),
+    inset 0 2px 0 rgba(255, 255, 255, 0.2);
   z-index: 15020;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
@@ -525,7 +541,7 @@ html, body {
 
 .sc-center-btn:hover {
   transform: translateX(-50%) scale(1.1);
-  background: linear-gradient(135deg, #17487a 0%, #387cc2 100%);
+  background: linear-gradient(135deg, #FFD54F 0%, #FFC107 100%);
   box-shadow: 
     0 16px 50px rgba(255, 193, 7, 0.5),
     0 8px 25px rgba(0, 0, 0, 0.2),
@@ -865,7 +881,7 @@ html, body {
   }
 
   .sc-bottom-bar {
-    height: calc(65px + env(safe-area-inset-bottom));
+    height: calc(75px + env(safe-area-inset-bottom));
     /* Ultra-smooth mobile curve */
     clip-path: polygon(
       0% 0%,
