@@ -159,7 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
     zoom: 14,
     minZoom: 12,                 // Minimum zoom level (more zoomed out)
     maxZoom: 16,                 // Maximum zoom level (more zoomed in)
-    mapId: "AIzaSyDtvSPeODSeJ_L2KXxp2DmIoZ1uAqWy1pQ", // Enable 3D buildings and advanced features
+    mapId: "AIzaSyBQw2MGT8kXptc2m_TKsnLWXqPGu3w4000", 
     tilt: 45, // Enable 3D tilt
     heading: 0, // Initial compass heading
     styles: [
