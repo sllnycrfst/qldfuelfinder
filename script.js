@@ -555,9 +555,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const allPrices = FUEL_TYPES.map(fuel => {
       const p = priceMap[site.S]?.[fuel.id];
       return p ? `
-        <div class="fuel-price-row" style="width:50%;">
+        <div class="fuel-price-row">
           <span class="fuel-type-label">${fuel.label}</span>
-          <span class="fuel-type-price" style="color:#387cc2;">${(p / 10).toFixed(1)}</span>
+          <span class="fuel-type-price">${(p / 10).toFixed(1)}</span>
         </div>
       ` : '';
     }).filter(Boolean).join('');
@@ -569,24 +569,22 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
       <div style="margin-bottom:15px;">
         <p class="feature-card-address" style="margin:0 0 12px 0;text-decoration:none;">${site.A}, ${getSuburbName(site.P)}</p>
-        <div style="display:flex;gap:12px;">
-          <button class="directions-btn" data-lat="${site.Lat}" data-lng="${site.Lng}" style="padding:10px 16px;background:#007AFF;color:white;border:none;border-radius:8px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:500;" title="Get Directions">
+        <div class="feature-card-actions">
+          <button class="feature-card-btn directions-btn" data-lat="${site.Lat}" data-lng="${site.Lng}" title="Get Directions">
             <i class="fas fa-route"></i>
-            Get Directions
           </button>
-          <button class="external-nav-btn" data-lat="${site.Lat}" data-lng="${site.Lng}" style="padding:10px 16px;background:#34C759;color:white;border:none;border-radius:8px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:500;" title="Open in Maps App">
+          <button class="feature-card-btn open-maps-btn" data-lat="${site.Lat}" data-lng="${site.Lng}" title="Open in Maps App">
             <i class="fa-solid fa-diamond-turn-right"></i>
-            Open in Maps
           </button>
         </div>
       </div>
-      <div class="fuel-prices-list" style="display:flex;flex-wrap:wrap;gap:8px;">${allPrices}</div>
+      <div class="fuel-prices-list">${allPrices}</div>
     `;
     
     // Add event listeners for navigation buttons
     setTimeout(() => {
       const directionsBtn = content.querySelector('.directions-btn');
-      const externalNavBtn = content.querySelector('.external-nav-btn');
+      const externalNavBtn = content.querySelector('.open-maps-btn');
       
       if (directionsBtn) {
         directionsBtn.addEventListener('click', (e) => {
