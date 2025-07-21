@@ -196,7 +196,7 @@ html, body {
 
 /* Search panel specific height */
 #search-panel {
-  height: 35vh;
+  height: 50vh;
 }
 
 .sliding-panel.open {
