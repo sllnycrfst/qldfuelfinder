@@ -427,11 +427,12 @@ html, body {
 .sc-bottom-bar {
   position: fixed;
   bottom: 0;
-  left: 0;
+  left: 50%;
   right: 0;
   height: calc(70px + env(safe-area-inset-bottom));
   max-width: 600px !important;
   background: linear-gradient(135deg, #ffffff 0%, #f7f7f7 100%);
+  border-radius: 10px 10px 0 0;
   z-index: 15005;
   
   /* Ultra-smooth clip-path with mathematical curve precision */
