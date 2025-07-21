@@ -200,8 +200,8 @@ html, body {
 .sliding-panel {
   position: fixed;
   left: 50%; 
-  bottom: -10vh
-  transform: translateX(-50%) translateY(150%);
+  bottom: -20vh
+  transform: translateX(-50%) translateY(100%);
   width: 100vw;
   max-width: 500px;
   height: 80vh;
