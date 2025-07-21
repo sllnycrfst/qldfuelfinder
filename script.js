@@ -155,9 +155,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Google Maps Initialization ---
   myMap = new google.maps.Map(document.getElementById("google-map"), {
     center: BRISBANE_COORDS,
-    zoom: 12,
+    zoom: 14,
     mapId: "AIzaSyAQ0Ba7zICGUy5zCVijkkDNrNVdKAG1FGU",
-    tilt: 45,
+    minZoom: 10,   // ← Prevents zooming out too far
+    maxZoom: 18,  // ← Prevents zooming in too far
     heading: 0,
     styles: [
       {
