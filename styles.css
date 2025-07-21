@@ -205,7 +205,7 @@ html, body {
   width: 100vw;
   max-width: 500px;
   height: 75vh;
-  background: rgba(233, 233, 233, 0.85);
+  background: rgba(233, 233, 233, 0.75);
   border-radius: 24px 24px 0 0;
   box-shadow: 0 8px 32px rgba(0,0,0,0.13);
   backdrop-filter: blur(10px);
@@ -226,7 +226,7 @@ html, body {
 
 /* Search panel specific height */
 #search-panel {
-  height: 75vh;
+  height: 60vh !important;
 }
 
 /* ========== PANEL DRAG BAR ========== */
