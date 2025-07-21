@@ -156,8 +156,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Google Maps Initialization ---
   myMap = new google.maps.Map(document.getElementById("google-map"), {
     center: BRISBANE_COORDS,
-    zoom: 12,
-    minZoom: 10,                 // Minimum zoom level (more zoomed out)
+    zoom: 14,
+    minZoom: 12,                 // Minimum zoom level (more zoomed out)
     maxZoom: 16,                 // Maximum zoom level (more zoomed in)
     mapId: "AIzaSyAQ0Ba7zICGUy5zCVijkkDNrNVdKAG1FGU", // Enable 3D buildings and advanced features
     tilt: 45, // Enable 3D tilt
