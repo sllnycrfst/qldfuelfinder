@@ -432,7 +432,7 @@ html, body {
   border-radius: 12px 12px 0 0;
   width: 100%;
   max-width: 600px;
-  height: calc(80px + env(safe-area-inset-bottom));
+  height: calc(60px + env(safe-area-inset-bottom));
   background: linear-gradient(185deg, #ffffff 0%, #f3f3f3 100%);
   
   /* Ultra-smooth clip-path - much better curve */
@@ -865,7 +865,7 @@ html, body {
   }
 
   .sc-bottom-bar {
-    height: calc(75px + env(safe-area-inset-bottom));
+    height: calc(65px + env(safe-area-inset-bottom));
     /* Ultra-smooth mobile curve */
     clip-path: polygon(
       0% 0%,
