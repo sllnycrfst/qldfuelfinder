@@ -523,6 +523,7 @@ document.addEventListener("DOMContentLoaded", () => {
       
       li.innerHTML = `
         <div style="display:flex;align-items:center;padding:12px;border-bottom:1px solid #eee;">
+          <img src="${getBrandLogo(site.B)}" alt="Station Logo" style="width:32px;height:32px;object-fit:contain;border-radius:6px;margin-right:12px;" onerror="this.src='images/default.png'">
           <div style="flex:1;">
             <div style="font-weight:600;color:#333;">${site.N} ${isCheapest ? '💚' : ''}</div>
             <div style="font-size:12px;color:#666;">${site.A}, ${getSuburbName(site.P)}</div>
@@ -565,6 +566,7 @@ document.addEventListener("DOMContentLoaded", () => {
     content.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:15px;">
         <h3 class="feature-card-title" style="margin:0;flex:1;">${site.N} ${isCheapest ? '💚 CHEAPEST' : ''}</h3>
+        <img src="${getBrandLogo(site.B)}" alt="Station Logo" style="width:40px;height:40px;object-fit:contain;border-radius:8px;" onerror="this.src='images/default.png'">
       </div>
       <div style="margin-bottom:15px;">
         <p class="feature-card-address" style="margin:0 0 12px 0;text-decoration:none;">${site.A}, ${getSuburbName(site.P)}</p>

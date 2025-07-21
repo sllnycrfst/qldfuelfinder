@@ -204,7 +204,7 @@ html, body {
   transform: translateX(-50%) translateY(120%);
   width: 100vw;
   max-width: 500px;
-  height: 80vh;
+  height: 75vh;
   background: rgba(233, 233, 233, 0.85);
   border-radius: 24px 24px 0 0;
   box-shadow: 0 8px 32px rgba(0,0,0,0.13);
@@ -216,10 +216,17 @@ html, body {
   transition: transform 0.35s cubic-bezier(.25,.8,.25,1);
   pointer-events: auto;
   touch-action: none;
+  /* iOS safe area adjustments */
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .sliding-panel.open {
   transform: translateX(-50%) translateY(0);
+}
+
+/* Search panel specific height */
+#search-panel {
+  height: 40vh;
 }
 
 /* ========== PANEL DRAG BAR ========== */
@@ -272,7 +279,7 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 18px;
-  margin-bottom: 70px;
+  margin-bottom: calc(70px + env(safe-area-inset-bottom));
   /* Remove opacity */
   background: transparent;
 }
@@ -419,7 +426,7 @@ html, body {
 /* ========== BOTTOM TOOLBAR  ========== */
 .sc-bottom-bar {
   position: fixed;
-  bottom: 18px;
+  bottom: calc(18px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -435,9 +442,6 @@ html, body {
   border-radius: 50px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.1);
   z-index: 15000;
-  /* iOS safe area adjustments */
-  padding-bottom: max(12px, env(safe-area-inset-bottom));
-  margin-bottom: env(safe-area-inset-bottom);
 }
 
 .sc-menu-item {
@@ -792,13 +796,7 @@ html, body {
   }
 
   .sc-bottom-bar {
-    bottom: max(12px, env(safe-area-inset-bottom));
-    margin-bottom: 0;
-  }
-  
-  /* Adjust panel content bottom margin for mobile */
-  .panel-content {
-    margin-bottom: max(70px, calc(70px + env(safe-area-inset-bottom)));
+    bottom: calc(12px + env(safe-area-inset-bottom));
   }
 }
 
@@ -859,6 +857,10 @@ html, body {
 
 @supports (-webkit-touch-callout: none) {
   .sliding-panel {
-    height: 90vh; /* or whatever height you prefer */
+    height: 75vh;
+  }
+  
+  #search-panel {
+    height: 40vh;
   }
 }
