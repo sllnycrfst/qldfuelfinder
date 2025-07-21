@@ -429,10 +429,10 @@ html, body {
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  border-radius: 12px 12px 0 0;
+  border-radius: 20px 20px 0 0;
   width: 100%;
   max-width: 600px;
-  height: calc(80px + env(safe-area-inset-bottom));
+  height: calc(70px + env(safe-area-inset-bottom));
   background: linear-gradient(185deg, #ffffff 0%, #f3f3f3 100%);
   
   /* Ultra-smooth clip-path - much better curve */
@@ -881,7 +881,7 @@ html, body {
   }
 
   .sc-bottom-bar {
-    height: calc(75px + env(safe-area-inset-bottom));
+    height: calc(70px + env(safe-area-inset-bottom));
     /* Ultra-smooth mobile curve */
     clip-path: polygon(
       0% 0%,
@@ -894,19 +894,19 @@ html, body {
       42% 28%,
       43% 36%,
       44% 45%,
-      45% 55%,
-      46% 66%,
-      47% 78%,
-      48% 85%,
-      49% 90%,
-      49.5% 93%,
-      50% 95%,
-      50.5% 93%,
-      51% 90%,
-      52% 85%,
-      53% 78%,
-      54% 66%,
-      55% 55%,
+      45% 60%,
+      46% 63%,
+      47% 65%,
+      48% 67%,
+      49% 68%,
+      49.5% 69%,
+      50% 70%,
+      50.5% 69%,
+      51% 68%,
+      52% 67%,
+      53% 65%,
+      54% 63%,
+      55% 60%,
       56% 45%,
       57% 36%,
       58% 28%,
@@ -929,7 +929,7 @@ html, body {
   }
   
   .sc-center-btn {
-    bottom: calc(25px + env(safe-area-inset-bottom));
+    bottom: calc(20px + env(safe-area-inset-bottom));
     width: 58px;
     height: 58px;
   }
