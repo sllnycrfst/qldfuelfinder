@@ -525,7 +525,6 @@ document.addEventListener("DOMContentLoaded", () => {
         <div style="display:flex;align-items:center;padding:12px;border-bottom:1px solid #eee;">
           <img src="${getBrandLogo(site.B)}" alt="Station Logo" style="width:32px;height:32px;object-fit:contain;border-radius:6px;margin-right:12px;" onerror="this.src='images/default.png'">
           <div style="flex:1;">
-            <div style="font-weight:600;color:#333;">${site.N} ${isCheapest ? '💚' : ''}</div>
             <div style="font-size:12px;color:#666;">${site.A}, ${getSuburbName(site.P)}</div>
             <div style="font-size:11px;color:#999;">${distance} km away</div>
           </div>
