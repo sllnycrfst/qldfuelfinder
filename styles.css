@@ -428,12 +428,11 @@ html, body {
   position: fixed;
   bottom: 0;
   left: 50%;
-  right: 0;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 600px;
   height: calc(70px + env(safe-area-inset-bottom));
-  max-width: 600px !important;
-  background: linear-gradient(135deg, #ffffff 0%, #f7f7f7 100%);
-  border-radius: 10px 10px 0 0;
-  z-index: 15005;
+  background: linear-gradient(135deg, #00BCD4 0%, #00ACC1 100%);
   
   /* Ultra-smooth clip-path with mathematical curve precision */
   clip-path: polygon(
@@ -486,6 +485,7 @@ html, body {
   align-items: center;
   padding: 0 20px;
   padding-bottom: env(safe-area-inset-bottom);
+  border-radius: 16px 16px 0 0;
 }
 
 .sc-menu-item {
