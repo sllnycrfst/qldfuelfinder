@@ -941,13 +941,13 @@ margin-bottom: max(70px, env(safe-area-inset-bottom, 0px) + 50px); /* iOS safe a
 }
 
 .map-ui-wrapper {
-  position: absolute;
-  top: 12px;
-  left: 12px;
+  position: fixed;
+  top: 20px;
+  right: 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  z-index: 1000;
+  z-index: 10000;
 }
 
 /* Basic button styling — adjust to suit your theme */
@@ -1019,7 +1019,8 @@ margin-bottom: max(70px, env(safe-area-inset-bottom, 0px) + 50px); /* iOS safe a
   .right-controls-container,
   .fuel-selector-right,
   .map-type-control-right,
-  .zoom-control-right {
+  .zoom-control-right,
+  .map-ui-wrapper {
     right: 15px;
   }
   
@@ -1030,13 +1031,19 @@ margin-bottom: max(70px, env(safe-area-inset-bottom, 0px) + 50px); /* iOS safe a
   .zoom-control-right {
     top: 130px;
   }
+  
+  .map-ui-wrapper {
+    top: 15px;
+    gap: 10px;
+  }
 }
 
 @media (max-width: 480px) {
   .right-controls-container,
   .fuel-selector-right,
   .map-type-control-right,
-  .zoom-control-right {
+  .zoom-control-right,
+  .map-ui-wrapper {
     right: 10px;
   }
   
@@ -1046,5 +1053,10 @@ margin-bottom: max(70px, env(safe-area-inset-bottom, 0px) + 50px); /* iOS safe a
   
   .zoom-control-right {
     top: 120px;
+  }
+  
+  .map-ui-wrapper {
+    top: 10px;
+    gap: 8px;
   }
 }
