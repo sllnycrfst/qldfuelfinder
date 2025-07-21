@@ -922,46 +922,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById('search-input');
   const suburbList = document.getElementById('suburb-list');
   
-  // Function to show current location option
-  function showCurrentLocationOption() {
-    suburbList.innerHTML = '';
-    const currentLocationLi = document.createElement('li');
-    currentLocationLi.className = 'suburb-list-item current-location-item';
-    currentLocationLi.innerHTML = '<i class="fas fa-location-arrow" style="margin-right: 8px; color: #007AFF;"></i>Current Location';
-    currentLocationLi.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      // Center on user location
-      if (userLocation) {
-        myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
-        myMap.setZoom(15);
-        createUserLocationMarker(userLocation.lat, userLocation.lng);
-      } else {
-        // Try to get location
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            position => {
-              userLocation = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-              };
-              myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
-              myMap.setZoom(15);
-              createUserLocationMarker(userLocation.lat, userLocation.lng);
-            },
-            error => console.log("Location error:", error)
-          );
-        }
-      }
-      closeAllPanels();
-    });
-    suburbList.appendChild(currentLocationLi);
-  }
+  
   
   if (searchInput && suburbList) {
-    // Show current location option by default
-    showCurrentLocationOption();
-    
     searchInput.addEventListener('input', e => {
       const query = e.target.value.toLowerCase();
       if (query.length < 2) {
