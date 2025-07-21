@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>QLD Fuel Watch</title>
   <link rel="icon" type="image/png" href="images/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -17,8 +17,17 @@
 
 <div id="google-map" style="width: 100vw; height: 100vh;"></div>
 
-<!-- Custom Map Controls Wrapper -->
-<div class="map-ui-wrapper">
+<!-- Custom Map Controls -->
+<div class="custom-map-controls">
+  <!-- Fuel Selector -->
+  <div class="fuel-selector">
+    <div class="fuel-dropdown">
+      <button class="fuel-dropdown-btn" id="fuel-dropdown-btn">E10</button>
+      <div class="fuel-dropdown-content" id="fuel-dropdown-content">
+        <!-- Populated by JavaScript -->
+      </div>
+    </div>
+  </div>
 
   <!-- Map Type Control -->
   <div class="custom-maptype-control">
@@ -32,27 +41,18 @@
       <div class="maptype-item" onclick="changeMapType('terrain')"><i class="fas fa-mountain"></i> Terrain</div>
     </div>
   </div>
+</div>
 
-  <!-- Fuel Selector -->
-  <div class="fuel-selector">
-    <div class="fuel-dropdown">
-      <button class="fuel-dropdown-btn" id="fuel-dropdown-btn">E10</button>
-      <div class="fuel-dropdown-content" id="fuel-dropdown-content">
-        <!-- Populated by JavaScript -->
-      </div>
-    </div>
-  </div>
-
-  <!-- Zoom Controls -->
+<!-- Zoom Controls (positioned at 50% height) -->
+<div class="zoom-controls-container">
   <div class="custom-zoom-control">
-    <button class="zoom-in-btn" onclick="myMap.setZoom(myMap.getZoom() + 1)">
+    <button class="zoom-in-btn" onclick="zoomIn()">
       <i class="fas fa-plus"></i>
     </button>
-    <button class="zoom-out-btn" onclick="myMap.setZoom(myMap.getZoom() - 1)">
+    <button class="zoom-out-btn" onclick="zoomOut()">
       <i class="fas fa-minus"></i>
     </button>
   </div>
-
 </div>
       
         <!-- Populated by JavaScript -->
