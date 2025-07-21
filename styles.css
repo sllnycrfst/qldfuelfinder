@@ -856,3 +856,9 @@ html, body {
     min-width: auto;
   }
 }
+
+@supports (-webkit-touch-callout: none) {
+  .sliding-panel {
+    height: 90vh; /* or whatever height you prefer */
+  }
+}
