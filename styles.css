@@ -429,10 +429,11 @@ html, body {
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
+  border-radius: 12px 12px 0 0;
   width: 100%;
   max-width: 600px;
   height: calc(80px + env(safe-area-inset-bottom));
-  background: linear-gradient(135deg, #00BCD4 0%, #00ACC1 100%);
+  background: linear-gradient(185deg, #ffffff 0%, #f3f3f3 100%);
   
   /* Ultra-smooth clip-path - much better curve */
   clip-path: polygon(
@@ -448,14 +449,14 @@ html, body {
     46% 37%,
     47% 46%,
     48% 56%,
-    49% 67%,
-    49.3% 74%,
-    49.6% 80%,
-    49.8% 85%,
-    50% 88%,
-    50.2% 85%,
-    50.4% 80%,
-    50.7% 74%,
+    49% 62%,
+    49.3% 64%,
+    49.6% 66%,
+    49.8% 68%,
+    50% 70%,
+    50.2% 68%,
+    50.4% 66%,
+    50.7% 64%,
     51% 67%,
     52% 56%,
     53% 46%,
@@ -517,7 +518,7 @@ html, body {
   transform: translateX(-50%);
   width: 64px;
   height: 64px;
-  background: linear-gradient(135deg, #FFC107 0%, #FFB300 100%);
+  background: linear-gradient(135deg, #387CC2 0%, #2c639b 100%);
   border-radius: 50%;
   border: none;
   display: flex;
