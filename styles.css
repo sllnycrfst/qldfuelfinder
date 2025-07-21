@@ -61,59 +61,13 @@ html, body {
   font-weight: 600;
 }
 
-/* ========== CUSTOM MAP CONTROLS ========== */
-.custom-map-controls {
-  position: fixed;
-  top: 120px;
-  right: 20px;
-  z-index: 10000;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* ========== SHARED BUTTON STYLES ========== */
-.custom-zoom-control button,
-.maptype-btn,
-.fuel-dropdown-btn {
-  width: 44px;
-  height: 44px;
-  border: none;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  color: #4a5568;
-  font-size: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  font-weight: 500;
-}
-
-.custom-zoom-control button:hover,
-.maptype-btn:hover,
-.fuel-dropdown-btn:hover {
-  background: rgba(255, 255, 255, 0.65);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-  transform: translateY(-1px);
-  color: #2d3748;
-}
-
-.custom-zoom-control button:active,
-.maptype-btn:active,
-.fuel-dropdown-btn:active {
-  transform: translateY(0) scale(0.95);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
 /* ========== FUEL SELECTOR DROPDOWN ========== */
 .fuel-selector {
-  position: relative;
+  position: fixed;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  z-index: 10005;
 }
 
 .fuel-dropdown {
@@ -122,60 +76,82 @@ html, body {
 }
 
 .fuel-dropdown-btn {
+  width: 44px;
+  height: 44px;
+  right: 20px
+  border-radius: 12px;
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.09);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  outline: none;
+  cursor: pointer;
   font-size: 14px;
+  font-weight: 500;
+  color: #727272;
+  transition: all 0.15s;
+}
+
+.fuel-dropdown-btn:hover {
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.fuel-dropdown-btn:active {
+  background: rgba(255,255,255,1);
+  transform: scale(0.98);
 }
 
 .fuel-dropdown-content {
   display: none;
   position: absolute;
-  top: 12px;
-  right: 38px;
+  right: 0;
   min-width: 120px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255,255,255,0.45);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
   z-index: 10002;
-  padding: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  animation: dropdownSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 8px 0;
+  border: 1px solid rgba(255,255,255,0.2);
 }
 
 .fuel-dropdown-content.show {
   display: block;
+  animation: dropdownFadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes dropdownSlideIn {
+@keyframes dropdownFadeIn {
   from {
     opacity: 0;
-    transform: translateY(-8px) scale(0.95);
+    transform: translateY(-8px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 
 .fuel-dropdown-item {
-  display: flex;
-  align-items: center;
-  padding: 10px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.15s ease;
+  padding: 8px 16px;
   font-size: 14px;
   font-weight: 500;
-  color: #4a5568;
+  color: #3b4664;
+  cursor: pointer;
+  transition: background 0.15s;
 }
 
 .fuel-dropdown-item:hover {
-  background: rgba(56, 124, 194, 0.1);
-  color: #387CC2;
+  background: rgba(0,0,0,0.05);
 }
 
 .fuel-dropdown-item.selected {
-  background: rgba(56, 124, 194, 0.9);
+  background: #697c91;
   color: white;
 }
 
@@ -204,13 +180,13 @@ html, body {
   transform: translateX(-50%) translateY(130%);
   width: 100vw;
   max-width: 500px;
-  height: 80vh;
+  height: 75vh;
   background: rgba(233, 233, 233, 0.52);
   border-radius: 24px 24px 0 0;
   box-shadow: 0 8px 32px rgba(0,0,0,0.13);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(12px);
-  z-index: 10001;
+  z-index: 9020;
   display: flex;
   flex-direction: column;
   transition: transform 0.35s cubic-bezier(.25,.8,.25,1);
@@ -224,8 +200,8 @@ html, body {
 
 /* ========== PANEL DRAG BAR ========== */
 .panel-drag-bar {
-  width: 48px;
-  height: 8px;
+  width: 44px;
+  height: 6px;
   background: #f7f7f7;
   border-radius: 3px;
   margin: 14px auto 12px auto;
@@ -233,35 +209,32 @@ html, body {
   user-select: none;
   -webkit-user-select: none;
   touch-action: pan-y;
+  /* Fixed width regardless of content */
+  flex-shrink: 0;
+  position: relative;
 }
 
 .panel-drag-bar:active {
   cursor: grabbing;
 }
 
-/* ========== PANEL CONTENT ========== */
-.panel-content {
-  flex: 1 1 auto;
-  overflow-y: auto;
-  padding: 0 22px 20px 22px;
-  width: 100%;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  margin-bottom: 70px;
-  /* Remove opacity */
-  background: transparent;
+/* Ensure drag bar stays consistent size */
+.sliding-panel .panel-drag-bar {
+  min-width: 44px;
+  max-width: 44px;
 }
 
-/* Panel content divider */
-.panel-content::before {
-  content: '';
-  width: 100%;
-  height: 1px;
-  background: rgba(0, 0, 0, 0.1);
-  margin: 0 0 10px 0;
-  flex-shrink: 0;
+/* ========== PANEL CONTENT ========== */
+.panel-content {
+flex: 1 1 auto;
+overflow-y: auto;
+padding: 0 22px 20px 22px;
+width: 100%;
+min-height: 0;
+display: flex;
+flex-direction: column;
+gap: 18px;
+margin-bottom: max(70px, env(safe-area-inset-bottom, 0px) + 50px); /* iOS safe area */
 }
 
 /* ========== SEARCH PANEL ========== */
@@ -393,10 +366,10 @@ html, body {
   border-radius: 47px;
 }
 
-/* ========== BOTTOM TOOLBAR  ========== */
+/* ========== BOTTOM TOOLBAR ========== */
 .sc-bottom-bar {
   position: fixed;
-  bottom: 18px;
+  bottom: 34px; /* Increased for iOS safe area */
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -406,12 +379,20 @@ html, body {
   gap: 20px;
   width: 95%;
   max-width: 600px;
-  background: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 50px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.1);
   z-index: 15000;
+  margin-bottom: env(safe-area-inset-bottom, 0px); /* iOS safe area support */
+}
+
+/* iOS specific adjustments */
+@supports (padding: max(0px)) {
+  .sc-bottom-bar {
+    bottom: max(34px, env(safe-area-inset-bottom, 0px) + 10px);
+  }
 }
 
 .sc-menu-item {
@@ -441,12 +422,10 @@ html, body {
   width: 60px !important;
   height: 60px !important;
   border-radius: 50% !important;
-  background: #387CC2 !important;
+  background: #387cc2 !important;
   color: white !important;
-  box-shadow: 0 4px 20px rgba(56, 124, 194, 0.4);
+  box-shadow: 0 4px 20px rgba(79, 70, 229, 0.4);
   margin-top: -20px;
-  position: relative;
-  z-index: 15010 !important; /* Higher than toolbar */
 }
 
 .sc-center-btn i {
@@ -455,13 +434,13 @@ html, body {
 }
 
 .sc-center-btn:hover {
-  background: #2A5F8F !important;
+  background: #4338CA !important;
   transform: scale(1.05);
-  box-shadow: 0 6px 25px rgba(56, 124, 194, 0.5);
+  box-shadow: 0 6px 25px rgba(79, 70, 229, 0.5);
 }
 
 .sc-current {
-  color: #387CC2;
+  color: #4F46E5;
 }
 
 /* ========== DIRECTIONS INFO PANEL ========== */
@@ -496,7 +475,7 @@ html, body {
 .directions-time {
   font-size: 16px;
   font-weight: 600;
-  color: #387CC2;
+  color: #4F46E5;
 }
 
 .directions-distance {
@@ -531,8 +510,6 @@ html, body {
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
-  /* Add drop shadow to markers */
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
 .custom-marker img {
@@ -590,13 +567,58 @@ html, body {
   color: #22C55E;
   font-weight: 700;
 }
-/* ========== ZOOM CONTROLS CONTAINER ========== */
-.zoom-controls-container {
+/* ========== CUSTOM MAP CONTROLS ========== */
+.custom-map-controls {
   position: fixed;
-  top: 65%;
+  top: 20px;
   right: 20px;
-  transform: translateY(-50%);
   z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ========== SHARED BUTTON STYLES ========== */
+.custom-zoom-control button,
+.maptype-btn,
+.streetview-btn,
+.fuel-dropdown-btn,
+.fuel-selector,
+.rotate-btn {
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #4a5568;
+  font-size: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.custom-zoom-control button:hover,
+.maptype-btn:hover,
+.streetview-btn:hover,
+.rotate-btn:hover {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+  color: #2d3748;
+}
+
+.custom-zoom-control button:active,
+.maptype-btn:active,
+.streetview-btn:active,
+.rotate-btn:active {
+  transform: translateY(0) scale(0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* ========== ZOOM CONTROLS ========== */
@@ -622,6 +644,8 @@ html, body {
 /* ========== MAP TYPE CONTROL ========== */
 .custom-maptype-control {
   position: relative;
+  right: 20px;
+  top: 100px;
 }
 
 .maptype-dropdown {
@@ -645,6 +669,17 @@ html, body {
   z-index: 11000;
 }
 
+@keyframes dropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .maptype-item {
   display: flex;
   align-items: center;
@@ -659,8 +694,8 @@ html, body {
 }
 
 .maptype-item:hover {
-  background: rgba(56, 124, 194, 0.1);
-  color: #387CC2;
+  background: rgba(79, 70, 229, 0.1);
+  color: #4F46E5;
 }
 
 .maptype-item i {
@@ -669,42 +704,48 @@ html, body {
   font-size: 14px;
 }
 
+/* ========== STREET VIEW CONTROL ========== */
+.custom-streetview-control .streetview-btn.active {
+  background: rgba(79, 70, 229, 0.9);
+  color: white;
+}
 
+.custom-streetview-control .streetview-btn.active:hover {
+  background: rgba(79, 70, 229, 1);
+}
+
+/* ========== ROTATE CONTROL ========== */
+.rotate-btn i {
+  transition: transform 0.3s ease;
+}
+
+.rotate-btn:active i {
+  transform: rotate(90deg);
+}
 
 /* ========== RESPONSIVE DESIGN ========== */
 @media (max-width: 768px) {
   .custom-map-controls {
-    top: 115px;
+    top: 15px;
     right: 15px;
     gap: 10px;
   }
   
-  .custom-zoom-control button {
-    width: 44px;
-    height: 44px;
-    font-size: 14px;
-  }
-
+  .custom-zoom-control button,
   .maptype-btn,
-  .fuel-dropdown-btn {
-    width: 48px;
-    height: 48px;
+  .streetview-btn,
+  .rotate-btn {
+    width: 40px;
+    height: 40px;
     font-size: 14px;
-    gap: 14px;
   }
   
-  .zoom-controls-container {
-    right: 15px;
-  }
-  
-  .maptype-dropdown,
-  .fuel-dropdown-content {
+  .maptype-dropdown {
     min-width: 120px;
     top: 48px;
   }
   
-  .maptype-item,
-  .fuel-dropdown-item {
+  .maptype-item {
     padding: 8px 10px;
     font-size: 13px;
   }
@@ -712,22 +753,19 @@ html, body {
 
 @media (max-width: 480px) {
   .custom-map-controls {
-    top: 110px;
+    top: 10px;
     right: 10px;
     gap: 8px;
   }
   
   .custom-zoom-control button,
   .maptype-btn,
-  .fuel-dropdown-btn {
+  .streetview-btn,
+  .rotate-btn {
     width: 36px;
     height: 36px;
     font-size: 13px;
     border-radius: 10px;
-  }
-  
-  .zoom-controls-container {
-    right: 10px;
   }
   
   .zoom-in-btn {
@@ -737,14 +775,68 @@ html, body {
   .zoom-out-btn {
     border-radius: 5px 5px 10px 10px !important;
   }
-  
-  .maptype-dropdown,
-  .fuel-dropdown-content {
-    min-width: 100px;
-    top: 44px;
+}
+/* ========== USER LOCATION MARKER ========== */
+.user-location-marker {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  cursor: default;
+}
+
+.user-location-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  background: #4285F4;
+  border: 3px solid white;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  z-index: 2;
+}
+
+.user-location-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  background: rgba(66, 133, 244, 0.3);
+  border-radius: 50%;
+  animation: userLocationPulse 2s infinite;
+  z-index: 1;
+}
+
+@keyframes userLocationPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.5);
+    opacity: 0;
   }
 }
 
+/* Animation for marker appearance */
+@keyframes markerAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.5) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.custom-marker {
+  animation: markerAppear 0.3s ease-out;
+}
 
 /* Responsive adjustments for smaller screens */
 @media (max-width: 768px) {
@@ -770,17 +862,106 @@ html, body {
     font-weight: 600 !important;
     bottom: 37px;
   }
-
-  .sc-bottom-bar {
-    bottom: 12px;
-  }
 }
 
 /* ========== RESPONSIVE DESIGN ========== */
 @media (max-width: 599px) {
+  .fuel-dropdown-btn {
+    width: 45px;
+    height: 25px;
+    border-radius: 10px;
+    font-size: 12px;
+  }
+  
   .directions-info {
     left: 10px;
     right: 10px;
     min-width: auto;
   }
+  
+  /* Improve mobile panel interactions */
+  .panel-content {
+    padding: 0 18px 20px 18px;
+    gap: 14px;
+  }
+  
+  .station-item {
+    border-radius: 8px;
+    margin-bottom: 4px;
+  }
+  
+  .suburb-list-item {
+    padding: 14px 12px;
+    border-radius: 8px;
+    margin-bottom: 2px;
+  }
+  
+  /* Better touch targets for mobile */
+  .fuel-dropdown-item {
+    padding: 12px 16px;
+    font-size: 16px;
+  }
+  
+  .maptype-item {
+    padding: 12px 16px;
+    font-size: 16px;
+  }
+  
+  /* User location marker scaling for mobile */
+  .user-location-marker {
+    width: 25px;
+    height: 25px;
+  }
+  
+  .user-location-dot {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .user-location-pulse {
+    width: 25px;
+    height: 25px;
+  }
+}
+
+.map-ui-wrapper {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 1000;
+}
+
+/* Basic button styling — adjust to suit your theme */
+.map-ui-wrapper button {
+  background: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  cursor: pointer;
+  margin-top: 38px;
+  margin-right: 20px;
+}
+
+/* Map type dropdown */
+.maptype-dropdown, .fuel-dropdown-content {
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  margin-top: 8px;
+  display: none;
+  position: absolute;
+  z-index: 1001;
+}
+
+.maptype-item, .fuel-dropdown-content div {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.maptype-item:hover, .fuel-dropdown-content div:hover {
+  background: #f0f0f0;
 }

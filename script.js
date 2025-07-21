@@ -1,4 +1,4 @@
-// Import suburb data
+ // Import suburb data
 import { QLD_SUBURBS } from './data/qld-suburbs.js';
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -118,6 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let userLocation = null;
   let cheapestStationId = null;
   let currentMarkers = []; // Track current markers for cleanup
+  let userLocationMarker = null; // Track user location marker
   
   // Create postcode to suburb mapping
   const postcodeToSuburb = {};
@@ -155,15 +156,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Google Maps Initialization ---
   myMap = new google.maps.Map(document.getElementById("google-map"), {
     center: BRISBANE_COORDS,
-    zoom: 14,
-    mapId: "AIzaSyAQ0Ba7zICGUy5zCVijkkDNrNVdKAG1FGU",
-    minZoom: 10,   // ← Prevents zooming out too far
-    maxZoom: 18,  // ← Prevents zooming in too far
-    heading: 0,
+    zoom: 15,
+    mapId: "AIzaSyAQ0Ba7zICGUy5zCVijkkDNrNVdKAG1FGU", // Enable 3D buildings and advanced features
+    tilt: 45, // Enable 3D tilt
+    heading: 0, // Initial compass heading
     styles: [
       {
         featureType: "poi",
-        elementType: "labels",
         stylers: [{ visibility: "off" }]
       },
       {
@@ -173,9 +172,33 @@ document.addEventListener("DOMContentLoaded", () => {
       {
         featureType: "poi.attraction",
         stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "poi.government",
+        stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "poi.medical",
+        stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "poi.park",
+        stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "poi.place_of_worship",
+        stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "poi.school",
+        stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "poi.sports_complex",
+        stylers: [{ visibility: "off" }]
       }
     ],
-    disableDefaultUI: true,
+    disableDefaultUI: true, // Disable all default controls
     zoomControl: false,
     mapTypeControl: false,
     scaleControl: false,
@@ -190,45 +213,107 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('maptype-dropdown').classList.remove('show');
   };
   
-  window.zoomIn = function() {
-    if (myMap) {
-      myMap.setZoom(myMap.getZoom() + 1);
-    }
+  window.toggleStreetView = function() {
+    const streetView = myMap.getStreetView();
+    const visible = streetView.getVisible();
+    streetView.setVisible(!visible);
   };
   
-  window.zoomOut = function() {
-    if (myMap) {
-      myMap.setZoom(myMap.getZoom() - 1);
-    }
+  window.rotateMap = function() {
+    const currentHeading = myMap.getHeading() || 0;
+    myMap.setHeading(currentHeading + 90);
   };
   
   // Map type dropdown toggle
   document.getElementById('maptype-btn').addEventListener('click', function(e) {
     e.stopPropagation();
     document.getElementById('maptype-dropdown').classList.toggle('show');
-    document.getElementById('fuel-dropdown-content').classList.remove('show');
   });
   
-  // Close dropdowns when clicking outside
+  // Close dropdown when clicking outside
   document.addEventListener('click', function() {
     document.getElementById('maptype-dropdown').classList.remove('show');
-    document.getElementById('fuel-dropdown-content').classList.remove('show');
   });
   
   // Initialize Directions Service and Renderer
   const directionsService = new google.maps.DirectionsService();
   const directionsRenderer = new google.maps.DirectionsRenderer({
-    suppressMarkers: true,
+    suppressMarkers: true, // Don't show default markers
     polylineOptions: {
-      strokeColor: '#387CC2',
+      strokeColor: '#4F46E5',
       strokeOpacity: 0.8,
       strokeWeight: 6
     }
   });
   directionsRenderer.setMap(myMap);
 
+  // --- User Location Marker ---
+  function createUserLocationMarker(lat, lng) {
+    // Remove existing user location marker
+    if (userLocationMarker) {
+      userLocationMarker.setMap(null);
+    }
+    
+    // Create custom user location marker element
+    const markerDiv = document.createElement('div');
+    markerDiv.className = 'user-location-marker';
+    
+    // Blue dot with white border and pulse animation
+    const blueDot = document.createElement('div');
+    blueDot.className = 'user-location-dot';
+    
+    const pulseRing = document.createElement('div');
+    pulseRing.className = 'user-location-pulse';
+    
+    markerDiv.appendChild(pulseRing);
+    markerDiv.appendChild(blueDot);
+    
+    // Create custom marker using OverlayView
+    class UserLocationMarker extends google.maps.OverlayView {
+      constructor(position, content, map) {
+        super();
+        this.position = position;
+        this.content = content;
+        this.div = null;
+        this.setMap(map);
+      }
+      
+      onAdd() {
+        this.div = document.createElement('div');
+        this.div.style.position = 'absolute';
+        this.div.appendChild(this.content);
+        
+        const panes = this.getPanes();
+        panes.overlayMouseTarget.appendChild(this.div);
+      }
+      
+      draw() {
+        const overlayProjection = this.getProjection();
+        const sw = overlayProjection.fromLatLngToDivPixel(this.position);
+        
+        if (this.div) {
+          this.div.style.left = (sw.x - 15) + 'px';
+          this.div.style.top = (sw.y - 15) + 'px';
+        }
+      }
+      
+      onRemove() {
+        if (this.div) {
+          this.div.parentNode.removeChild(this.div);
+          this.div = null;
+        }
+      }
+    }
+    
+    userLocationMarker = new UserLocationMarker(
+      new google.maps.LatLng(lat, lng), 
+      markerDiv, 
+      myMap
+    );
+  }
+
   // --- Weather API ---
-  async function fetchWeather() {
+  async function fetchWeather(lat = BRISBANE_COORDS.lat, lng = BRISBANE_COORDS.lng) {
     try {
       const weatherIcons = {
         '0': '☀️', '1': '🌤️', '2': '⛅', '3': '☁️',
@@ -239,7 +324,7 @@ document.addEventListener("DOMContentLoaded", () => {
         '86': '🌨️', '95': '⛈️', '96': '⛈️', '99': '⛈️'
       };
       
-      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${BRISBANE_COORDS.lat}&longitude=${BRISBANE_COORDS.lng}&current_weather=true`);
+      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current_weather=true`);
       const data = await res.json();
       const { temperature, weathercode } = data.current_weather;
       document.getElementById('weather-temp').textContent = `${Math.round(temperature)}°`;
@@ -254,6 +339,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       console.log("Fetching sites and prices...");
       
+      // QLD data only
       const [siteRes, priceRes] = await Promise.all([
         fetch("data/sites.json").then(r => r.json()),
         fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
@@ -275,6 +361,7 @@ document.addEventListener("DOMContentLoaded", () => {
         priceMap[p.SiteId][p.FuelId] = p.Price;
       });
       
+      // Find cheapest station
       findCheapestStation();
       
       console.log("Data processed. Sites:", allSites.length, "Prices:", allPrices.length);
@@ -290,7 +377,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function findCheapestStation() {
     const fuelId = FUEL_TYPES.find(f => f.key === currentFuel).id;
     let cheapestPrice = Infinity;
-    cheapestStationId = null;
+    cheapestStationId = null; // Reset cheapest station
     
     allSites.forEach(site => {
       const price = priceMap[site.S]?.[fuelId];
@@ -302,34 +389,12 @@ document.addEventListener("DOMContentLoaded", () => {
     
     console.log("Cheapest station:", cheapestStationId, "Price:", cheapestPrice);
   }
-  
-  // Find all stations with cheapest price
-  function findAllCheapestStations() {
-    const fuelId = FUEL_TYPES.find(f => f.key === currentFuel).id;
-    let cheapestPrice = Infinity;
-    let cheapestStations = [];
-    
-    allSites.forEach(site => {
-      const price = priceMap[site.S]?.[fuelId];
-      if (price && price < cheapestPrice) {
-        cheapestPrice = price;
-      }
-    });
-    
-    allSites.forEach(site => {
-      const price = priceMap[site.S]?.[fuelId];
-      if (price === cheapestPrice) {
-        cheapestStations.push(site.S);
-      }
-    });
-    
-    return { cheapestPrice, cheapestStations };
-  }
 
   // --- Map Markers ---
   function updateVisibleStationsAndList() {
     console.log("Updating stations and list...");
     
+    // Clear existing markers
     currentMarkers.forEach(marker => {
       if (marker.setMap) {
         marker.setMap(null);
@@ -341,9 +406,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!bounds) return;
     
     const visibleStations = [];
-    let cheapestVisiblePrice = Infinity;
-    let cheapestVisibleStations = [];
     
+    // Find cheapest station among visible ones
+    let cheapestVisiblePrice = Infinity;
+    let cheapestVisibleStationId = null;
+    
+    // First pass: find all visible stations and their cheapest price
     allSites.forEach(site => {
       const position = new google.maps.LatLng(site.Lat, site.Lng);
       const price = priceMap[site.S]?.[FUEL_TYPES.find(f => f.key === currentFuel).id];
@@ -354,19 +422,22 @@ document.addEventListener("DOMContentLoaded", () => {
       
       if (price < cheapestVisiblePrice) {
         cheapestVisiblePrice = price;
-        cheapestVisibleStations = [site.S];
-      } else if (price === cheapestVisiblePrice) {
-        cheapestVisibleStations.push(site.S);
+        cheapestVisibleStationId = site.S;
       }
     });
     
+    // Second pass: create markers with correct cheapest highlighting
     visibleStations.forEach(({ site, price }) => {
       const position = new google.maps.LatLng(site.Lat, site.Lng);
-      const isCheapest = cheapestVisibleStations.includes(site.S);
+      const isCheapest = site.S === cheapestVisibleStationId;
       const brandId = site.B;
       
+      console.log(`Station ${site.N}: Price ${price}, isCheapest: ${isCheapest}`);
+      
+      // Create the custom marker
       const markerElement = createCustomMarker(price, brandId, isCheapest);
       
+      // Create marker using OverlayView for custom HTML content
       class CustomMarker extends google.maps.OverlayView {
         constructor(position, content, map) {
           super();
@@ -405,6 +476,7 @@ document.addEventListener("DOMContentLoaded", () => {
       
       const marker = new CustomMarker(position, markerElement, myMap);
       
+      // Add click listener
       markerElement.addEventListener('click', () => {
         showFeatureCard(site, price);
       });
@@ -412,15 +484,17 @@ document.addEventListener("DOMContentLoaded", () => {
       currentMarkers.push(marker);
     });
     
-    updateList(visibleStations, cheapestVisibleStations);
+    updateList(visibleStations);
   }
   
   // --- List Panel ---
-  function updateList(stations, cheapestStations = []) {
+  function updateList(stations) {
     const list = document.getElementById('list');
     if (!list) return;
     
     list.innerHTML = '';
+    
+    // Sort by price
     stations.sort((a, b) => a.price - b.price);
     
     stations.slice(0, 50).forEach(({ site, price }) => {
@@ -431,19 +505,17 @@ document.addEventListener("DOMContentLoaded", () => {
         getDistance(userLocation.lat, userLocation.lng, site.Lat, site.Lng).toFixed(1) : 
         '?';
       
-      const isCheapest = cheapestStations.includes(site.S);
-      const brandLogo = getBrandLogo(site.B);
+      const isCheapest = site.S === cheapestStationId;
       
       li.innerHTML = `
-        <div style="display:flex;align-items:center;padding:12px;border-bottom:1px solid #eee;gap:12px;">
-          <img src="${brandLogo}" style="width:40px;height:40px;object-fit:contain;flex-shrink:0;" onerror="this.src='images/default.png'" />
-          <div style="flex:1;min-width:0;">
-            <div style="font-weight:600;color:#333;">${site.N}</div>
-            <div style="font-size:12px;color:#666;">${site.A}, ${getSuburbName(site.P)} ${site.P}</div>
+        <div style="display:flex;align-items:center;padding:12px;border-bottom:1px solid #eee;">
+          <div style="flex:1;">
+            <div style="font-weight:600;color:#333;">${site.N} ${isCheapest ? '💚' : ''}</div>
+            <div style="font-size:12px;color:#666;">${site.A}, ${getSuburbName(site.P)}</div>
             <div style="font-size:11px;color:#999;">${distance} km away</div>
           </div>
           <div style="text-align:right;">
-            <div style="font-size:20px;font-weight:700;color:${isCheapest ? '#22C55E' : '#007AFF'};">
+            <div style="font-size:20px;font-weight:700;color:${isCheapest ? '#00AA00' : '#007AFF'};">
               ${(price / 10).toFixed(1)}
             </div>
           </div>
@@ -451,6 +523,8 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
       
       li.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         if (e.target.tagName !== 'BUTTON') {
           showFeatureCard(site, price);
         }
@@ -462,9 +536,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Feature Card ---
   function showFeatureCard(site, price) {
     const content = document.getElementById('feature-card-content');
-    const { cheapestStations } = findAllCheapestStations();
-    const isCheapest = cheapestStations.includes(site.S);
-    const brandLogo = getBrandLogo(site.B);
+    const isCheapest = site.S === cheapestStationId;
     
     const allPrices = FUEL_TYPES.map(fuel => {
       const p = priceMap[site.S]?.[fuel.id];
@@ -478,22 +550,47 @@ document.addEventListener("DOMContentLoaded", () => {
     
     content.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:15px;">
-        <h3 class="feature-card-title" style="margin:0;flex:1;">${site.N} ${isCheapest ? 'CHEAPEST' : ''}</h3>
-        <img src="${brandLogo}" style="width:40px;height:40px;object-fit:contain;margin-left:12px;" onerror="this.src='images/default.png'" />
+        <h3 class="feature-card-title" style="margin:0;flex:1;">${site.N} ${isCheapest ? '💚 CHEAPEST' : ''}</h3>
       </div>
-      <div style="margin-bottom:15px;">
-        <p class="feature-card-address" style="margin:0 0 10px 0;text-decoration:none;">${site.A}, ${getSuburbName(site.P)} ${site.P}</p>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <button onclick="getDirections(${site.Lat}, ${site.Lng})" style="padding:8px 12px;background:#387CC2;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;width:fit-content;" title="Get Directions">
-            <i class="fas fa-route"></i> Get Directions
+      <div style="display:flex;align-items:center;margin-bottom:15px;">
+        <p class="feature-card-address" style="margin:0;flex:1;text-decoration:none;">${site.A}, ${getSuburbName(site.P)}</p>
+        <div style="display:flex;gap:8px;">
+          <button class="directions-btn" data-lat="${site.Lat}" data-lng="${site.Lng}" style="padding:8px;background:#4F46E5;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;" title="Get Directions">
+            <i class="fas fa-route"></i>
           </button>
-          <button onclick="navigateExternal(${site.Lat}, ${site.Lng})" style="padding:8px 12px;background:#007AFF;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;width:fit-content;" title="Open in Maps App">
-            <i class="fa-solid fa-diamond-turn-right"></i> Open in Maps App
+          <button class="external-nav-btn" data-lat="${site.Lat}" data-lng="${site.Lng}" style="padding:8px;background:#007AFF;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;" title="Open in Maps App">
+            <i class="fa-solid fa-diamond-turn-right"></i>
           </button>
         </div>
       </div>
       <div class="fuel-prices-list" style="display:flex;flex-wrap:wrap;gap:8px;">${allPrices}</div>
     `;
+    
+    // Add event listeners for navigation buttons
+    setTimeout(() => {
+      const directionsBtn = content.querySelector('.directions-btn');
+      const externalNavBtn = content.querySelector('.external-nav-btn');
+      
+      if (directionsBtn) {
+        directionsBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const lat = parseFloat(e.target.closest('button').dataset.lat);
+          const lng = parseFloat(e.target.closest('button').dataset.lng);
+          navigate(lat, lng);
+        });
+      }
+      
+      if (externalNavBtn) {
+        externalNavBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const lat = parseFloat(e.target.closest('button').dataset.lat);
+          const lng = parseFloat(e.target.closest('button').dataset.lng);
+          navigateExternal(lat, lng);
+        });
+      }
+    }, 100);
     
     openPanel('feature');
   }
@@ -501,10 +598,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Navigation Functions ---
   let currentDirections = null;
   
+  // Get directions to a station
   function getDirections(destinationLat, destinationLng) {
-    closeAllPanels();
-    
     if (!userLocation) {
+      // Fallback to external navigation if no user location
       navigateExternal(destinationLat, destinationLng);
       return;
     }
@@ -526,26 +623,31 @@ document.addEventListener("DOMContentLoaded", () => {
         directionsRenderer.setDirections(result);
         currentDirections = result;
         
+        // Show directions info
         const route = result.routes[0];
         const leg = route.legs[0];
         showDirectionsInfo(leg.duration.text, leg.distance.text);
         
+        // Fit map to show entire route
         const bounds = new google.maps.LatLngBounds();
         route.overview_path.forEach(point => bounds.extend(point));
         myMap.fitBounds(bounds);
       } else {
         console.error('Directions request failed:', status);
+        // Fallback to external navigation
         navigateExternal(destinationLat, destinationLng);
       }
     });
   }
   
+  // Clear current directions
   function clearDirections() {
     directionsRenderer.setDirections({routes: []});
     currentDirections = null;
     hideDirectionsInfo();
   }
   
+  // External navigation fallback
   function navigateExternal(lat, lng) {
     if (isAppleDevice()) {
       window.open(`maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`);
@@ -554,6 +656,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
   
+  // Show directions info panel
   function showDirectionsInfo(duration, distance) {
     let directionsInfo = document.getElementById('directions-info');
     if (!directionsInfo) {
@@ -577,6 +680,7 @@ document.addEventListener("DOMContentLoaded", () => {
     directionsInfo.style.display = 'block';
   }
   
+  // Hide directions info panel
   function hideDirectionsInfo() {
     const directionsInfo = document.getElementById('directions-info');
     if (directionsInfo) {
@@ -584,29 +688,32 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
   
-  // Make navigation functions global
+  // Main navigation function (called from feature cards)
   window.navigate = function(lat, lng) {
     getDirections(lat, lng);
   };
   
+  // Make functions global
   window.clearDirections = clearDirections;
   window.getDirections = getDirections;
   
   // --- Panel Management ---
   function openPanel(panelName) {
+    // Close all panels first
     document.querySelectorAll('.sliding-panel').forEach(p => {
       p.classList.remove('open');
-      p.style.transform = 'translateX(-50%) translateY(130%)';
+      p.style.transform = 'translateX(-50%) translateY(130%)'; // Reset position
     });
     document.querySelectorAll('.panel-overlay').forEach(o => o.classList.remove('active'));
     
+    // Open the requested panel
     const panel = document.getElementById(`${panelName}-panel`);
     const overlay = document.getElementById(`${panelName}-overlay`);
     
     if (panel && overlay) {
       panel.classList.add('open');
       overlay.classList.add('active');
-      panel.style.transform = 'translateX(-50%) translateY(0)';
+      panel.style.transform = 'translateX(-50%) translateY(0)'; // Ensure it's visible
       initializeDrag(panel);
     }
   }
@@ -614,7 +721,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function closeAllPanels() {
     document.querySelectorAll('.sliding-panel').forEach(p => {
       p.classList.remove('open');
-      p.style.transform = 'translateX(-50%) translateY(130%)';
+      p.style.transform = 'translateX(-50%) translateY(130%)'; // Reset to hidden position
     });
     document.querySelectorAll('.panel-overlay').forEach(o => o.classList.remove('active'));
   }
@@ -622,9 +729,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Drag Functionality ---
   function initializeDrag(panel) {
     const dragBar = panel.querySelector('.panel-drag-bar');
-    const panelContent = panel.querySelector('.panel-content');
-    
-    if (!dragBar || !panelContent) return;
+    if (!dragBar) return;
     
     let isDragging = false;
     let startY = 0;
@@ -632,6 +737,9 @@ document.addEventListener("DOMContentLoaded", () => {
     let initialTranslateY = 0;
     
     function handleStart(e) {
+      // Only start dragging if the target is the drag bar itself
+      if (!e.target.classList.contains('panel-drag-bar')) return;
+      
       isDragging = true;
       const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
       startY = clientY;
@@ -642,6 +750,7 @@ document.addEventListener("DOMContentLoaded", () => {
       
       panel.style.transition = 'none';
       e.preventDefault();
+      e.stopPropagation();
     }
     
     function handleMove(e) {
@@ -650,11 +759,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
       currentY = clientY - startY;
       
-      // Only allow dragging downward (positive currentY)
-      if (currentY > 0) {
-        const newTranslateY = initialTranslateY + currentY;
-        panel.style.transform = `translateX(-50%) translateY(${newTranslateY}px)`;
-      }
+      const newTranslateY = Math.max(-window.innerHeight * 0.4, initialTranslateY + currentY);
+      panel.style.transform = `translateX(-50%) translateY(${newTranslateY}px)`;
       
       e.preventDefault();
     }
@@ -667,9 +773,12 @@ document.addEventListener("DOMContentLoaded", () => {
       
       const threshold = window.innerHeight * 0.2;
       
-      // Only allow closing panels by dragging down
       if (currentY > threshold) {
+        // Drag down - close panel
         closeAllPanels();
+      } else if (currentY < -threshold) {
+        // Drag up - expand to top
+        panel.style.transform = 'translateX(-50%) translateY(-40vh)';
       } else {
         // Snap back to normal position
         panel.style.transform = 'translateX(-50%) translateY(0)';
@@ -678,76 +787,57 @@ document.addEventListener("DOMContentLoaded", () => {
       currentY = 0;
     }
     
-    // Touch events for drag bar
+    // Touch events - only on drag bar
     dragBar.addEventListener('touchstart', handleStart, { passive: false });
     document.addEventListener('touchmove', handleMove, { passive: false });
     document.addEventListener('touchend', handleEnd);
     
-    // Mouse events for drag bar
+    // Mouse events - only on drag bar
     dragBar.addEventListener('mousedown', handleStart);
     document.addEventListener('mousemove', handleMove);
     document.addEventListener('mouseup', handleEnd);
     
-    // Touch events for panel content (swipe anywhere)
-    panelContent.addEventListener('touchstart', handleStart, { passive: false });
-    
-    // Mouse events for panel content (drag anywhere)
-    panelContent.addEventListener('mousedown', handleStart);
+    // Prevent scrolling on panel content from interfering with drag
+    const panelContent = panel.querySelector('.panel-content');
+    if (panelContent) {
+      panelContent.addEventListener('touchstart', (e) => {
+        e.stopPropagation();
+      }, { passive: true });
+    }
   }
   
   // --- Event Listeners ---
-  
-  // Preset locations
-  const PRESET_LOCATIONS = [
-    { name: "Current Location", action: "current" },
-    { name: "Brisbane", lat: -27.4698, lng: 153.0251 },
-    { name: "Gold Coast", lat: -28.0167, lng: 153.4000 },
-    { name: "Sunshine Coast", lat: -26.6500, lng: 153.0667 },
-    { name: "Toowoomba", lat: -27.5598, lng: 151.9507 },
-    { name: "Rockhampton", lat: -23.3781, lng: 150.5069 },
-    { name: "Mackay", lat: -21.1558, lng: 149.1692 },
-    { name: "Townsville", lat: -19.2590, lng: 146.8169 },
-    { name: "Cairns", lat: -16.9186, lng: 145.7781 }
-  ];
   
   // Search functionality
   const searchInput = document.getElementById('search-input');
   const suburbList = document.getElementById('suburb-list');
   
   if (searchInput && suburbList) {
-    function showPresetLocations() {
-      suburbList.innerHTML = PRESET_LOCATIONS.map(location => {
-        if (location.action === 'current') {
-          return `<li class="suburb-list-item" onclick="goToCurrentLocation()"><i class="fas fa-location-arrow" style="color:#387CC2;margin-right:8px;font-size:12px;"></i>${location.name}</li>`;
-        } else {
-          return `<li class="suburb-list-item" onclick="goToLocation(${location.lat}, ${location.lng}, '${location.name}')">${location.name}</li>`;
-        }
-      }).join('');
-    }
-    
-    showPresetLocations();
-    
     searchInput.addEventListener('input', e => {
       const query = e.target.value.toLowerCase();
       if (query.length < 2) {
-        showPresetLocations();
+        suburbList.innerHTML = '';
         return;
       }
       
+      // Search through suburb names
       const matchingSuburbs = QLD_SUBURBS
         .filter(suburb => suburb.suburb.toLowerCase().includes(query))
         .sort((a, b) => a.suburb.localeCompare(b.suburb))
         .slice(0, 20);
       
-      suburbList.innerHTML = matchingSuburbs.map(suburb => 
-        `<li class="suburb-list-item" onclick="searchSuburb('${suburb.suburb}', '${suburb.postcode}')">${suburb.suburb}</li>`
-      ).join('');
-    });
-    
-    searchInput.addEventListener('focus', () => {
-      if (!searchInput.value) {
-        showPresetLocations();
-      }
+      suburbList.innerHTML = '';
+      matchingSuburbs.forEach(suburb => {
+        const li = document.createElement('li');
+        li.className = 'suburb-list-item';
+        li.textContent = suburb.suburb;
+        li.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          searchSuburb(suburb.suburb, suburb.postcode);
+        });
+        suburbList.appendChild(li);
+      });
     });
   }
   
@@ -761,6 +851,7 @@ document.addEventListener("DOMContentLoaded", () => {
       myMap.setZoom(14);
       closeAllPanels();
     } else {
+      // If no sites found with exact postcode, try to find the suburb in our mapping
       const suburbData = QLD_SUBURBS.find(s => s.suburb.toLowerCase() === suburbName.toLowerCase());
       if (suburbData) {
         myMap.setCenter(new google.maps.LatLng(suburbData.lat, suburbData.lng));
@@ -770,44 +861,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
   
-  // Go to preset location
-  window.goToLocation = function(lat, lng, name) {
-    myMap.setCenter(new google.maps.LatLng(lat, lng));
-    myMap.setZoom(12);
-    closeAllPanels();
-  };
-  
-  // Go to current location
-  window.goToCurrentLocation = function() {
-    if (userLocation) {
-      myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
-      myMap.setZoom(15);
-    } else {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          position => {
-            userLocation = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            };
-            myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
-            myMap.setZoom(15);
-          },
-          error => {
-            console.log("Location error:", error);
-            alert("Unable to get your current location");
-          }
-        );
-      }
-    }
-    closeAllPanels();
-  };
-  
   // Fuel selector dropdown
   const fuelBtn = document.getElementById('fuel-dropdown-btn');
   const fuelContent = document.getElementById('fuel-dropdown-content');
   
   if (fuelBtn && fuelContent) {
+    // Populate fuel types
     FUEL_TYPES.forEach(fuel => {
       const item = document.createElement('div');
       item.className = 'fuel-dropdown-item';
@@ -833,7 +892,10 @@ document.addEventListener("DOMContentLoaded", () => {
     fuelBtn.addEventListener('click', e => {
       e.stopPropagation();
       fuelContent.classList.toggle('show');
-      document.getElementById('maptype-dropdown').classList.remove('show');
+    });
+    
+    document.addEventListener('click', () => {
+      fuelContent.classList.remove('show');
     });
   }
   
@@ -845,10 +907,31 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   
   document.getElementById('toolbar-center-btn')?.addEventListener('click', () => {
+    // Navigate to user's location or default Brisbane location
     if (userLocation) {
       myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
+      createUserLocationMarker(userLocation.lat, userLocation.lng);
     } else {
-      myMap.setCenter(new google.maps.LatLng(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng));
+      // Try to get location again if not available
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            userLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
+            createUserLocationMarker(userLocation.lat, userLocation.lng);
+          },
+          error => {
+            console.log("Location error:", error);
+            // Fallback to Brisbane
+            myMap.setCenter(new google.maps.LatLng(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng));
+          }
+        );
+      } else {
+        myMap.setCenter(new google.maps.LatLng(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng));
+      }
     }
     closeAllPanels();
     document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));
@@ -868,9 +951,16 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // Map events
   myMap.addListener('bounds_changed', () => {
+    // Debounce the update to avoid too many calls
     clearTimeout(window.boundsUpdateTimeout);
     window.boundsUpdateTimeout = setTimeout(() => {
       updateVisibleStationsAndList();
+      
+      // Update weather based on map center
+      const center = myMap.getCenter();
+      if (center) {
+        fetchWeather(center.lat(), center.lng());
+      }
     }, 300);
   });
   
@@ -883,6 +973,7 @@ document.addEventListener("DOMContentLoaded", () => {
           lng: position.coords.longitude
         };
         myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
+        createUserLocationMarker(userLocation.lat, userLocation.lng);
       },
       error => console.log("Location error:", error)
     );
