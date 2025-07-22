@@ -117,16 +117,16 @@ html, body {
 @media (max-width: 768px) {
   .maptype-btn,
   .fuel-dropdown-btn {
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
   }
 }
 
 @media (min-width: 769px) and (max-width: 1023px) {
   .maptype-btn,
   .fuel-dropdown-btn {
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
   }
 }
 
@@ -193,7 +193,7 @@ html, body {
 
 .fuel-dropdown-btn {
   font-size: 14px;
-  margin-bottom: 40px;
+  margin-bottom: 100px;
 }
 
 .fuel-dropdown-content {
@@ -1040,13 +1040,14 @@ html, body {
   .custom-zoom-control button,
   .maptype-btn,
   .fuel-dropdown-btn {
-    width: 36px;
-    height: 36px;
+    width: 42px;
+    height: 42px;
     font-size: 13px;
     border-radius: 10px;
   }
   
   .zoom-in-btn {
+    margin-top: 100px;
     border-radius: 10px 10px 5px 5px !important;
   }
   
