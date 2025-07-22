@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // --- Constants & Config ---
   const BRISBANE_COORDS = { lat: -27.4698, lng: 153.0251 };
-  const LOAD_RADIUS_KM = 20; // Load stations within 20km of center
   
   const FUEL_TYPES = [
     { key: "E10", id: 12, label: "E10", fullName: "Unleaded E10", color: "fuel-e10" },
@@ -63,34 +62,28 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // Helper function to get brand logo
   const getBrandLogo = (brandId) => {
-    return BRAND_LOGOS[brandId] || BRAND_LOGOS[12]; // Default to generic logo
+    return BRAND_LOGOS[brandId] || BRAND_LOGOS[12];
   };
   
-  // Create custom marker with mymarker.png base, station logo, and price in black box
+  // Create custom marker
   function createCustomMarker(price, brandId, isCheapest = false) {
     const priceText = (price / 10).toFixed(1);
     const logoUrl = getBrandLogo(brandId);
     
-    // Create a custom marker element
     const markerDiv = document.createElement('div');
     markerDiv.className = `custom-marker ${isCheapest ? 'cheapest' : ''}`;
     
-    // Base marker image (mymarker.png)
     const baseMarker = document.createElement('img');
     baseMarker.src = 'images/mymarker.png';
     baseMarker.className = `marker-base ${isCheapest ? 'cheapest' : ''}`;
     
-    // Station logo on top of marker
     const stationLogo = document.createElement('img');
     stationLogo.src = logoUrl;
     stationLogo.className = 'marker-logo';
-    
-    // Error handling for logo loading
     stationLogo.onerror = function() {
       this.src = 'images/default.png';
     };
     
-    // Price box (black background with white text)
     const priceBox = document.createElement('div');
     priceBox.textContent = priceText;
     priceBox.className = 'marker-price';
@@ -102,20 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return markerDiv;
   }
   
-  const BRAND_NAMES = {
-    2: "Caltex", 5: "BP", 7: "Budget", 12: "Independent", 16: "Mobil", 20: "Shell", 
-    23: "United", 27: "Unbranded", 51: "Apco", 57: "Metro", 65: "Petrogas", 72: "Gull", 
-    86: "Liberty", 87: "AM/PM", 105: "Better Choice", 110: "Freedom", 111: "Coles", 
-    113: "7-Eleven", 114: "Astron", 115: "Prime", 167: "Speedway", 169: "OTR", 
-    2301: "Choice", 4896: "Mogas", 5094: "Puma", 2031031: "Costco", 2418994: "Pacific", 
-    2418995: "Vibe", 2419007: "Lowes", 2419008: "Westside", 2419037: "Enhance", 
-    2459022: "FuelXpress", 3421028: "X Convenience", 3421066: "Ampol", 3421073: "EG Ampol", 
-    3421074: "Perrys", 3421075: "IOR", 3421139: "Pearl", 3421162: "Pacific Fuel", 
-    3421183: "U-Go", 3421193: "Reddy Express", 3421195: "Ultra", 3421196: "Bennetts", 
-    3421202: "Atlas", 3421204: "Woodham", 3421207: "Tas Petroleum"
-  };
-  
-  // Device detection for navigation
+  // Device detection
   const isAppleDevice = () => {
     return /iPad|iPhone|iPod|Mac/.test(navigator.userAgent) || 
            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -131,18 +111,13 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentFuel = localStorage.getItem('preferredFuel') || "E10";
   let userLocation = null;
   let cheapestStationId = null;
-  let currentMarkers = []; // Track current markers for cleanup
-  let userLocationMarker = null; // Track user location marker
-  let loadedAreas = []; // Track loaded areas to avoid reloading
-  let isLoading = false;
+  let currentMarkers = [];
+  let userLocationMarker = null;
+  let isTrackingLocation = false;
+  let watchId = null;
   
   // Filter state
   let selectedBrands = new Set();
-  let fuelOptions = {
-    anyUnleaded: false,
-    anyPremium: false,
-    anyDiesel: false
-  };
   
   // Create postcode to suburb mapping
   const postcodeToSuburb = {};
@@ -156,23 +131,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // Helper function to get suburb name from postcode
   const getSuburbName = (postcode) => {
     const suburbs = postcodeToSuburb[postcode];
-    return suburbs ? suburbs[0] : postcode; // Return first suburb or postcode if not found
+    return suburbs ? suburbs[0] : postcode;
   };
   
   // --- User Preferences ---
   function savePreferences() {
     localStorage.setItem('preferredFuel', currentFuel);
-  }
-  
-  // --- Loading Indicator ---
-  function showLoading() {
-    document.getElementById('loading-spinner').classList.add('active');
-    isLoading = true;
-  }
-  
-  function hideLoading() {
-    document.getElementById('loading-spinner').classList.remove('active');
-    isLoading = false;
   }
   
   // --- Utility Functions ---
@@ -188,84 +152,31 @@ document.addEventListener("DOMContentLoaded", () => {
     return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
   };
   
-  // Check if an area has been loaded
-  function isAreaLoaded(lat, lng, radius) {
-    return loadedAreas.some(area => {
-      const distance = getDistance(area.lat, area.lng, lat, lng);
-      return distance < (area.radius + radius) * 0.8; // 80% overlap
-    });
-  }
-  
-  // Mark area as loaded
-  function markAreaLoaded(lat, lng, radius) {
-    loadedAreas.push({ lat, lng, radius });
-  }
-  
   // --- Google Maps Initialization ---
   myMap = new google.maps.Map(document.getElementById("google-map"), {
     center: BRISBANE_COORDS,
     zoom: 14,
-    minZoom: 10,                 // Allow more zoom out
-    maxZoom: 18,                 // Allow more zoom in
-    mapId: "AIzaSyAQ0Ba7zICGUy5zCVijkkDNrNVdKAG1FGU", 
-    tilt: 45, // Enable 3D tilt
-    heading: 0, // Initial compass heading
+    minZoom: 10,
+    maxZoom: 18,
+    mapId: "AIzaSyAQ0Ba7zICGUy5zCVijkkDNrNVdKAG1FGU",
+    tilt: 45,
+    heading: 0,
     styles: [
-      {
-        featureType: "poi",
-        stylers: [{ visibility: "off" }]
-      },
-      {
-        featureType: "poi.business",
-        stylers: [{ visibility: "off" }]
-      },
-      {
-        featureType: "poi.attraction",
-        stylers: [{ visibility: "off" }]
-      },
-      {
-        featureType: "poi.government",
-        stylers: [{ visibility: "off" }]
-      },
-      {
-        featureType: "poi.medical",
-        stylers: [{ visibility: "off" }]
-      },
-      {
-        featureType: "poi.park",
-        stylers: [{ visibility: "off" }]
-      },
-      {
-        featureType: "poi.place_of_worship",
-        stylers: [{ visibility: "off" }]
-      },
-      {
-        featureType: "poi.school",
-        stylers: [{ visibility: "off" }]
-      },
-      {
-        featureType: "poi.sports_complex",
-        stylers: [{ visibility: "off" }]
-      },
-      {
-        featureType: "transit",
-        stylers: [{ visibility: "off" }]
-      },
-      {
-        featureType: "transit.station",
-        stylers: [{ visibility: "off" }]
-      },
-      {
-        featureType: "transit.line",
-        stylers: [{ visibility: "off" }]
-      },
-      {
-        featureType: "transit",
-        elementType: "labels.icon",
-        stylers: [{ visibility: "off" }]
-      }
+      { featureType: "poi", stylers: [{ visibility: "off" }] },
+      { featureType: "poi.business", stylers: [{ visibility: "off" }] },
+      { featureType: "poi.attraction", stylers: [{ visibility: "off" }] },
+      { featureType: "poi.government", stylers: [{ visibility: "off" }] },
+      { featureType: "poi.medical", stylers: [{ visibility: "off" }] },
+      { featureType: "poi.park", stylers: [{ visibility: "off" }] },
+      { featureType: "poi.place_of_worship", stylers: [{ visibility: "off" }] },
+      { featureType: "poi.school", stylers: [{ visibility: "off" }] },
+      { featureType: "poi.sports_complex", stylers: [{ visibility: "off" }] },
+      { featureType: "transit", stylers: [{ visibility: "off" }] },
+      { featureType: "transit.station", stylers: [{ visibility: "off" }] },
+      { featureType: "transit.line", stylers: [{ visibility: "off" }] },
+      { featureType: "transit", elementType: "labels.icon", stylers: [{ visibility: "off" }] }
     ],
-    disableDefaultUI: true, // Disable all default controls
+    disableDefaultUI: true,
     zoomControl: false,
     mapTypeControl: false,
     scaleControl: false,
@@ -274,63 +185,114 @@ document.addEventListener("DOMContentLoaded", () => {
     fullscreenControl: false
   });
   
-  // Custom control functions
-  window.changeMapType = function(type) {
-    myMap.setMapTypeId(type);
-    document.getElementById('maptype-dropdown').classList.remove('show');
-  };
-  
+  // --- Map Control Functions ---
   window.resetNorth = function() {
     myMap.setHeading(0);
     myMap.setTilt(0);
+    document.getElementById('compass-control').querySelector('.compass-btn').classList.remove('active');
   };
   
-  window.toggleStreetView = function() {
-    const streetView = myMap.getStreetView();
-    const visible = streetView.getVisible();
-    streetView.setVisible(!visible);
+  window.zoomIn = function() {
+    const currentZoom = myMap.getZoom();
+    myMap.setZoom(Math.min(currentZoom + 1, 18));
   };
   
-  window.rotateMap = function() {
-    const currentHeading = myMap.getHeading() || 0;
-    myMap.setHeading(currentHeading + 90);
+  window.zoomOut = function() {
+    const currentZoom = myMap.getZoom();
+    myMap.setZoom(Math.max(currentZoom - 1, 10));
   };
   
-  // Map type dropdown toggle
-  document.getElementById('maptype-btn').addEventListener('click', function(e) {
-    e.stopPropagation();
-    document.getElementById('maptype-dropdown').classList.toggle('show');
-  });
-  
-  // Close dropdown when clicking outside
-  document.addEventListener('click', function() {
-    document.getElementById('maptype-dropdown').classList.remove('show');
-  });
-  
-  // Initialize Directions Service and Renderer
-  const directionsService = new google.maps.DirectionsService();
-  const directionsRenderer = new google.maps.DirectionsRenderer({
-    suppressMarkers: true, // Don't show default markers
-    polylineOptions: {
-      strokeColor: '#007AFF',
-      strokeOpacity: 0.8,
-      strokeWeight: 6
+  window.centerOnLocation = function() {
+    const locationBtn = document.getElementById('location-btn');
+    
+    if (!isTrackingLocation) {
+      // First click - center on location
+      if (userLocation) {
+        myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
+        createUserLocationMarker(userLocation.lat, userLocation.lng);
+        locationBtn.classList.add('tracking');
+        isTrackingLocation = true;
+        
+        // Start watching position for rotation
+        if (navigator.geolocation) {
+          watchId = navigator.geolocation.watchPosition(
+            (position) => {
+              userLocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+              };
+              
+              // Update location marker
+              createUserLocationMarker(userLocation.lat, userLocation.lng);
+              
+              // Rotate map with heading if available
+              if (position.coords.heading !== null && position.coords.heading !== undefined) {
+                myMap.setHeading(position.coords.heading);
+              }
+            },
+            (error) => console.log("Location tracking error:", error),
+            { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+          );
+        }
+      } else {
+        // Try to get location
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              userLocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+              };
+              myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
+              createUserLocationMarker(userLocation.lat, userLocation.lng);
+              locationBtn.classList.add('tracking');
+              isTrackingLocation = true;
+              
+              // Start tracking
+              watchId = navigator.geolocation.watchPosition(
+                (position) => {
+                  userLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                  };
+                  createUserLocationMarker(userLocation.lat, userLocation.lng);
+                  if (position.coords.heading !== null && position.coords.heading !== undefined) {
+                    myMap.setHeading(position.coords.heading);
+                  }
+                },
+                (error) => console.log("Location tracking error:", error),
+                { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+              );
+            },
+            (error) => {
+              console.log("Location error:", error);
+              alert("Unable to get your location");
+            }
+          );
+        }
+      }
+    } else {
+      // Second click - stop tracking
+      locationBtn.classList.remove('tracking');
+      isTrackingLocation = false;
+      myMap.setHeading(0);
+      
+      if (watchId) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+      }
     }
-  });
-  directionsRenderer.setMap(myMap);
-
+  };
+  
   // --- User Location Marker ---
   function createUserLocationMarker(lat, lng) {
-    // Remove existing user location marker
     if (userLocationMarker) {
       userLocationMarker.setMap(null);
     }
     
-    // Create custom user location marker element
     const markerDiv = document.createElement('div');
     markerDiv.className = 'user-location-marker';
     
-    // Blue dot with white border and pulse animation
     const blueDot = document.createElement('div');
     blueDot.className = 'user-location-dot';
     
@@ -340,7 +302,6 @@ document.addEventListener("DOMContentLoaded", () => {
     markerDiv.appendChild(pulseRing);
     markerDiv.appendChild(blueDot);
     
-    // Create custom marker using OverlayView
     class UserLocationMarker extends google.maps.OverlayView {
       constructor(position, content, map) {
         super();
@@ -409,76 +370,43 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Site & Price Data ---
   async function fetchSitesAndPrices() {
     try {
-      showLoading();
       console.log("Fetching sites and prices...");
       
-      // Load sites once, prices will be loaded on demand
-      const siteRes = await fetch("data/sites.json").then(r => r.json());
+      const [siteRes, priceRes] = await Promise.all([
+        fetch("data/sites.json").then(r => r.json()),
+        fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
+      ]);
       
       console.log("Sites loaded:", siteRes);
+      console.log("Prices loaded:", priceRes);
       
       allSites = (Array.isArray(siteRes) ? siteRes : siteRes.S)
         .filter(site => !bannedStations.some(b => site.N && site.N.includes(b)));
         
-      console.log("Data processed. Sites:", allSites.length);
-      
-      // Load initial area data
-      await loadAreaData(myMap.getCenter().lat(), myMap.getCenter().lng());
-      
-      await fetchWeather();
-      hideLoading();
-    } catch (err) {
-      console.error("Error loading sites/prices:", err);
-      hideLoading();
-    }
-  }
-  
-  // Load data for a specific area
-  async function loadAreaData(centerLat, centerLng) {
-    if (isAreaLoaded(centerLat, centerLng, LOAD_RADIUS_KM)) {
-      console.log("Area already loaded");
-      updateVisibleStationsAndList();
-      return;
-    }
-    
-    try {
-      showLoading();
-      
-      // Fetch prices from API
-      const priceRes = await fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json());
-      
-      console.log("Prices loaded:", priceRes);
-      
-      // Filter prices for valid fuel types and prices
-      const newPrices = priceRes.SitePrices.filter(
+      allPrices = priceRes.SitePrices.filter(
         p => FUEL_TYPES.some(f => f.id === p.FuelId) && isValidPrice(p.Price)
       );
       
-      // Update price map with new prices
-      newPrices.forEach(p => {
+      priceMap = {};
+      allPrices.forEach(p => {
         if (!priceMap[p.SiteId]) priceMap[p.SiteId] = {};
         priceMap[p.SiteId][p.FuelId] = p.Price;
       });
       
-      // Mark area as loaded
-      markAreaLoaded(centerLat, centerLng, LOAD_RADIUS_KM);
-      
-      // Find cheapest station
       findCheapestStation();
       
-      // Update display
-      updateVisibleStationsAndList();
+      console.log("Data processed. Sites:", allSites.length, "Prices:", allPrices.length);
       
-      hideLoading();
+      updateVisibleStations();
+      await fetchWeather();
     } catch (err) {
-      console.error("Error loading area data:", err);
-      hideLoading();
+      console.error("Error loading sites/prices:", err);
     }
   }
   
   // --- Find Cheapest Station ---
   function findCheapestStation() {
-    const fuelId = getFuelIdsForSelection();
+    const fuelId = FUEL_TYPES.find(f => f.key === currentFuel).id;
     let cheapestPrice = Infinity;
     cheapestStationId = null;
     
@@ -486,42 +414,19 @@ document.addEventListener("DOMContentLoaded", () => {
       // Check brand filter
       if (selectedBrands.size > 0 && !selectedBrands.has(site.B)) return;
       
-      // Check for any matching fuel type
-      const prices = fuelId.map(id => priceMap[site.S]?.[id]).filter(p => p);
-      if (prices.length === 0) return;
-      
-      const minPrice = Math.min(...prices);
-      if (minPrice < cheapestPrice) {
-        cheapestPrice = minPrice;
+      const price = priceMap[site.S]?.[fuelId];
+      if (price && price < cheapestPrice) {
+        cheapestPrice = price;
         cheapestStationId = site.S;
       }
     });
     
     console.log("Cheapest station:", cheapestStationId, "Price:", cheapestPrice);
   }
-  
-  // Get fuel IDs based on current selection and options
-  function getFuelIdsForSelection() {
-    let fuelIds = [];
-    
-    if (fuelOptions.anyUnleaded) {
-      fuelIds = [12, 2]; // E10, U91
-    } else if (fuelOptions.anyPremium) {
-      fuelIds = [5, 8]; // P95, P98
-    } else if (fuelOptions.anyDiesel) {
-      fuelIds = [3, 14]; // Diesel, Premium Diesel
-    } else {
-      // Single fuel type selected
-      const fuel = FUEL_TYPES.find(f => f.key === currentFuel);
-      fuelIds = [fuel.id];
-    }
-    
-    return fuelIds;
-  }
 
   // --- Map Markers ---
-  function updateVisibleStationsAndList() {
-    console.log("Updating stations and list...");
+  function updateVisibleStations() {
+    console.log("Updating stations...");
     
     // Clear existing markers
     currentMarkers.forEach(marker => {
@@ -534,48 +439,41 @@ document.addEventListener("DOMContentLoaded", () => {
     const bounds = myMap.getBounds();
     if (!bounds) return;
     
-    const visibleStations = [];
-    const fuelIds = getFuelIdsForSelection();
+    const fuelId = FUEL_TYPES.find(f => f.key === currentFuel).id;
     
-    // Find cheapest station among visible ones
+    // Find cheapest visible station
     let cheapestVisiblePrice = Infinity;
     let cheapestVisibleStationId = null;
     
-    // First pass: find all visible stations and their cheapest price
+    const visibleStations = [];
+    
     allSites.forEach(site => {
       const position = new google.maps.LatLng(site.Lat, site.Lng);
       
-      // Check if in bounds
       if (!bounds.contains(position)) return;
       
       // Check brand filter
       if (selectedBrands.size > 0 && !selectedBrands.has(site.B)) return;
       
-      // Get prices for selected fuel types
-      const prices = fuelIds.map(id => priceMap[site.S]?.[id]).filter(p => p);
-      if (prices.length === 0) return;
+      const price = priceMap[site.S]?.[fuelId];
+      if (!price) return;
       
-      const minPrice = Math.min(...prices);
-      const selectedFuelPrice = priceMap[site.S]?.[FUEL_TYPES.find(f => f.key === currentFuel).id] || minPrice;
+      visibleStations.push({ site, price });
       
-      visibleStations.push({ site, price: selectedFuelPrice, minPrice });
-      
-      if (minPrice < cheapestVisiblePrice) {
-        cheapestVisiblePrice = minPrice;
+      if (price < cheapestVisiblePrice) {
+        cheapestVisiblePrice = price;
         cheapestVisibleStationId = site.S;
       }
     });
     
-    // Second pass: create markers with correct cheapest highlighting
-    visibleStations.forEach(({ site, price, minPrice }) => {
+    // Create markers
+    visibleStations.forEach(({ site, price }) => {
       const position = new google.maps.LatLng(site.Lat, site.Lng);
       const isCheapest = site.S === cheapestVisibleStationId;
       const brandId = site.B;
       
-      // Create the custom marker
       const markerElement = createCustomMarker(price, brandId, isCheapest);
       
-      // Create marker using OverlayView for custom HTML content
       class CustomMarker extends google.maps.OverlayView {
         constructor(position, content, map) {
           super();
@@ -614,61 +512,11 @@ document.addEventListener("DOMContentLoaded", () => {
       
       const marker = new CustomMarker(position, markerElement, myMap);
       
-      // Add click listener
       markerElement.addEventListener('click', () => {
         showFeatureCard(site, price);
       });
       
       currentMarkers.push(marker);
-    });
-    
-    updateList(visibleStations);
-  }
-  
-  // --- List Panel ---
-  function updateList(stations) {
-    const list = document.getElementById('list');
-    if (!list) return;
-    
-    list.innerHTML = '';
-    
-    // Sort by price
-    stations.sort((a, b) => a.minPrice - b.minPrice);
-    
-    stations.slice(0, 50).forEach(({ site, price, minPrice }) => {
-      const li = document.createElement('li');
-      li.className = 'station-item';
-      
-      const distance = userLocation ? 
-        getDistance(userLocation.lat, userLocation.lng, site.Lat, site.Lng).toFixed(1) : 
-        '?';
-      
-      const isCheapest = site.S === cheapestStationId;
-      
-      li.innerHTML = `
-        <div style="display:flex;align-items:center;padding:12px;border-bottom:1px solid #eee;">
-          <img src="${getBrandLogo(site.B)}" alt="Station Logo" style="width:32px;height:32px;object-fit:contain;border-radius:6px;margin-right:12px;" onerror="this.src='images/default.png'">
-          <div style="flex:1;">
-            <div style="font-size:14px;font-weight:600;color:#2a2d3f;">${site.N}</div>
-            <div style="font-size:12px;color:#666;">${site.A}, ${getSuburbName(site.P)}</div>
-            <div style="font-size:11px;color:#999;">${distance} km away</div>
-          </div>
-          <div style="text-align:right;">
-            <div style="font-size:20px;font-weight:700;color:${isCheapest ? '#00AA00' : '#007AFF'};">
-              ${(price / 10).toFixed(1)}
-            </div>
-          </div>
-        </div>
-      `;
-      
-      li.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (e.target.tagName !== 'BUTTON') {
-          showFeatureCard(site, price);
-        }
-      });
-      list.appendChild(li);
     });
   }
   
@@ -704,7 +552,6 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="fuel-prices-list">${allPrices}</div>
     `;
     
-    // Add event listeners for navigation buttons
     setTimeout(() => {
       const directionsBtn = content.querySelector('.open-maps-btn');
       
@@ -722,59 +569,7 @@ document.addEventListener("DOMContentLoaded", () => {
     openPanel('feature');
   }
   
-  // --- Navigation Functions ---
-  let currentDirections = null;
-  
-  // Get directions to a station
-  function getDirections(destinationLat, destinationLng) {
-    if (!userLocation) {
-      // Fallback to external navigation if no user location
-      navigateExternal(destinationLat, destinationLng);
-      return;
-    }
-    
-    const origin = new google.maps.LatLng(userLocation.lat, userLocation.lng);
-    const destination = new google.maps.LatLng(destinationLat, destinationLng);
-    
-    const request = {
-      origin: origin,
-      destination: destination,
-      travelMode: google.maps.TravelMode.DRIVING,
-      unitSystem: google.maps.UnitSystem.METRIC,
-      avoidHighways: false,
-      avoidTolls: false
-    };
-    
-    directionsService.route(request, (result, status) => {
-      if (status === 'OK') {
-        directionsRenderer.setDirections(result);
-        currentDirections = result;
-        
-        // Show directions info
-        const route = result.routes[0];
-        const leg = route.legs[0];
-        showDirectionsInfo(leg.duration.text, leg.distance.text);
-        
-        // Fit map to show entire route
-        const bounds = new google.maps.LatLngBounds();
-        route.overview_path.forEach(point => bounds.extend(point));
-        myMap.fitBounds(bounds);
-      } else {
-        console.error('Directions request failed:', status);
-        // Fallback to external navigation
-        navigateExternal(destinationLat, destinationLng);
-      }
-    });
-  }
-  
-  // Clear current directions
-  function clearDirections() {
-    directionsRenderer.setDirections({routes: []});
-    currentDirections = null;
-    hideDirectionsInfo();
-  }
-  
-  // External navigation fallback
+  // External navigation
   function navigateExternal(lat, lng) {
     if (isAppleDevice()) {
       window.open(`maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`);
@@ -783,62 +578,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
   
-  // Show directions info panel
-  function showDirectionsInfo(duration, distance) {
-    let directionsInfo = document.getElementById('directions-info');
-    if (!directionsInfo) {
-      directionsInfo = document.createElement('div');
-      directionsInfo.id = 'directions-info';
-      directionsInfo.className = 'directions-info';
-      document.body.appendChild(directionsInfo);
-    }
-    
-    directionsInfo.innerHTML = `
-      <div class="directions-content">
-        <div class="directions-text">
-          <div class="directions-time">${duration}</div>
-          <div class="directions-distance">${distance}</div>
-        </div>
-        <button class="directions-close" onclick="clearDirections()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-    `;
-    directionsInfo.style.display = 'block';
-  }
-  
-  // Hide directions info panel
-  function hideDirectionsInfo() {
-    const directionsInfo = document.getElementById('directions-info');
-    if (directionsInfo) {
-      directionsInfo.style.display = 'none';
-    }
-  }
-  
-  // Main navigation function (called from feature cards)
-  window.navigate = function(lat, lng) {
-    getDirections(lat, lng);
-  };
-  
-  // Zoom functions
-  window.zoomIn = function() {
-    const currentZoom = myMap.getZoom();
-    myMap.setZoom(Math.min(currentZoom + 1, 18));
-  };
-  
-  window.zoomOut = function() {
-    const currentZoom = myMap.getZoom();
-    myMap.setZoom(Math.max(currentZoom - 1, 10));
-  };
-  
-  // Make functions global
-  window.clearDirections = clearDirections;
-  window.getDirections = getDirections;
-  
   // --- Filters Panel ---
   function setupFilters() {
-    const filtersBtn = document.getElementById('filters-btn');
-    const filtersPanel = document.getElementById('filters-panel');
+    const filtersBtn = document.getElementById('toolbar-filters-btn');
     const fuelTypeGrid = document.getElementById('fuel-type-grid');
     const brandGrid = document.getElementById('brand-grid');
     
@@ -851,20 +593,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (fuel.key === currentFuel) item.classList.add('selected');
       
       item.addEventListener('click', () => {
-        // Deselect all fuel types
         document.querySelectorAll('.fuel-type-item').forEach(i => i.classList.remove('selected'));
         item.classList.add('selected');
         currentFuel = fuel.key;
         savePreferences();
-        
-        // Clear fuel options when selecting specific fuel
-        fuelOptions.anyUnleaded = false;
-        fuelOptions.anyPremium = false;
-        fuelOptions.anyDiesel = false;
-        document.querySelectorAll('input[name="fuel-option"]').forEach(cb => cb.checked = false);
-        
         findCheapestStation();
-        updateVisibleStationsAndList();
+        updateVisibleStations();
       });
       
       fuelTypeGrid.appendChild(item);
@@ -896,84 +630,21 @@ document.addEventListener("DOMContentLoaded", () => {
           selectedBrands.delete(brand.id);
         }
         findCheapestStation();
-        updateVisibleStationsAndList();
+        updateVisibleStations();
       });
       
       brandGrid.appendChild(item);
-    });
-    
-    // Setup fuel options
-    document.getElementById('any-unleaded').addEventListener('change', (e) => {
-      fuelOptions.anyUnleaded = e.target.checked;
-      if (e.target.checked) {
-        fuelOptions.anyPremium = false;
-        fuelOptions.anyDiesel = false;
-        document.getElementById('any-premium').checked = false;
-        document.getElementById('any-diesel').checked = false;
-        // Clear fuel type selection
-        document.querySelectorAll('.fuel-type-item').forEach(i => i.classList.remove('selected'));
-      }
-      findCheapestStation();
-      updateVisibleStationsAndList();
-    });
-    
-    document.getElementById('any-premium').addEventListener('change', (e) => {
-      fuelOptions.anyPremium = e.target.checked;
-      if (e.target.checked) {
-        fuelOptions.anyUnleaded = false;
-        fuelOptions.anyDiesel = false;
-        document.getElementById('any-unleaded').checked = false;
-        document.getElementById('any-diesel').checked = false;
-        // Clear fuel type selection
-        document.querySelectorAll('.fuel-type-item').forEach(i => i.classList.remove('selected'));
-      }
-      findCheapestStation();
-      updateVisibleStationsAndList();
-    });
-    
-    document.getElementById('any-diesel').addEventListener('change', (e) => {
-      fuelOptions.anyDiesel = e.target.checked;
-      if (e.target.checked) {
-        fuelOptions.anyUnleaded = false;
-        fuelOptions.anyPremium = false;
-        document.getElementById('any-unleaded').checked = false;
-        document.getElementById('any-premium').checked = false;
-        // Clear fuel type selection
-        document.querySelectorAll('.fuel-type-item').forEach(i => i.classList.remove('selected'));
-      }
-      findCheapestStation();
-      updateVisibleStationsAndList();
-    });
-    
-    // Toggle filters panel
-    filtersBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      filtersPanel.classList.toggle('open');
-    });
-    
-    // Close filters
-    window.closeFilters = function() {
-      filtersPanel.classList.remove('open');
-    };
-    
-    // Close on outside click
-    document.addEventListener('click', (e) => {
-      if (!filtersPanel.contains(e.target) && !filtersBtn.contains(e.target)) {
-        filtersPanel.classList.remove('open');
-      }
     });
   }
   
   // --- Panel Management ---
   function openPanel(panelName) {
-    // Close all panels first
     document.querySelectorAll('.sliding-panel').forEach(p => {
       p.classList.remove('open');
       p.style.transform = 'translateX(-50%) translateY(130%)';
     });
     document.querySelectorAll('.panel-overlay').forEach(o => o.classList.remove('active'));
     
-    // Open the requested panel
     const panel = document.getElementById(`${panelName}-panel`);
     const overlay = document.getElementById(`${panelName}-overlay`);
     
@@ -1151,7 +822,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById('search-input');
   const suburbList = document.getElementById('suburb-list');
   
-  // Show all suburbs by default
   function showAllSuburbs() {
     const sortedSuburbs = QLD_SUBURBS
       .sort((a, b) => a.suburb.localeCompare(b.suburb));
@@ -1201,66 +871,34 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   
   // Global search function
-  window.searchSuburb = async function(suburbName, postcode) {
+  window.searchSuburb = function(suburbName, postcode) {
     const sites = allSites.filter(s => s.P === postcode);
     if (sites.length > 0) {
       const avgLat = sites.reduce((sum, s) => sum + s.Lat, 0) / sites.length;
       const avgLng = sites.reduce((sum, s) => sum + s.Lng, 0) / sites.length;
       myMap.setCenter(new google.maps.LatLng(avgLat, avgLng));
       myMap.setZoom(14);
-      await loadAreaData(avgLat, avgLng);
       closeAllPanels();
     } else {
       const suburbData = QLD_SUBURBS.find(s => s.suburb.toLowerCase() === suburbName.toLowerCase());
       if (suburbData) {
         myMap.setCenter(new google.maps.LatLng(suburbData.lat, suburbData.lng));
         myMap.setZoom(14);
-        await loadAreaData(suburbData.lat, suburbData.lng);
         closeAllPanels();
       }
     }
   };
   
   // Toolbar buttons
-  document.getElementById('toolbar-search-btn')?.addEventListener('click', () => {
-    openPanel('search');
+  document.getElementById('toolbar-filters-btn')?.addEventListener('click', () => {
+    openPanel('filters');
     document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));
-    document.getElementById('toolbar-search-btn').classList.add('sc-current');
+    document.getElementById('toolbar-filters-btn').classList.add('sc-current');
   });
   
   document.getElementById('toolbar-center-btn')?.addEventListener('click', () => {
-    if (userLocation) {
-      myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
-      createUserLocationMarker(userLocation.lat, userLocation.lng);
-    } else {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          position => {
-            userLocation = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            };
-            myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
-            createUserLocationMarker(userLocation.lat, userLocation.lng);
-          },
-          error => {
-            console.log("Location error:", error);
-            myMap.setCenter(new google.maps.LatLng(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng));
-          }
-        );
-      } else {
-        myMap.setCenter(new google.maps.LatLng(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng));
-      }
-    }
-    closeAllPanels();
+    openPanel('search');
     document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));
-    document.getElementById('toolbar-center-btn').classList.add('sc-current');
-  });
-  
-  document.getElementById('toolbar-list-btn')?.addEventListener('click', () => {
-    openPanel('list');
-    document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));
-    document.getElementById('toolbar-list-btn').classList.add('sc-current');
   });
   
   // Overlays close panels
@@ -1269,20 +907,10 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   
   // Map events
-  let mapIdleTimeout;
-  myMap.addListener('idle', async () => {
-    // Map has stopped moving/zooming
-    clearTimeout(mapIdleTimeout);
-    mapIdleTimeout = setTimeout(async () => {
-      const center = myMap.getCenter();
-      await loadAreaData(center.lat(), center.lng());
-    }, 500);
-  });
-  
   myMap.addListener('bounds_changed', () => {
     clearTimeout(window.boundsUpdateTimeout);
     window.boundsUpdateTimeout = setTimeout(() => {
-      updateVisibleStationsAndList();
+      updateVisibleStations();
     }, 300);
   });
   
@@ -1294,6 +922,17 @@ document.addEventListener("DOMContentLoaded", () => {
         fetchWeather(center.lat(), center.lng());
       }
     }, 1000);
+  });
+  
+  // Monitor compass heading changes
+  myMap.addListener('heading_changed', () => {
+    const heading = myMap.getHeading();
+    const compassBtn = document.getElementById('compass-control').querySelector('.compass-btn');
+    if (heading !== 0) {
+      compassBtn.classList.add('active');
+    } else {
+      compassBtn.classList.remove('active');
+    }
   });
   
   // Get user location
@@ -1311,16 +950,12 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
   
-  // Make functions global for onclick handlers
+  // Make functions global
   window.showFeatureCard = showFeatureCard;
   window.navigateExternal = navigateExternal;
   
-  // Initialize drag functionality
-  setupGlobalDragListeners();
-  
-  // Setup filters
-  setupFilters();
-  
   // Initialize
+  setupGlobalDragListeners();
+  setupFilters();
   fetchSitesAndPrices();
 });
