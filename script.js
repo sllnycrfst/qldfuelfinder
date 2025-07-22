@@ -8,12 +8,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const BRISBANE_COORDS = { lat: -27.4698, lng: 153.0251 };
   
   const FUEL_TYPES = [
-    { key: "E10", id: 12, label: "E10", fullName: "Unleaded E10", color: "fuel-e10" },
-    { key: "91", id: 2, label: "U91", fullName: "Unleaded 91", color: "fuel-u91" },
-    { key: "95", id: 5, label: "P95", fullName: "Premium 95", color: "fuel-p95" },
-    { key: "98", id: 8, label: "P98", fullName: "Premium 98", color: "fuel-p98" },
-    { key: "Diesel", id: 3, label: "DSL", fullName: "Diesel", color: "fuel-diesel" },
-    { key: "Premium Diesel", id: 14, label: "PDSL", fullName: "Premium Diesel", color: "fuel-pdiesel" }
+    { key: "E10", id: 12, label: "E10", fullName: "Unleaded E10" },
+    { key: "91", id: 2, label: "U91", fullName: "Unleaded 91" },
+    { key: "95", id: 5, label: "P95", fullName: "Premium 95" },
+    { key: "98", id: 8, label: "P98", fullName: "Premium 98" },
+    { key: "Diesel", id: 1000, label: "DSL", fullName: "Diesel/Premium Diesel" }
   ];
   
   // Brand logos for stations
@@ -394,12 +393,21 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // --- Find Cheapest Station ---
   function findCheapestStation() {
-    const fuelId = FUEL_TYPES.find(f => f.key === currentFuel).id;
+    const fuel = FUEL_TYPES.find(f => f.key === currentFuel);
     let cheapestPrice = Infinity;
     cheapestStationId = null; // Reset cheapest station
     
     allSites.forEach(site => {
-      const price = priceMap[site.S]?.[fuelId];
+      let price;
+      if (fuel.id === 1000) { // Diesel/Premium Diesel
+        const dieselPrice = priceMap[site.S]?.[3];
+        const premiumDieselPrice = priceMap[site.S]?.[14];
+        price = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);
+        if (price === Infinity) price = null;
+      } else {
+        price = priceMap[site.S]?.[fuel.id];
+      }
+      
       if (price && price < cheapestPrice) {
         cheapestPrice = price;
         cheapestStationId = site.S;
@@ -433,7 +441,17 @@ document.addEventListener("DOMContentLoaded", () => {
     // First pass: find all visible stations and their cheapest price
     allSites.forEach(site => {
       const position = new google.maps.LatLng(site.Lat, site.Lng);
-      const price = priceMap[site.S]?.[FUEL_TYPES.find(f => f.key === currentFuel).id];
+      const fuel = FUEL_TYPES.find(f => f.key === currentFuel);
+      let price;
+      
+      if (fuel.id === 1000) { // Diesel/Premium Diesel
+        const dieselPrice = priceMap[site.S]?.[3];
+        const premiumDieselPrice = priceMap[site.S]?.[14];
+        price = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);
+        if (price === Infinity) price = null;
+      } else {
+        price = priceMap[site.S]?.[fuel.id];
+      }
       
       if (!price || !bounds.contains(position)) return;
       
@@ -559,9 +577,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const isCheapest = site.S === cheapestStationId;
     
     const allPrices = FUEL_TYPES.map(fuel => {
-      const p = priceMap[site.S]?.[fuel.id];
+      let p;
+      if (fuel.id === 1000) { // Diesel/Premium Diesel
+        const dieselPrice = priceMap[site.S]?.[3];
+        const premiumDieselPrice = priceMap[site.S]?.[14];
+        p = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);
+        if (p === Infinity) p = null;
+      } else {
+        p = priceMap[site.S]?.[fuel.id];
+      }
       return p ? `
-        <div class="fuel-price-row ${fuel.color}">
+        <div class="fuel-price-row">
           <span class="fuel-type-label">${fuel.fullName}</span>
           <span class="fuel-type-price">${(p / 10).toFixed(1)}</span>
         </div>
@@ -655,11 +681,29 @@ document.addEventListener("DOMContentLoaded", () => {
     hideDirectionsInfo();
   }
   
-  // External navigation fallback
+  // External navigation with app choice
   function navigateExternal(lat, lng) {
-    if (isAppleDevice()) {
-      window.open(`maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`);
+    // Check what's available
+    const isApple = isAppleDevice();
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (!isMobile) {
+      // Desktop - just open Google Maps in browser
+      window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
+      return;
+    }
+    
+    // Mobile device
+    if (isApple) {
+      // iOS device - ask user preference
+      const choice = confirm('Open in Apple Maps?\n\nOK = Apple Maps\nCancel = Google Maps');
+      if (choice) {
+        window.open(`maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`);
+      } else {
+        window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
+      }
     } else {
+      // Android - just use Google Maps
       window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
     }
   }

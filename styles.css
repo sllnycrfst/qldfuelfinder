@@ -35,7 +35,7 @@ html, body {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   padding: 8px 12px;
@@ -44,7 +44,7 @@ html, body {
     0 8px 32px rgba(0, 0, 0, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.5),
     inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   font-size: 14px;
   font-weight: 500;
   color: #3b4664;
@@ -73,14 +73,14 @@ html, body {
   z-index: 10000;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 40px;
 }
 
 /* ========== CUSTOM MAP CONTROLS ========== */
 .custom-map-controls {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 40px;
 }
 
 /* ========== SHARED BUTTON STYLES ========== */
@@ -89,13 +89,13 @@ html, body {
   height: 44px;
   border: none;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   box-shadow: 
     0 8px 32px rgba(0, 0, 0, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -103,7 +103,7 @@ html, body {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   color: #4a5568;
   font-size: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   font-weight: 500;
 }
 
@@ -144,7 +144,7 @@ html, body {
 .fuel-dropdown-btn {
   border: none;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   box-shadow: 
@@ -156,19 +156,19 @@ html, body {
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  color: #4a5568;
+  color: #3b4664;
   font-size: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   font-weight: 500;
 }
 
 .custom-zoom-control button:hover,
 .maptype-btn:hover,
 .fuel-dropdown-btn:hover {
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.85);
   box-shadow: 
     0 12px 40px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
   transform: translateY(-1px);
   color: #2d3748;
 }
@@ -192,16 +192,16 @@ html, body {
 
 .fuel-dropdown-btn {
   font-size: 14px;
-  margin-bottom: 100px;
+  padding: 8px 12px;
 }
 
 .fuel-dropdown-content {
   display: none;
   position: absolute;
-  top: 12px;
-  right: 38px;
+  top: 52px;
+  right: 0;
   min-width: 120px;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   border-radius: 12px;
@@ -211,7 +211,7 @@ html, body {
     inset 0 -1px 0 rgba(0, 0, 0, 0.1);
   z-index: 10002;
   padding: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   animation: dropdownSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -508,49 +508,20 @@ html, body {
   color: #333;
 }
 
-/* Fuel type specific colors */
-.fuel-price-row.fuel-e10 {
-  background: rgba(34, 197, 94, 0.15);
-  border: 1px solid rgba(34, 197, 94, 0.3);
-}
-
-.fuel-price-row.fuel-u91 {
-  background: rgba(251, 191, 36, 0.15);
-  border: 1px solid rgba(251, 191, 36, 0.3);
-}
-
-.fuel-price-row.fuel-p95 {
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-}
-
-.fuel-price-row.fuel-p98 {
-  background: rgba(147, 51, 234, 0.15);
-  border: 1px solid rgba(147, 51, 234, 0.3);
-}
-
-.fuel-price-row.fuel-diesel {
-  background: rgba(251, 146, 60, 0.15);
-  border: 1px solid rgba(251, 146, 60, 0.3);
-}
-
-.fuel-price-row.fuel-pdiesel {
-  background: rgba(59, 130, 246, 0.15);
-  border: 1px solid rgba(59, 130, 246, 0.3);
-}
+/* Removed fuel type specific colors - all rows now use the same styling */
 
 /* ========== FEATURE CARD BUTTONS ========== */
 .feature-card-actions {
   display: flex;
   gap: 12px;
-  margin-top: 8px;
-  margin-bottom: 16px;
+  margin-top: 4px;
+  margin-bottom: 12px;
   justify-content: flex-start;
 }
 
 .feature-card-btn {
-  padding: 8px 16px;
-  border-radius: 10px;
+  padding: 6px 12px;
+  border-radius: 8px;
   border: none;
   font-weight: 600;
   cursor: pointer;
@@ -565,8 +536,8 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 40px;
-  height: 40px;
+  min-width: 36px;
+  height: 36px;
 }
 
 .directions-btn {
@@ -597,7 +568,7 @@ html, body {
 }
 
 .feature-card-btn i {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 /* ========== SCROLLBAR STYLING ========== */
@@ -911,6 +882,10 @@ html, body {
 }
 /* ========== ZOOM CONTROLS CONTAINER ========== */
 .zoom-controls-container {
+  position: fixed;
+  bottom: 120px;
+  right: 20px;
+  z-index: 10000;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -946,7 +921,7 @@ html, body {
   top: 52px;
   right: 0;
   min-width: 140px;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   border-radius: 12px;
@@ -956,7 +931,7 @@ html, body {
     inset 0 -1px 0 rgba(0, 0, 0, 0.1);
   padding: 8px;
   display: none;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   animation: dropdownSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -994,13 +969,18 @@ html, body {
 /* ========== RESPONSIVE DESIGN ========== */
 @media (max-width: 768px) {
   .map-controls-wrapper {
-    top: 115px;
+    top: 15px;
     right: 15px;
-    gap: 24px;
+    gap: 30px;
   }
   
   .custom-map-controls {
-    gap: 10px;
+    gap: 30px;
+  }
+  
+  .zoom-controls-container {
+    bottom: 110px;
+    right: 15px;
   }
   
   .custom-zoom-control button,
@@ -1026,13 +1006,18 @@ html, body {
 
 @media (max-width: 500px) {
   .map-controls-wrapper {
-    top: 110px;
+    top: 10px;
     right: 10px;
-    gap: 28px;
+    gap: 25px;
   }
   
   .custom-map-controls {
-    gap: 28px;
+    gap: 25px;
+  }
+  
+  .zoom-controls-container {
+    bottom: 100px;
+    right: 10px;
   }
   
   .custom-zoom-control button,
@@ -1045,7 +1030,6 @@ html, body {
   }
   
   .zoom-in-btn {
-    margin-top: 100px;
     border-radius: 10px 10px 5px 5px !important;
   }
   
