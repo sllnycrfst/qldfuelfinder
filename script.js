@@ -210,6 +210,11 @@ document.addEventListener("DOMContentLoaded", () => {
       {
         featureType: "transit.line",
         stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "transit",
+        elementType: "labels.icon",
+        stylers: [{ visibility: "off" }]
       }
     ],
     disableDefaultUI: true, // Disable all default controls
