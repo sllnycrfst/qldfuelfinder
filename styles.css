@@ -690,6 +690,8 @@ html, body {
   width: 64px;
   height: 64px;
   background: radial-gradient(circle at 30% 30%, #5e9fd7 0%, #387CC2 40%, #2a5d8f 80%, #1e4a73 100%) !important;
+  backdrop-filter: blur(4px) saturate(140%);
+  -webkit-backdrop-filter: blur(4px) saturate(140%);
   border-radius: 50%;
   border: none;
   display: flex;
@@ -723,6 +725,8 @@ html, body {
 .sc-center-btn i {
   font-size: 26px;
   color: #ffffff;
+  backdrop-filter: blur(4px) saturate(140%);
+  -webkit-backdrop-filter: blur(4px) saturate(140%);
   z-index: 1;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
@@ -730,6 +734,8 @@ html, body {
 .sc-center-btn:hover {
   transform: translateX(-50%) scale(1.1);
   background: radial-gradient(circle at 30% 30%, #5e9fd7 0%, #387CC2 40%, #2a5d8f 80%, #1e4a73 100%) !important;
+  backdrop-filter: blur(4px) saturate(140%);
+  -webkit-backdrop-filter: blur(4px) saturate(140%);
   box-shadow: 
     0 16px 50px rgba(56, 124, 194, 0.6),
     0 8px 25px rgba(0, 0, 0, 0.35),
@@ -741,6 +747,8 @@ html, body {
 .sc-center-btn:active {
   transform: translateX(-50%) scale(0.95);
   background: rgba(56, 124, 194, 0.3) !important;
+  backdrop-filter: blur(4px) saturate(140%);
+  -webkit-backdrop-filter: blur(4px) saturate(140%);
   box-shadow: 
     0 4px 16px rgba(56, 124, 194, 0.3),
     0 2px 8px rgba(0, 0, 0, 0.2),
@@ -770,7 +778,8 @@ html, body {
 /* Center button always keeps its glass effect */
 .sc-center-btn.sc-current {
   background: rgba(56, 124, 194, 0.35) !important;
-  backdrop-filter: blur(4px) saturate(120%);
+  backdrop-filter: blur(4px) saturate(140%);
+  -webkit-backdrop-filter: blur(4px) saturate(140%);
 }
 
 /* ========== DIRECTIONS INFO PANEL ========== */
