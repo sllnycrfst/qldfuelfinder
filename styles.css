@@ -65,12 +65,19 @@ html, body {
   font-weight: 600;
 }
 
-/* ========== CUSTOM MAP CONTROLS ========== */
-.custom-map-controls {
+/* ========== MAP CONTROLS WRAPPER ========== */
+.map-controls-wrapper {
   position: fixed;
   top: 120px;
   right: 20px;
   z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ========== CUSTOM MAP CONTROLS ========== */
+.custom-map-controls {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -102,8 +109,25 @@ html, body {
 
 .maptype-btn,
 .fuel-dropdown-btn {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
+}
+
+/* Mobile and Desktop sizing */
+@media (max-width: 768px) {
+  .maptype-btn,
+  .fuel-dropdown-btn {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1023px) {
+  .maptype-btn,
+  .fuel-dropdown-btn {
+    width: 48px;
+    height: 48px;
+  }
 }
 
 /* Desktop larger buttons */
@@ -365,15 +389,14 @@ html, body {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(12px) saturate(150%);
   -webkit-backdrop-filter: blur(12px) saturate(150%);
   border-radius: 12px;
   box-shadow: 
-    0 4px 16px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+    inset 0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 8px 14px 8px 10px;
 }
 
@@ -480,15 +503,46 @@ html, body {
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
-.fuel-type-label {
-  font-weight: 600;
-  font-size: 14px;
-  color: #333;
-}
-
 .fuel-type-price {
   font-weight: bold;
   font-size: 16px;
+}
+
+.fuel-type-label {
+  font-weight: 600;
+  font-size: 13px;
+  color: #333;
+}
+
+/* Fuel type specific colors */
+.fuel-price-row.fuel-e10 {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.fuel-price-row.fuel-u91 {
+  background: rgba(251, 191, 36, 0.15);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.fuel-price-row.fuel-p95 {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.fuel-price-row.fuel-p98 {
+  background: rgba(147, 51, 234, 0.15);
+  border: 1px solid rgba(147, 51, 234, 0.3);
+}
+
+.fuel-price-row.fuel-diesel {
+  background: rgba(251, 146, 60, 0.15);
+  border: 1px solid rgba(251, 146, 60, 0.3);
+}
+
+.fuel-price-row.fuel-pdiesel {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
 /* ========== FEATURE CARD BUTTONS ========== */
@@ -535,15 +589,15 @@ html, body {
 }
 
 .open-maps-btn {
-  background: rgba(116, 185, 255, 0.25);
-  color: #4ECDC4;
+  background: rgba(59, 130, 246, 0.25);
+  color: #3B82F6;
 }
 
 .open-maps-btn:hover {
-  background: rgba(116, 185, 255, 0.35);
+  background: rgba(59, 130, 246, 0.35);
   transform: translateY(-1px);
   box-shadow: 
-    0 12px 40px rgba(116, 185, 255, 0.25),
+    0 12px 40px rgba(59, 130, 246, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.6),
     inset 0 -1px 0 rgba(0, 0, 0, 0.1);
 }
@@ -594,9 +648,8 @@ html, body {
   z-index: 15000;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  gap: 60px;
   padding: 0 30px;
   padding-bottom: env(safe-area-inset-bottom);
 }
@@ -630,7 +683,7 @@ html, body {
 /* Center location button (floating action button) */
 .sc-center-btn {
   position: fixed;
-  bottom: calc(85px + env(safe-area-inset-bottom));
+  bottom: calc(35px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
   width: 64px;
@@ -839,11 +892,9 @@ html, body {
 }
 /* ========== ZOOM CONTROLS CONTAINER ========== */
 .zoom-controls-container {
-  position: fixed;
-  top: 65%;
-  right: 20px;
-  transform: translateY(-50%);
-  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 /* ========== ZOOM CONTROLS ========== */
@@ -932,9 +983,13 @@ html, body {
 
 /* ========== RESPONSIVE DESIGN ========== */
 @media (max-width: 768px) {
-  .custom-map-controls {
+  .map-controls-wrapper {
     top: 115px;
     right: 15px;
+    gap: 10px;
+  }
+  
+  .custom-map-controls {
     gap: 10px;
   }
   
@@ -944,10 +999,6 @@ html, body {
     width: 40px;
     height: 40px;
     font-size: 14px;
-  }
-  
-  .zoom-controls-container {
-    right: 15px;
   }
   
   .maptype-dropdown,
@@ -964,9 +1015,13 @@ html, body {
 }
 
 @media (max-width: 480px) {
-  .custom-map-controls {
+  .map-controls-wrapper {
     top: 110px;
     right: 10px;
+    gap: 8px;
+  }
+  
+  .custom-map-controls {
     gap: 8px;
   }
   
@@ -977,10 +1032,6 @@ html, body {
     height: 36px;
     font-size: 13px;
     border-radius: 10px;
-  }
-  
-  .zoom-controls-container {
-    right: 10px;
   }
   
   .zoom-in-btn {
@@ -1057,12 +1108,11 @@ html, body {
     transform: none;
     width: 100%;
     max-width: none;
-    gap: 40px;
-    padding: 0 25px;
+    padding: 0 20px;
   }
   
   .sc-center-btn {
-    bottom: calc(80px + env(safe-area-inset-bottom));
+    bottom: calc(30px + env(safe-area-inset-bottom));
     width: 58px;
     height: 58px;
   }

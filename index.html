@@ -17,41 +17,44 @@
 
 <div id="google-map" style="width: 100vw; height: 100vh;"></div>
 
-<!-- Custom Map Controls -->
-<div class="custom-map-controls">
-  <!-- Map Type Control (moved to top) -->
-  <div class="custom-maptype-control">
-    <button class="maptype-btn" id="maptype-btn">
-      <i class="fas fa-layer-group"></i>
-    </button>
-    <div class="maptype-dropdown" id="maptype-dropdown">
-      <div class="maptype-item" onclick="changeMapType('roadmap')"><i class="fas fa-road"></i> Map</div>
-      <div class="maptype-item" onclick="changeMapType('satellite')"><i class="fas fa-satellite"></i> Satellite</div>
-      <div class="maptype-item" onclick="changeMapType('hybrid')"><i class="fas fa-globe"></i> Hybrid</div>
-      <div class="maptype-item" onclick="changeMapType('terrain')"><i class="fas fa-mountain"></i> Terrain</div>
+<!-- Map Controls Wrapper -->
+<div class="map-controls-wrapper">
+  <!-- Custom Map Controls -->
+  <div class="custom-map-controls">
+    <!-- Map Type Control (moved to top) -->
+    <div class="custom-maptype-control">
+      <button class="maptype-btn" id="maptype-btn">
+        <i class="fas fa-layer-group"></i>
+      </button>
+      <div class="maptype-dropdown" id="maptype-dropdown">
+        <div class="maptype-item" onclick="changeMapType('roadmap')"><i class="fas fa-road"></i> Map</div>
+        <div class="maptype-item" onclick="changeMapType('satellite')"><i class="fas fa-satellite"></i> Satellite</div>
+        <div class="maptype-item" onclick="changeMapType('hybrid')"><i class="fas fa-globe"></i> Hybrid</div>
+        <div class="maptype-item" onclick="changeMapType('terrain')"><i class="fas fa-mountain"></i> Terrain</div>
+      </div>
     </div>
-  </div>
 
-  <!-- Fuel Selector (moved to bottom) -->
-  <div class="fuel-selector">
-    <div class="fuel-dropdown">
-      <button class="fuel-dropdown-btn" id="fuel-dropdown-btn">E10</button>
-      <div class="fuel-dropdown-content" id="fuel-dropdown-content">
-        <!-- Populated by JavaScript -->
+    <!-- Fuel Selector (moved to bottom) -->
+    <div class="fuel-selector">
+      <div class="fuel-dropdown">
+        <button class="fuel-dropdown-btn" id="fuel-dropdown-btn">E10</button>
+        <div class="fuel-dropdown-content" id="fuel-dropdown-content">
+          <!-- Populated by JavaScript -->
+        </div>
       </div>
     </div>
   </div>
-</div>
-
-<!-- Zoom Controls (positioned at 50% height) -->
-<div class="zoom-controls-container">
-  <div class="custom-zoom-control">
-    <button class="zoom-in-btn" onclick="zoomIn()">
-      <i class="fas fa-plus"></i>
-    </button>
-    <button class="zoom-out-btn" onclick="zoomOut()">
-      <i class="fas fa-minus"></i>
-    </button>
+  
+  <!-- Zoom Controls -->
+  <div class="zoom-controls-container">
+    <div class="custom-zoom-control">
+      <button class="zoom-in-btn" onclick="zoomIn()">
+        <i class="fas fa-plus"></i>
+      </button>
+      <button class="zoom-out-btn" onclick="zoomOut()">
+        <i class="fas fa-minus"></i>
+      </button>
+    </div>
   </div>
 </div>
       

@@ -8,12 +8,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const BRISBANE_COORDS = { lat: -27.4698, lng: 153.0251 };
   
   const FUEL_TYPES = [
-    { key: "E10", id: 12, label: "E10" },
-    { key: "91", id: 2, label: "U91" },
-    { key: "95", id: 5, label: "P95" },
-    { key: "98", id: 8, label: "P98" },
-    { key: "Diesel", id: 3, label: "DSL" },
-    { key: "Premium Diesel", id: 14, label: "PDSL" }
+    { key: "E10", id: 12, label: "E10", fullName: "Unleaded E10", color: "fuel-e10" },
+    { key: "91", id: 2, label: "U91", fullName: "Unleaded 91", color: "fuel-u91" },
+    { key: "95", id: 5, label: "P95", fullName: "Premium 95", color: "fuel-p95" },
+    { key: "98", id: 8, label: "P98", fullName: "Premium 98", color: "fuel-p98" },
+    { key: "Diesel", id: 3, label: "DSL", fullName: "Diesel", color: "fuel-diesel" },
+    { key: "Premium Diesel", id: 14, label: "PDSL", fullName: "Premium Diesel", color: "fuel-pdiesel" }
   ];
   
   // Brand logos for stations
@@ -556,8 +556,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const allPrices = FUEL_TYPES.map(fuel => {
       const p = priceMap[site.S]?.[fuel.id];
       return p ? `
-        <div class="fuel-price-row">
-          <span class="fuel-type-label">${fuel.label}</span>
+        <div class="fuel-price-row ${fuel.color}">
+          <span class="fuel-type-label">${fuel.fullName}</span>
           <span class="fuel-type-price">${(p / 10).toFixed(1)}</span>
         </div>
       ` : '';
@@ -573,11 +573,8 @@ document.addEventListener("DOMContentLoaded", () => {
         <img src="${getBrandLogo(site.B)}" alt="Station Logo" style="width:40px;height:40px;object-fit:contain;border-radius:8px;" onerror="this.src='images/default.png'">
       </div>
       <div class="feature-card-actions">
-        <button class="feature-card-btn directions-btn" data-lat="${site.Lat}" data-lng="${site.Lng}" title="Get Directions">
+        <button class="feature-card-btn open-maps-btn" data-lat="${site.Lat}" data-lng="${site.Lng}" title="Get Directions">
           <i class="fas fa-route"></i>
-        </button>
-        <button class="feature-card-btn open-maps-btn" data-lat="${site.Lat}" data-lng="${site.Lng}" title="Open in Maps App">
-          <i class="fa-solid fa-diamond-turn-right"></i>
         </button>
       </div>
       <div class="fuel-prices-list" style="margin-top:20px;">${allPrices}</div>
@@ -585,22 +582,10 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Add event listeners for navigation buttons
     setTimeout(() => {
-      const directionsBtn = content.querySelector('.directions-btn');
-      const externalNavBtn = content.querySelector('.open-maps-btn');
+      const directionsBtn = content.querySelector('.open-maps-btn');
       
       if (directionsBtn) {
         directionsBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          const lat = parseFloat(e.target.closest('button').dataset.lat);
-          const lng = parseFloat(e.target.closest('button').dataset.lng);
-          getDirections(lat, lng);
-          closeAllPanels(); // Close feature card when directions are requested
-        });
-      }
-      
-      if (externalNavBtn) {
-        externalNavBtn.addEventListener('click', (e) => {
           e.preventDefault();
           e.stopPropagation();
           const lat = parseFloat(e.target.closest('button').dataset.lat);
