@@ -1125,9 +1125,9 @@ html, body {
   }
   
   .sc-center-btn {
-    bottom: calc(30px + env(safe-area-inset-bottom));
-    width: 61px;
-    height: 61px;
+    bottom: calc(35px + env(safe-area-inset-bottom));
+    width: 65px;
+    height: 65px;
   }
   
   .sc-center-btn i {
