@@ -85,8 +85,8 @@ html, body {
 
 /* ========== SHARED BUTTON STYLES ========== */
 .custom-zoom-control button {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border: none;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.25);
@@ -109,16 +109,16 @@ html, body {
 
 .maptype-btn,
 .fuel-dropdown-btn {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
 }
 
 /* Mobile and Desktop sizing */
 @media (max-width: 768px) {
   .maptype-btn,
   .fuel-dropdown-btn {
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
   }
 }
 
@@ -134,8 +134,8 @@ html, body {
 @media (min-width: 1024px) {
   .maptype-btn,
   .fuel-dropdown-btn {
-    width: 56px;
-    height: 56px;
+    width: 48px;
+    height: 48px;
     font-size: 20px;
   }
 }
