@@ -1,4 +1,4 @@
-// Import suburb data
+ // Import suburb data
 import { QLD_SUBURBS } from './data/qld-suburbs.js';
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -14,19 +14,6 @@ document.addEventListener("DOMContentLoaded", () => {
     { key: "98", id: 8, label: "P98", fullName: "Premium 98", color: "fuel-p98" },
     { key: "Diesel", id: 3, label: "DSL", fullName: "Diesel", color: "fuel-diesel" },
     { key: "Premium Diesel", id: 14, label: "PDSL", fullName: "Premium Diesel", color: "fuel-pdiesel" }
-  ];
-  
-  // Main brands to show in filter
-  const MAIN_BRANDS = [
-    { id: 3421066, name: "Ampol" },
-    { id: 5, name: "BP" },
-    { id: 20, name: "Shell" },
-    { id: 113, name: "7-Eleven" },
-    { id: 2, name: "Caltex" },
-    { id: 111, name: "Coles" },
-    { id: 23, name: "United" },
-    { id: 57, name: "Metro" },
-    { id: 5094, name: "Puma" }
   ];
   
   // Brand logos for stations
@@ -62,28 +49,34 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // Helper function to get brand logo
   const getBrandLogo = (brandId) => {
-    return BRAND_LOGOS[brandId] || BRAND_LOGOS[12];
+    return BRAND_LOGOS[brandId] || BRAND_LOGOS[12]; // Default to generic logo
   };
   
-  // Create custom marker
+  // Create custom marker with mymarker.png base, station logo, and price in black box
   function createCustomMarker(price, brandId, isCheapest = false) {
     const priceText = (price / 10).toFixed(1);
     const logoUrl = getBrandLogo(brandId);
     
+    // Create a custom marker element
     const markerDiv = document.createElement('div');
     markerDiv.className = `custom-marker ${isCheapest ? 'cheapest' : ''}`;
     
+    // Base marker image (mymarker.png)
     const baseMarker = document.createElement('img');
     baseMarker.src = 'images/mymarker.png';
     baseMarker.className = `marker-base ${isCheapest ? 'cheapest' : ''}`;
     
+    // Station logo on top of marker
     const stationLogo = document.createElement('img');
     stationLogo.src = logoUrl;
     stationLogo.className = 'marker-logo';
+    
+    // Error handling for logo loading
     stationLogo.onerror = function() {
       this.src = 'images/default.png';
     };
     
+    // Price box (black background with white text)
     const priceBox = document.createElement('div');
     priceBox.textContent = priceText;
     priceBox.className = 'marker-price';
@@ -95,7 +88,20 @@ document.addEventListener("DOMContentLoaded", () => {
     return markerDiv;
   }
   
-  // Device detection
+  const BRAND_NAMES = {
+    2: "Caltex", 5: "BP", 7: "Budget", 12: "Independent", 16: "Mobil", 20: "Shell", 
+    23: "United", 27: "Unbranded", 51: "Apco", 57: "Metro", 65: "Petrogas", 72: "Gull", 
+    86: "Liberty", 87: "AM/PM", 105: "Better Choice", 110: "Freedom", 111: "Coles", 
+    113: "7-Eleven", 114: "Astron", 115: "Prime", 167: "Speedway", 169: "OTR", 
+    2301: "Choice", 4896: "Mogas", 5094: "Puma", 2031031: "Costco", 2418994: "Pacific", 
+    2418995: "Vibe", 2419007: "Lowes", 2419008: "Westside", 2419037: "Enhance", 
+    2459022: "FuelXpress", 3421028: "X Convenience", 3421066: "Ampol", 3421073: "EG Ampol", 
+    3421074: "Perrys", 3421075: "IOR", 3421139: "Pearl", 3421162: "Pacific Fuel", 
+    3421183: "U-Go", 3421193: "Reddy Express", 3421195: "Ultra", 3421196: "Bennetts", 
+    3421202: "Atlas", 3421204: "Woodham", 3421207: "Tas Petroleum"
+  };
+  
+  // Device detection for navigation
   const isAppleDevice = () => {
     return /iPad|iPhone|iPod|Mac/.test(navigator.userAgent) || 
            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -111,13 +117,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentFuel = localStorage.getItem('preferredFuel') || "E10";
   let userLocation = null;
   let cheapestStationId = null;
-  let currentMarkers = [];
-  let userLocationMarker = null;
-  let isTrackingLocation = false;
-  let watchId = null;
-  
-  // Filter state
-  let selectedBrands = new Set();
+  let currentMarkers = []; // Track current markers for cleanup
+  let userLocationMarker = null; // Track user location marker
   
   // Create postcode to suburb mapping
   const postcodeToSuburb = {};
@@ -131,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Helper function to get suburb name from postcode
   const getSuburbName = (postcode) => {
     const suburbs = postcodeToSuburb[postcode];
-    return suburbs ? suburbs[0] : postcode;
+    return suburbs ? suburbs[0] : postcode; // Return first suburb or postcode if not found
   };
   
   // --- User Preferences ---
@@ -156,27 +157,67 @@ document.addEventListener("DOMContentLoaded", () => {
   myMap = new google.maps.Map(document.getElementById("google-map"), {
     center: BRISBANE_COORDS,
     zoom: 14,
-    minZoom: 10,
-    maxZoom: 18,
-    mapId: "AIzaSyAQ0Ba7zICGUy5zCVijkkDNrNVdKAG1FGU",
-    tilt: 45,
-    heading: 0,
+    minZoom: 12,                 // Minimum zoom level (more zoomed out)
+    maxZoom: 16,                 // Maximum zoom level (more zoomed in)
+    mapId: "AIzaSyAQ0Ba7zICGUy5zCVijkkDNrNVdKAG1FGU", 
+    tilt: 45, // Enable 3D tilt
+    heading: 0, // Initial compass heading
     styles: [
-      { featureType: "poi", stylers: [{ visibility: "off" }] },
-      { featureType: "poi.business", stylers: [{ visibility: "off" }] },
-      { featureType: "poi.attraction", stylers: [{ visibility: "off" }] },
-      { featureType: "poi.government", stylers: [{ visibility: "off" }] },
-      { featureType: "poi.medical", stylers: [{ visibility: "off" }] },
-      { featureType: "poi.park", stylers: [{ visibility: "off" }] },
-      { featureType: "poi.place_of_worship", stylers: [{ visibility: "off" }] },
-      { featureType: "poi.school", stylers: [{ visibility: "off" }] },
-      { featureType: "poi.sports_complex", stylers: [{ visibility: "off" }] },
-      { featureType: "transit", stylers: [{ visibility: "off" }] },
-      { featureType: "transit.station", stylers: [{ visibility: "off" }] },
-      { featureType: "transit.line", stylers: [{ visibility: "off" }] },
-      { featureType: "transit", elementType: "labels.icon", stylers: [{ visibility: "off" }] }
+      {
+        featureType: "poi",
+        stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "poi.business",
+        stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "poi.attraction",
+        stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "poi.government",
+        stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "poi.medical",
+        stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "poi.park",
+        stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "poi.place_of_worship",
+        stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "poi.school",
+        stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "poi.sports_complex",
+        stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "transit",
+        stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "transit.station",
+        stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "transit.line",
+        stylers: [{ visibility: "off" }]
+      },
+      {
+        featureType: "transit",
+        elementType: "labels.icon",
+        stylers: [{ visibility: "off" }]
+      }
     ],
-    disableDefaultUI: true,
+    disableDefaultUI: true, // Disable all default controls
     zoomControl: false,
     mapTypeControl: false,
     scaleControl: false,
@@ -185,114 +226,58 @@ document.addEventListener("DOMContentLoaded", () => {
     fullscreenControl: false
   });
   
-  // --- Map Control Functions ---
-  window.resetNorth = function() {
-    myMap.setHeading(0);
-    myMap.setTilt(0);
-    document.getElementById('compass-control').querySelector('.compass-btn').classList.remove('active');
+  // Custom control functions
+  window.changeMapType = function(type) {
+    myMap.setMapTypeId(type);
+    document.getElementById('maptype-dropdown').classList.remove('show');
   };
   
-  window.zoomIn = function() {
-    const currentZoom = myMap.getZoom();
-    myMap.setZoom(Math.min(currentZoom + 1, 18));
+  window.toggleStreetView = function() {
+    const streetView = myMap.getStreetView();
+    const visible = streetView.getVisible();
+    streetView.setVisible(!visible);
   };
   
-  window.zoomOut = function() {
-    const currentZoom = myMap.getZoom();
-    myMap.setZoom(Math.max(currentZoom - 1, 10));
+  window.rotateMap = function() {
+    const currentHeading = myMap.getHeading() || 0;
+    myMap.setHeading(currentHeading + 90);
   };
   
-  window.centerOnLocation = function() {
-    const locationBtn = document.getElementById('location-btn');
-    
-    if (!isTrackingLocation) {
-      // First click - center on location
-      if (userLocation) {
-        myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
-        createUserLocationMarker(userLocation.lat, userLocation.lng);
-        locationBtn.classList.add('tracking');
-        isTrackingLocation = true;
-        
-        // Start watching position for rotation
-        if (navigator.geolocation) {
-          watchId = navigator.geolocation.watchPosition(
-            (position) => {
-              userLocation = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-              };
-              
-              // Update location marker
-              createUserLocationMarker(userLocation.lat, userLocation.lng);
-              
-              // Rotate map with heading if available
-              if (position.coords.heading !== null && position.coords.heading !== undefined) {
-                myMap.setHeading(position.coords.heading);
-              }
-            },
-            (error) => console.log("Location tracking error:", error),
-            { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
-          );
-        }
-      } else {
-        // Try to get location
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              userLocation = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-              };
-              myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
-              createUserLocationMarker(userLocation.lat, userLocation.lng);
-              locationBtn.classList.add('tracking');
-              isTrackingLocation = true;
-              
-              // Start tracking
-              watchId = navigator.geolocation.watchPosition(
-                (position) => {
-                  userLocation = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                  };
-                  createUserLocationMarker(userLocation.lat, userLocation.lng);
-                  if (position.coords.heading !== null && position.coords.heading !== undefined) {
-                    myMap.setHeading(position.coords.heading);
-                  }
-                },
-                (error) => console.log("Location tracking error:", error),
-                { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
-              );
-            },
-            (error) => {
-              console.log("Location error:", error);
-              alert("Unable to get your location");
-            }
-          );
-        }
-      }
-    } else {
-      // Second click - stop tracking
-      locationBtn.classList.remove('tracking');
-      isTrackingLocation = false;
-      myMap.setHeading(0);
-      
-      if (watchId) {
-        navigator.geolocation.clearWatch(watchId);
-        watchId = null;
-      }
+  // Map type dropdown toggle
+  document.getElementById('maptype-btn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    document.getElementById('maptype-dropdown').classList.toggle('show');
+  });
+  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function() {
+    document.getElementById('maptype-dropdown').classList.remove('show');
+  });
+  
+  // Initialize Directions Service and Renderer
+  const directionsService = new google.maps.DirectionsService();
+  const directionsRenderer = new google.maps.DirectionsRenderer({
+    suppressMarkers: true, // Don't show default markers
+    polylineOptions: {
+      strokeColor: '#007AFF',
+      strokeOpacity: 0.8,
+      strokeWeight: 6
     }
-  };
-  
+  });
+  directionsRenderer.setMap(myMap);
+
   // --- User Location Marker ---
   function createUserLocationMarker(lat, lng) {
+    // Remove existing user location marker
     if (userLocationMarker) {
       userLocationMarker.setMap(null);
     }
     
+    // Create custom user location marker element
     const markerDiv = document.createElement('div');
     markerDiv.className = 'user-location-marker';
     
+    // Blue dot with white border and pulse animation
     const blueDot = document.createElement('div');
     blueDot.className = 'user-location-dot';
     
@@ -302,6 +287,7 @@ document.addEventListener("DOMContentLoaded", () => {
     markerDiv.appendChild(pulseRing);
     markerDiv.appendChild(blueDot);
     
+    // Create custom marker using OverlayView
     class UserLocationMarker extends google.maps.OverlayView {
       constructor(position, content, map) {
         super();
@@ -372,6 +358,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       console.log("Fetching sites and prices...");
       
+      // QLD data only
       const [siteRes, priceRes] = await Promise.all([
         fetch("data/sites.json").then(r => r.json()),
         fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
@@ -393,11 +380,12 @@ document.addEventListener("DOMContentLoaded", () => {
         priceMap[p.SiteId][p.FuelId] = p.Price;
       });
       
+      // Find cheapest station
       findCheapestStation();
       
       console.log("Data processed. Sites:", allSites.length, "Prices:", allPrices.length);
       
-      updateVisibleStations();
+      updateVisibleStationsAndList();
       await fetchWeather();
     } catch (err) {
       console.error("Error loading sites/prices:", err);
@@ -408,12 +396,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function findCheapestStation() {
     const fuelId = FUEL_TYPES.find(f => f.key === currentFuel).id;
     let cheapestPrice = Infinity;
-    cheapestStationId = null;
+    cheapestStationId = null; // Reset cheapest station
     
     allSites.forEach(site => {
-      // Check brand filter
-      if (selectedBrands.size > 0 && !selectedBrands.has(site.B)) return;
-      
       const price = priceMap[site.S]?.[fuelId];
       if (price && price < cheapestPrice) {
         cheapestPrice = price;
@@ -425,8 +410,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --- Map Markers ---
-  function updateVisibleStations() {
-    console.log("Updating stations...");
+  function updateVisibleStationsAndList() {
+    console.log("Updating stations and list...");
     
     // Clear existing markers
     currentMarkers.forEach(marker => {
@@ -439,24 +424,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const bounds = myMap.getBounds();
     if (!bounds) return;
     
-    const fuelId = FUEL_TYPES.find(f => f.key === currentFuel).id;
+    const visibleStations = [];
     
-    // Find cheapest visible station
+    // Find cheapest station among visible ones
     let cheapestVisiblePrice = Infinity;
     let cheapestVisibleStationId = null;
     
-    const visibleStations = [];
-    
+    // First pass: find all visible stations and their cheapest price
     allSites.forEach(site => {
       const position = new google.maps.LatLng(site.Lat, site.Lng);
+      const price = priceMap[site.S]?.[FUEL_TYPES.find(f => f.key === currentFuel).id];
       
-      if (!bounds.contains(position)) return;
-      
-      // Check brand filter
-      if (selectedBrands.size > 0 && !selectedBrands.has(site.B)) return;
-      
-      const price = priceMap[site.S]?.[fuelId];
-      if (!price) return;
+      if (!price || !bounds.contains(position)) return;
       
       visibleStations.push({ site, price });
       
@@ -466,14 +445,18 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
     
-    // Create markers
+    // Second pass: create markers with correct cheapest highlighting
     visibleStations.forEach(({ site, price }) => {
       const position = new google.maps.LatLng(site.Lat, site.Lng);
       const isCheapest = site.S === cheapestVisibleStationId;
       const brandId = site.B;
       
+      console.log(`Station ${site.N}: Price ${price}, isCheapest: ${isCheapest}`);
+      
+      // Create the custom marker
       const markerElement = createCustomMarker(price, brandId, isCheapest);
       
+      // Create marker using OverlayView for custom HTML content
       class CustomMarker extends google.maps.OverlayView {
         constructor(position, content, map) {
           super();
@@ -512,11 +495,61 @@ document.addEventListener("DOMContentLoaded", () => {
       
       const marker = new CustomMarker(position, markerElement, myMap);
       
+      // Add click listener
       markerElement.addEventListener('click', () => {
         showFeatureCard(site, price);
       });
       
       currentMarkers.push(marker);
+    });
+    
+    updateList(visibleStations);
+  }
+  
+  // --- List Panel ---
+  function updateList(stations) {
+    const list = document.getElementById('list');
+    if (!list) return;
+    
+    list.innerHTML = '';
+    
+    // Sort by price
+    stations.sort((a, b) => a.price - b.price);
+    
+    stations.slice(0, 50).forEach(({ site, price }) => {
+      const li = document.createElement('li');
+      li.className = 'station-item';
+      
+      const distance = userLocation ? 
+        getDistance(userLocation.lat, userLocation.lng, site.Lat, site.Lng).toFixed(1) : 
+        '?';
+      
+      const isCheapest = site.S === cheapestStationId;
+      
+      li.innerHTML = `
+        <div style="display:flex;align-items:center;padding:12px;border-bottom:1px solid #eee;">
+          <img src="${getBrandLogo(site.B)}" alt="Station Logo" style="width:32px;height:32px;object-fit:contain;border-radius:6px;margin-right:12px;" onerror="this.src='images/default.png'">
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:600;color:#2a2d3f;">${site.N}</div>
+            <div style="font-size:12px;color:#666;">${site.A}, ${getSuburbName(site.P)}</div>
+            <div style="font-size:11px;color:#999;">${distance} km away</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:20px;font-weight:700;color:${isCheapest ? '#00AA00' : '#007AFF'};">
+              ${(price / 10).toFixed(1)}
+            </div>
+          </div>
+        </div>
+      `;
+      
+      li.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.target.tagName !== 'BUTTON') {
+          showFeatureCard(site, price);
+        }
+      });
+      list.appendChild(li);
     });
   }
   
@@ -552,6 +585,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="fuel-prices-list">${allPrices}</div>
     `;
     
+    // Add event listeners for navigation buttons
     setTimeout(() => {
       const directionsBtn = content.querySelector('.open-maps-btn');
       
@@ -569,7 +603,59 @@ document.addEventListener("DOMContentLoaded", () => {
     openPanel('feature');
   }
   
-  // External navigation
+  // --- Navigation Functions ---
+  let currentDirections = null;
+  
+  // Get directions to a station
+  function getDirections(destinationLat, destinationLng) {
+    if (!userLocation) {
+      // Fallback to external navigation if no user location
+      navigateExternal(destinationLat, destinationLng);
+      return;
+    }
+    
+    const origin = new google.maps.LatLng(userLocation.lat, userLocation.lng);
+    const destination = new google.maps.LatLng(destinationLat, destinationLng);
+    
+    const request = {
+      origin: origin,
+      destination: destination,
+      travelMode: google.maps.TravelMode.DRIVING,
+      unitSystem: google.maps.UnitSystem.METRIC,
+      avoidHighways: false,
+      avoidTolls: false
+    };
+    
+    directionsService.route(request, (result, status) => {
+      if (status === 'OK') {
+        directionsRenderer.setDirections(result);
+        currentDirections = result;
+        
+        // Show directions info
+        const route = result.routes[0];
+        const leg = route.legs[0];
+        showDirectionsInfo(leg.duration.text, leg.distance.text);
+        
+        // Fit map to show entire route
+        const bounds = new google.maps.LatLngBounds();
+        route.overview_path.forEach(point => bounds.extend(point));
+        myMap.fitBounds(bounds);
+      } else {
+        console.error('Directions request failed:', status);
+        // Fallback to external navigation
+        navigateExternal(destinationLat, destinationLng);
+      }
+    });
+  }
+  
+  // Clear current directions
+  function clearDirections() {
+    directionsRenderer.setDirections({routes: []});
+    currentDirections = null;
+    hideDirectionsInfo();
+  }
+  
+  // External navigation fallback
   function navigateExternal(lat, lng) {
     if (isAppleDevice()) {
       window.open(`maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`);
@@ -578,80 +664,75 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
   
-  // --- Filters Panel ---
-  function setupFilters() {
-    const filtersBtn = document.getElementById('toolbar-filters-btn');
-    const fuelTypeGrid = document.getElementById('fuel-type-grid');
-    const brandGrid = document.getElementById('brand-grid');
+  // Show directions info panel
+  function showDirectionsInfo(duration, distance) {
+    let directionsInfo = document.getElementById('directions-info');
+    if (!directionsInfo) {
+      directionsInfo = document.createElement('div');
+      directionsInfo.id = 'directions-info';
+      directionsInfo.className = 'directions-info';
+      document.body.appendChild(directionsInfo);
+    }
     
-    // Populate fuel types
-    FUEL_TYPES.forEach(fuel => {
-      const item = document.createElement('div');
-      item.className = 'fuel-type-item';
-      item.textContent = fuel.label;
-      item.dataset.fuelKey = fuel.key;
-      if (fuel.key === currentFuel) item.classList.add('selected');
-      
-      item.addEventListener('click', () => {
-        document.querySelectorAll('.fuel-type-item').forEach(i => i.classList.remove('selected'));
-        item.classList.add('selected');
-        currentFuel = fuel.key;
-        savePreferences();
-        findCheapestStation();
-        updateVisibleStations();
-      });
-      
-      fuelTypeGrid.appendChild(item);
-    });
-    
-    // Populate brands
-    MAIN_BRANDS.forEach(brand => {
-      const item = document.createElement('div');
-      item.className = 'brand-item';
-      item.dataset.brandId = brand.id;
-      
-      const logo = document.createElement('img');
-      logo.src = getBrandLogo(brand.id);
-      logo.className = 'brand-logo';
-      logo.onerror = function() { this.src = 'images/default.png'; };
-      
-      const name = document.createElement('div');
-      name.className = 'brand-name';
-      name.textContent = brand.name;
-      
-      item.appendChild(logo);
-      item.appendChild(name);
-      
-      item.addEventListener('click', () => {
-        item.classList.toggle('selected');
-        if (item.classList.contains('selected')) {
-          selectedBrands.add(brand.id);
-        } else {
-          selectedBrands.delete(brand.id);
-        }
-        findCheapestStation();
-        updateVisibleStations();
-      });
-      
-      brandGrid.appendChild(item);
-    });
+    directionsInfo.innerHTML = `
+      <div class="directions-content">
+        <div class="directions-text">
+          <div class="directions-time">${duration}</div>
+          <div class="directions-distance">${distance}</div>
+        </div>
+        <button class="directions-close" onclick="clearDirections()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    `;
+    directionsInfo.style.display = 'block';
   }
+  
+  // Hide directions info panel
+  function hideDirectionsInfo() {
+    const directionsInfo = document.getElementById('directions-info');
+    if (directionsInfo) {
+      directionsInfo.style.display = 'none';
+    }
+  }
+  
+  // Main navigation function (called from feature cards)
+  window.navigate = function(lat, lng) {
+    getDirections(lat, lng);
+  };
+  
+  // Zoom functions
+  window.zoomIn = function() {
+    const currentZoom = myMap.getZoom();
+    myMap.setZoom(Math.min(currentZoom + 1, 16)); // Max zoom 16
+  };
+  
+  window.zoomOut = function() {
+    const currentZoom = myMap.getZoom();
+    myMap.setZoom(Math.max(currentZoom - 1, 12)); // Min zoom 12
+  };
+  
+  // Make functions global
+  window.clearDirections = clearDirections;
+  window.getDirections = getDirections;
   
   // --- Panel Management ---
   function openPanel(panelName) {
+    // Close all panels first
     document.querySelectorAll('.sliding-panel').forEach(p => {
       p.classList.remove('open');
-      p.style.transform = 'translateX(-50%) translateY(130%)';
+      p.style.transform = 'translateX(-50%) translateY(130%)'; // Reset position
     });
     document.querySelectorAll('.panel-overlay').forEach(o => o.classList.remove('active'));
     
+    // Open the requested panel
     const panel = document.getElementById(`${panelName}-panel`);
     const overlay = document.getElementById(`${panelName}-overlay`);
     
     if (panel && overlay) {
       panel.classList.add('open');
       overlay.classList.add('active');
-      panel.style.transform = 'translateX(-50%) translateY(0)';
+      panel.style.transform = 'translateX(-50%) translateY(0)'; // Ensure it's visible
       initializeDrag(panel);
     }
   }
@@ -659,7 +740,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function closeAllPanels() {
     document.querySelectorAll('.sliding-panel').forEach(p => {
       p.classList.remove('open');
-      p.style.transform = 'translateX(-50%) translateY(130%)';
+      p.style.transform = 'translateX(-50%) translateY(130%)'; // Reset to hidden position
     });
     document.querySelectorAll('.panel-overlay').forEach(o => o.classList.remove('active'));
   }
@@ -678,22 +759,27 @@ document.addEventListener("DOMContentLoaded", () => {
     let initialTranslateY = 0;
     
     function handleStart(e) {
+      // Only handle if this panel is currently open
       if (!panel.classList.contains('open')) return;
       
+      // Check if the touch/click is within the drag bar area
       const rect = dragBar.getBoundingClientRect();
       const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
       const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
       
+      // Extended touch area for mobile (30px above, 15px below drag bar)
       const extendedTop = rect.top - 30;
       const extendedBottom = rect.bottom + 15;
       const extendedLeft = rect.left - 50;
       const extendedRight = rect.right + 50;
       
+      // Only start dragging if touch/click is in the extended drag bar area
       if (clientY < extendedTop || clientY > extendedBottom || 
           clientX < extendedLeft || clientX > extendedRight) {
         return;
       }
       
+      // Clean up any existing drag handlers
       if (currentDragPanel && currentDragPanel !== panel) {
         cleanupDragHandlers();
       }
@@ -717,6 +803,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
       currentY = clientY - startY;
       
+      // Only allow dragging down (positive currentY)
       if (currentY < 0) {
         currentY = 0;
         return;
@@ -738,19 +825,24 @@ document.addEventListener("DOMContentLoaded", () => {
       const threshold = window.innerHeight * 0.2;
       
       if (currentY > threshold) {
+        // Drag down - close panel
         closeAllPanels();
       } else {
+        // Snap back to normal position
         panel.style.transform = 'translateX(-50%) translateY(0)';
       }
       
       currentY = 0;
     }
     
+    // Store handlers for cleanup
     dragHandlers = { start: handleStart, move: handleMove, end: handleEnd };
     
+    // Prevent content scrolling from interfering
     const panelContent = panel.querySelector('.panel-content');
     if (panelContent) {
       panelContent.addEventListener('touchstart', (e) => {
+        // Only stop propagation if not in drag bar area
         const rect = dragBar.getBoundingClientRect();
         const clientY = e.touches[0].clientY;
         if (clientY > rect.bottom + 15) {
@@ -822,6 +914,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById('search-input');
   const suburbList = document.getElementById('suburb-list');
   
+  
+  
+  // Show all suburbs by default
   function showAllSuburbs() {
     const sortedSuburbs = QLD_SUBURBS
       .sort((a, b) => a.suburb.localeCompare(b.suburb));
@@ -841,6 +936,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   
   if (searchInput && suburbList) {
+    // Show all suburbs initially
     showAllSuburbs();
     
     searchInput.addEventListener('input', e => {
@@ -850,12 +946,14 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       
+      // Search through suburb names
       const matchingSuburbs = QLD_SUBURBS
         .filter(suburb => suburb.suburb.toLowerCase().includes(query))
         .sort((a, b) => a.suburb.localeCompare(b.suburb));
       
       suburbList.innerHTML = '';
       
+      // Add matching suburbs
       matchingSuburbs.forEach(suburb => {
         const li = document.createElement('li');
         li.className = 'suburb-list-item';
@@ -880,6 +978,7 @@ document.addEventListener("DOMContentLoaded", () => {
       myMap.setZoom(14);
       closeAllPanels();
     } else {
+      // If no sites found with exact postcode, try to find the suburb in our mapping
       const suburbData = QLD_SUBURBS.find(s => s.suburb.toLowerCase() === suburbName.toLowerCase());
       if (suburbData) {
         myMap.setCenter(new google.maps.LatLng(suburbData.lat, suburbData.lng));
@@ -889,16 +988,87 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
   
+  // Fuel selector dropdown
+  const fuelBtn = document.getElementById('fuel-dropdown-btn');
+  const fuelContent = document.getElementById('fuel-dropdown-content');
+  
+  if (fuelBtn && fuelContent) {
+    // Populate fuel types
+    FUEL_TYPES.forEach(fuel => {
+      const item = document.createElement('div');
+      item.className = 'fuel-dropdown-item';
+      item.textContent = fuel.label;
+      if (fuel.key === currentFuel) item.classList.add('selected');
+      
+      item.addEventListener('click', () => {
+        currentFuel = fuel.key;
+        savePreferences();
+        fuelBtn.textContent = fuel.label;
+        fuelContent.classList.remove('show');
+        document.querySelectorAll('.fuel-dropdown-item').forEach(i => i.classList.remove('selected'));
+        item.classList.add('selected');
+        findCheapestStation();
+        updateVisibleStationsAndList();
+      });
+      
+      fuelContent.appendChild(item);
+    });
+    
+    fuelBtn.textContent = FUEL_TYPES.find(f => f.key === currentFuel).label;
+    
+    fuelBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      fuelContent.classList.toggle('show');
+    });
+    
+    document.addEventListener('click', () => {
+      fuelContent.classList.remove('show');
+    });
+  }
+  
   // Toolbar buttons
-  document.getElementById('toolbar-filters-btn')?.addEventListener('click', () => {
-    openPanel('filters');
+  document.getElementById('toolbar-search-btn')?.addEventListener('click', () => {
+    openPanel('search');
     document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));
-    document.getElementById('toolbar-filters-btn').classList.add('sc-current');
+    document.getElementById('toolbar-search-btn').classList.add('sc-current');
   });
   
   document.getElementById('toolbar-center-btn')?.addEventListener('click', () => {
-    openPanel('search');
+    // Navigate to user's location or default Brisbane location
+    if (userLocation) {
+      myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
+      createUserLocationMarker(userLocation.lat, userLocation.lng);
+    } else {
+      // Try to get location again if not available
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            userLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
+            createUserLocationMarker(userLocation.lat, userLocation.lng);
+          },
+          error => {
+            console.log("Location error:", error);
+            // Fallback to Brisbane
+            myMap.setCenter(new google.maps.LatLng(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng));
+          }
+        );
+      } else {
+        myMap.setCenter(new google.maps.LatLng(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng));
+      }
+    }
+    closeAllPanels();
     document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));
+    document.getElementById('toolbar-center-btn').classList.add('sc-current');
+  });
+  
+  document.getElementById('toolbar-list-btn')?.addEventListener('click', () => {
+    openPanel('list');
+    document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));
+    document.getElementById('toolbar-list-btn').classList.add('sc-current');
   });
   
   // Overlays close panels
@@ -908,12 +1078,14 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // Map events
   myMap.addListener('bounds_changed', () => {
+    // Debounce the update to avoid too many calls
     clearTimeout(window.boundsUpdateTimeout);
     window.boundsUpdateTimeout = setTimeout(() => {
-      updateVisibleStations();
+      updateVisibleStationsAndList();
     }, 300);
   });
   
+  // Update weather when map center changes (less frequent than bounds)
   myMap.addListener('center_changed', () => {
     clearTimeout(window.weatherUpdateTimeout);
     window.weatherUpdateTimeout = setTimeout(() => {
@@ -921,18 +1093,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (center) {
         fetchWeather(center.lat(), center.lng());
       }
-    }, 1000);
-  });
-  
-  // Monitor compass heading changes
-  myMap.addListener('heading_changed', () => {
-    const heading = myMap.getHeading();
-    const compassBtn = document.getElementById('compass-control').querySelector('.compass-btn');
-    if (heading !== 0) {
-      compassBtn.classList.add('active');
-    } else {
-      compassBtn.classList.remove('active');
-    }
+    }, 1000); // Longer delay for weather updates
   });
   
   // Get user location
@@ -950,12 +1111,13 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
   
-  // Make functions global
+  // Make functions global for onclick handlers
   window.showFeatureCard = showFeatureCard;
   window.navigateExternal = navigateExternal;
   
-  // Initialize
+  // Initialize drag functionality
   setupGlobalDragListeners();
-  setupFilters();
+  
+  // Initialize
   fetchSitesAndPrices();
 });
