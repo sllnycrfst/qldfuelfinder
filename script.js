@@ -582,7 +582,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <i class="fas fa-route"></i>
         </button>
       </div>
-      <div class="fuel-prices-list" style="margin-top:20px;">${allPrices}</div>
+      <div class="fuel-prices-list">${allPrices}</div>
     `;
     
     // Add event listeners for navigation buttons
