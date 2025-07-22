@@ -1044,6 +1044,13 @@ html, body {
     font-size: 13px;
     border-radius: 10px;
   }
+
+  .custom-zoom-control button {
+    width: 36px;
+    height: 30px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
   
   .zoom-in-btn {
     border-radius: 10px 10px 5px 5px !important;
