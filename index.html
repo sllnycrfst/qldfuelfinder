@@ -17,58 +17,101 @@
 
 <div id="google-map" style="width: 100vw; height: 100vh;"></div>
 
-<!-- Map Controls Wrapper -->
-<div class="map-controls-wrapper">
-  <!-- Custom Map Controls -->
-  <div class="custom-map-controls">
-    <!-- Map Type Control (moved to top) -->
-    <div class="custom-maptype-control">
-      <button class="maptype-btn" id="maptype-btn">
-        <i class="fas fa-layer-group"></i>
-      </button>
-      <div class="maptype-dropdown" id="maptype-dropdown">
-        <div class="maptype-item" onclick="changeMapType('roadmap')"><i class="fas fa-road"></i> Map</div>
-        <div class="maptype-item" onclick="changeMapType('satellite')"><i class="fas fa-satellite"></i> Satellite</div>
-        <div class="maptype-item" onclick="changeMapType('hybrid')"><i class="fas fa-globe"></i> Hybrid</div>
-        <div class="maptype-item" onclick="changeMapType('terrain')"><i class="fas fa-mountain"></i> Terrain</div>
-      </div>
-    </div>
-
-    <!-- Fuel Selector (moved to bottom) -->
-    <div class="fuel-selector">
-      <div class="fuel-dropdown">
-        <button class="fuel-dropdown-btn" id="fuel-dropdown-btn">E10</button>
-        <div class="fuel-dropdown-content" id="fuel-dropdown-content">
-          <!-- Populated by JavaScript -->
-        </div>
-      </div>
-    </div>
+<!-- Map Controls - Top Left -->
+<div class="map-controls-top-left">
+  <!-- Compass Control -->
+  <div class="compass-control" id="compass-control">
+    <button class="compass-btn" onclick="resetNorth()">
+      <i class="fas fa-compass"></i>
+    </button>
   </div>
   
-  <!-- Zoom Controls -->
-  <div class="zoom-controls-container">
-    <div class="custom-zoom-control">
-      <button class="zoom-in-btn" onclick="zoomIn()">
-        <i class="fas fa-plus"></i>
-      </button>
-      <button class="zoom-out-btn" onclick="zoomOut()">
-        <i class="fas fa-minus"></i>
-      </button>
-    </div>
-  </div>
-</div>
-      
-        <!-- Populated by JavaScript -->
-      </div>
-    </div>
-  </div>
-    </div>
-    
   <!-- Weather Display -->
   <div class="weather-display" id="weather-display">
     <span class="weather-icon" id="weather-icon">☀️</span>
     <span class="weather-temp" id="weather-temp">--°</span>
   </div>
+</div>
+
+<!-- Map Controls - Right Side -->
+<div class="map-controls-right">
+  <!-- Map Type Control -->
+  <div class="custom-maptype-control">
+    <button class="maptype-btn" id="maptype-btn">
+      <i class="fas fa-layer-group"></i>
+    </button>
+    <div class="maptype-dropdown" id="maptype-dropdown">
+      <div class="maptype-item" onclick="changeMapType('roadmap')"><i class="fas fa-road"></i> Map</div>
+      <div class="maptype-item" onclick="changeMapType('satellite')"><i class="fas fa-satellite"></i> Satellite</div>
+      <div class="maptype-item" onclick="changeMapType('hybrid')"><i class="fas fa-globe"></i> Hybrid</div>
+      <div class="maptype-item" onclick="changeMapType('terrain')"><i class="fas fa-mountain"></i> Terrain</div>
+    </div>
+  </div>
+  
+  <!-- Filters Button -->
+  <button class="filters-btn" id="filters-btn">
+    <i class="fas fa-filter"></i>
+  </button>
+</div>
+
+<!-- Map Controls - Bottom Right -->
+<div class="map-controls-bottom-right">
+  <!-- Zoom Controls -->
+  <div class="custom-zoom-control">
+    <button class="zoom-in-btn" onclick="zoomIn()">
+      <i class="fas fa-plus"></i>
+    </button>
+    <button class="zoom-out-btn" onclick="zoomOut()">
+      <i class="fas fa-minus"></i>
+    </button>
+  </div>
+</div>
+
+<!-- Loading Spinner -->
+<div class="loading-spinner" id="loading-spinner">
+  <div class="spinner-wheel"></div>
+</div>
+
+<!-- Filters Panel -->
+<div class="filters-panel" id="filters-panel">
+  <div class="filters-header">
+    <h3>Filters</h3>
+    <button class="filters-close" onclick="closeFilters()">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+  <div class="filters-content">
+    <div class="filter-section">
+      <h4>Fuel Type</h4>
+      <div class="fuel-type-grid" id="fuel-type-grid">
+        <!-- Populated by JavaScript -->
+      </div>
+    </div>
+    <div class="filter-section">
+      <h4>Fuel Options</h4>
+      <div class="fuel-options">
+        <label class="option-item">
+          <input type="checkbox" id="any-unleaded" name="fuel-option">
+          <span>Any Unleaded</span>
+        </label>
+        <label class="option-item">
+          <input type="checkbox" id="any-premium" name="fuel-option">
+          <span>Any Premium</span>
+        </label>
+        <label class="option-item">
+          <input type="checkbox" id="any-diesel" name="fuel-option">
+          <span>Any Diesel</span>
+        </label>
+      </div>
+    </div>
+    <div class="filter-section">
+      <h4>Brands</h4>
+      <div class="brand-grid" id="brand-grid">
+        <!-- Populated by JavaScript -->
+      </div>
+    </div>
+  </div>
+</div>
 
 
   <!--Bottom Toolbar-->

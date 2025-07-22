@@ -988,43 +988,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
   
-  // Fuel selector dropdown
-  const fuelBtn = document.getElementById('fuel-dropdown-btn');
-  const fuelContent = document.getElementById('fuel-dropdown-content');
-  
-  if (fuelBtn && fuelContent) {
-    // Populate fuel types
-    FUEL_TYPES.forEach(fuel => {
-      const item = document.createElement('div');
-      item.className = 'fuel-dropdown-item';
-      item.textContent = fuel.label;
-      if (fuel.key === currentFuel) item.classList.add('selected');
-      
-      item.addEventListener('click', () => {
-        currentFuel = fuel.key;
-        savePreferences();
-        fuelBtn.textContent = fuel.label;
-        fuelContent.classList.remove('show');
-        document.querySelectorAll('.fuel-dropdown-item').forEach(i => i.classList.remove('selected'));
-        item.classList.add('selected');
-        findCheapestStation();
-        updateVisibleStationsAndList();
-      });
-      
-      fuelContent.appendChild(item);
-    });
-    
-    fuelBtn.textContent = FUEL_TYPES.find(f => f.key === currentFuel).label;
-    
-    fuelBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      fuelContent.classList.toggle('show');
-    });
-    
-    document.addEventListener('click', () => {
-      fuelContent.classList.remove('show');
-    });
-  }
+  // Global search function
+  window.searchSuburb = async function(suburbName, postcode) {
+    const sites = allSites.filter(s => s.P === postcode);
+    if (sites.length > 0) {
+      const avgLat = sites.reduce((sum, s) => sum + s.Lat, 0) / sites.length;
+      const avgLng = sites.reduce((sum, s) => sum + s.Lng, 0) / sites.length;
+      myMap.setCenter(new google.maps.LatLng(avgLat, avgLng));
+      myMap.setZoom(14);
+      await loadAreaData(avgLat, avgLng);
+      closeAllPanels();
+    } else {
+      const suburbData = QLD_SUBURBS.find(s => s.suburb.toLowerCase() === suburbName.toLowerCase());
+      if (suburbData) {
+        myMap.setCenter(new google.maps.LatLng(suburbData.lat, suburbData.lng));
+        myMap.setZoom(14);
+        await loadAreaData(suburbData.lat, suburbData.lng);
+        closeAllPanels();
+      }
+    }
+  };
   
   // Toolbar buttons
   document.getElementById('toolbar-search-btn')?.addEventListener('click', () => {
@@ -1077,15 +1060,23 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   
   // Map events
+  let mapIdleTimeout;
+  myMap.addListener('idle', async () => {
+    // Map has stopped moving/zooming
+    clearTimeout(mapIdleTimeout);
+    mapIdleTimeout = setTimeout(async () => {
+      const center = myMap.getCenter();
+      await loadAreaData(center.lat(), center.lng());
+    }, 500);
+  });
+  
   myMap.addListener('bounds_changed', () => {
-    // Debounce the update to avoid too many calls
     clearTimeout(window.boundsUpdateTimeout);
     window.boundsUpdateTimeout = setTimeout(() => {
       updateVisibleStationsAndList();
     }, 300);
   });
   
-  // Update weather when map center changes (less frequent than bounds)
   myMap.addListener('center_changed', () => {
     clearTimeout(window.weatherUpdateTimeout);
     window.weatherUpdateTimeout = setTimeout(() => {
@@ -1093,7 +1084,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (center) {
         fetchWeather(center.lat(), center.lng());
       }
-    }, 1000); // Longer delay for weather updates
+    }, 1000);
   });
   
   // Get user location
@@ -1117,6 +1108,9 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // Initialize drag functionality
   setupGlobalDragListeners();
+  
+  // Setup filters
+  setupFilters();
   
   // Initialize
   fetchSitesAndPrices();
