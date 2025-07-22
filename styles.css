@@ -739,23 +739,23 @@ html, body {
 
 .sc-center-btn:active {
   transform: translateX(-50%) scale(0.95);
-  background: radial-gradient(circle at 30% 30%, #5e9fd7 0%, #387CC2 40%, #2a5d8f 80%, #1e4a73 100%) !important;
+  background: rgba(56, 124, 194, 0.3) !important;
   box-shadow: 
-    0 8px 30px rgba(56, 124, 194, 0.4),
-    0 4px 15px rgba(0, 0, 0, 0.3),
-    inset 0 2px 4px rgba(0, 0, 0, 0.2),
-    inset 0 -2px 4px rgba(255, 255, 255, 0.2);
+    0 4px 16px rgba(56, 124, 194, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.3);
 }
 
-/* Keep gradient when active/focused */
+/* Keep glass effect when active/focused */
 .sc-center-btn:focus {
   outline: none;
-  background: radial-gradient(circle at 30% 30%, #5e9fd7 0%, #387CC2 40%, #2a5d8f 80%, #1e4a73 100%) !important;
+  background: rgba(56, 124, 194, 0.25) !important;
 }
 
 /* Ensure background stays when not current */
 .sc-center-btn:not(.sc-current) {
-  background: radial-gradient(circle at 30% 30%, #5e9fd7 0%, #387CC2 40%, #2a5d8f 80%, #1e4a73 100%) !important;
+  background: rgba(56, 124, 194, 0.25) !important;
 }
 
 .sc-current {
@@ -766,9 +766,9 @@ html, body {
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
-/* Center button always keeps its gradient */
+/* Center button always keeps its glass effect */
 .sc-center-btn.sc-current {
-  background: radial-gradient(circle at 30% 30%, #5e9fd7 0%, #387CC2 40%, #2a5d8f 80%, #1e4a73 100%) !important;
+  background: rgba(56, 124, 194, 0.25) !important;
 }
 
 /* ========== DIRECTIONS INFO PANEL ========== */
