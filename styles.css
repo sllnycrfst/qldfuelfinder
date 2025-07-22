@@ -1026,15 +1026,15 @@ html, body {
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 500px) {
   .map-controls-wrapper {
     top: 110px;
     right: 10px;
-    gap: 8px;
+    gap: 28px;
   }
   
   .custom-map-controls {
-    gap: 8px;
+    gap: 28px;
   }
   
   .custom-zoom-control button,
