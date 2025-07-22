@@ -117,16 +117,16 @@ html, body {
 @media (max-width: 768px) {
   .maptype-btn,
   .fuel-dropdown-btn {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
   }
 }
 
 @media (min-width: 769px) and (max-width: 1023px) {
   .maptype-btn,
   .fuel-dropdown-btn {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
   }
 }
 
@@ -193,6 +193,7 @@ html, body {
 
 .fuel-dropdown-btn {
   font-size: 14px;
+  margin-bottom: 40px;
 }
 
 .fuel-dropdown-content {
