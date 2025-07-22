@@ -798,7 +798,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
       currentY = clientY - startY;
       
-      const newTranslateY = Math.max(-window.innerHeight * 0.4, initialTranslateY + currentY);
+      // Only allow dragging down (positive currentY)
+      if (currentY < 0) {
+        currentY = 0;
+        return;
+      }
+      
+      const newTranslateY = initialTranslateY + currentY;
       panel.style.transform = `translateX(-50%) translateY(${newTranslateY}px)`;
       
       e.preventDefault();
@@ -816,9 +822,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (currentY > threshold) {
         // Drag down - close panel
         closeAllPanels();
-      } else if (currentY < -threshold) {
-        // Drag up - expand to top
-        panel.style.transform = 'translateX(-50%) translateY(-40vh)';
       } else {
         // Snap back to normal position
         panel.style.transform = 'translateX(-50%) translateY(0)';
