@@ -914,14 +914,14 @@ html, body {
 .zoom-controls-container {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 /* ========== ZOOM CONTROLS ========== */
 .custom-zoom-control {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .custom-zoom-control button {
@@ -997,7 +997,7 @@ html, body {
   .map-controls-wrapper {
     top: 115px;
     right: 15px;
-    gap: 10px;
+    gap: 24px;
   }
   
   .custom-map-controls {
