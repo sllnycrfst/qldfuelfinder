@@ -43,7 +43,6 @@ html, body {
   box-shadow: 
     0 8px 32px rgba(0, 0, 0, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.18);
   font-size: 14px;
   font-weight: 500;
@@ -95,7 +94,6 @@ html, body {
   box-shadow: 
     0 8px 32px rgba(0, 0, 0, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -150,7 +148,6 @@ html, body {
   box-shadow: 
     0 8px 32px rgba(0, 0, 0, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -169,7 +166,6 @@ html, body {
   box-shadow: 
     0 12px 40px rgba(0, 0, 0, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
   transform: translateY(-1px);
   color: #2d3748;
 }
@@ -209,7 +205,6 @@ html, body {
   box-shadow: 
     0 12px 48px rgba(0, 0, 0, 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
   z-index: 10002;
   padding: 8px;
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -580,8 +575,7 @@ html, body {
   transform: translateY(-1px);
   box-shadow: 
     0 12px 40px rgba(56, 124, 194, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 .open-maps-btn {
@@ -777,8 +771,8 @@ html, body {
 /* Center button always keeps its glass effect */
 .sc-center-btn.sc-current {
   background: rgba(56, 124, 194, 0.35) !important;
-  backdrop-filter: blur(4px) saturate(140%);
-  -webkit-backdrop-filter: blur(4px) saturate(140%);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
 }
 
 /* ========== DIRECTIONS INFO PANEL ========== */
