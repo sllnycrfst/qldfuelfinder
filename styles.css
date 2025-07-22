@@ -298,6 +298,24 @@ html, body {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+/* Add a pseudo-element for the cutout border effect */
+.sc-bottom-bar::after {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 74px;
+  height: 37px;
+  background: transparent;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  border-left: 1px solid rgba(255, 255, 255, 0.18);
+  border-right: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 37px 37px 0 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
 .sliding-panel.open {
   transform: translateX(-50%) translateY(0);
 }
@@ -637,7 +655,13 @@ html, body {
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   
-  /* Remove clip-path for cleaner toolbar */
+  /* Circular cutout for center button */
+  -webkit-mask-image: radial-gradient(circle at center top, transparent 0, transparent 36px, black 36px);
+  mask-image: radial-gradient(circle at center top, transparent 0, transparent 36px, black 36px);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
   
   box-shadow: 
     0 -8px 48px rgba(0, 0, 0, 0.2),
@@ -1044,13 +1068,6 @@ html, body {
     font-size: 13px;
     border-radius: 10px;
   }
-
-  .custom-zoom-control button {
-    width: 36px;
-    height: 30px;
-    font-size: 13px;
-    border-radius: 10px;
-  }
   
   .zoom-in-btn {
     border-radius: 10px 10px 5px 5px !important;
@@ -1120,7 +1137,9 @@ html, body {
 
   .sc-bottom-bar {
     height: calc(70px + env(safe-area-inset-bottom));
-    /* Remove clip-path for cleaner mobile toolbar */
+    /* Circular cutout for center button on mobile */
+    -webkit-mask-image: radial-gradient(circle at center top, transparent 0, transparent 33px, black 33px);
+    mask-image: radial-gradient(circle at center top, transparent 0, transparent 33px, black 33px);
     /* Make full width on mobile */
     left: 0;
     transform: none;
