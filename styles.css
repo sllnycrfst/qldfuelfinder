@@ -769,7 +769,8 @@ html, body {
 
 /* Center button always keeps its glass effect */
 .sc-center-btn.sc-current {
-  background: rgba(56, 124, 194, 0.25) !important;
+  background: rgba(56, 124, 194, 0.35) !important;
+  backdrop-filter: blur(4px) saturate(120%);
 }
 
 /* ========== DIRECTIONS INFO PANEL ========== */
