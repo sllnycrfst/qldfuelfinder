@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { key: "91", id: 2, label: "U91", fullName: "Unleaded 91" },
     { key: "95", id: 5, label: "P95", fullName: "Premium 95" },
     { key: "98", id: 8, label: "P98", fullName: "Premium 98" },
-    { key: "Diesel", id: 1000, label: "DSL", fullName: "Diesel/Premium Diesel" }
+    { key: "Diesel", id: 3, label: "DSL", fullName: "Diesel/Premium Diesel", altId: 14 }
   ];
   
   // Brand logos for stations
@@ -370,8 +370,12 @@ document.addEventListener("DOMContentLoaded", () => {
         .filter(site => !bannedStations.some(b => site.N && site.N.includes(b)));
         
       allPrices = priceRes.SitePrices.filter(
-        p => FUEL_TYPES.some(f => f.id === p.FuelId) && isValidPrice(p.Price)
+        p => FUEL_TYPES.some(f => f.id === p.FuelId || (f.altId && f.altId === p.FuelId)) && isValidPrice(p.Price)
       );
+      
+      // Log diesel prices for debugging
+      const dieselPrices = allPrices.filter(p => p.FuelId === 3 || p.FuelId === 14);
+      console.log("Diesel prices found:", dieselPrices.length, "(Regular:", dieselPrices.filter(p => p.FuelId === 3).length, "Premium:", dieselPrices.filter(p => p.FuelId === 14).length, ")");
       
       priceMap = {};
       allPrices.forEach(p => {
@@ -397,24 +401,30 @@ document.addEventListener("DOMContentLoaded", () => {
     let cheapestPrice = Infinity;
     cheapestStationId = null; // Reset cheapest station
     
+    console.log("Finding cheapest for fuel:", fuel.label, "ID:", fuel.id, "Alt ID:", fuel.altId);
+    let stationsWithFuel = 0;
+    
     allSites.forEach(site => {
       let price;
-      if (fuel.id === 1000) { // Diesel/Premium Diesel
-        const dieselPrice = priceMap[site.S]?.[3];
-        const premiumDieselPrice = priceMap[site.S]?.[14];
+      if (fuel.altId) { // Diesel/Premium Diesel
+        const dieselPrice = priceMap[site.S]?.[fuel.id];
+        const premiumDieselPrice = priceMap[site.S]?.[fuel.altId];
         price = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);
         if (price === Infinity) price = null;
       } else {
         price = priceMap[site.S]?.[fuel.id];
       }
       
-      if (price && price < cheapestPrice) {
-        cheapestPrice = price;
-        cheapestStationId = site.S;
+      if (price) {
+        stationsWithFuel++;
+        if (price < cheapestPrice) {
+          cheapestPrice = price;
+          cheapestStationId = site.S;
+        }
       }
     });
     
-    console.log("Cheapest station:", cheapestStationId, "Price:", cheapestPrice);
+    console.log("Cheapest station:", cheapestStationId, "Price:", cheapestPrice, "Stations with fuel:", stationsWithFuel);
   }
 
   // --- Map Markers ---
@@ -444,9 +454,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const fuel = FUEL_TYPES.find(f => f.key === currentFuel);
       let price;
       
-      if (fuel.id === 1000) { // Diesel/Premium Diesel
-        const dieselPrice = priceMap[site.S]?.[3];
-        const premiumDieselPrice = priceMap[site.S]?.[14];
+      if (fuel.altId) { // Diesel/Premium Diesel
+        const dieselPrice = priceMap[site.S]?.[fuel.id];
+        const premiumDieselPrice = priceMap[site.S]?.[fuel.altId];
         price = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);
         if (price === Infinity) price = null;
       } else {
@@ -578,9 +588,9 @@ document.addEventListener("DOMContentLoaded", () => {
     
     const allPrices = FUEL_TYPES.map(fuel => {
       let p;
-      if (fuel.id === 1000) { // Diesel/Premium Diesel
-        const dieselPrice = priceMap[site.S]?.[3];
-        const premiumDieselPrice = priceMap[site.S]?.[14];
+      if (fuel.altId) { // Diesel/Premium Diesel
+        const dieselPrice = priceMap[site.S]?.[fuel.id];
+        const premiumDieselPrice = priceMap[site.S]?.[fuel.altId];
         p = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);
         if (p === Infinity) p = null;
       } else {

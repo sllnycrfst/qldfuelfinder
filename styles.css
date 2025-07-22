@@ -38,7 +38,8 @@ html, body {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
-  padding: 8px 12px;
+  padding: 8px 16px;
+  height: 44px;
   border-radius: 12px;
   box-shadow: 
     0 8px 32px rgba(0, 0, 0, 0.12),
@@ -54,6 +55,8 @@ html, body {
   .weather-display {
     top: 10px;
     left: 10px;
+    height: 40px;
+    padding: 6px 12px;
   }
 }
 
@@ -63,6 +66,18 @@ html, body {
 
 .weather-temp {
   font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .weather-icon {
+    font-size: 18px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .weather-icon {
+    font-size: 22px;
+  }
 }
 
 /* ========== MAP CONTROLS WRAPPER ========== */
@@ -107,36 +122,63 @@ html, body {
   font-weight: 500;
 }
 
-.maptype-btn,
-.fuel-dropdown-btn {
+.maptype-btn {
   width: 44px;
   height: 44px;
 }
 
+.fuel-dropdown-btn {
+  height: 44px;
+  width: auto;
+  min-width: 60px;
+}
+
 /* Mobile and Desktop sizing */
 @media (max-width: 768px) {
-  .maptype-btn,
-  .fuel-dropdown-btn {
+  .maptype-btn {
     width: 48px;
     height: 48px;
+  }
+  .fuel-dropdown-btn {
+    height: 48px;
+    width: auto;
+    min-width: 65px;
   }
 }
 
 @media (min-width: 769px) and (max-width: 1023px) {
-  .maptype-btn,
-  .fuel-dropdown-btn {
+  .maptype-btn {
     width: 48px;
     height: 48px;
+  }
+  .fuel-dropdown-btn {
+    height: 48px;
+    width: auto;
+    min-width: 65px;
+  }
+  .weather-display {
+    height: 48px;
+    padding: 8px 16px;
   }
 }
 
 /* Desktop larger buttons */
 @media (min-width: 1024px) {
-  .maptype-btn,
-  .fuel-dropdown-btn {
+  .maptype-btn {
     width: 56px;
     height: 56px;
     font-size: 20px;
+  }
+  .fuel-dropdown-btn {
+    height: 56px;
+    width: auto;
+    min-width: 70px;
+    font-size: 16px;
+  }
+  .weather-display {
+    height: 56px;
+    padding: 10px 20px;
+    font-size: 16px;
   }
 }
 
@@ -192,14 +234,20 @@ html, body {
 
 .fuel-dropdown-btn {
   font-size: 14px;
-  padding: 8px 12px;
+  font-weight: 600;
+  padding: 8px 16px;
+  width: auto !important;
+  min-width: 60px;
+  justify-content: center;
+  color: #2d3748;
 }
 
 .fuel-dropdown-content {
   display: none;
   position: absolute;
-  top: 52px;
-  right: 0;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
   min-width: 120px;
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(24px) saturate(180%);
@@ -222,11 +270,11 @@ html, body {
 @keyframes dropdownSlideIn {
   from {
     opacity: 0;
-    transform: translateY(-8px) scale(0.95);
+    transform: translateX(-50%) translateY(-8px) scale(0.95);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateX(-50%) translateY(0) scale(1);
   }
 }
 
@@ -984,17 +1032,31 @@ html, body {
   }
   
   .custom-zoom-control button,
-  .maptype-btn,
-  .fuel-dropdown-btn {
+  .maptype-btn {
     width: 40px;
     height: 40px;
     font-size: 14px;
   }
   
-  .maptype-dropdown,
-  .fuel-dropdown-content {
+  .fuel-dropdown-btn {
+    height: 40px;
+    font-size: 14px;
+    min-width: 55px;
+  }
+  
+  .weather-display {
+    height: 40px;
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  
+  .maptype-dropdown {
     min-width: 120px;
     top: 48px;
+  }
+  
+  .fuel-dropdown-content {
+    min-width: 110px;
   }
   
   .maptype-item,
@@ -1021,12 +1083,18 @@ html, body {
   }
   
   .custom-zoom-control button,
-  .maptype-btn,
-  .fuel-dropdown-btn {
+  .maptype-btn {
     width: 42px;
     height: 42px;
     font-size: 13px;
     border-radius: 10px;
+  }
+  
+  .fuel-dropdown-btn {
+    height: 42px;
+    font-size: 13px;
+    border-radius: 10px;
+    min-width: 58px;
   }
   
   .zoom-in-btn {
@@ -1037,10 +1105,13 @@ html, body {
     border-radius: 5px 5px 10px 10px !important;
   }
   
-  .maptype-dropdown,
-  .fuel-dropdown-content {
+  .maptype-dropdown {
     min-width: 100px;
     top: 44px;
+  }
+  
+  .fuel-dropdown-content {
+    min-width: 100px;
   }
 }
 
