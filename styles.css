@@ -276,7 +276,7 @@ html, body {
 
 .sliding-panel {
   position: fixed;
-  left: ;
+  left: 50%;
   bottom: 0;
   transform: translateX(-50%) translateY(120%);
   width: 100vw;
