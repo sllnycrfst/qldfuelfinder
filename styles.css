@@ -530,6 +530,30 @@ html, body {
   background: rgba(0,0,0,0.02);
 }
 
+/* Make logos uniform in size and appearance */
+.list-item-logo {
+  width: 25px; /* Adjust as needed */
+  height: 25px; /* Adjust as needed */
+  object-fit: contain; /* Ensures logos maintain aspect ratio */
+  margin-right: 10px; /* Adds spacing between logo and text */
+}
+
+/* Increase font size for name and address */
+.list-item-name {
+  font-size: 18px; /* Adjust as needed to make it more prominent */
+  font-weight: bold;
+}
+
+.list-item-address {
+  font-size: 14px; /* Slightly smaller than the name */
+  color: #555; /* Optional: add a subtle color for secondary text */
+}
+
+/* Reduce font size for price */
+.list-item-price {
+  font-size: 12px; /* Reduce size to make it less dominant */
+  color: #333; /* Optional: adjust color for better visibility */
+}
 /* ========== FEATURE CARD PANEL ========== */
 .feature-card-title {
   font-weight: 700;
