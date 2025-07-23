@@ -577,8 +577,8 @@ html, body {
 }
 
 .station-logo-container {
-  width: 70px;
-  height: 70px;
+  width: 60px;
+  height: 60px;
   background: radial-gradient(circle at 30% 30%, #ffffff 0%, #f8f9fa 40%, #e9ecef 70%, #dee2e6 100%);
   border-radius: 50%;
   display: flex;
@@ -608,8 +608,8 @@ html, body {
 }
 
 .station-logo {
-  width: 46px;
-  height: 46px;
+  width: 50px;
+  height: 50px;
   object-fit: contain;
   z-index: 1;
   position: relative;
