@@ -1,4 +1,4 @@
- // Import suburb data
+// Import suburb data
 import { QLD_SUBURBS } from './data/qld-suburbs.js';
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { key: "91", id: 2, label: "U91", fullName: "Unleaded 91" },
     { key: "95", id: 5, label: "P95", fullName: "Premium 95" },
     { key: "98", id: 8, label: "P98", fullName: "Premium 98" },
-    { key: "Diesel", id: 3, label: "DSL", fullName: "Diesel/Premium Diesel", altId: 14 }
+    { key: "Diesel", id: 3, label: "DSL", fullName: "Diesel", altId: 14 }
   ];
   
   // Brand logos for stations
@@ -171,10 +171,6 @@ document.addEventListener("DOMContentLoaded", () => {
         stylers: [{ visibility: "off" }]
       },
       {
-        featureType: "poi.attraction",
-        stylers: [{ visibility: "off" }]
-      },
-      {
         featureType: "poi.government",
         stylers: [{ visibility: "off" }]
       },
@@ -204,15 +200,6 @@ document.addEventListener("DOMContentLoaded", () => {
       },
       {
         featureType: "transit.station",
-        stylers: [{ visibility: "off" }]
-      },
-      {
-        featureType: "transit.line",
-        stylers: [{ visibility: "off" }]
-      },
-      {
-        featureType: "transit",
-        elementType: "labels.icon",
         stylers: [{ visibility: "off" }]
       }
     ],
@@ -335,7 +322,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const weatherIcons = {
         '0': '☀️', '1': '🌤️', '2': '⛅', '3': '☁️',
-        '45': '☁️', '48': '☁️', '51': '🌦️', '53': '🌦️',
+        '45': '🌫️', '48': '🌫️', '51': '🌦️', '53': '🌦️',
         '55': '🌦️', '61': '🌧️', '63': '🌧️', '65': '🌧️',
         '71': '🌨️', '73': '🌨️', '75': '🌨️', '77': '🌨️',
         '80': '🌦️', '81': '🌦️', '82': '🌧️', '85': '🌨️',
@@ -586,9 +573,31 @@ document.addEventListener("DOMContentLoaded", () => {
     const content = document.getElementById('feature-card-content');
     const isCheapest = site.S === cheapestStationId;
     
+    // Find cheapest visible station price
+    const bounds = myMap.getBounds();
+    let cheapestVisiblePrice = Infinity;
+    allSites.forEach(s => {
+      const position = new google.maps.LatLng(s.Lat, s.Lng);
+      if (bounds && bounds.contains(position)) {
+        const fuel = FUEL_TYPES.find(f => f.key === currentFuel);
+        let p;
+        if (fuel.altId) {
+          const dieselPrice = priceMap[s.S]?.[fuel.id];
+          const premiumDieselPrice = priceMap[s.S]?.[fuel.altId];
+          p = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);
+          if (p === Infinity) p = null;
+        } else {
+          p = priceMap[s.S]?.[fuel.id];
+        }
+        if (p && p < cheapestVisiblePrice) {
+          cheapestVisiblePrice = p;
+        }
+      }
+    });
+    
     const allPrices = FUEL_TYPES.map(fuel => {
       let p;
-      if (fuel.altId) { // Diesel/Premium Diesel
+      if (fuel.altId) { // Diesel
         const dieselPrice = priceMap[site.S]?.[fuel.id];
         const premiumDieselPrice = priceMap[site.S]?.[fuel.altId];
         p = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);
@@ -596,10 +605,13 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         p = priceMap[site.S]?.[fuel.id];
       }
+      const isCurrentFuelCheapest = fuel.key === currentFuel && p === cheapestVisiblePrice;
+      // Change label for diesel types
+      const displayLabel = (fuel.key === 'Diesel') ? 'Diesel' : fuel.fullName;
       return p ? `
-        <div class="fuel-price-row">
-          <span class="fuel-type-label">${fuel.fullName}</span>
-          <span class="fuel-type-price">${(p / 10).toFixed(1)}</span>
+        <div class="fuel-price-row" data-fuel="${fuel.key}" data-price="${p}" data-fuel-name="${fuel.fullName}">
+          <span class="fuel-type-label">${displayLabel}</span>
+          <span class="fuel-type-price ${isCurrentFuelCheapest ? 'cheapest' : ''}">${(p / 10).toFixed(1)}</span>
         </div>
       ` : '';
     }).filter(Boolean).join('');
@@ -609,31 +621,101 @@ document.addEventListener("DOMContentLoaded", () => {
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
         <div style="flex:1;">
           <h3 class="feature-card-title" style="margin:0;">${site.N} ${isCheapest ? '💚 CHEAPEST' : ''}</h3>
-          <p class="feature-card-address" style="margin:0;">${site.A}, ${getSuburbName(site.P)}</p>
+          <p class="feature-card-address" style="margin:0;">${site.A}, ${getSuburbName(site.P)}, QLD ${site.P}</p>
         </div>
-        <img src="${getBrandLogo(site.B)}" alt="Station Logo" style="width:40px;height:40px;object-fit:contain;border-radius:8px;" onerror="this.src='images/default.png'">
+        <div class="station-logo-container">
+          <img src="${getBrandLogo(site.B)}" alt="Station Logo" class="station-logo" onerror="this.src='images/default.png'">
+        </div>
       </div>
       <div class="feature-card-actions">
-        <button class="feature-card-btn open-maps-btn" data-lat="${site.Lat}" data-lng="${site.Lng}" title="Get Directions">
-          <i class="fas fa-route"></i>
+        <button class="feature-card-btn open-maps-btn" data-lat="${site.Lat}" data-lng="${site.Lng}" title="Navigate">
+          <i class="fa-solid fa-diamond-turn-right"></i>
+          <div class="nav-menu glass-effect" id="nav-menu">
+            <a href="#" class="nav-menu-item" data-app="apple" data-lat="${site.Lat}" data-lng="${site.Lng}">
+              <i class="fab fa-apple"></i> Apple Maps
+            </a>
+            <a href="#" class="nav-menu-item" data-app="google" data-lat="${site.Lat}" data-lng="${site.Lng}">
+              <i class="fab fa-google"></i> Google Maps
+            </a>
+            <a href="#" class="nav-menu-item" data-app="waze" data-lat="${site.Lat}" data-lng="${site.Lng}">
+              <i class="fab fa-waze"></i> Waze
+            </a>
+          </div>
+        </button>
+        <button class="feature-card-btn calculator-btn" title="Discount Calculator">
+          <i class="fa-solid fa-calculator"></i>
         </button>
       </div>
       <div class="fuel-prices-list">${allPrices}</div>
     `;
     
-    // Add event listeners for navigation buttons
+    // Add event listeners
     setTimeout(() => {
-      const directionsBtn = content.querySelector('.open-maps-btn');
+      const navBtn = content.querySelector('.open-maps-btn');
+      const navMenu = content.querySelector('#nav-menu');
+      const calcBtn = content.querySelector('.calculator-btn');
+      const fuelRows = content.querySelectorAll('.fuel-price-row');
       
-      if (directionsBtn) {
-        directionsBtn.addEventListener('click', (e) => {
+      // Navigation button
+      if (navBtn) {
+        navBtn.addEventListener('click', (e) => {
           e.preventDefault();
           e.stopPropagation();
-          const lat = parseFloat(e.target.closest('button').dataset.lat);
-          const lng = parseFloat(e.target.closest('button').dataset.lng);
-          navigateExternal(lat, lng);
+          navMenu.classList.toggle('show');
         });
       }
+      
+      // Navigation menu items
+      content.querySelectorAll('.nav-menu-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const app = e.currentTarget.dataset.app;
+          const lat = parseFloat(e.currentTarget.dataset.lat);
+          const lng = parseFloat(e.currentTarget.dataset.lng);
+          navigateWithApp(app, lat, lng);
+          navMenu.classList.remove('show');
+        });
+      });
+      
+      // Calculator button
+      if (calcBtn) {
+        calcBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          // Use the current fuel's price
+          const fuel = FUEL_TYPES.find(f => f.key === currentFuel);
+          let price;
+          if (fuel.altId) {
+            const dieselPrice = priceMap[site.S]?.[fuel.id];
+            const premiumDieselPrice = priceMap[site.S]?.[fuel.altId];
+            price = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);
+            if (price === Infinity) price = null;
+          } else {
+            price = priceMap[site.S]?.[fuel.id];
+          }
+          if (price) {
+            openCalculator(fuel.fullName, price);
+          }
+        });
+      }
+      
+      // Fuel row clicks
+      fuelRows.forEach(row => {
+        row.addEventListener('click', (e) => {
+          e.preventDefault();
+          const fuelName = row.dataset.fuelName;
+          const price = parseFloat(row.dataset.price);
+          openCalculator(fuelName, price);
+        });
+      });
+      
+      // Close nav menu when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!navBtn.contains(e.target)) {
+          navMenu.classList.remove('show');
+        }
+      });
     }, 100);
     
     openPanel('feature');
@@ -689,6 +771,21 @@ document.addEventListener("DOMContentLoaded", () => {
     directionsRenderer.setDirections({routes: []});
     currentDirections = null;
     hideDirectionsInfo();
+  }
+  
+  // Navigate with specific app
+  function navigateWithApp(app, lat, lng) {
+    switch(app) {
+      case 'apple':
+        window.open(`maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`);
+        break;
+      case 'google':
+        window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
+        break;
+      case 'waze':
+        window.open(`https://waze.com/ul?ll=${lat},${lng}&navigate=yes`);
+        break;
+    }
   }
   
   // External navigation with app choice
@@ -1051,13 +1148,13 @@ document.addEventListener("DOMContentLoaded", () => {
     FUEL_TYPES.forEach(fuel => {
       const item = document.createElement('div');
       item.className = 'fuel-dropdown-item';
-      item.textContent = fuel.label;
+      item.textContent = fuel.fullName;
       if (fuel.key === currentFuel) item.classList.add('selected');
       
       item.addEventListener('click', () => {
         currentFuel = fuel.key;
         savePreferences();
-        fuelBtn.textContent = fuel.label;
+        fuelBtn.innerHTML = `${fuel.fullName} <span class="arrow">▼</span>`;
         fuelContent.classList.remove('show');
         document.querySelectorAll('.fuel-dropdown-item').forEach(i => i.classList.remove('selected'));
         item.classList.add('selected');
@@ -1068,7 +1165,7 @@ document.addEventListener("DOMContentLoaded", () => {
       fuelContent.appendChild(item);
     });
     
-    fuelBtn.textContent = FUEL_TYPES.find(f => f.key === currentFuel).label;
+    fuelBtn.innerHTML = `${FUEL_TYPES.find(f => f.key === currentFuel).fullName} <span class="arrow">▼</span>`;
     
     fuelBtn.addEventListener('click', e => {
       e.stopPropagation();
@@ -1165,9 +1262,127 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
   
+  // Discount Calculator
+  let currentCalculatorFuel = null;
+  let currentCalculatorPrice = null;
+  let selectedDiscount = 6;
+  
+  function openCalculator(fuelName, price) {
+    currentCalculatorFuel = fuelName;
+    currentCalculatorPrice = price;
+    
+    // Create calculator panel if it doesn't exist
+    let calcPanel = document.getElementById('calculator-panel');
+    if (!calcPanel) {
+      calcPanel = document.createElement('div');
+      calcPanel.id = 'calculator-panel';
+      calcPanel.className = 'calculator-panel';
+      calcPanel.innerHTML = `
+        <div class="panel-drag-bar"></div>
+        <div class="calculator-content">
+          <h3 class="panel-title">Discount Calculator</h3>
+          <div class="calculator-fuel-info">
+            <div class="calculator-fuel-type" id="calc-fuel-type"></div>
+            <div class="calculator-fuel-price" id="calc-fuel-price"></div>
+          </div>
+          <div class="discount-buttons">
+            <button class="discount-btn" data-discount="4">4¢</button>
+            <button class="discount-btn active" data-discount="6">6¢</button>
+            <button class="discount-btn" data-discount="8">8¢</button>
+          </div>
+          <div class="calculator-result">
+            <div class="calculator-result-label">You save on 40L</div>
+            <div class="calculator-result-value" id="calc-savings">$2.40</div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(calcPanel);
+      
+      // Add event listeners
+      calcPanel.querySelectorAll('.discount-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          selectedDiscount = parseInt(e.target.dataset.discount);
+          calcPanel.querySelectorAll('.discount-btn').forEach(b => b.classList.remove('active'));
+          e.target.classList.add('active');
+          updateCalculatorResult();
+        });
+      });
+      
+      // Drag functionality
+      initializeCalculatorDrag(calcPanel);
+    }
+    
+    // Update content
+    document.getElementById('calc-fuel-type').textContent = fuelName;
+    document.getElementById('calc-fuel-price').textContent = (price / 10).toFixed(1) + '¢/L';
+    updateCalculatorResult();
+    
+    // Open panel
+    calcPanel.classList.add('open');
+  }
+  
+  function updateCalculatorResult() {
+    const savings = (selectedDiscount * 40) / 100;
+    document.getElementById('calc-savings').textContent = '$' + savings.toFixed(2);
+  }
+  
+  function closeCalculator() {
+    const calcPanel = document.getElementById('calculator-panel');
+    if (calcPanel) {
+      calcPanel.classList.remove('open');
+    }
+  }
+  
+  function initializeCalculatorDrag(panel) {
+    const dragBar = panel.querySelector('.panel-drag-bar');
+    let isDragging = false;
+    let startY = 0;
+    let currentY = 0;
+    
+    dragBar.addEventListener('touchstart', handleStart, { passive: false });
+    dragBar.addEventListener('mousedown', handleStart);
+    
+    function handleStart(e) {
+      isDragging = true;
+      startY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+      panel.style.transition = 'none';
+    }
+    
+    document.addEventListener('touchmove', handleMove, { passive: false });
+    document.addEventListener('mousemove', handleMove);
+    
+    function handleMove(e) {
+      if (!isDragging) return;
+      const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+      currentY = clientY - startY;
+      if (currentY > 0) {
+        panel.style.transform = `translateX(-50%) translateY(${currentY}px)`;
+      }
+    }
+    
+    document.addEventListener('touchend', handleEnd);
+    document.addEventListener('mouseup', handleEnd);
+    
+    function handleEnd() {
+      if (!isDragging) return;
+      isDragging = false;
+      panel.style.transition = 'transform 0.35s cubic-bezier(.25,.8,.25,1)';
+      
+      if (currentY > 100) {
+        closeCalculator();
+      } else {
+        panel.style.transform = 'translateX(-50%) translateY(0)';
+      }
+      currentY = 0;
+    }
+  }
+  
   // Make functions global for onclick handlers
   window.showFeatureCard = showFeatureCard;
   window.navigateExternal = navigateExternal;
+  window.navigateWithApp = navigateWithApp;
+  window.openCalculator = openCalculator;
+  window.closeCalculator = closeCalculator;
   
   // Initialize drag functionality
   setupGlobalDragListeners();
