@@ -1,4 +1,4 @@
-/* ========== RESET & GLOBALS ========== */
+/* ========== IMPORTS & RESET ========== */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
 * {
@@ -15,13 +15,13 @@ html, body {
   overflow: hidden;
 }
 
-/* ========== MAP ========== */
+/* ========== MAIN MAP ========== */
 #google-map {
   width: 100vw;
   height: 100vh;
   position: absolute;
-  top: 0; 
-  left: 0; 
+  top: 0;
+  left: 0;
   right: 0;
   z-index: 1;
 }
@@ -35,31 +35,12 @@ html, body {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.35) !important;
-  box-shadow: 
-    0 16px 64px rgba(0, 0, 0, 0.25),
-    0 8px 32px rgba(0, 0, 0, 0.15),
-    inset 0 2px 4px rgba(255, 255, 255, 0.8),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.1),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(32px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.3);
   padding: 8px 16px;
   height: 44px;
   border-radius: 12px;
   font-size: 14px;
   font-weight: 500;
   color: #3b4664;
-}
-
-@media (max-width: 599px) {
-  .weather-display {
-    top: 10px;
-    left: 10px;
-    height: 40px;
-    padding: 6px 12px;
-  }
 }
 
 .weather-icon {
@@ -70,19 +51,7 @@ html, body {
   font-weight: 600;
 }
 
-@media (max-width: 768px) {
-  .weather-icon {
-    font-size: 18px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .weather-icon {
-    font-size: 22px;
-  }
-}
-
-/* ========== MAP CONTROLS WRAPPER ========== */
+/* ========== MAP CONTROLS CONTAINER ========== */
 .map-controls-wrapper {
   position: fixed;
   top: 20px;
@@ -93,7 +62,6 @@ html, body {
   gap: 40px;
 }
 
-/* ========== CUSTOM MAP CONTROLS ========== */
 .custom-map-controls {
   display: flex;
   flex-direction: column;
@@ -101,119 +69,24 @@ html, body {
 }
 
 /* ========== SHARED BUTTON STYLES ========== */
-.custom-zoom-control button {
-  width: 44px;
-  height: 44px;
-  border: none;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.35) !important;
-  box-shadow: 
-    0 16px 64px rgba(0, 0, 0, 0.25),
-    0 8px 32px rgba(0, 0, 0, 0.15),
-    inset 0 2px 4px rgba(255, 255, 255, 0.8),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.1),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(32px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  color: #4a5568;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.maptype-btn {
-  width: 44px;
-  height: 44px;
-}
-
-.fuel-dropdown-btn {
-  height: 44px;
-  width: auto;
-  min-width: 60px;
-}
-
-/* Mobile and Desktop sizing */
-@media (max-width: 768px) {
-  .maptype-btn {
-    width: 48px;
-    height: 48px;
-  }
-  .fuel-dropdown-btn {
-    height: 48px;
-    width: auto;
-    min-width: 65px;
-  }
-}
-
-@media (min-width: 769px) and (max-width: 1023px) {
-  .maptype-btn {
-    width: 48px;
-    height: 48px;
-  }
-  .fuel-dropdown-btn {
-    height: 48px;
-    width: auto;
-    min-width: 65px;
-  }
-  .weather-display {
-    height: 48px;
-    padding: 8px 16px;
-  }
-}
-
-/* Desktop larger buttons */
-@media (min-width: 1024px) {
-  .maptype-btn {
-    width: 56px;
-    height: 56px;
-    font-size: 20px;
-  }
-  .fuel-dropdown-btn {
-    height: 56px;
-    width: auto;
-    min-width: 70px;
-    font-size: 16px;
-  }
-  .weather-display {
-    height: 56px;
-    padding: 10px 20px;
-    font-size: 16px;
-  }
-}
-
+.custom-zoom-control button,
 .maptype-btn,
 .fuel-dropdown-btn {
   border: none;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.35) !important;
-  box-shadow: 
-    0 16px 64px rgba(0, 0, 0, 0.25),
-    0 8px 32px rgba(0, 0, 0, 0.15),
-    inset 0 2px 4px rgba(255, 255, 255, 0.8),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.1),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(32px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   color: #3b4664;
-  font-size: 18px;
   font-weight: 500;
 }
 
 .custom-zoom-control button:hover,
 .maptype-btn:hover,
 .fuel-dropdown-btn:hover {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.85) !important;
   box-shadow: 
     0 12px 40px rgba(0, 0, 0, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.6);
@@ -228,6 +101,91 @@ html, body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
+/* ========== ZOOM CONTROLS ========== */
+.zoom-controls-container {
+  position: fixed;
+  bottom: 120px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.custom-zoom-control {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.custom-zoom-control button {
+  width: 44px;
+  height: 44px;
+  font-size: 16px;
+}
+
+.zoom-in-btn {
+  border-radius: 12px 12px 6px 6px !important;
+}
+
+.zoom-out-btn {
+  border-radius: 6px 6px 12px 12px !important;
+}
+
+/* ========== MAP TYPE CONTROL ========== */
+.custom-maptype-control {
+  position: fixed;
+  top: 100px;
+  right: 16px;
+  z-index: 10000;
+}
+
+.maptype-btn {
+  width: 44px;
+  height: 44px;
+  font-size: 18px;
+}
+
+.maptype-dropdown {
+  position: absolute;
+  top: 20px;
+  right: 0;
+  min-width: 100px;
+  border-radius: 12px;
+  padding: 8px;
+  display: none;
+  z-index: 11000;
+  animation: dropdownSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.maptype-dropdown.show {
+  display: block;
+}
+
+.maptype-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.maptype-item:hover {
+  background: rgba(56, 124, 194, 0.1);
+  color: #387CC2;
+}
+
+.maptype-item i {
+  width: 16px;
+  text-align: center;
+  font-size: 14px;
+}
+
 /* ========== FUEL SELECTOR DROPDOWN ========== */
 .fuel-selector {
   position: relative;
@@ -239,15 +197,14 @@ html, body {
 }
 
 .fuel-dropdown-btn {
+  height: 44px;
+  width: 200px;
+  min-width: 60px;
   font-size: 14px;
   font-weight: 600;
   padding: 8px 16px;
-  width: auto !important;
-  min-width: 60px;
   justify-content: space-between;
   color: #2d3748;
-  display: flex;
-  align-items: center;
   gap: 8px;
 }
 
@@ -268,33 +225,14 @@ html, body {
   left: 50%;
   transform: translateX(-50%);
   min-width: 120px;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
   border-radius: 12px;
-  box-shadow: 
-    0 12px 48px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
   z-index: 10002;
   padding: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
   animation: dropdownSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .fuel-dropdown-content.show {
   display: block;
-}
-
-@keyframes dropdownSlideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-8px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0) scale(1);
-  }
 }
 
 .fuel-dropdown-item {
@@ -319,59 +257,47 @@ html, body {
   color: white;
 }
 
-/* ========== SLIDING PANEL CONTAINER ========== */
+/* ========== SLIDING PANELS ========== */
 .panel-overlay {
   position: fixed;
-  left: 0; 
-  top: 0; 
-  width: 100vw; 
+  left: 0;
+  top: 0;
+  width: 100vw;
   height: 100vh;
-  background: rgba(0,0,0,0.15);
+  background: rgba(0, 0, 0, 0.15);
   z-index: 9010;
   display: none;
   transition: background 0.2s;
 }
 
-.panel-overlay.active { 
-  display: block; 
+.panel-overlay.active {
+  display: block;
 }
 
-/* ========== SLIDING PANEL ========== */
 .sliding-panel {
   position: fixed;
-  left: 50%; 
+  left: 50%;
   bottom: 0;
   transform: translateX(-50%) translateY(120%);
   width: 100vw;
   max-width: 500px;
   height: 75vh;
-  background: rgba(255, 255, 255, 0.15) !important;
   border-radius: 24px 24px 0 0;
-  box-shadow: 
-    0 16px 64px rgba(0, 0, 0, 0.25),
-    0 8px 32px rgba(0, 0, 0, 0.15),
-    inset 0 2px 4px rgba(255, 255, 255, 0.8),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.1),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(32px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-bottom: none;
   z-index: 10001;
   display: flex;
   flex-direction: column;
-  transition: transform 0.35s cubic-bezier(.25,.8,.25,1);
+  transition: transform 0.35s cubic-bezier(.25, .8, .25, 1);
   pointer-events: auto;
   touch-action: none;
-  /* iOS safe area adjustments */
   padding-bottom: env(safe-area-inset-bottom);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-bottom: none;
 }
 
 .sliding-panel.open {
   transform: translateX(-50%) translateY(0);
 }
 
-/* Search panel specific height */
 #search-panel {
   height: 75vh !important;
 }
@@ -390,7 +316,7 @@ html, body {
   user-select: none;
   -webkit-user-select: none;
   touch-action: pan-y;
-  flex-shrink: 0; /* Prevent shrinking */
+  flex-shrink: 0;
   position: relative;
   z-index: 9025;
 }
@@ -399,7 +325,6 @@ html, body {
   cursor: grabbing;
 }
 
-/* Create a larger touch area for mobile but only at the top */
 .panel-drag-bar::before {
   content: '';
   position: absolute;
@@ -408,15 +333,6 @@ html, body {
   right: -30px;
   bottom: -10px;
   z-index: 9026;
-}
-
-@media (max-width: 768px) {
-  .panel-drag-bar::before {
-    top: -25px;
-    left: -50px;
-    right: -50px;
-    bottom: -15px;
-  }
 }
 
 /* ========== PANEL CONTENT ========== */
@@ -430,7 +346,6 @@ html, body {
   flex-direction: column;
   gap: 18px;
   margin-bottom: calc(70px + env(safe-area-inset-bottom));
-  /* Remove opacity */
   background: transparent;
 }
 
@@ -441,7 +356,6 @@ html, body {
   margin: 0 0 12px 0;
 }
 
-/* Panel content divider */
 .panel-content::before {
   content: '';
   width: 100%;
@@ -485,8 +399,8 @@ html, body {
   padding: 6px 0;
 }
 
-#search-input::placeholder { 
-  color: #7e7e7e; 
+#search-input::placeholder {
+  color: #7e7e7e;
 }
 
 .suburb-list {
@@ -512,48 +426,7 @@ html, body {
   background: #f2f3fa;
 }
 
-/* ========== LIST PANEL ========== */
-#list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  overflow-y: auto;
-  height: 100%;
-}
 
-.station-item {
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.station-item:hover {
-  background: rgba(0,0,0,0.02);
-}
-
-/* Make logos uniform in size and appearance */
-.list-item-logo {
-  width: 25px; /* Adjust as needed */
-  height: 25px; /* Adjust as needed */
-  object-fit: contain; /* Ensures logos maintain aspect ratio */
-  margin-right: 10px; /* Adds spacing between logo and text */
-}
-
-/* Increase font size for name and address */
-.list-item-name {
-  font-size: 18px; /* Adjust as needed to make it more prominent */
-  font-weight: bold;
-}
-
-.list-item-address {
-  font-size: 14px; /* Slightly smaller than the name */
-  color: #555; /* Optional: add a subtle color for secondary text */
-}
-
-/* Reduce font size for price */
-.list-item-price {
-  font-size: 12px; /* Reduce size to make it less dominant */
-  color: #333; /* Optional: adjust color for better visibility */
-}
 /* ========== FEATURE CARD PANEL ========== */
 .feature-card-title {
   font-weight: 700;
@@ -653,15 +526,8 @@ html, body {
   justify-content: space-between;
   align-items: center;
   padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border-radius: 10px;
   width: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -689,9 +555,7 @@ html, body {
   color: #333;
 }
 
-/* Removed fuel type specific colors - all rows now use the same styling */
-
-/* Navigation Menu */
+/* ========== NAVIGATION MENU ========== */
 .nav-menu {
   position: absolute;
   top: 5px;
@@ -711,13 +575,6 @@ html, body {
   min-width: 160px;
   display: none;
   z-index: 10102;
-}
-
-.nav-menu.glass-effect {
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 .nav-menu.show {
@@ -748,24 +605,7 @@ html, body {
   text-align: center;
 }
 
-/* ========== SCROLLBAR STYLING ========== */
-.panel-content, .suburb-list {
-  scrollbar-width: thin;
-  scrollbar-color: #e0e3ed #f7f7fa;
-}
-
-.panel-content::-webkit-scrollbar, .suburb-list::-webkit-scrollbar {
-  width: 7px;
-  background: #f7f7fa;
-  border-radius: 20px;
-}
-
-.panel-content::-webkit-scrollbar-thumb, .suburb-list::-webkit-scrollbar-thumb {
-  background: #e0e3ed;
-  border-radius: 47px;
-}
-
-/* ========== BOTTOM TOOLBAR  ========== */
+/* ========== BOTTOM TOOLBAR ========== */
 .sc-bottom-bar {
   position: fixed;
   bottom: 0;
@@ -775,21 +615,6 @@ html, body {
   width: 100%;
   max-width: 600px;
   height: calc(70px + env(safe-area-inset-bottom));
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-
-  /* Circular cutout for center button */
-  -webkit-mask-image: radial-gradient(circle at center top, transparent 0, transparent 36px, black 36px);
-  mask-image: radial-gradient(circle at center top, transparent 0, transparent 36px, black 36px);
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  box-shadow: 
-    0 -8px 48px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-bottom: none;
   z-index: 15000;
@@ -827,17 +652,25 @@ html, body {
   color: #387CC2;
 }
 
-/* Center location button (floating action button) */
+.sc-current {
+  color: #387CC2;
+  background: rgba(56, 124, 194, 0.15);
+  box-shadow: 
+    0 2px 8px rgba(56, 124, 194, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* ========== CENTER FLOATING ACTION BUTTON ========== */
 .sc-center-btn {
   position: fixed;
-  bottom: calc(35px + env(safe-area-inset-bottom));
+  bottom: calc(5px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
-  width: 64px;
-  height: 64px;
+  width: 60px;
+  height: 60px;
   background: radial-gradient(circle at 30% 30%, #5e9fd7 0%, #387CC2 40%, #2a5d8f 80%, #1e4a73 100%) !important;
   backdrop-filter: blur(24px) saturate(140%);
-  -webkit-backdrop-filter: blur(4px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
   border-radius: 50%;
   border: none;
   display: flex;
@@ -856,17 +689,6 @@ html, body {
   overflow: hidden;
 }
 
-.sc-center-btn::before {
-  content: '';
-  position: absolute;
-  top: 10%;
-  left: 10%;
-  width: 40%;
-  height: 40%;
-  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.4) 0%, transparent 70%);
-  border-radius: 50%;
-  filter: blur(4px);
-}
 
 .sc-center-btn i {
   font-size: 26px;
@@ -877,9 +699,6 @@ html, body {
 
 .sc-center-btn:hover {
   transform: translateX(-50%) scale(1.1);
-  background: radial-gradient(circle at 30% 30%, #5e9fd7 0%, #387CC2 40%, #2a5d8f 80%, #1e4a73 100%) !important;
-  backdrop-filter: blur(4px) saturate(140%);
-  -webkit-backdrop-filter: blur(4px) saturate(140%);
   box-shadow: 
     0 16px 50px rgba(56, 124, 194, 0.6),
     0 8px 25px rgba(0, 0, 0, 0.35),
@@ -890,40 +709,10 @@ html, body {
 
 .sc-center-btn:active {
   transform: translateX(-50%) scale(0.95);
-  background: rgba(56, 124, 194, 0.3) !important;
-  backdrop-filter: blur(4px) saturate(140%);
-  -webkit-backdrop-filter: blur(4px) saturate(140%);
-  box-shadow: 
-    0 4px 16px rgba(56, 124, 194, 0.3),
-    0 2px 8px rgba(0, 0, 0, 0.2),
-    inset 0 2px 4px rgba(0, 0, 0, 0.1),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.3);
 }
 
-/* Keep glass effect when active/focused */
 .sc-center-btn:focus {
   outline: none;
-  background: rgba(56, 124, 194, 0.25) !important;
-}
-
-/* Ensure background stays when not current */
-.sc-center-btn:not(.sc-current) {
-  background: rgba(56, 124, 194, 0.25) !important;
-}
-
-.sc-current {
-  color: #387CC2;
-  background: rgba(56, 124, 194, 0.15);
-  box-shadow: 
-    0 2px 8px rgba(56, 124, 194, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
-}
-
-/* Center button always keeps its glass effect */
-.sc-center-btn.sc-current {
-  background: rgba(56, 124, 194, 0.35) !important;
-  backdrop-filter: blur(12px) saturate(140%);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
 }
 
 /* ========== DIRECTIONS INFO PANEL ========== */
@@ -932,15 +721,7 @@ html, body {
   top: 80px;
   left: 20px;
   z-index: 10001;
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
   border-radius: 12px;
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.18);
   display: none;
   min-width: 200px;
 }
@@ -971,7 +752,7 @@ html, body {
 }
 
 .directions-close {
-  background: rgba(0,0,0,0.1);
+  background: rgba(0, 0, 0, 0.1);
   border: none;
   border-radius: 50%;
   width: 24px;
@@ -985,11 +766,11 @@ html, body {
 }
 
 .directions-close:hover {
-  background: rgba(0,0,0,0.2);
+  background: rgba(0, 0, 0, 0.2);
   color: #333;
 }
 
-/* ========== CUSTOM MARKER STYLES ========== */
+/* ========== CUSTOM MARKERS ========== */
 .custom-marker {
   position: relative;
   width: 66px;
@@ -997,7 +778,6 @@ html, body {
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
-  /* Add drop shadow to markers */
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
@@ -1046,251 +826,13 @@ html, body {
   transform: translateX(-50%) scale(1.05);
 }
 
-/* Active/click state */
 .custom-marker:active {
   transform: scale(0.95);
 }
 
-/* Special styling for cheapest marker price box */
 .custom-marker.cheapest .marker-price {
   color: #22C55E;
   font-weight: 700;
-}
-/* ========== ZOOM CONTROLS CONTAINER ========== */
-.zoom-controls-container {
-  position: fixed;
-  bottom: 120px;
-  right: 20px;
-  z-index: 10000;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-/* ========== ZOOM CONTROLS ========== */
-.custom-zoom-control {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.custom-zoom-control button {
-  height: 48px !important;
-  border-radius: 12px !important;
-}
-
-.zoom-in-btn {
-  border-radius: 12px 12px 6px 6px !important;
-}
-
-.zoom-out-btn {
-  border-radius: 6px 6px 12px 12px !important;
-}
-
-/* ========== MAP TYPE CONTROL ========== */
-.custom-maptype-control {
-  position: relative;
-}
-
-.maptype-dropdown {
-  position: absolute;
-  top: 52px;
-  right: 0;
-  min-width: 140px;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border-radius: 12px;
-  box-shadow: 
-    0 12px 48px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-  padding: 8px;
-  display: none;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  animation: dropdownSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.maptype-dropdown.show {
-  display: block;
-  z-index: 11000;
-}
-
-.maptype-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  font-size: 14px;
-  font-weight: 500;
-  color: #4a5568;
-}
-
-.maptype-item:hover {
-  background: rgba(56, 124, 194, 0.1);
-  color: #387CC2;
-}
-
-.maptype-item i {
-  width: 16px;
-  text-align: center;
-  font-size: 14px;
-}
-
-
-
-/* ========== RESPONSIVE DESIGN ========== */
-@media (max-width: 768px) {
-  .map-controls-wrapper {
-    top: 15px;
-    right: 15px;
-    gap: 30px;
-  }
-  
-  .custom-map-controls {
-    gap: 30px;
-  }
-  
-  .zoom-controls-container {
-    bottom: 110px;
-    right: 15px;
-  }
-  
-  .custom-zoom-control button,
-  .maptype-btn {
-    width: 40px;
-    height: 40px;
-    font-size: 14px;
-  }
-  
-  .fuel-dropdown-btn {
-    height: 40px;
-    font-size: 14px;
-    min-width: 55px;
-  }
-  
-  .weather-display {
-    height: 40px;
-    padding: 6px 12px;
-    font-size: 13px;
-  }
-  
-  .maptype-dropdown {
-    min-width: 120px;
-    top: 48px;
-  }
-  
-  .fuel-dropdown-content {
-    min-width: 110px;
-  }
-  
-  .maptype-item,
-  .fuel-dropdown-item {
-    padding: 8px 10px;
-    font-size: 13px;
-  }
-}
-
-@media (max-width: 500px) {
-  .map-controls-wrapper {
-    top: 10px;
-    right: 10px;
-    gap: 25px;
-  }
-  
-  .custom-map-controls {
-    gap: 25px;
-  }
-  
-  .zoom-controls-container {
-    bottom: 100px;
-    right: 10px;
-  }
-  
-  .custom-zoom-control button,
-  .maptype-btn {
-    width: 42px;
-    height: 42px;
-    font-size: 13px;
-    border-radius: 10px;
-  }
-  
-  .fuel-dropdown-btn {
-    height: 42px;
-    font-size: 13px;
-    border-radius: 10px;
-    min-width: 58px;
-  }
-  
-  .zoom-in-btn {
-    border-radius: 10px 10px 5px 5px !important;
-  }
-  
-  .zoom-out-btn {
-    border-radius: 5px 5px 10px 10px !important;
-  }
-  
-  .maptype-dropdown {
-    min-width: 100px;
-    top: 44px;
-  }
-  
-  .fuel-dropdown-content {
-    min-width: 100px;
-  }
-}
-
-
-/* Responsive adjustments for smaller screens */
-@media (max-width: 768px) {
-  .custom-marker {
-    width: 55px;
-    height: 55px;
-  }
-  
-  .marker-base {
-    width: 55px;
-    height: 55px;
-  }
-  
-  .marker-logo {
-    width: 22px;
-    height: 22px;
-    top: 21px;
-  }
-  
-  .marker-price {
-    font-size: 10px !important;
-    padding: 1px 5px;
-    font-weight: 600 !important;
-    bottom: 37px;
-  }
-
-  .sc-bottom-bar {
-    height: calc(70px + env(safe-area-inset-bottom));
-    /* Circular cutout for center button on mobile */
-    -webkit-mask-image: radial-gradient(circle at center top, transparent 0, transparent 33px, black 33px);
-    mask-image: radial-gradient(circle at center top, transparent 0, transparent 33px, black 33px);
-    /* Make full width on mobile */
-    left: 0;
-    transform: none;
-    width: 100%;
-    max-width: none;
-    padding: 0 20px;
-  }
-  
-  .sc-center-btn {
-    bottom: calc(35px + env(safe-area-inset-bottom));
-    width: 65px;
-    height: 65px;
-  }
-  
-  .sc-center-btn i {
-    font-size: 24px;
-  }
 }
 
 /* ========== USER LOCATION MARKER ========== */
@@ -1328,6 +870,38 @@ html, body {
   z-index: 1;
 }
 
+/* ========== SCROLLBAR STYLING ========== */
+.panel-content, 
+.suburb-list {
+  scrollbar-width: thin;
+  scrollbar-color: #e0e3ed #f7f7fa;
+}
+
+.panel-content::-webkit-scrollbar, 
+.suburb-list::-webkit-scrollbar {
+  width: 7px;
+  background: #f7f7fa;
+  border-radius: 20px;
+}
+
+.panel-content::-webkit-scrollbar-thumb, 
+.suburb-list::-webkit-scrollbar-thumb {
+  background: #e0e3ed;
+  border-radius: 47px;
+}
+
+/* ========== ANIMATIONS ========== */
+@keyframes dropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
 @keyframes userLocationPulse {
   0% {
     transform: translate(-50%, -50%) scale(0.8);
@@ -1339,15 +913,7 @@ html, body {
   }
 }
 
-/* ========== RESPONSIVE DESIGN ========== */
-@media (max-width: 599px) {
-  .directions-info {
-    left: 10px;
-    right: 10px;
-    min-width: auto;
-  }
-}
-
+/* iOS specific adjustments */
 @supports (-webkit-touch-callout: none) {
   .sliding-panel {
     height: 75vh;
@@ -1356,4 +922,131 @@ html, body {
   #search-panel {
     height: 40vh;
   }
+}
+
+/* Apply glass effects directly to components */
+.weather-display,
+.custom-zoom-control button,
+.maptype-btn,
+.fuel-dropdown-btn {
+  background: rgba(255, 255, 255, 0.35) !important;
+  backdrop-filter: blur(32px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 16px 64px rgba(0, 0, 0, 0.25),
+    0 8px 32px rgba(0, 0, 0, 0.15),
+    inset 0 2px 4px rgba(255, 255, 255, 0.8),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+.sc-bottom-bar,
+.directions-info {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
+.sliding-panel {
+  background: rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(32px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
+  box-shadow: 
+    0 16px 64px rgba(0, 0, 0, 0.25),
+    0 8px 32px rgba(0, 0, 0, 0.15),
+    inset 0 2px 4px rgba(255, 255, 255, 0.8),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+.maptype-dropdown,
+.fuel-dropdown-content {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: 
+    0 12px 48px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+#list {
+  list-style: none;
+  padding: 0 0 0px 0;
+  margin: 0;
+  overflow-y: auto;
+  flex: 1 1 auto;
+}
+
+.station-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 22px;
+  border-bottom: none; /* Removed the extra lines */
+  cursor: pointer;
+  transition: background 0.18s, box-shadow 0.18s;
+  background: transparent;
+  margin-bottom: 8px; /* Add spacing between items */
+}
+
+.station-item:hover {
+  background: rgba(56, 124, 194, 0.07);
+  box-shadow: 0 2px 12px rgba(56, 124, 194, 0.08);
+  border-radius: 12px;
+}
+
+.list-item-logo {
+  left: 4px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50px;
+  background: radial-gradient(circle at 30% 30%, #ffffff 0%, #f8f9fa 40%, #e9ecef 70%, #dee2e6 100%);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    0 2px 6px rgba(0, 0, 0, 0.1),
+    inset 0 1px 2px rgba(255, 255, 255, 0.8),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.05);
+  padding: 6px;
+  flex-shrink: 0;
+}
+
+.list-item-details {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0; /* Allow text to truncate */
+}
+
+.list-item-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2a2d3f;
+  margin-bottom: 4px;
+}
+
+.list-item-address {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 2px;
+}
+
+.list-item-distance {
+  font-size: 14px;
+  color: #999;
+}
+
+.list-item-price {
+  font-size: 16px;
+  color: #387CC2;
+  font-weight: 700;
+  text-align: right;
+  flex-shrink: 0;
 }
