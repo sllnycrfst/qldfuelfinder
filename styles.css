@@ -222,8 +222,8 @@ html, body {
   display: none;
   position: absolute;
   top: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
+  left: ;
+  transform: translateX(-);
   min-width: 120px;
   border-radius: 12px;
   z-index: 10002;
@@ -276,7 +276,7 @@ html, body {
 
 .sliding-panel {
   position: fixed;
-  left: 50%;
+  left: ;
   bottom: 0;
   transform: translateX(-50%) translateY(120%);
   width: 100vw;
@@ -921,10 +921,6 @@ html, body {
   .sliding-panel {
     height: 75vh;
   }
-  
-  #search-panel {
-    height: 40vh;
-  }
 }
 
 /* Apply glass effects directly to components */
@@ -957,9 +953,9 @@ html, body {
 }
 
 .sliding-panel {
-  background: rgba(255, 255, 255, 0.15) !important;
-  backdrop-filter: blur(32px) saturate(50%) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(50%) !important;
+  background: rgba(255, 255, 255, 0.25) !important;
+  backdrop-filter: blur(32px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(120%) !important;
   box-shadow: 
     0 16px 64px rgba(0, 0, 0, 0.25),
     0 8px 32px rgba(0, 0, 0, 0.15),
