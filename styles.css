@@ -35,17 +35,19 @@ html, body {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  background: rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 
+    0 16px 64px rgba(0, 0, 0, 0.25),
+    0 8px 32px rgba(0, 0, 0, 0.15),
+    inset 0 2px 4px rgba(255, 255, 255, 0.8),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(32px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   padding: 8px 16px;
   height: 44px;
   border-radius: 12px;
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.3);
   font-size: 14px;
   font-weight: 500;
   color: #3b4664;
@@ -104,13 +106,16 @@ html, body {
   height: 44px;
   border: none;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  background: rgba(255, 255, 255, 0.35) !important;
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+    0 16px 64px rgba(0, 0, 0, 0.25),
+    0 8px 32px rgba(0, 0, 0, 0.15),
+    inset 0 2px 4px rgba(255, 255, 255, 0.8),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(32px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -118,7 +123,6 @@ html, body {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   color: #4a5568;
   font-size: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
   font-weight: 500;
 }
 
@@ -186,13 +190,16 @@ html, body {
 .fuel-dropdown-btn {
   border: none;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  background: rgba(255, 255, 255, 0.35) !important;
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+    0 16px 64px rgba(0, 0, 0, 0.25),
+    0 8px 32px rgba(0, 0, 0, 0.15),
+    inset 0 2px 4px rgba(255, 255, 255, 0.8),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(32px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -200,7 +207,6 @@ html, body {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   color: #3b4664;
   font-size: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
   font-weight: 500;
 }
 
@@ -339,15 +345,17 @@ html, body {
   width: 100vw;
   max-width: 500px;
   height: 75vh;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.15) !important;
   border-radius: 24px 24px 0 0;
   box-shadow: 
-    0 -4px 48px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+    0 16px 64px rgba(0, 0, 0, 0.25),
+    0 8px 32px rgba(0, 0, 0, 0.15),
+    inset 0 2px 4px rgba(255, 255, 255, 0.8),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(32px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
+  border: 2px solid rgba(255, 255, 255, 0.3);
   border-bottom: none;
   z-index: 10001;
   display: flex;
@@ -525,7 +533,7 @@ html, body {
 /* ========== FEATURE CARD PANEL ========== */
 .feature-card-title {
   font-weight: 700;
-  font-size: 1.2em;
+  font-size: 1.1em;
   color: #2a2d3f;
   margin: 0;
 }
@@ -533,7 +541,7 @@ html, body {
 .feature-card-address {
   font-size: 14px;
   color: #666;
-  margin: 4px 0 0 0;
+  margin: 10px 0 0 0;
 }
 
 .station-header {
@@ -555,9 +563,9 @@ html, body {
 
 .directions-icon {
   color: #387CC2;
-  font-size: 18px;
+  font-size: 22px;
   cursor: pointer;
-  padding: 4px;
+  padding: 8px;
   border-radius: 4px;
   transition: all 0.2s ease;
   position: relative;
@@ -582,7 +590,7 @@ html, body {
     inset 0 2px 4px rgba(255, 255, 255, 0.9),
     inset 0 -2px 4px rgba(0, 0, 0, 0.1),
     inset 0 0 0 1px rgba(255, 255, 255, 0.5);
-  border: 2px solid rgba(255, 255, 255, 0.6);
+  border: 0px solid rgba(255, 255, 255, 0.6);
   position: relative;
   flex-shrink: 0;
 }
@@ -612,8 +620,8 @@ html, body {
   grid-template-columns: 1fr 1fr;
   gap: 8px;
   width: 100%;
-  margin: 0 -22px;
-  padding: 0 40px;
+  margin: 0 0px;
+  padding: 0 10px;
 }
 
 .fuel-price-row {
@@ -646,9 +654,9 @@ html, body {
 
 .fuel-type-price.cheapest {
   color: #22C55E;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
-  text-shadow: 0 1px 2px rgba(34, 197, 94, 0.3);
+  text-shadow: 0 1px 2px rgba(67, 67, 67, 0.1);
 }
 
 .fuel-type-label {
@@ -662,11 +670,11 @@ html, body {
 /* Navigation Menu */
 .nav-menu {
   position: absolute;
-  top: 40px;
-  right: 0;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(32px) saturate(200%);
-  -webkit-backdrop-filter: blur(32px) saturate(200%);
+  top: 5px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(32px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
   border-radius: 16px;
   box-shadow: 
     0 16px 64px rgba(0, 0, 0, 0.25),
@@ -678,7 +686,7 @@ html, body {
   padding: 12px;
   min-width: 160px;
   display: none;
-  z-index: 10100;
+  z-index: 10102;
 }
 
 .nav-menu.glass-effect {
@@ -746,7 +754,7 @@ html, body {
   background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
-  
+
   /* Circular cutout for center button */
   -webkit-mask-image: radial-gradient(circle at center top, transparent 0, transparent 36px, black 36px);
   mask-image: radial-gradient(circle at center top, transparent 0, transparent 36px, black 36px);
@@ -754,7 +762,6 @@ html, body {
   mask-size: 100% 100%;
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
-  
   box-shadow: 
     0 -8px 48px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.5),
@@ -805,7 +812,7 @@ html, body {
   width: 64px;
   height: 64px;
   background: radial-gradient(circle at 30% 30%, #5e9fd7 0%, #387CC2 40%, #2a5d8f 80%, #1e4a73 100%) !important;
-  backdrop-filter: blur(4px) saturate(140%);
+  backdrop-filter: blur(24px) saturate(140%);
   -webkit-backdrop-filter: blur(4px) saturate(140%);
   border-radius: 50%;
   border: none;
@@ -1214,31 +1221,6 @@ html, body {
 
 
 /* Responsive adjustments for smaller screens */
-@media (max-width: 768px) {
-  .custom-marker {
-    width: 55px;
-    height: 55px;
-  }
-  
-  .marker-base {
-    width: 55px;
-    height: 55px;
-  }
-  
-  .marker-logo {
-    width: 22px;
-    height: 22px;
-    top: 21px;
-  }
-  
-  .marker-price {
-    font-size: 10px !important;
-    padding: 1px 5px;
-    font-weight: 600 !important;
-    bottom: 37px;
-  }
-
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .custom-marker {
     width: 55px;
