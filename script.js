@@ -535,29 +535,22 @@ document.addEventListener("DOMContentLoaded", () => {
     stations.slice(0, 50).forEach(({ site, price }) => {
       const li = document.createElement('li');
       li.className = 'station-item';
-      
-      const distance = userLocation ? 
-        getDistance(userLocation.lat, userLocation.lng, site.Lat, site.Lng).toFixed(1) : 
-        '?';
-      
+
+      const distance = userLocation ?
+        getDistance(userLocation.lat, userLocation.lng, site.Lat, site.Lng).toFixed(1) : '?';
       const isCheapest = site.S === cheapestStationId;
-      
+
+      // Build the structure matching the CSS
       li.innerHTML = `
-        <div style="display:flex;align-items:center;padding:12px;border-bottom:1px solid #eee;">
-          <img src="${getBrandLogo(site.B)}" alt="Station Logo" style="width:32px;height:32px;object-fit:contain;border-radius:6px;margin-right:12px;" onerror="this.src='images/default.png'">
-          <div style="flex:1;">
-            <div style="font-size:14px;font-weight:600;color:#2a2d3f;">${site.N}</div>
-            <div style="font-size:12px;color:#666;">${site.A}, ${getSuburbName(site.P)}</div>
-            <div style="font-size:11px;color:#999;">${distance} km away</div>
-          </div>
-          <div style="text-align:right;">
-            <div style="font-size:20px;font-weight:700;color:${isCheapest ? '#00AA00' : '#007AFF'};">
-              ${(price / 10).toFixed(1)}
-            </div>
-          </div>
+        <img class="list-item-logo" src="${getBrandLogo(site.B)}" alt="Brand logo" onerror="this.src='images/default.png'" />
+        <div class="list-item-details">
+          <span class="list-item-name">${site.N}</span>
+          <span class="list-item-address">${site.A}, ${getSuburbName(site.P)}</span>
+          <span class="list-item-distance">${distance} km</span>
         </div>
+        <span class="list-item-price" style="color:${isCheapest ? '#22C55E' : '#387CC2'};">${(price / 10).toFixed(1)}</span>
       `;
-      
+
       li.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
