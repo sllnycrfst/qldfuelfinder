@@ -198,8 +198,8 @@ html, body {
 
 .fuel-dropdown-btn {
   height: 44px;
-  width: 200px;
-  min-width: 60px;
+  width: 130px;
+  min-width: 80px;
   font-size: 14px;
   font-weight: 600;
   padding: 8px 16px;
@@ -339,7 +339,7 @@ html, body {
 .panel-content {
   flex: 1 1 auto;
   overflow-y: auto;
-  padding: 0 22px 20px 22px;
+  padding: 0 18px 16px 18px;
   width: 100%;
   min-height: 0;
   display: flex;
@@ -551,7 +551,7 @@ html, body {
 
 .fuel-type-label {
   font-weight: 600;
-  font-size: 13px;
+  font-size: 14px;
   color: #333;
 }
 
@@ -561,8 +561,8 @@ html, body {
   top: 5px;
   right: 20px;
   background: rgba(255, 255, 255, 0.75) !important;
-  backdrop-filter: blur(32px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
+  backdrop-filter: blur(32px) saturate(50%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(50%) !important;
   border-radius: 16px;
   box-shadow: 
     0 16px 64px rgba(0, 0, 0, 0.25),
@@ -615,7 +615,10 @@ html, body {
   width: 100%;
   max-width: 600px;
   height: calc(70px + env(safe-area-inset-bottom));
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-bottom: none;
   z-index: 15000;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -930,8 +933,8 @@ html, body {
 .maptype-btn,
 .fuel-dropdown-btn {
   background: rgba(255, 255, 255, 0.35) !important;
-  backdrop-filter: blur(32px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
+  backdrop-filter: blur(32px) saturate(50%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(50%) !important;
   border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 
     0 16px 64px rgba(0, 0, 0, 0.25),
@@ -944,8 +947,8 @@ html, body {
 .sc-bottom-bar,
 .directions-info {
   background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(50%);
+  -webkit-backdrop-filter: blur(24px) saturate(50%);
   border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow: 
     0 8px 32px rgba(0, 0, 0, 0.12),
@@ -955,8 +958,8 @@ html, body {
 
 .sliding-panel {
   background: rgba(255, 255, 255, 0.15) !important;
-  backdrop-filter: blur(32px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
+  backdrop-filter: blur(32px) saturate(50%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(50%) !important;
   box-shadow: 
     0 16px 64px rgba(0, 0, 0, 0.25),
     0 8px 32px rgba(0, 0, 0, 0.15),
@@ -968,12 +971,14 @@ html, body {
 .maptype-dropdown,
 .fuel-dropdown-content {
   background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(50%);
+  -webkit-backdrop-filter: blur(24px) saturate(50%);
   box-shadow: 
-    0 12px 48px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+   0 16px 64px rgba(0, 0, 0, 0.25),
+    0 8px 32px rgba(0, 0, 0, 0.15),
+    inset 0 2px 4px rgba(255, 255, 255, 0.8),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
