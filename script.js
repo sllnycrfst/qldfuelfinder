@@ -642,6 +642,9 @@ document.addEventListener("DOMContentLoaded", () => {
             </a>
           </div>
         </button>
+        <button class="feature-card-btn calculator-btn" title="Discount Calculator">
+          <i class="fa-solid fa-calculator"></i>
+        </button>
       </div>
       <div class="fuel-prices-list">${allPrices}</div>
     `;
@@ -650,7 +653,9 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       const navBtn = content.querySelector('.open-maps-btn');
       const navMenu = content.querySelector('#nav-menu');
-     
+      const calcBtn = content.querySelector('.calculator-btn');
+      const fuelRows = content.querySelectorAll('.fuel-price-row');
+      
       // Navigation button
       if (navBtn) {
         navBtn.addEventListener('click', (e) => {
@@ -670,6 +675,38 @@ document.addEventListener("DOMContentLoaded", () => {
           const lng = parseFloat(e.currentTarget.dataset.lng);
           navigateWithApp(app, lat, lng);
           navMenu.classList.remove('show');
+        });
+      });
+      
+      // Calculator button
+      if (calcBtn) {
+        calcBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          // Use the current fuel's price
+          const fuel = FUEL_TYPES.find(f => f.key === currentFuel);
+          let price;
+          if (fuel.altId) {
+            const dieselPrice = priceMap[site.S]?.[fuel.id];
+            const premiumDieselPrice = priceMap[site.S]?.[fuel.altId];
+            price = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);
+            if (price === Infinity) price = null;
+          } else {
+            price = priceMap[site.S]?.[fuel.id];
+          }
+          if (price) {
+            openCalculator(fuel.fullName, price);
+          }
+        });
+      }
+      
+      // Fuel row clicks
+      fuelRows.forEach(row => {
+        row.addEventListener('click', (e) => {
+          e.preventDefault();
+          const fuelName = row.dataset.fuelName;
+          const price = parseFloat(row.dataset.price);
+          openCalculator(fuelName, price);
         });
       });
       
@@ -1028,6 +1065,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById('search-input');
   const suburbList = document.getElementById('suburb-list');
   
+  
+  
   // Show all suburbs by default
   function showAllSuburbs() {
     const sortedSuburbs = QLD_SUBURBS
@@ -1223,10 +1262,127 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
   
+  // Discount Calculator
+  let currentCalculatorFuel = null;
+  let currentCalculatorPrice = null;
+  let selectedDiscount = 6;
+  
+  function openCalculator(fuelName, price) {
+    currentCalculatorFuel = fuelName;
+    currentCalculatorPrice = price;
+    
+    // Create calculator panel if it doesn't exist
+    let calcPanel = document.getElementById('calculator-panel');
+    if (!calcPanel) {
+      calcPanel = document.createElement('div');
+      calcPanel.id = 'calculator-panel';
+      calcPanel.className = 'calculator-panel';
+      calcPanel.innerHTML = `
+        <div class="panel-drag-bar"></div>
+        <div class="calculator-content">
+          <h3 class="panel-title">Discount Calculator</h3>
+          <div class="calculator-fuel-info">
+            <div class="calculator-fuel-type" id="calc-fuel-type"></div>
+            <div class="calculator-fuel-price" id="calc-fuel-price"></div>
+          </div>
+          <div class="discount-buttons">
+            <button class="discount-btn" data-discount="4">4¢</button>
+            <button class="discount-btn active" data-discount="6">6¢</button>
+            <button class="discount-btn" data-discount="8">8¢</button>
+          </div>
+          <div class="calculator-result">
+            <div class="calculator-result-label">You save on 40L</div>
+            <div class="calculator-result-value" id="calc-savings">$2.40</div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(calcPanel);
+      
+      // Add event listeners
+      calcPanel.querySelectorAll('.discount-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          selectedDiscount = parseInt(e.target.dataset.discount);
+          calcPanel.querySelectorAll('.discount-btn').forEach(b => b.classList.remove('active'));
+          e.target.classList.add('active');
+          updateCalculatorResult();
+        });
+      });
+      
+      // Drag functionality
+      initializeCalculatorDrag(calcPanel);
+    }
+    
+    // Update content
+    document.getElementById('calc-fuel-type').textContent = fuelName;
+    document.getElementById('calc-fuel-price').textContent = (price / 10).toFixed(1) + '¢/L';
+    updateCalculatorResult();
+    
+    // Open panel
+    calcPanel.classList.add('open');
+  }
+  
+  function updateCalculatorResult() {
+    const savings = (selectedDiscount * 40) / 100;
+    document.getElementById('calc-savings').textContent = '$' + savings.toFixed(2);
+  }
+  
+  function closeCalculator() {
+    const calcPanel = document.getElementById('calculator-panel');
+    if (calcPanel) {
+      calcPanel.classList.remove('open');
+    }
+  }
+  
+  function initializeCalculatorDrag(panel) {
+    const dragBar = panel.querySelector('.panel-drag-bar');
+    let isDragging = false;
+    let startY = 0;
+    let currentY = 0;
+    
+    dragBar.addEventListener('touchstart', handleStart, { passive: false });
+    dragBar.addEventListener('mousedown', handleStart);
+    
+    function handleStart(e) {
+      isDragging = true;
+      startY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+      panel.style.transition = 'none';
+    }
+    
+    document.addEventListener('touchmove', handleMove, { passive: false });
+    document.addEventListener('mousemove', handleMove);
+    
+    function handleMove(e) {
+      if (!isDragging) return;
+      const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+      currentY = clientY - startY;
+      if (currentY > 0) {
+        panel.style.transform = `translateX(-50%) translateY(${currentY}px)`;
+      }
+    }
+    
+    document.addEventListener('touchend', handleEnd);
+    document.addEventListener('mouseup', handleEnd);
+    
+    function handleEnd() {
+      if (!isDragging) return;
+      isDragging = false;
+      panel.style.transition = 'transform 0.35s cubic-bezier(.25,.8,.25,1)';
+      
+      if (currentY > 100) {
+        closeCalculator();
+      } else {
+        panel.style.transform = 'translateX(-50%) translateY(0)';
+      }
+      currentY = 0;
+    }
+  }
+  
   // Make functions global for onclick handlers
   window.showFeatureCard = showFeatureCard;
   window.navigateExternal = navigateExternal;
   window.navigateWithApp = navigateWithApp;
+  window.openCalculator = openCalculator;
+  window.closeCalculator = closeCalculator;
   
   // Initialize drag functionality
   setupGlobalDragListeners();
