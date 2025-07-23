@@ -642,9 +642,6 @@ document.addEventListener("DOMContentLoaded", () => {
             </a>
           </div>
         </button>
-        <button class="feature-card-btn calculator-btn" title="Discount Calculator">
-          <i class="fa-solid fa-calculator"></i>
-        </button>
       </div>
       <div class="fuel-prices-list">${allPrices}</div>
     `;
@@ -675,7 +672,6 @@ document.addEventListener("DOMContentLoaded", () => {
           navMenu.classList.remove('show');
         });
       });
-    
       
       // Close nav menu when clicking outside
       document.addEventListener('click', (e) => {
@@ -1032,8 +1028,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById('search-input');
   const suburbList = document.getElementById('suburb-list');
   
-  
-  
   // Show all suburbs by default
   function showAllSuburbs() {
     const sortedSuburbs = QLD_SUBURBS
@@ -1227,27 +1221,6 @@ document.addEventListener("DOMContentLoaded", () => {
       },
       error => console.log("Location error:", error)
     );
-  }
-  
-
-  
-
-    
-    document.addEventListener('touchend', handleEnd);
-    document.addEventListener('mouseup', handleEnd);
-    
-    function handleEnd() {
-      if (!isDragging) return;
-      isDragging = false;
-      panel.style.transition = 'transform 0.35s cubic-bezier(.25,.8,.25,1)';
-      
-      if (currentY > 100) {
-        closeCalculator();
-      } else {
-        panel.style.transform = 'translateX(-50%) translateY(0)';
-      }
-      currentY = 0;
-    }
   }
   
   // Make functions global for onclick handlers
