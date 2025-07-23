@@ -15,6 +15,7 @@
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAQ0Ba7zICGUy5zCVijkkDNrNVdKAG1FGU&libraries=geometry&map_ids=DEMO_MAP_ID"></script>
 </head>
 
+<body>
 <div id="google-map" style="width: 100vw; height: 100vh;"></div>
 
 <!-- Map Controls Wrapper -->
@@ -24,7 +25,7 @@
     <!-- Fuel Selector (moved to top) -->
     <div class="fuel-selector">
       <div class="fuel-dropdown">
-        <button class="fuel-dropdown-btn" id="fuel-dropdown-btn">E10</button>
+        <button class="fuel-dropdown-btn" id="fuel-dropdown-btn">Unleaded E10 <span class="arrow">▼</span></button>
         <div class="fuel-dropdown-content" id="fuel-dropdown-content">
           <!-- Populated by JavaScript -->
         </div>
@@ -57,70 +58,63 @@
     </button>
   </div>
 </div>
-      
-        <!-- Populated by JavaScript -->
-      </div>
-    </div>
-  </div>
-    </div>
-    
-  <!-- Weather Display -->
-  <div class="weather-display" id="weather-display">
-    <span class="weather-icon" id="weather-icon">☀️</span>
-    <span class="weather-temp" id="weather-temp">--°</span>
-  </div>
+        
+<!-- Weather Display -->
+<div class="weather-display" id="weather-display">
+  <span class="weather-icon" id="weather-icon">☀️</span>
+  <span class="weather-temp" id="weather-temp">--°</span>
+</div>
 
+<!--Bottom Toolbar-->
+<div class="sc-bottom-bar">
+  <a class="sc-menu-item" id="toolbar-search-btn">
+    <i class="fas fa-search"></i>
+  </a>
+  <a class="sc-menu-item" id="toolbar-list-btn">
+    <i class="fas fa-list"></i>
+  </a>
+</div>
 
-  <!--Bottom Toolbar-->
-  <div class="sc-bottom-bar">
-    <a class="sc-menu-item" id="toolbar-search-btn">
+<!-- Center Floating Action Button -->
+<button class="sc-center-btn" id="toolbar-center-btn">
+  <i class="fa-solid fa-location-arrow"></i>
+</button>
+
+<!-- Search Panel -->
+<div class="panel-overlay" id="search-overlay"></div>
+<div class="sliding-panel" id="search-panel">
+  <div class="panel-drag-bar"></div>
+  <div class="panel-content">
+    <h3 class="panel-title">Search</h3>
+    <div class="search-bar-panel">
       <i class="fas fa-search"></i>
-    </a>
-    <a class="sc-menu-item" id="toolbar-list-btn">
-      <i class="fas fa-list"></i>
-    </a>
+      <input type="text" id="search-input" placeholder="Search by suburb" />
+    </div>
+    <ul id="suburb-list" class="suburb-list"></ul>
   </div>
-  
-  <!-- Center Floating Action Button -->
-  <button class="sc-center-btn" id="toolbar-center-btn">
-    <i class="fa-solid fa-location-arrow"></i>
-  </button>
-  
-  <!-- Search Panel -->
-  <div class="panel-overlay" id="search-overlay"></div>
-  <div class="sliding-panel" id="search-panel">
-    <div class="panel-drag-bar"></div>
-    <div class="panel-content">
-      <h3 class="panel-title">Search</h3>
-      <div class="search-bar-panel">
-        <i class="fas fa-search"></i>
-        <input type="text" id="search-input" placeholder="Search by suburb" />
-      </div>
-      <ul id="suburb-list" class="suburb-list"></ul>
+</div>
+
+<!-- List Panel -->
+<div class="panel-overlay" id="list-overlay"></div>
+<div class="sliding-panel" id="list-panel">
+  <div class="panel-drag-bar"></div>
+  <div class="panel-content">
+    <h3 class="panel-title">Nearby Stations</h3>
+    <div class="list-content-wrapper" style="height:100%;min-height:0;display:flex;flex-direction:column;">
+      <ul id="list" style="flex:1 1 auto;min-height:0;height:100%;"></ul>
     </div>
   </div>
+</div>
 
-  <!-- List Panel -->
-  <div class="panel-overlay" id="list-overlay"></div>
-  <div class="sliding-panel" id="list-panel">
-    <div class="panel-drag-bar"></div>
-    <div class="panel-content">
-      <h3 class="panel-title">Nearby Stations</h3>
-      <div class="list-content-wrapper" style="height:100%;min-height:0;display:flex;flex-direction:column;">
-        <ul id="list" style="flex:1 1 auto;min-height:0;height:100%;"></ul>
-      </div>
-    </div>
+<!-- Feature Card Panel -->
+<div class="panel-overlay" id="feature-overlay"></div>
+<div class="sliding-panel" id="feature-panel">
+  <div class="panel-drag-bar"></div>
+  <div class="panel-content" id="feature-card-content">
+    <!-- Populated by JS with station details -->
   </div>
+</div>
 
-  <!-- Feature Card Panel -->
-  <div class="panel-overlay" id="feature-overlay"></div>
-  <div class="sliding-panel" id="feature-panel">
-    <div class="panel-drag-bar"></div>
-    <div class="panel-content" id="feature-card-content">
-      <!-- Populated by JS with station details -->
-    </div>
-  </div>
-
-  <script type="module" src="script.js"></script>
+<script type="module" src="script.js"></script>
 </body>
 </html>
