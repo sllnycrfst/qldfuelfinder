@@ -1333,3 +1333,39 @@ html, body {
     height: 40vh;
   }
 }
+
+/* Align the map type button to the right */
+.map-controls-wrapper {
+  right: 10px; /* Adjust as needed for alignment */
+}
+
+/* Move the zoom controls up by 40px */
+.custom-zoom-control {
+  margin-top: -40px; /* Moves the controls up */
+}
+
+/* Feature card logo adjustments */
+.station-logo-container {
+  background-size: cover; /* Ensures the logo fills the background more */
+  position: relative;
+}
+
+.station-logo-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4); /* Adjust shading color and transparency */
+  z-index: 2; /* Ensures the shading is on top of the logo */
+}
+
+.station-logo {
+  z-index: 1; /* Keeps the logo underneath the shading */
+}
+
+/* Use the same logos for the list */
+.station-item img {
+  object-fit: contain; /* Ensures logos maintain aspect ratio */
+}
