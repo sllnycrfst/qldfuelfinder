@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
     priceBox.className = 'marker-price';
     priceBox.style.cssText = `
       position: absolute;
-      top: -8px;
+      top: -10px;
       left: 50%;
       transform: translateX(-50%);
       background: ${isCheapest ? 'rgba(34, 197, 94, 0.95)' : 'rgba(0, 0, 0, 0.85)'};
@@ -357,8 +357,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!myMap) return;
     const currentRegion = myMap.region;
     const newSpan = new mapkit.CoordinateSpan(
-      currentRegion.span.latitudeDelta * 0.5,
-      currentRegion.span.longitudeDelta * 0.5
+      currentRegion.span.latitudeDelta * 0.2,
+      currentRegion.span.longitudeDelta * 0.2
     );
     myMap.region = new mapkit.CoordinateRegion(currentRegion.center, newSpan);
   };
