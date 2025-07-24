@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   mapkit.init({
     authorizationCallback: function(done) {
       // Replace with your actual JWT token
-      done("YOUR_MAPKIT_JS_TOKEN_HERE");
+      done("eyJraWQiOiJCTVQ1NzVTUFc5IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUyOTg5NjYyLCJvcmlnaW4iOiJzbGxueWNyZnN0LmdpdGh1Yi5pbyJ9.dF_WYx3PZly0Fo1dec9KYc1ZJAxRS_WO7pvyXq04Fr7kWVXGGuRFYgzeA3K7DvH2JZEwgB6V-gidn3HfPIXpQQ");
     }
   });
   
