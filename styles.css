@@ -758,7 +758,7 @@ html, body {
   z-index: 15000;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
   padding: 0 30px;
   padding-bottom: env(safe-area-inset-bottom);
