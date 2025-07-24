@@ -764,8 +764,7 @@ html, body {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-.sc-menu-item,
-.sc-center-btn {
+.sc-menu-item {
   width: 48px;
   height: 48px;
   display: flex;
@@ -780,13 +779,11 @@ html, body {
   border: none;
 }
 
-.sc-menu-item i,
-.sc-center-btn i {
+.sc-menu-item i {
   font-size: 24px;
 }
 
-.sc-menu-item:hover,
-.sc-center-btn:hover {
+.sc-menu-item:hover {
   background: rgba(255, 255, 255, 0.25);
   box-shadow: 
     0 4px 16px rgba(0, 0, 0, 0.08),
@@ -795,17 +792,65 @@ html, body {
   color: #387CC2;
 }
 
-.sc-menu-item:active,
-.sc-center-btn:active {
+.sc-menu-item:active {
   transform: translateY(0) scale(0.95);
 }
 
-.sc-menu-item:focus,
-.sc-center-btn:focus {
+.sc-menu-item:focus {
   outline: none;
 }
 
 .sc-current {
+  color: #387CC2;
+  background: rgba(56, 124, 194, 0.15);
+  box-shadow: 
+    0 2px 8px rgba(56, 124, 194, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* ========== CENTER BUTTON (positioned in middle of toolbar) ========== */
+.sc-center-btn {
+  position: fixed;
+  bottom: 31px; /* Center it vertically in the 70px toolbar */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  color: #3b4664;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  z-index: 15001; /* Above the toolbar */
+}
+
+.sc-center-btn i {
+  font-size: 24px;
+}
+
+.sc-center-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transform: translateX(-50%) translateY(-2px);
+  color: #387CC2;
+}
+
+.sc-center-btn:active {
+  transform: translateX(-50%) scale(0.95);
+}
+
+.sc-center-btn:focus {
+  outline: none;
+}
+
+.sc-center-btn.sc-current {
   color: #387CC2;
   background: rgba(56, 124, 194, 0.15);
   box-shadow: 
@@ -1026,6 +1071,10 @@ html, body {
     width: calc(100% - 20px);
     height: 64px;
     padding: 0 25px;
+  }
+  
+  .sc-center-btn {
+    bottom: 18px; /* Adjust for smaller mobile toolbar */
   }
   
   .panel-drag-bar::before {
