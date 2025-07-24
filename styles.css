@@ -1192,7 +1192,7 @@ padding: 0 15px;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  border-radius: 50px;
+  border-radius: 50px !important;
   width: calc(100% - 40px);
   max-width: 400px;
   height: 70px;
@@ -1323,6 +1323,6 @@ padding: 0 15px;
   }
   
   .sc-center-btn {
-    bottom: calc(10px + 3.5px);
+    bottom: calc(15px + 3.5px);
   }
 }
