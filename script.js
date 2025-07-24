@@ -291,7 +291,7 @@ document.addEventListener("DOMContentLoaded", () => {
         center: new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng),
         region: new mapkit.CoordinateRegion(
           new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng),
-          new mapkit.CoordinateSpan(0.2, 0.2)
+          new mapkit.CoordinateSpan(0.1, 0.1)
         ),
         mapType: mapkit.Map.MapTypes.Standard,
         showsMapTypeControl: false,
@@ -357,8 +357,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!myMap) return;
     const currentRegion = myMap.region;
     const newSpan = new mapkit.CoordinateSpan(
-      currentRegion.span.latitudeDelta * 0.1,
-      currentRegion.span.longitudeDelta * 0.1
+      currentRegion.span.latitudeDelta * 0.05,
+      currentRegion.span.longitudeDelta * 0.05
     );
     myMap.region = new mapkit.CoordinateRegion(currentRegion.center, newSpan);
   };
@@ -367,8 +367,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!myMap) return;
     const currentRegion = myMap.region;
     const newSpan = new mapkit.CoordinateSpan(
-      currentRegion.span.latitudeDelta * 1.0,
-      currentRegion.span.longitudeDelta * 1.0
+      currentRegion.span.latitudeDelta * 0.8,
+      currentRegion.span.longitudeDelta * 0.8
     );
     myMap.region = new mapkit.CoordinateRegion(currentRegion.center, newSpan);
   };
