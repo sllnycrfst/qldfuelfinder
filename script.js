@@ -4,13 +4,11 @@ import { QLD_SUBURBS } from './data/qld-suburbs.js';
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Script loaded!");
   
-  // Initialize MapKit with your team ID and key ID
-  // You'll need to replace these with your actual Apple Developer credentials
+  // Initialize MapKit with your token
   mapkit.init({
     authorizationCallback: function(done) {
-      // You'll need to implement server-side JWT token generation
-      // For now, using a placeholder - you'll need to get this from Apple Developer
-      done("eyJraWQiOiJCTVQ1NzVTUFc5IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUyOTg5NjYyLCJvcmlnaW4iOiJzbGxueWNyZnN0LmdpdGh1Yi5pbyJ9.dF_WYx3PZly0Fo1dec9KYc1ZJAxRS_WO7pvyXq04Fr7kWVXGGuRFYgzeA3K7DvH2JZEwgB6V-gidn3HfPIXpQQ");
+      // Replace with your actual JWT token
+      done("YOUR_MAPKIT_JS_TOKEN_HERE");
     }
   });
   
@@ -27,67 +25,17 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // Brand logos for stations
   const BRAND_LOGOS = {
-    2: "images/2.png",       // Caltex
-    5: "images/5.png",       // BP
-    20: "images/20.png",     // Shell
-    113: "images/113.png",   // 7-Eleven
-    5094: "images/5094.png", // Puma
-    57: "images/57.png",     // Metro
-    23: "images/23.png",     // United
-    110: "images/110.png",   // Freedom
-    111: "images/111.png",   // Coles
-    86: "images/86.png",     // Liberty
-    3421066: "images/3421066.png", // Ampol
-    3421073: "images/3421073.png", // EG Ampol
-    3421139: "images/3421139.png", // Pearl
-    3421193: "images/3421193.png", // Reddy Express
-    2031031: "images/2031031.png", // Costco
-    2418994: "images/2418994.png", // Pacific
-    169: "images/169.png",   // OTR
-    16: "images/16.png",     // Mobil
-    26: "images/26.png",
-    114: "images/114.png",
-    167: "images/167.png",
-    2419037: "images/2419037.png",
-    3421028: "images/3421028.png",
-    3421162: "images/3421162.png",
-    3421183: "images/3421183.png",
-    3421202: "images/3421202.png",
-    12: "images/default.png" // Default for Independent/Unknown
+    2: "images/2.png", 5: "images/5.png", 20: "images/20.png", 113: "images/113.png",
+    5094: "images/5094.png", 57: "images/57.png", 23: "images/23.png", 110: "images/110.png",
+    111: "images/111.png", 86: "images/86.png", 3421066: "images/3421066.png", 
+    3421073: "images/3421073.png", 3421139: "images/3421139.png", 3421193: "images/3421193.png",
+    2031031: "images/2031031.png", 2418994: "images/2418994.png", 169: "images/169.png",
+    16: "images/16.png", 26: "images/26.png", 114: "images/114.png", 167: "images/167.png",
+    2419037: "images/2419037.png", 3421028: "images/3421028.png", 3421162: "images/3421162.png",
+    3421183: "images/3421183.png", 3421202: "images/3421202.png", 12: "images/default.png"
   };
   
-  // Helper function to get brand logo
-  const getBrandLogo = (brandId) => {
-    return BRAND_LOGOS[brandId] || BRAND_LOGOS[12]; // Default to generic logo
-  };
-  
-  // Create custom marker annotation with MapKit
-  function createCustomMarkerAnnotation(site, price, isCheapest = false) {
-    const priceText = (price / 10).toFixed(1);
-    const logoUrl = getBrandLogo(site.B);
-    
-    // Create annotation
-    const annotation = new mapkit.MarkerAnnotation(
-      new mapkit.Coordinate(site.Lat, site.Lng),
-      {
-        color: isCheapest ? "#22C55E" : "#387CC2",
-        title: site.N,
-        subtitle: `${priceText}c - ${site.A}`,
-        data: {
-          site: site,
-          price: price,
-          isCheapest: isCheapest
-        }
-      }
-    );
-    
-    // Custom appearance using DOM element
-    annotation.appearance = {
-      markerAnimationType: mapkit.Annotation.AnimationType.Rise
-    };
-    
-    return annotation;
-  }
+  const getBrandLogo = (brandId) => BRAND_LOGOS[brandId] || BRAND_LOGOS[12];
   
   const BRAND_NAMES = {
     2: "Caltex", 5: "BP", 7: "Budget", 12: "Independent", 16: "Mobil", 20: "Shell", 
@@ -102,11 +50,8 @@ document.addEventListener("DOMContentLoaded", () => {
     3421202: "Atlas", 3421204: "Woodham", 3421207: "Tas Petroleum"
   };
   
-  // Device detection for navigation
-  const isAppleDevice = () => {
-    return /iPad|iPhone|iPod|Mac/.test(navigator.userAgent) || 
-           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  };
+  const isAppleDevice = () => /iPad|iPhone|iPod|Mac/.test(navigator.userAgent) || 
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   
   const bannedStations = ["Stargazers Yarraman"];
   
@@ -118,8 +63,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentFuel = localStorage.getItem('preferredFuel') || "E10";
   let userLocation = null;
   let cheapestStationId = null;
-  let currentAnnotations = []; // Track current annotations for cleanup
-  let userLocationAnnotation = null; // Track user location annotation
+  let currentAnnotations = [];
+  let userLocationAnnotation = null;
   
   // Create postcode to suburb mapping
   const postcodeToSuburb = {};
@@ -130,10 +75,9 @@ document.addEventListener("DOMContentLoaded", () => {
     postcodeToSuburb[suburb.postcode].push(suburb.suburb);
   });
   
-  // Helper function to get suburb name from postcode
   const getSuburbName = (postcode) => {
     const suburbs = postcodeToSuburb[postcode];
-    return suburbs ? suburbs[0] : postcode; // Return first suburb or postcode if not found
+    return suburbs ? suburbs[0] : postcode;
   };
   
   // --- User Preferences ---
@@ -154,24 +98,78 @@ document.addEventListener("DOMContentLoaded", () => {
     return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
   };
   
+  // Check if coordinate is in visible region
+  function isCoordinateInVisibleRegion(lat, lng) {
+    const visibleRegion = myMap.visibleMapRect;
+    const coordinate = new mapkit.Coordinate(lat, lng);
+    
+    // Convert coordinate to map point for bounds checking
+    const region = myMap.region;
+    const centerLat = region.center.latitude;
+    const centerLng = region.center.longitude;
+    const latDelta = region.span.latitudeDelta;
+    const lngDelta = region.span.longitudeDelta;
+    
+    const minLat = centerLat - latDelta / 2;
+    const maxLat = centerLat + latDelta / 2;
+    const minLng = centerLng - lngDelta / 2;
+    const maxLng = centerLng + lngDelta / 2;
+    
+    return lat >= minLat && lat <= maxLat && lng >= minLng && lng <= maxLng;
+  }
+  
   // --- Apple Maps MapKit JS Initialization ---
-  myMap = new mapkit.Map("map", {
-    center: new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng),
-    region: new mapkit.CoordinateRegion(
-      new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng),
-      new mapkit.CoordinateSpan(0.5, 0.5) // Roughly equivalent to zoom 14
-    ),
-    mapType: mapkit.Map.MapTypes.Standard,
-    showsMapTypeControl: false,
-    showsZoomControl: false,
-    showsUserLocationControl: false,
-    showsCompass: mapkit.FeatureVisibility.Hidden,
-    showsScale: mapkit.FeatureVisibility.Hidden,
-    showsPointsOfInterest: false
-  });
+  setTimeout(() => {
+    try {
+      myMap = new mapkit.Map("map", {
+        center: new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng),
+        region: new mapkit.CoordinateRegion(
+          new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng),
+          new mapkit.CoordinateSpan(0.5, 0.5)
+        ),
+        mapType: mapkit.Map.MapTypes.Standard,
+        showsMapTypeControl: false,
+        showsZoomControl: false,
+        showsUserLocationControl: false,
+        showsCompass: mapkit.FeatureVisibility.Hidden,
+        showsScale: mapkit.FeatureVisibility.Hidden,
+        showsPointsOfInterest: false
+      });
+      
+      console.log("Map initialized successfully");
+      
+      // Add map event listeners after map is created
+      myMap.addEventListener('region-change-end', () => {
+        console.log("Map region changed");
+        clearTimeout(window.boundsUpdateTimeout);
+        window.boundsUpdateTimeout = setTimeout(() => {
+          updateVisibleStationsAndList();
+        }, 300);
+      });
+      
+      // Weather update on center change
+      myMap.addEventListener('region-change-end', () => {
+        clearTimeout(window.weatherUpdateTimeout);
+        window.weatherUpdateTimeout = setTimeout(() => {
+          const center = myMap.center;
+          if (center) {
+            fetchWeather(center.latitude, center.longitude);
+          }
+        }, 1000);
+      });
+      
+      // Initialize after map is ready
+      fetchSitesAndPrices();
+      
+    } catch (error) {
+      console.error("Map initialization failed:", error);
+      alert("MapKit initialization failed. Check your authentication token.");
+    }
+  }, 100);
   
   // Custom control functions
   window.changeMapType = function(type) {
+    if (!myMap) return;
     switch(type) {
       case 'roadmap':
         myMap.mapType = mapkit.Map.MapTypes.Standard;
@@ -183,53 +181,70 @@ document.addEventListener("DOMContentLoaded", () => {
         myMap.mapType = mapkit.Map.MapTypes.Hybrid;
         break;
       case 'terrain':
-        myMap.mapType = mapkit.Map.MapTypes.Standard; // MapKit doesn't have terrain, use standard
+        myMap.mapType = mapkit.Map.MapTypes.Standard;
         break;
     }
     document.getElementById('maptype-dropdown').classList.remove('show');
   };
   
+  window.zoomIn = function() {
+    if (!myMap) return;
+    const currentRegion = myMap.region;
+    const newSpan = new mapkit.CoordinateSpan(
+      currentRegion.span.latitudeDelta * 0.5,
+      currentRegion.span.longitudeDelta * 0.5
+    );
+    myMap.region = new mapkit.CoordinateRegion(currentRegion.center, newSpan);
+  };
+  
+  window.zoomOut = function() {
+    if (!myMap) return;
+    const currentRegion = myMap.region;
+    const newSpan = new mapkit.CoordinateSpan(
+      currentRegion.span.latitudeDelta * 2.0,
+      currentRegion.span.longitudeDelta * 2.0
+    );
+    myMap.region = new mapkit.CoordinateRegion(currentRegion.center, newSpan);
+  };
+  
   // Map type dropdown toggle
-  document.getElementById('maptype-btn').addEventListener('click', function(e) {
+  document.getElementById('maptype-btn')?.addEventListener('click', function(e) {
     e.stopPropagation();
     document.getElementById('maptype-dropdown').classList.toggle('show');
   });
   
-  // Close dropdown when clicking outside
   document.addEventListener('click', function() {
-    document.getElementById('maptype-dropdown').classList.remove('show');
+    document.getElementById('maptype-dropdown')?.classList.remove('show');
   });
 
   // --- User Location Annotation ---
   function createUserLocationAnnotation(lat, lng) {
-    // Remove existing user location annotation
+    if (!myMap) return;
+    
     if (userLocationAnnotation) {
       myMap.removeAnnotation(userLocationAnnotation);
     }
     
-    // Create user location annotation
     userLocationAnnotation = new mapkit.MarkerAnnotation(
       new mapkit.Coordinate(lat, lng),
       {
         color: "#007AFF",
-        title: "Your Location",
-        animationType: mapkit.Annotation.AnimationType.Rise
+        title: "Your Location"
       }
     );
     
     myMap.addAnnotation(userLocationAnnotation);
+    console.log("User location annotation added");
   }
 
   // --- Weather API ---
   async function fetchWeather(lat = BRISBANE_COORDS.lat, lng = BRISBANE_COORDS.lng) {
     try {
       const weatherIcons = {
-        '0': '☀️', '1': '🌤️', '2': '⛅', '3': '☁️',
-        '45': '☁️', '48': '☁️', '51': '🌦️', '53': '🌦️',
-        '55': '🌦️', '61': '🌧️', '63': '🌧️', '65': '🌧️',
-        '71': '🌨️', '73': '🌨️', '75': '🌨️', '77': '🌨️',
-        '80': '🌦️', '81': '🌦️', '82': '🌧️', '85': '🌨️',
-        '86': '🌨️', '95': '⛈️', '96': '⛈️', '99': '⛈️'
+        '0': '☀️', '1': '🌤️', '2': '⛅', '3': '☁️', '45': '☁️', '48': '☁️', 
+        '51': '🌦️', '53': '🌦️', '55': '🌦️', '61': '🌧️', '63': '🌧️', '65': '🌧️',
+        '71': '🌨️', '73': '🌨️', '75': '🌨️', '77': '🌨️', '80': '🌦️', '81': '🌦️', 
+        '82': '🌧️', '85': '🌨️', '86': '🌨️', '95': '⛈️', '96': '⛈️', '99': '⛈️'
       };
       
       const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current_weather=true`);
@@ -247,7 +262,6 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       console.log("Fetching sites and prices...");
       
-      // QLD data only
       const [siteRes, priceRes] = await Promise.all([
         fetch("data/sites.json").then(r => r.json()),
         fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
@@ -263,23 +277,19 @@ document.addEventListener("DOMContentLoaded", () => {
         p => FUEL_TYPES.some(f => f.id === p.FuelId || (f.altId && f.altId === p.FuelId)) && isValidPrice(p.Price)
       );
       
-      // Log diesel prices for debugging
-      const dieselPrices = allPrices.filter(p => p.FuelId === 3 || p.FuelId === 14);
-      console.log("Diesel prices found:", dieselPrices.length, "(Regular:", dieselPrices.filter(p => p.FuelId === 3).length, "Premium:", dieselPrices.filter(p => p.FuelId === 14).length, ")");
-      
       priceMap = {};
       allPrices.forEach(p => {
         if (!priceMap[p.SiteId]) priceMap[p.SiteId] = {};
         priceMap[p.SiteId][p.FuelId] = p.Price;
       });
       
-      // Find cheapest station
       findCheapestStation();
-      
       console.log("Data processed. Sites:", allSites.length, "Prices:", allPrices.length);
       
+      // Initial update
       updateVisibleStationsAndList();
       await fetchWeather();
+      
     } catch (err) {
       console.error("Error loading sites/prices:", err);
     }
@@ -289,14 +299,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function findCheapestStation() {
     const fuel = FUEL_TYPES.find(f => f.key === currentFuel);
     let cheapestPrice = Infinity;
-    cheapestStationId = null; // Reset cheapest station
-    
-    console.log("Finding cheapest for fuel:", fuel.label, "ID:", fuel.id, "Alt ID:", fuel.altId);
-    let stationsWithFuel = 0;
+    cheapestStationId = null;
     
     allSites.forEach(site => {
       let price;
-      if (fuel.altId) { // Diesel/Premium Diesel
+      if (fuel.altId) {
         const dieselPrice = priceMap[site.S]?.[fuel.id];
         const premiumDieselPrice = priceMap[site.S]?.[fuel.altId];
         price = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);
@@ -305,40 +312,42 @@ document.addEventListener("DOMContentLoaded", () => {
         price = priceMap[site.S]?.[fuel.id];
       }
       
-      if (price) {
-        stationsWithFuel++;
-        if (price < cheapestPrice) {
-          cheapestPrice = price;
-          cheapestStationId = site.S;
-        }
+      if (price && price < cheapestPrice) {
+        cheapestPrice = price;
+        cheapestStationId = site.S;
       }
     });
     
-    console.log("Cheapest station:", cheapestStationId, "Price:", cheapestPrice, "Stations with fuel:", stationsWithFuel);
+    console.log("Cheapest station:", cheapestStationId, "Price:", cheapestPrice);
   }
 
   // --- Map Annotations ---
   function updateVisibleStationsAndList() {
+    if (!myMap) {
+      console.log("Map not ready yet");
+      return;
+    }
+    
     console.log("Updating stations and list...");
     
     // Clear existing annotations
-    myMap.removeAnnotations(currentAnnotations);
-    currentAnnotations = [];
+    if (currentAnnotations.length > 0) {
+      myMap.removeAnnotations(currentAnnotations);
+      currentAnnotations = [];
+    }
     
-    const visibleRegion = myMap.visibleMapRect;
     const visibleStations = [];
-    
-    // Find cheapest station among visible ones
     let cheapestVisiblePrice = Infinity;
     let cheapestVisibleStationId = null;
     
-    // First pass: find all visible stations and their cheapest price
+    // Find all visible stations
     allSites.forEach(site => {
-      const coordinate = new mapkit.Coordinate(site.Lat, site.Lng);
+      if (!isCoordinateInVisibleRegion(site.Lat, site.Lng)) return;
+      
       const fuel = FUEL_TYPES.find(f => f.key === currentFuel);
       let price;
       
-      if (fuel.altId) { // Diesel/Premium Diesel
+      if (fuel.altId) {
         const dieselPrice = priceMap[site.S]?.[fuel.id];
         const premiumDieselPrice = priceMap[site.S]?.[fuel.altId];
         price = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);
@@ -347,7 +356,7 @@ document.addEventListener("DOMContentLoaded", () => {
         price = priceMap[site.S]?.[fuel.id];
       }
       
-      if (!price || !mapkit.MapRect.containsCoordinate(visibleRegion, coordinate)) return;
+      if (!price) return;
       
       visibleStations.push({ site, price });
       
@@ -357,25 +366,39 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
     
-    // Second pass: create annotations with correct cheapest highlighting
+    console.log("Found", visibleStations.length, "visible stations");
+    
+    // Create annotations
     visibleStations.forEach(({ site, price }) => {
       const isCheapest = site.S === cheapestVisibleStationId;
+      const priceText = (price / 10).toFixed(1);
       
-      console.log(`Station ${site.N}: Price ${price}, isCheapest: ${isCheapest}`);
-      
-      // Create the custom annotation
-      const annotation = createCustomMarkerAnnotation(site, price, isCheapest);
-      
-      // Add click listener via delegation
-      annotation.addEventListener('select', () => {
-        showFeatureCard(site, price);
-      });
+      const annotation = new mapkit.MarkerAnnotation(
+        new mapkit.Coordinate(site.Lat, site.Lng),
+        {
+          color: isCheapest ? "#22C55E" : "#387CC2",
+          title: site.N,
+          subtitle: `${priceText}c - ${site.A}`,
+          data: { site, price, isCheapest }
+        }
+      );
       
       currentAnnotations.push(annotation);
     });
     
-    // Add all annotations to map
-    myMap.addAnnotations(currentAnnotations);
+    // Add all annotations at once
+    if (currentAnnotations.length > 0) {
+      myMap.addAnnotations(currentAnnotations);
+      console.log("Added", currentAnnotations.length, "annotations");
+    }
+    
+    // Handle annotation selection
+    myMap.addEventListener('select', (event) => {
+      const annotation = event.target;
+      if (annotation.data) {
+        showFeatureCard(annotation.data.site, annotation.data.price);
+      }
+    });
     
     updateList(visibleStations);
   }
@@ -386,8 +409,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!list) return;
     
     list.innerHTML = '';
-    
-    // Sort by price
     stations.sort((a, b) => a.price - b.price);
     
     stations.slice(0, 50).forEach(({ site, price }) => {
@@ -398,7 +419,6 @@ document.addEventListener("DOMContentLoaded", () => {
         getDistance(userLocation.lat, userLocation.lng, site.Lat, site.Lng).toFixed(1) : '?';
       const isCheapest = site.S === cheapestStationId;
 
-      // Build the structure matching the CSS
       li.innerHTML = `
         <img class="list-item-logo" src="${getBrandLogo(site.B)}" alt="Brand logo" onerror="this.src='images/default.png'" />
         <div class="list-item-details">
@@ -418,6 +438,8 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       list.appendChild(li);
     });
+    
+    console.log("Updated list with", stations.length, "stations");
   }
   
   // --- Feature Card ---
@@ -425,31 +447,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const content = document.getElementById('feature-card-content');
     const isCheapest = site.S === cheapestStationId;
     
-    // Find cheapest visible station price
-    const visibleRegion = myMap.visibleMapRect;
-    let cheapestVisiblePrice = Infinity;
-    allSites.forEach(s => {
-      const coordinate = new mapkit.Coordinate(s.Lat, s.Lng);
-      if (mapkit.MapRect.containsCoordinate(visibleRegion, coordinate)) {
-        const fuel = FUEL_TYPES.find(f => f.key === currentFuel);
-        let p;
-        if (fuel.altId) {
-          const dieselPrice = priceMap[s.S]?.[fuel.id];
-          const premiumDieselPrice = priceMap[s.S]?.[fuel.altId];
-          p = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);
-          if (p === Infinity) p = null;
-        } else {
-          p = priceMap[s.S]?.[fuel.id];
-        }
-        if (p && p < cheapestVisiblePrice) {
-          cheapestVisiblePrice = p;
-        }
-      }
-    });
-    
     const allPrices = FUEL_TYPES.map(fuel => {
       let p;
-      if (fuel.altId) { // Diesel
+      if (fuel.altId) {
         const dieselPrice = priceMap[site.S]?.[fuel.id];
         const premiumDieselPrice = priceMap[site.S]?.[fuel.altId];
         p = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);
@@ -457,13 +457,11 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         p = priceMap[site.S]?.[fuel.id];
       }
-      const isCurrentFuelCheapest = fuel.key === currentFuel && p === cheapestVisiblePrice;
-      // Change label for diesel types
       const displayLabel = (fuel.key === 'Diesel') ? 'Diesel' : fuel.fullName;
       return p ? `
-        <div class="fuel-price-row" data-fuel="${fuel.key}" data-price="${p}" data-fuel-name="${fuel.fullName}">
+        <div class="fuel-price-row">
           <span class="fuel-type-label">${displayLabel}</span>
-          <span class="fuel-type-price ${isCurrentFuelCheapest ? 'cheapest' : ''}">${(p / 10).toFixed(1)}</span>
+          <span class="fuel-type-price">${(p / 10).toFixed(1)}</span>
         </div>
       ` : '';
     }).filter(Boolean).join('');
@@ -496,12 +494,10 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="fuel-prices-grid">${allPrices}</div>
     `;
     
-    // Add event listeners
     setTimeout(() => {
       const directionsIcon = content.querySelector('.directions-icon');
       const navMenu = content.querySelector('#nav-menu');
      
-      // Directions icon
       if (directionsIcon) {
         directionsIcon.addEventListener('click', (e) => {
           e.preventDefault();
@@ -510,7 +506,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
       
-      // Navigation menu items
       content.querySelectorAll('.nav-menu-item').forEach(item => {
         item.addEventListener('click', (e) => {
           e.preventDefault();
@@ -522,21 +517,12 @@ document.addEventListener("DOMContentLoaded", () => {
           navMenu.classList.remove('show');
         });
       });
-      
-      // Close nav menu when clicking outside
-      document.addEventListener('click', (e) => {
-        if (!directionsIcon.contains(e.target) && !navMenu.contains(e.target)) {
-          navMenu.classList.remove('show');
-        }
-      });
     }, 100);
     
     openPanel('feature');
   }
   
   // --- Navigation Functions ---
-  
-  // Navigate with specific app
   function navigateWithApp(app, lat, lng) {
     switch(app) {
       case 'apple':
@@ -551,73 +537,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
   
-  // External navigation with app choice
-  function navigateExternal(lat, lng) {
-    // Check what's available
-    const isApple = isAppleDevice();
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    if (!isMobile) {
-      // Desktop - just open Google Maps in browser
-      window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
-      return;
-    }
-    
-    // Mobile device
-    if (isApple) {
-      // iOS device - ask user preference
-      const choice = confirm('Open in Apple Maps?\n\nOK = Apple Maps\nCancel = Google Maps');
-      if (choice) {
-        window.open(`maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`);
-      } else {
-        window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
-      }
-    } else {
-      // Android - just use Google Maps
-      window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
-    }
-  }
-  
-  // Zoom functions for MapKit
-  window.zoomIn = function() {
-    const currentRegion = myMap.region;
-    const newSpan = new mapkit.CoordinateSpan(
-      currentRegion.span.latitudeDelta * 0.5,
-      currentRegion.span.longitudeDelta * 0.5
-    );
-    myMap.region = new mapkit.CoordinateRegion(currentRegion.center, newSpan);
-  };
-  
-  window.zoomOut = function() {
-    const currentRegion = myMap.region;
-    const newSpan = new mapkit.CoordinateSpan(
-      currentRegion.span.latitudeDelta * 2.0,
-      currentRegion.span.longitudeDelta * 2.0
-    );
-    myMap.region = new mapkit.CoordinateRegion(currentRegion.center, newSpan);
-  };
-  
   // Make functions global
   window.navigateWithApp = navigateWithApp;
-  window.navigateExternal = navigateExternal;
   
   // --- Panel Management ---
   function openPanel(panelName) {
-    // Close all panels first
     document.querySelectorAll('.sliding-panel').forEach(p => {
       p.classList.remove('open');
-      p.style.transform = 'translateX(-50%) translateY(130%)'; // Reset position
+      p.style.transform = 'translateX(-50%) translateY(130%)';
     });
     document.querySelectorAll('.panel-overlay').forEach(o => o.classList.remove('active'));
     
-    // Open the requested panel
     const panel = document.getElementById(`${panelName}-panel`);
     const overlay = document.getElementById(`${panelName}-overlay`);
     
     if (panel && overlay) {
       panel.classList.add('open');
       overlay.classList.add('active');
-      panel.style.transform = 'translateX(-50%) translateY(0)'; // Ensure it's visible
+      panel.style.transform = 'translateX(-50%) translateY(0)';
       initializeDrag(panel);
     }
   }
@@ -625,7 +562,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function closeAllPanels() {
     document.querySelectorAll('.sliding-panel').forEach(p => {
       p.classList.remove('open');
-      p.style.transform = 'translateX(-50%) translateY(130%)'; // Reset to hidden position
+      p.style.transform = 'translateX(-50%) translateY(130%)';
     });
     document.querySelectorAll('.panel-overlay').forEach(o => o.classList.remove('active'));
   }
@@ -644,27 +581,22 @@ document.addEventListener("DOMContentLoaded", () => {
     let initialTranslateY = 0;
     
     function handleStart(e) {
-      // Only handle if this panel is currently open
       if (!panel.classList.contains('open')) return;
       
-      // Check if the touch/click is within the drag bar area
       const rect = dragBar.getBoundingClientRect();
       const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
       const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
       
-      // Extended touch area for mobile (30px above, 15px below drag bar)
       const extendedTop = rect.top - 30;
       const extendedBottom = rect.bottom + 15;
       const extendedLeft = rect.left - 50;
       const extendedRight = rect.right + 50;
       
-      // Only start dragging if touch/click is in the extended drag bar area
       if (clientY < extendedTop || clientY > extendedBottom || 
           clientX < extendedLeft || clientX > extendedRight) {
         return;
       }
       
-      // Clean up any existing drag handlers
       if (currentDragPanel && currentDragPanel !== panel) {
         cleanupDragHandlers();
       }
@@ -688,7 +620,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
       currentY = clientY - startY;
       
-      // Only allow dragging down (positive currentY)
       if (currentY < 0) {
         currentY = 0;
         return;
@@ -710,24 +641,19 @@ document.addEventListener("DOMContentLoaded", () => {
       const threshold = window.innerHeight * 0.2;
       
       if (currentY > threshold) {
-        // Drag down - close panel
         closeAllPanels();
       } else {
-        // Snap back to normal position
         panel.style.transform = 'translateX(-50%) translateY(0)';
       }
       
       currentY = 0;
     }
     
-    // Store handlers for cleanup
     dragHandlers = { start: handleStart, move: handleMove, end: handleEnd };
     
-    // Prevent content scrolling from interfering
     const panelContent = panel.querySelector('.panel-content');
     if (panelContent) {
       panelContent.addEventListener('touchstart', (e) => {
-        // Only stop propagation if not in drag bar area
         const rect = dragBar.getBoundingClientRect();
         const clientY = e.touches[0].clientY;
         if (clientY > rect.bottom + 15) {
@@ -752,7 +678,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
   
-  // Set up global drag event listeners
   function setupGlobalDragListeners() {
     document.addEventListener('touchstart', (e) => {
       const openPanel = document.querySelector('.sliding-panel.open');
@@ -794,15 +719,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   
   // --- Event Listeners ---
-  
-  // Search functionality
   const searchInput = document.getElementById('search-input');
   const suburbList = document.getElementById('suburb-list');
   
-  // Show all suburbs by default
   function showAllSuburbs() {
-    const sortedSuburbs = QLD_SUBURBS
-      .sort((a, b) => a.suburb.localeCompare(b.suburb));
+    const sortedSuburbs = QLD_SUBURBS.sort((a, b) => a.suburb.localeCompare(b.suburb));
     
     suburbList.innerHTML = '';
     sortedSuburbs.forEach(suburb => {
@@ -819,7 +740,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   
   if (searchInput && suburbList) {
-    // Show all suburbs initially
     showAllSuburbs();
     
     searchInput.addEventListener('input', e => {
@@ -829,14 +749,12 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       
-      // Search through suburb names
       const matchingSuburbs = QLD_SUBURBS
         .filter(suburb => suburb.suburb.toLowerCase().includes(query))
         .sort((a, b) => a.suburb.localeCompare(b.suburb));
       
       suburbList.innerHTML = '';
       
-      // Add matching suburbs
       matchingSuburbs.forEach(suburb => {
         const li = document.createElement('li');
         li.className = 'suburb-list-item';
@@ -851,8 +769,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
   
-  // Global search function
   window.searchSuburb = function(suburbName, postcode) {
+    if (!myMap) return;
+    
     const sites = allSites.filter(s => s.P === postcode);
     if (sites.length > 0) {
       const avgLat = sites.reduce((sum, s) => sum + s.Lat, 0) / sites.length;
@@ -864,7 +783,6 @@ document.addEventListener("DOMContentLoaded", () => {
       );
       closeAllPanels();
     } else {
-      // If no sites found with exact postcode, try to find the suburb in our mapping
       const suburbData = QLD_SUBURBS.find(s => s.suburb.toLowerCase() === suburbName.toLowerCase());
       if (suburbData) {
         myMap.center = new mapkit.Coordinate(suburbData.lat, suburbData.lng);
@@ -882,7 +800,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const fuelContent = document.getElementById('fuel-dropdown-content');
   
   if (fuelBtn && fuelContent) {
-    // Populate fuel types
     FUEL_TYPES.forEach(fuel => {
       const item = document.createElement('div');
       item.className = 'fuel-dropdown-item';
@@ -923,12 +840,12 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   
   document.getElementById('toolbar-center-btn')?.addEventListener('click', () => {
-    // Navigate to user's location or default Brisbane location
+    if (!myMap) return;
+    
     if (userLocation) {
       myMap.center = new mapkit.Coordinate(userLocation.lat, userLocation.lng);
       createUserLocationAnnotation(userLocation.lat, userLocation.lng);
     } else {
-      // Try to get location again if not available
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           position => {
@@ -941,7 +858,6 @@ document.addEventListener("DOMContentLoaded", () => {
           },
           error => {
             console.log("Location error:", error);
-            // Fallback to Brisbane
             myMap.center = new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng);
           }
         );
@@ -965,26 +881,6 @@ document.addEventListener("DOMContentLoaded", () => {
     overlay.addEventListener('click', closeAllPanels);
   });
   
-  // Map events - use MapKit event listeners
-  myMap.addEventListener('region-change-end', () => {
-    // Debounce the update to avoid too many calls
-    clearTimeout(window.boundsUpdateTimeout);
-    window.boundsUpdateTimeout = setTimeout(() => {
-      updateVisibleStationsAndList();
-    }, 300);
-  });
-  
-  // Update weather when map center changes
-  myMap.addEventListener('region-change-end', () => {
-    clearTimeout(window.weatherUpdateTimeout);
-    window.weatherUpdateTimeout = setTimeout(() => {
-      const center = myMap.center;
-      if (center) {
-        fetchWeather(center.latitude, center.longitude);
-      }
-    }, 1000); // Longer delay for weather updates
-  });
-  
   // Get user location
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
@@ -993,19 +889,18 @@ document.addEventListener("DOMContentLoaded", () => {
           lat: position.coords.latitude,
           lng: position.coords.longitude
         };
-        myMap.center = new mapkit.Coordinate(userLocation.lat, userLocation.lng);
-        createUserLocationAnnotation(userLocation.lat, userLocation.lng);
+        if (myMap) {
+          myMap.center = new mapkit.Coordinate(userLocation.lat, userLocation.lng);
+          createUserLocationAnnotation(userLocation.lat, userLocation.lng);
+        }
       },
       error => console.log("Location error:", error)
     );
   }
   
-  // Make functions global for onclick handlers
+  // Make functions global
   window.showFeatureCard = showFeatureCard;
   
   // Initialize drag functionality
   setupGlobalDragListeners();
-  
-  // Initialize
-  fetchSitesAndPrices();
 });
