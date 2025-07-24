@@ -827,6 +827,7 @@ html, body {
     inset 0 0 0 1px rgba(255, 255, 255, 0.4);
 }
 
+.sc-bottom-bar,
 .directions-info {
   background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(24px) saturate(50%);
@@ -937,6 +938,7 @@ html, body {
   text-align: right;
   flex-shrink: 0;
 }
+
 ​​​​​​​​​​​​​​​​
 /* ========== BOTTOM TOOLBAR ========== */
 .sc-bottom-bar {
@@ -946,11 +948,11 @@ html, body {
   transform: translateX(-50%);
   border-radius: 50px !important;
   width: calc(100% - 40px);
-  max-width: 500px;
+  max-width: 400px;
   height: 70px;
   background: rgba(255, 255, 255, 0.15) !important;
-  backdrop-filter: blur(32px) saturate(50%) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(50%) !important;
+  backdrop-filter: blur(32px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
   box-shadow: 
     0 16px 64px rgba(0, 0, 0, 0.25),
     0 8px 32px rgba(0, 0, 0, 0.15),
@@ -1006,6 +1008,7 @@ html, body {
 /* ========== CENTER BUTTON (back in the middle but styled like others) ========== */
 .sc-center-btn {
   position: fixed;
+  bottom: calc(32px + 6px);
   left: 50%;
   transform: translateX(-50%);
   width: 48px;
