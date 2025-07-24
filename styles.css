@@ -312,7 +312,7 @@ html, body {
   position: absolute;
   bottom: 0;
   left: 50%;
-  transform: translateX(-50%) rotate(-45deg);
+  transform: translateX(-50%);
   width: 40px;
   height: 40px;
   background: #387CC2;
@@ -1049,8 +1049,8 @@ html, body {
 /* ========== CUSTOM MARKERS ========== */
 .custom-marker {
   position: relative;
-  width: 66px;
-  height: 66px;
+  width: 60px;
+  height: 60px;
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
@@ -1062,8 +1062,8 @@ html, body {
 }
 
 .marker-base {
-  width: 66px;
-  height: 66px;
+  width: 62px;
+  height: 62px;
   position: absolute;
   top: 0;
   left: 0;
@@ -1071,10 +1071,10 @@ html, body {
 }
 
 .marker-logo {
-  width: 26px;
-  height: 26px;
+  width: 30px;
+  height: 30px;
   position: absolute;
-  top: 25px;
+  top: 20px;
   left: 50%;
   transform: translateX(-50%);
   background: none !important;
@@ -1084,7 +1084,7 @@ html, body {
 
 .marker-price {
   position: absolute;
-  bottom: 44px;
+  bottom: 46px;
   left: 50%;
   transform: translateX(-50%);
   color: white;
