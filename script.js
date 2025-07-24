@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     authorizationCallback: function(done) {
       // You'll need to implement server-side JWT token generation
       // For now, using a placeholder - you'll need to get this from Apple Developer
-      done("YOUR_MAPKIT_JS_TOKEN_HERE");
+      done("eyJraWQiOiJCTVQ1NzVTUFc5IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUyOTg5NjYyLCJvcmlnaW4iOiJzbGxueWNyZnN0LmdpdGh1Yi5pbyJ9.dF_WYx3PZly0Fo1dec9KYc1ZJAxRS_WO7pvyXq04Fr7kWVXGGuRFYgzeA3K7DvH2JZEwgB6V-gidn3HfPIXpQQ");
     }
   });
   
