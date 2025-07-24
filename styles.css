@@ -1140,6 +1140,7 @@ display: none;
 .sc-center-btn i {
 font-size: 24px;
 color: #3b4664;
+background: none !important;
 z-index: 1;
 text-shadow: none;
 }
@@ -1253,7 +1254,7 @@ padding: 0 15px;
 /* ========== CENTER BUTTON (back in the middle but styled like others) ========== */
 .sc-center-btn {
   position: fixed;
-  bottom: calc(25px + 6px);
+  bottom: calc(32px + 6px);
   left: 50%;
   transform: translateX(-50%);
   width: 48px;
