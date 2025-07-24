@@ -299,24 +299,25 @@ html, body {
 
 /* ========== CUSTOM MARKERS ========== */
 .custom-marker {
-  position: relative;
+  position: absolute;
   width: 50px;
   height: 60px;
   cursor: pointer;
   transform-origin: center bottom;
+  pointer-events: all;
+  z-index: 1000;
 }
 
 .marker-base {
   position: absolute;
   bottom: 0;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) rotate(-45deg);
   width: 40px;
   height: 40px;
   background: #387CC2;
   border: 3px solid white;
   border-radius: 50% 50% 50% 0;
-  transform: translateX(-50%) rotate(-45deg);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   transition: all 0.2s ease;
 }
@@ -338,6 +339,7 @@ html, body {
   background: white;
   padding: 2px;
   z-index: 2;
+  pointer-events: none;
 }
 
 .marker-price {
@@ -354,6 +356,7 @@ html, body {
   white-space: nowrap;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   z-index: 3;
+  pointer-events: none;
 }
 
 .custom-marker.cheapest .marker-price {
@@ -363,7 +366,7 @@ html, body {
 
 .custom-marker:hover {
   transform: scale(1.1);
-  z-index: 1000;
+  z-index: 1001;
 }
 
 .custom-marker:hover .marker-base {
@@ -411,6 +414,12 @@ html, body {
     transform: translate(-50%, -50%) scale(2);
     opacity: 0;
   }
+}
+
+/* Hide default MapKit markers when using custom elements */
+.mk-marker {
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 /* ========== SLIDING PANELS ========== */

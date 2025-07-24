@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   mapkit.init({
     authorizationCallback: function(done) {
       // Replace with your actual JWT token
-      done("eyJraWQiOiJCTVQ1NzVTUFc5IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUyOTg5NjYyLCJvcmlnaW4iOiJzbGxueWNyZnN0LmdpdGh1Yi5pbyJ9.dF_WYx3PZly0Fo1dec9KYc1ZJAxRS_WO7pvyXq04Fr7kWVXGGuRFYgzeA3K7DvH2JZEwgB6V-gidn3HfPIXpQQ");
+      done("YOUR_MAPKIT_JS_TOKEN_HERE");
     }
   });
   
@@ -42,37 +42,117 @@ document.addEventListener("DOMContentLoaded", () => {
     const priceText = (price / 10).toFixed(1);
     const logoUrl = getBrandLogo(site.B);
     
-    // Create the custom marker element
+    // Create the main marker container
     const markerDiv = document.createElement('div');
     markerDiv.className = `custom-marker ${isCheapest ? 'cheapest' : ''}`;
+    markerDiv.style.cssText = `
+      position: absolute;
+      width: 50px;
+      height: 60px;
+      cursor: pointer;
+      transform-origin: center bottom;
+      pointer-events: all;
+      z-index: ${isCheapest ? '1002' : '1001'};
+      transition: transform 0.2s ease;
+    `;
     
-    // Base marker shape (teardrop)
+    // Create the teardrop shape base
     const baseMarker = document.createElement('div');
     baseMarker.className = `marker-base ${isCheapest ? 'cheapest' : ''}`;
+    baseMarker.style.cssText = `
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%) rotate(-45deg);
+      width: 40px;
+      height: 40px;
+      background: ${isCheapest ? '#22C55E' : '#387CC2'};
+      border: 3px solid white;
+      border-radius: 50% 50% 50% 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transition: all 0.2s ease;
+    `;
     
-    // Station logo on top of marker
+    // Station logo (centered inside the marker)
     const stationLogo = document.createElement('img');
     stationLogo.src = logoUrl;
     stationLogo.className = 'marker-logo';
+    stationLogo.style.cssText = `
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      object-fit: contain;
+      background: white;
+      padding: 2px;
+      z-index: 2;
+      pointer-events: none;
+    `;
     
     // Error handling for logo loading
     stationLogo.onerror = function() {
-      // Create a simple fallback element instead of missing image
       this.style.display = 'none';
       const fallback = document.createElement('div');
       fallback.textContent = '⛽';
-      fallback.style.cssText = 'position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%) rotate(45deg); font-size: 16px; color: #387CC2;';
+      fallback.style.cssText = `
+        position: absolute;
+        bottom: 8px;
+        left: 50%;
+        transform: translateX(-50%) rotate(45deg);
+        font-size: 16px;
+        color: ${isCheapest ? '#22C55E' : '#387CC2'};
+        z-index: 2;
+        pointer-events: none;
+      `;
       markerDiv.appendChild(fallback);
     };
     
-    // Price box (black background with white text)
+    // Price box (above the marker)
     const priceBox = document.createElement('div');
     priceBox.textContent = priceText;
     priceBox.className = 'marker-price';
+    priceBox.style.cssText = `
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: ${isCheapest ? 'rgba(34, 197, 94, 0.95)' : 'rgba(0, 0, 0, 0.85)'};
+      color: white;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      box-shadow: 0 2px 8px ${isCheapest ? 'rgba(34, 197, 94, 0.4)' : 'rgba(0, 0, 0, 0.3)'};
+      z-index: 3;
+      pointer-events: none;
+      font-family: 'Inter', Arial, sans-serif;
+    `;
     
+    // Add hover effects
+    markerDiv.addEventListener('mouseenter', () => {
+      markerDiv.style.transform = 'scale(1.1)';
+      markerDiv.style.zIndex = '1003';
+      baseMarker.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.4)';
+    });
+    
+    markerDiv.addEventListener('mouseleave', () => {
+      markerDiv.style.transform = 'scale(1)';
+      markerDiv.style.zIndex = isCheapest ? '1002' : '1001';
+      baseMarker.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+    });
+    
+    // Assemble the marker
     markerDiv.appendChild(baseMarker);
     markerDiv.appendChild(stationLogo);
     markerDiv.appendChild(priceBox);
+    
+    // Store data for click handling
+    markerDiv.dataset.siteId = site.S;
+    markerDiv.dataset.price = price;
     
     return markerDiv;
   }
@@ -81,14 +161,43 @@ document.addEventListener("DOMContentLoaded", () => {
   function createUserLocationElement() {
     const markerDiv = document.createElement('div');
     markerDiv.className = 'user-location-marker';
+    markerDiv.style.cssText = `
+      position: relative;
+      width: 30px;
+      height: 30px;
+    `;
     
     // Blue dot with white border
     const blueDot = document.createElement('div');
     blueDot.className = 'user-location-dot';
+    blueDot.style.cssText = `
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 12px;
+      height: 12px;
+      background: #007AFF;
+      border: 3px solid white;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+      z-index: 2;
+    `;
     
     // Pulse animation ring
     const pulseRing = document.createElement('div');
     pulseRing.className = 'user-location-pulse';
+    pulseRing.style.cssText = `
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 30px;
+      height: 30px;
+      background: rgba(0, 122, 255, 0.2);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    `;
     
     markerDiv.appendChild(pulseRing);
     markerDiv.appendChild(blueDot);
@@ -124,6 +233,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let cheapestStationId = null;
   let currentAnnotations = [];
   let userLocationAnnotation = null;
+  let customMarkers = []; // Track custom marker elements
   
   // Create postcode to suburb mapping
   const postcodeToSuburb = {};
@@ -159,6 +269,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // Check if coordinate is in visible region
   function isCoordinateInVisibleRegion(lat, lng) {
+    if (!myMap) return false;
     const region = myMap.region;
     const centerLat = region.center.latitude;
     const centerLng = region.center.longitude;
@@ -193,7 +304,7 @@ document.addEventListener("DOMContentLoaded", () => {
       
       console.log("Map initialized successfully");
       
-      // Add map event listeners after map is created
+      // Add map event listeners
       myMap.addEventListener('region-change-end', () => {
         console.log("Map region changed");
         clearTimeout(window.boundsUpdateTimeout);
@@ -210,7 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (center) {
             fetchWeather(center.latitude, center.longitude);
           }
-        }, 1000);
+        }, 2000);
       });
       
       // Initialize after map is ready
@@ -283,7 +394,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Create user location marker element
     const markerElement = createUserLocationElement();
     
-    // Create annotation with custom element
+    // Create annotation 
     userLocationAnnotation = new mapkit.Annotation(new mapkit.Coordinate(lat, lng), {
       title: "Your Location",
       subtitle: "Current position"
@@ -386,12 +497,8 @@ document.addEventListener("DOMContentLoaded", () => {
     
     console.log("Updating stations and list...");
     
-    // Clear existing annotations (keep user location)
-    const stationAnnotations = currentAnnotations.filter(ann => !ann.isUserLocation);
-    if (stationAnnotations.length > 0) {
-      myMap.removeAnnotations(stationAnnotations);
-    }
-    currentAnnotations = currentAnnotations.filter(ann => ann.isUserLocation);
+    // Clean up existing custom markers
+    cleanupCustomMarkers();
     
     const visibleStations = [];
     let cheapestVisiblePrice = Infinity;
@@ -425,37 +532,95 @@ document.addEventListener("DOMContentLoaded", () => {
     
     console.log("Found", visibleStations.length, "visible stations");
     
-    // Create basic annotations - MapKit JS will handle rendering
+    // Create custom markers for each station
     visibleStations.forEach(({ site, price }) => {
       const isCheapest = site.S === cheapestVisibleStationId;
-      const priceText = (price / 10).toFixed(1);
       
-      // For now, use basic MapKit annotations since custom elements are complex
-      const annotation = new mapkit.MarkerAnnotation(new mapkit.Coordinate(site.Lat, site.Lng), {
-        color: isCheapest ? "#22C55E" : "#387CC2",
-        title: site.N,
-        subtitle: `${priceText}c - ${site.A}`,
-        data: { site, price, isCheapest }
+      // Create the custom marker element
+      const markerElement = createCustomMarkerElement(site, price, isCheapest);
+      
+      // Add click handler to open feature card
+      markerElement.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        showFeatureCard(site, price);
       });
       
-      currentAnnotations.push(annotation);
+      // Calculate position using map coordinates
+      const coordinate = new mapkit.Coordinate(site.Lat, site.Lng);
+      
+      // Position the marker on the map
+      const updateMarkerPosition = () => {
+        try {
+          const point = myMap.convertCoordinateToPointOnPage(coordinate);
+          const mapContainer = document.getElementById('map');
+          const mapRect = mapContainer.getBoundingClientRect();
+          
+          markerElement.style.left = (point.x - mapRect.left) + 'px';
+          markerElement.style.top = (point.y - mapRect.top) + 'px';
+          markerElement.style.transform = 'translate(-50%, -100%)';
+        } catch (e) {
+          console.warn('Error updating marker position:', e);
+        }
+      };
+      
+      // Initial positioning
+      updateMarkerPosition();
+      
+      // Add to map container
+      const mapContainer = document.getElementById('map');
+      mapContainer.appendChild(markerElement);
+      
+      // Store marker for cleanup
+      customMarkers.push({
+        element: markerElement,
+        updatePosition: updateMarkerPosition,
+        coordinate: coordinate
+      });
     });
     
-    // Add all annotations at once
-    if (currentAnnotations.filter(ann => !ann.isUserLocation).length > 0) {
-      myMap.addAnnotations(currentAnnotations.filter(ann => !ann.isUserLocation));
-      console.log("Added", currentAnnotations.filter(ann => !ann.isUserLocation).length, "annotations");
-    }
+    // Update marker positions when map moves
+    const throttledUpdatePositions = throttle(() => {
+      customMarkers.forEach(marker => {
+        marker.updatePosition();
+      });
+    }, 50);
     
-    // Handle annotation clicks
-    myMap.addEventListener('select', (event) => {
-      const annotation = event.target;
-      if (annotation.data) {
-        showFeatureCard(annotation.data.site, annotation.data.price);
-      }
-    });
+    // Remove old listener and add new one
+    myMap.removeEventListener('region-change-start', window.currentPositionUpdater);
+    window.currentPositionUpdater = throttledUpdatePositions;
+    myMap.addEventListener('region-change-start', window.currentPositionUpdater);
     
     updateList(visibleStations);
+  }
+  
+  // Clean up custom marker elements
+  function cleanupCustomMarkers() {
+    customMarkers.forEach(marker => {
+      if (marker.element && marker.element.parentNode) {
+        marker.element.parentNode.removeChild(marker.element);
+      }
+    });
+    customMarkers = [];
+    
+    // Remove the position update listener
+    if (window.currentPositionUpdater) {
+      myMap.removeEventListener('region-change-start', window.currentPositionUpdater);
+    }
+  }
+  
+  // Throttle function to limit how often position updates happen
+  function throttle(func, limit) {
+    let inThrottle;
+    return function() {
+      const args = arguments;
+      const context = this;
+      if (!inThrottle) {
+        func.apply(context, args);
+        inThrottle = true;
+        setTimeout(() => inThrottle = false, limit);
+      }
+    }
   }
   
   // --- List Panel ---
