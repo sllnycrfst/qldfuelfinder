@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   mapkit.init({
     authorizationCallback: function(done) {
       // Replace with your actual JWT token
-      done("eyJraWQiOiJCTVQ1NzVTUFc5IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUyOTg5NjYyLCJvcmlnaW4iOiJzbGxueWNyZnN0LmdpdGh1Yi5pbyJ9.dF_WYx3PZly0Fo1dec9KYc1ZJAxRS_WO7pvyXq04Fr7kWVXGGuRFYgzeA3K7DvH2JZEwgB6V-gidn3HfPIXpQQ");
+      done("YOUR_MAPKIT_JS_TOKEN_HERE");
     }
   });
   
@@ -36,6 +36,65 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   
   const getBrandLogo = (brandId) => BRAND_LOGOS[brandId] || BRAND_LOGOS[12];
+  
+  // Create custom marker with station logo and price box
+  function createCustomMarkerElement(site, price, isCheapest = false) {
+    const priceText = (price / 10).toFixed(1);
+    const logoUrl = getBrandLogo(site.B);
+    
+    // Create the custom marker element
+    const markerDiv = document.createElement('div');
+    markerDiv.className = `custom-marker ${isCheapest ? 'cheapest' : ''}`;
+    
+    // Base marker shape (teardrop)
+    const baseMarker = document.createElement('div');
+    baseMarker.className = `marker-base ${isCheapest ? 'cheapest' : ''}`;
+    
+    // Station logo on top of marker
+    const stationLogo = document.createElement('img');
+    stationLogo.src = logoUrl;
+    stationLogo.className = 'marker-logo';
+    
+    // Error handling for logo loading
+    stationLogo.onerror = function() {
+      // Create a simple fallback element instead of missing image
+      this.style.display = 'none';
+      const fallback = document.createElement('div');
+      fallback.textContent = '⛽';
+      fallback.style.cssText = 'position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%) rotate(45deg); font-size: 16px; color: #387CC2;';
+      markerDiv.appendChild(fallback);
+    };
+    
+    // Price box (black background with white text)
+    const priceBox = document.createElement('div');
+    priceBox.textContent = priceText;
+    priceBox.className = 'marker-price';
+    
+    markerDiv.appendChild(baseMarker);
+    markerDiv.appendChild(stationLogo);
+    markerDiv.appendChild(priceBox);
+    
+    return markerDiv;
+  }
+  
+  // Create user location marker element
+  function createUserLocationElement() {
+    const markerDiv = document.createElement('div');
+    markerDiv.className = 'user-location-marker';
+    
+    // Blue dot with white border
+    const blueDot = document.createElement('div');
+    blueDot.className = 'user-location-dot';
+    
+    // Pulse animation ring
+    const pulseRing = document.createElement('div');
+    pulseRing.className = 'user-location-pulse';
+    
+    markerDiv.appendChild(pulseRing);
+    markerDiv.appendChild(blueDot);
+    
+    return markerDiv;
+  }
   
   const BRAND_NAMES = {
     2: "Caltex", 5: "BP", 7: "Budget", 12: "Independent", 16: "Mobil", 20: "Shell", 
@@ -100,10 +159,6 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // Check if coordinate is in visible region
   function isCoordinateInVisibleRegion(lat, lng) {
-    const visibleRegion = myMap.visibleMapRect;
-    const coordinate = new mapkit.Coordinate(lat, lng);
-    
-    // Convert coordinate to map point for bounds checking
     const region = myMap.region;
     const centerLat = region.center.latitude;
     const centerLng = region.center.longitude;
@@ -137,6 +192,16 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       
       console.log("Map initialized successfully");
+      
+      // Set up custom annotation rendering
+      myMap.annotationForCluster = function(clusterAnnotation) {
+        return clusterAnnotation;
+      };
+      
+      // Custom element rendering for annotations
+      myMap.annotationCallout = function(annotation) {
+        return null; // Disable default callouts
+      };
       
       // Add map event listeners after map is created
       myMap.addEventListener('region-change-end', () => {
@@ -225,13 +290,23 @@ document.addEventListener("DOMContentLoaded", () => {
       myMap.removeAnnotation(userLocationAnnotation);
     }
     
-    userLocationAnnotation = new mapkit.MarkerAnnotation(
-      new mapkit.Coordinate(lat, lng),
-      {
-        color: "#007AFF",
-        title: "Your Location"
-      }
-    );
+    // Create user location marker element
+    const markerElement = createUserLocationElement();
+    
+    // Create annotation with custom element
+    userLocationAnnotation = new mapkit.Annotation(new mapkit.Coordinate(lat, lng), {
+      title: "Your Location",
+      subtitle: "Current position"
+    });
+    
+    // Create annotation view with custom element
+    userLocationAnnotation.createAnnotationView = function() {
+      const annotationView = document.createElement('div');
+      annotationView.appendChild(markerElement);
+      annotationView.style.position = 'absolute';
+      annotationView.style.transform = 'translate(-50%, -50%)';
+      return annotationView;
+    };
     
     myMap.addAnnotation(userLocationAnnotation);
     console.log("User location annotation added");
@@ -330,11 +405,12 @@ document.addEventListener("DOMContentLoaded", () => {
     
     console.log("Updating stations and list...");
     
-    // Clear existing annotations
-    if (currentAnnotations.length > 0) {
-      myMap.removeAnnotations(currentAnnotations);
-      currentAnnotations = [];
+    // Clear existing annotations (keep user location)
+    const stationAnnotations = currentAnnotations.filter(ann => !ann.isUserLocation);
+    if (stationAnnotations.length > 0) {
+      myMap.removeAnnotations(stationAnnotations);
     }
+    currentAnnotations = currentAnnotations.filter(ann => ann.isUserLocation);
     
     const visibleStations = [];
     let cheapestVisiblePrice = Infinity;
@@ -368,539 +444,36 @@ document.addEventListener("DOMContentLoaded", () => {
     
     console.log("Found", visibleStations.length, "visible stations");
     
-    // Create annotations
+    // Create custom annotations with logos and price boxes
     visibleStations.forEach(({ site, price }) => {
       const isCheapest = site.S === cheapestVisibleStationId;
       const priceText = (price / 10).toFixed(1);
       
-      const annotation = new mapkit.MarkerAnnotation(
-        new mapkit.Coordinate(site.Lat, site.Lng),
-        {
-          color: isCheapest ? "#22C55E" : "#387CC2",
-          title: site.N,
-          subtitle: `${priceText}c - ${site.A}`,
-          data: { site, price, isCheapest }
-        }
-      );
+      // Create the custom marker HTML element
+      const markerElement = createCustomMarkerElement(site, price, isCheapest);
       
-      currentAnnotations.push(annotation);
-    });
-    
-    // Add all annotations at once
-    if (currentAnnotations.length > 0) {
-      myMap.addAnnotations(currentAnnotations);
-      console.log("Added", currentAnnotations.length, "annotations");
-    }
-    
-    // Handle annotation selection
-    myMap.addEventListener('select', (event) => {
-      const annotation = event.target;
-      if (annotation.data) {
-        showFeatureCard(annotation.data.site, annotation.data.price);
-      }
-    });
-    
-    updateList(visibleStations);
-  }
-  
-  // --- List Panel ---
-  function updateList(stations) {
-    const list = document.getElementById('list');
-    if (!list) return;
-    
-    list.innerHTML = '';
-    stations.sort((a, b) => a.price - b.price);
-    
-    stations.slice(0, 50).forEach(({ site, price }) => {
-      const li = document.createElement('li');
-      li.className = 'station-item';
-
-      const distance = userLocation ?
-        getDistance(userLocation.lat, userLocation.lng, site.Lat, site.Lng).toFixed(1) : '?';
-      const isCheapest = site.S === cheapestStationId;
-
-      li.innerHTML = `
-        <img class="list-item-logo" src="${getBrandLogo(site.B)}" alt="Brand logo" onerror="this.src='images/default.png'" />
-        <div class="list-item-details">
-          <span class="list-item-name">${site.N}</span>
-          <span class="list-item-address">${site.A}, ${getSuburbName(site.P)}</span>
-          <span class="list-item-distance">${distance} km</span>
-        </div>
-        <span class="list-item-price" style="color:${isCheapest ? '#22C55E' : '#387CC2'};">${(price / 10).toFixed(1)}</span>
-      `;
-
-      li.addEventListener('click', (e) => {
+      // Create annotation
+      const annotation = new mapkit.Annotation(new mapkit.Coordinate(site.Lat, site.Lng), {
+        title: site.N,
+        subtitle: `${priceText}c - ${site.A}`,
+        data: { site, price, isCheapest }
+      });
+      
+      // Custom annotation view creation
+      annotation.createAnnotationView = function() {
+        const annotationView = document.createElement('div');
+        annotationView.appendChild(markerElement);
+        annotationView.style.position = 'absolute';
+        annotationView.style.transform = 'translate(-50%, -100%)';
+        annotationView.style.zIndex = isCheapest ? '1000' : '999';
+        return annotationView;
+      };
+      
+      // Add click handler to the marker element
+      markerElement.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        if (e.target.tagName !== 'BUTTON') {
-          showFeatureCard(site, price);
-        }
-      });
-      list.appendChild(li);
-    });
-    
-    console.log("Updated list with", stations.length, "stations");
-  }
-  
-  // --- Feature Card ---
-  function showFeatureCard(site, price) {
-    const content = document.getElementById('feature-card-content');
-    const isCheapest = site.S === cheapestStationId;
-    
-    const allPrices = FUEL_TYPES.map(fuel => {
-      let p;
-      if (fuel.altId) {
-        const dieselPrice = priceMap[site.S]?.[fuel.id];
-        const premiumDieselPrice = priceMap[site.S]?.[fuel.altId];
-        p = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);
-        if (p === Infinity) p = null;
-      } else {
-        p = priceMap[site.S]?.[fuel.id];
-      }
-      const displayLabel = (fuel.key === 'Diesel') ? 'Diesel' : fuel.fullName;
-      return p ? `
-        <div class="fuel-price-row">
-          <span class="fuel-type-label">${displayLabel}</span>
-          <span class="fuel-type-price">${(p / 10).toFixed(1)}</span>
-        </div>
-      ` : '';
-    }).filter(Boolean).join('');
-    
-    content.innerHTML = `
-      <h3 class="panel-title">Station Details</h3>
-      <div class="station-header">
-        <div class="station-logo-container">
-          <img src="${getBrandLogo(site.B)}" alt="Station Logo" class="station-logo" onerror="this.src='images/default.png'">
-        </div>
-        <div class="station-info">
-          <h3 class="feature-card-title">${site.N} ${isCheapest ? '💚 CHEAPEST' : ''}</h3>
-          <div class="address-container">
-            <p class="feature-card-address">${site.A}, ${getSuburbName(site.P)}, QLD ${site.P}</p>
-            <i class="fa-solid fa-diamond-turn-right directions-icon" data-lat="${site.Lat}" data-lng="${site.Lng}" title="Navigate"></i>
-          </div>
-        </div>
-      </div>
-      <div class="nav-menu glass-effect" id="nav-menu">
-        <a href="#" class="nav-menu-item" data-app="apple" data-lat="${site.Lat}" data-lng="${site.Lng}">
-          <i class="fab fa-apple"></i> Apple Maps
-        </a>
-        <a href="#" class="nav-menu-item" data-app="google" data-lat="${site.Lat}" data-lng="${site.Lng}">
-          <i class="fab fa-google"></i> Google Maps
-        </a>
-        <a href="#" class="nav-menu-item" data-app="waze" data-lat="${site.Lat}" data-lng="${site.Lng}">
-          <i class="fab fa-waze"></i> Waze
-        </a>
-      </div>
-      <div class="fuel-prices-grid">${allPrices}</div>
-    `;
-    
-    setTimeout(() => {
-      const directionsIcon = content.querySelector('.directions-icon');
-      const navMenu = content.querySelector('#nav-menu');
-     
-      if (directionsIcon) {
-        directionsIcon.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          navMenu.classList.toggle('show');
-        });
-      }
-      
-      content.querySelectorAll('.nav-menu-item').forEach(item => {
-        item.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          const app = e.currentTarget.dataset.app;
-          const lat = parseFloat(e.currentTarget.dataset.lat);
-          const lng = parseFloat(e.currentTarget.dataset.lng);
-          navigateWithApp(app, lat, lng);
-          navMenu.classList.remove('show');
-        });
-      });
-    }, 100);
-    
-    openPanel('feature');
-  }
-  
-  // --- Navigation Functions ---
-  function navigateWithApp(app, lat, lng) {
-    switch(app) {
-      case 'apple':
-        window.open(`maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`);
-        break;
-      case 'google':
-        window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
-        break;
-      case 'waze':
-        window.open(`https://waze.com/ul?ll=${lat},${lng}&navigate=yes`);
-        break;
-    }
-  }
-  
-  // Make functions global
-  window.navigateWithApp = navigateWithApp;
-  
-  // --- Panel Management ---
-  function openPanel(panelName) {
-    document.querySelectorAll('.sliding-panel').forEach(p => {
-      p.classList.remove('open');
-      p.style.transform = 'translateX(-50%) translateY(130%)';
-    });
-    document.querySelectorAll('.panel-overlay').forEach(o => o.classList.remove('active'));
-    
-    const panel = document.getElementById(`${panelName}-panel`);
-    const overlay = document.getElementById(`${panelName}-overlay`);
-    
-    if (panel && overlay) {
-      panel.classList.add('open');
-      overlay.classList.add('active');
-      panel.style.transform = 'translateX(-50%) translateY(0)';
-      initializeDrag(panel);
-    }
-  }
-  
-  function closeAllPanels() {
-    document.querySelectorAll('.sliding-panel').forEach(p => {
-      p.classList.remove('open');
-      p.style.transform = 'translateX(-50%) translateY(130%)';
-    });
-    document.querySelectorAll('.panel-overlay').forEach(o => o.classList.remove('active'));
-  }
-  
-  // --- Drag Functionality ---
-  let currentDragPanel = null;
-  let dragHandlers = { start: null, move: null, end: null };
-  
-  function initializeDrag(panel) {
-    const dragBar = panel.querySelector('.panel-drag-bar');
-    if (!dragBar) return;
-    
-    let isDragging = false;
-    let startY = 0;
-    let currentY = 0;
-    let initialTranslateY = 0;
-    
-    function handleStart(e) {
-      if (!panel.classList.contains('open')) return;
-      
-      const rect = dragBar.getBoundingClientRect();
-      const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
-      const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-      
-      const extendedTop = rect.top - 30;
-      const extendedBottom = rect.bottom + 15;
-      const extendedLeft = rect.left - 50;
-      const extendedRight = rect.right + 50;
-      
-      if (clientY < extendedTop || clientY > extendedBottom || 
-          clientX < extendedLeft || clientX > extendedRight) {
-        return;
-      }
-      
-      if (currentDragPanel && currentDragPanel !== panel) {
-        cleanupDragHandlers();
-      }
-      
-      currentDragPanel = panel;
-      isDragging = true;
-      startY = clientY;
-      
-      const transform = getComputedStyle(panel).transform;
-      const matrix = new DOMMatrix(transform);
-      initialTranslateY = matrix.m42;
-      
-      panel.style.transition = 'none';
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    
-    function handleMove(e) {
-      if (!isDragging || currentDragPanel !== panel) return;
-      
-      const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
-      currentY = clientY - startY;
-      
-      if (currentY < 0) {
-        currentY = 0;
-        return;
-      }
-      
-      const newTranslateY = initialTranslateY + currentY;
-      panel.style.transform = `translateX(-50%) translateY(${newTranslateY}px)`;
-      
-      e.preventDefault();
-    }
-    
-    function handleEnd(e) {
-      if (!isDragging || currentDragPanel !== panel) return;
-      isDragging = false;
-      currentDragPanel = null;
-      
-      panel.style.transition = 'transform 0.35s cubic-bezier(.25,.8,.25,1)';
-      
-      const threshold = window.innerHeight * 0.2;
-      
-      if (currentY > threshold) {
-        closeAllPanels();
-      } else {
-        panel.style.transform = 'translateX(-50%) translateY(0)';
-      }
-      
-      currentY = 0;
-    }
-    
-    dragHandlers = { start: handleStart, move: handleMove, end: handleEnd };
-    
-    const panelContent = panel.querySelector('.panel-content');
-    if (panelContent) {
-      panelContent.addEventListener('touchstart', (e) => {
-        const rect = dragBar.getBoundingClientRect();
-        const clientY = e.touches[0].clientY;
-        if (clientY > rect.bottom + 15) {
-          e.stopPropagation();
-        }
-      }, { passive: true });
-    }
-  }
-  
-  function cleanupDragHandlers() {
-    if (dragHandlers.start) {
-      document.removeEventListener('touchstart', dragHandlers.start);
-      document.removeEventListener('mousedown', dragHandlers.start);
-    }
-    if (dragHandlers.move) {
-      document.removeEventListener('touchmove', dragHandlers.move);
-      document.removeEventListener('mousemove', dragHandlers.move);
-    }
-    if (dragHandlers.end) {
-      document.removeEventListener('touchend', dragHandlers.end);
-      document.removeEventListener('mouseup', dragHandlers.end);
-    }
-  }
-  
-  function setupGlobalDragListeners() {
-    document.addEventListener('touchstart', (e) => {
-      const openPanel = document.querySelector('.sliding-panel.open');
-      if (openPanel && dragHandlers.start) {
-        dragHandlers.start(e);
-      }
-    }, { passive: false });
-    
-    document.addEventListener('touchmove', (e) => {
-      if (dragHandlers.move) {
-        dragHandlers.move(e);
-      }
-    }, { passive: false });
-    
-    document.addEventListener('touchend', (e) => {
-      if (dragHandlers.end) {
-        dragHandlers.end(e);
-      }
-    });
-    
-    document.addEventListener('mousedown', (e) => {
-      const openPanel = document.querySelector('.sliding-panel.open');
-      if (openPanel && dragHandlers.start) {
-        dragHandlers.start(e);
-      }
-    });
-    
-    document.addEventListener('mousemove', (e) => {
-      if (dragHandlers.move) {
-        dragHandlers.move(e);
-      }
-    });
-    
-    document.addEventListener('mouseup', (e) => {
-      if (dragHandlers.end) {
-        dragHandlers.end(e);
-      }
-    });
-  }
-  
-  // --- Event Listeners ---
-  const searchInput = document.getElementById('search-input');
-  const suburbList = document.getElementById('suburb-list');
-  
-  function showAllSuburbs() {
-    const sortedSuburbs = QLD_SUBURBS.sort((a, b) => a.suburb.localeCompare(b.suburb));
-    
-    suburbList.innerHTML = '';
-    sortedSuburbs.forEach(suburb => {
-      const li = document.createElement('li');
-      li.className = 'suburb-list-item';
-      li.textContent = suburb.suburb;
-      li.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        searchSuburb(suburb.suburb, suburb.postcode);
-      });
-      suburbList.appendChild(li);
-    });
-  }
-  
-  if (searchInput && suburbList) {
-    showAllSuburbs();
-    
-    searchInput.addEventListener('input', e => {
-      const query = e.target.value.toLowerCase();
-      if (query.length === 0) {
-        showAllSuburbs();
-        return;
-      }
-      
-      const matchingSuburbs = QLD_SUBURBS
-        .filter(suburb => suburb.suburb.toLowerCase().includes(query))
-        .sort((a, b) => a.suburb.localeCompare(b.suburb));
-      
-      suburbList.innerHTML = '';
-      
-      matchingSuburbs.forEach(suburb => {
-        const li = document.createElement('li');
-        li.className = 'suburb-list-item';
-        li.textContent = suburb.suburb;
-        li.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          searchSuburb(suburb.suburb, suburb.postcode);
-        });
-        suburbList.appendChild(li);
-      });
-    });
-  }
-  
-  window.searchSuburb = function(suburbName, postcode) {
-    if (!myMap) return;
-    
-    const sites = allSites.filter(s => s.P === postcode);
-    if (sites.length > 0) {
-      const avgLat = sites.reduce((sum, s) => sum + s.Lat, 0) / sites.length;
-      const avgLng = sites.reduce((sum, s) => sum + s.Lng, 0) / sites.length;
-      myMap.center = new mapkit.Coordinate(avgLat, avgLng);
-      myMap.region = new mapkit.CoordinateRegion(
-        new mapkit.Coordinate(avgLat, avgLng),
-        new mapkit.CoordinateSpan(0.1, 0.1)
-      );
-      closeAllPanels();
-    } else {
-      const suburbData = QLD_SUBURBS.find(s => s.suburb.toLowerCase() === suburbName.toLowerCase());
-      if (suburbData) {
-        myMap.center = new mapkit.Coordinate(suburbData.lat, suburbData.lng);
-        myMap.region = new mapkit.CoordinateRegion(
-          new mapkit.Coordinate(suburbData.lat, suburbData.lng),
-          new mapkit.CoordinateSpan(0.1, 0.1)
-        );
-        closeAllPanels();
-      }
-    }
-  };
-  
-  // Fuel selector dropdown
-  const fuelBtn = document.getElementById('fuel-dropdown-btn');
-  const fuelContent = document.getElementById('fuel-dropdown-content');
-  
-  if (fuelBtn && fuelContent) {
-    FUEL_TYPES.forEach(fuel => {
-      const item = document.createElement('div');
-      item.className = 'fuel-dropdown-item';
-      item.textContent = fuel.fullName;
-      if (fuel.key === currentFuel) item.classList.add('selected');
-      
-      item.addEventListener('click', () => {
-        currentFuel = fuel.key;
-        savePreferences();
-        fuelBtn.innerHTML = `${fuel.fullName} <span class="arrow">▼</span>`;
-        fuelContent.classList.remove('show');
-        document.querySelectorAll('.fuel-dropdown-item').forEach(i => i.classList.remove('selected'));
-        item.classList.add('selected');
-        findCheapestStation();
-        updateVisibleStationsAndList();
+        showFeatureCard(site, price);
       });
       
-      fuelContent.appendChild(item);
-    });
-    
-    fuelBtn.innerHTML = `${FUEL_TYPES.find(f => f.key === currentFuel).fullName} <span class="arrow">▼</span>`;
-    
-    fuelBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      fuelContent.classList.toggle('show');
-    });
-    
-    document.addEventListener('click', () => {
-      fuelContent.classList.remove('show');
-    });
-  }
-  
-  // Toolbar buttons
-  document.getElementById('toolbar-search-btn')?.addEventListener('click', () => {
-    openPanel('search');
-    document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));
-    document.getElementById('toolbar-search-btn').classList.add('sc-current');
-  });
-  
-  document.getElementById('toolbar-center-btn')?.addEventListener('click', () => {
-    if (!myMap) return;
-    
-    if (userLocation) {
-      myMap.center = new mapkit.Coordinate(userLocation.lat, userLocation.lng);
-      createUserLocationAnnotation(userLocation.lat, userLocation.lng);
-    } else {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          position => {
-            userLocation = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            };
-            myMap.center = new mapkit.Coordinate(userLocation.lat, userLocation.lng);
-            createUserLocationAnnotation(userLocation.lat, userLocation.lng);
-          },
-          error => {
-            console.log("Location error:", error);
-            myMap.center = new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng);
-          }
-        );
-      } else {
-        myMap.center = new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng);
-      }
-    }
-    closeAllPanels();
-    document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));
-    document.getElementById('toolbar-center-btn').classList.add('sc-current');
-  });
-  
-  document.getElementById('toolbar-list-btn')?.addEventListener('click', () => {
-    openPanel('list');
-    document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));
-    document.getElementById('toolbar-list-btn').classList.add('sc-current');
-  });
-  
-  // Overlays close panels
-  document.querySelectorAll('.panel-overlay').forEach(overlay => {
-    overlay.addEventListener('click', closeAllPanels);
-  });
-  
-  // Get user location
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      position => {
-        userLocation = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude
-        };
-        if (myMap) {
-          myMap.center = new mapkit.Coordinate(userLocation.lat, userLocation.lng);
-          createUserLocationAnnotation(userLocation.lat, userLocation.lng);
-        }
-      },
-      error => console.log("Location error:", error)
-    );
-  }
-  
-  // Make functions global
-  window.showFeatureCard = showFeatureCard;
-  
-  // Initialize drag functionality
-  setupGlobalDragListeners();
-});
+      currentAnnotations.push(annotation);\n    });\n    \n    // Add all annotations at once\n    if (currentAnnotations.filter(ann => !ann.isUserLocation).length > 0) {\n      myMap.addAnnotations(currentAnnotations.filter(ann => !ann.isUserLocation));\n      console.log("Added", currentAnnotations.filter(ann => !ann.isUserLocation).length, "annotations");\n    }\n    \n    updateList(visibleStations);\n  }\n  \n  // --- List Panel ---\n  function updateList(stations) {\n    const list = document.getElementById('list');\n    if (!list) return;\n    \n    list.innerHTML = '';\n    stations.sort((a, b) => a.price - b.price);\n    \n    stations.slice(0, 50).forEach(({ site, price }) => {\n      const li = document.createElement('li');\n      li.className = 'station-item';\n\n      const distance = userLocation ?\n        getDistance(userLocation.lat, userLocation.lng, site.Lat, site.Lng).toFixed(1) : '?';\n      const isCheapest = site.S === cheapestStationId;\n\n      li.innerHTML = `\n        <img class="list-item-logo" src="${getBrandLogo(site.B)}" alt="Brand logo" onerror="this.src='images/default.png'" />\n        <div class="list-item-details">\n          <span class="list-item-name">${site.N}</span>\n          <span class="list-item-address">${site.A}, ${getSuburbName(site.P)}</span>\n          <span class="list-item-distance">${distance} km</span>\n        </div>\n        <span class="list-item-price" style="color:${isCheapest ? '#22C55E' : '#387CC2'};">${(price / 10).toFixed(1)}</span>\n      `;\n\n      li.addEventListener('click', (e) => {\n        e.preventDefault();\n        e.stopPropagation();\n        if (e.target.tagName !== 'BUTTON') {\n          showFeatureCard(site, price);\n        }\n      });\n      list.appendChild(li);\n    });\n    \n    console.log("Updated list with", stations.length, "stations");\n  }\n  \n  // --- Feature Card ---\n  function showFeatureCard(site, price) {\n    const content = document.getElementById('feature-card-content');\n    const isCheapest = site.S === cheapestStationId;\n    \n    const allPrices = FUEL_TYPES.map(fuel => {\n      let p;\n      if (fuel.altId) {\n        const dieselPrice = priceMap[site.S]?.[fuel.id];\n        const premiumDieselPrice = priceMap[site.S]?.[fuel.altId];\n        p = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);\n        if (p === Infinity) p = null;\n      } else {\n        p = priceMap[site.S]?.[fuel.id];\n      }\n      const displayLabel = (fuel.key === 'Diesel') ? 'Diesel' : fuel.fullName;\n      return p ? `\n        <div class="fuel-price-row">\n          <span class="fuel-type-label">${displayLabel}</span>\n          <span class="fuel-type-price">${(p / 10).toFixed(1)}</span>\n        </div>\n      ` : '';\n    }).filter(Boolean).join('');\n    \n    content.innerHTML = `\n      <h3 class="panel-title">Station Details</h3>\n      <div class="station-header">\n        <div class="station-logo-container">\n          <img src="${getBrandLogo(site.B)}" alt="Station Logo" class="station-logo" onerror="this.src='images/default.png'">\n        </div>\n        <div class="station-info">\n          <h3 class="feature-card-title">${site.N} ${isCheapest ? '💚 CHEAPEST' : ''}</h3>\n          <div class="address-container">\n            <p class="feature-card-address">${site.A}, ${getSuburbName(site.P)}, QLD ${site.P}</p>\n            <i class="fa-solid fa-diamond-turn-right directions-icon" data-lat="${site.Lat}" data-lng="${site.Lng}" title="Navigate"></i>\n          </div>\n        </div>\n      </div>\n      <div class="nav-menu glass-effect" id="nav-menu">\n        <a href="#" class="nav-menu-item" data-app="apple" data-lat="${site.Lat}" data-lng="${site.Lng}">\n          <i class="fab fa-apple"></i> Apple Maps\n        </a>\n        <a href="#" class="nav-menu-item" data-app="google" data-lat="${site.Lat}" data-lng="${site.Lng}">\n          <i class="fab fa-google"></i> Google Maps\n        </a>\n        <a href="#" class="nav-menu-item" data-app="waze" data-lat="${site.Lat}" data-lng="${site.Lng}">\n          <i class="fab fa-waze"></i> Waze\n        </a>\n      </div>\n      <div class="fuel-prices-grid">${allPrices}</div>\n    `;\n    \n    setTimeout(() => {\n      const directionsIcon = content.querySelector('.directions-icon');\n      const navMenu = content.querySelector('#nav-menu');\n     \n      if (directionsIcon) {\n        directionsIcon.addEventListener('click', (e) => {\n          e.preventDefault();\n          e.stopPropagation();\n          navMenu.classList.toggle('show');\n        });\n      }\n      \n      content.querySelectorAll('.nav-menu-item').forEach(item => {\n        item.addEventListener('click', (e) => {\n          e.preventDefault();\n          e.stopPropagation();\n          const app = e.currentTarget.dataset.app;\n          const lat = parseFloat(e.currentTarget.dataset.lat);\n          const lng = parseFloat(e.currentTarget.dataset.lng);\n          navigateWithApp(app, lat, lng);\n          navMenu.classList.remove('show');\n        });\n      });\n    }, 100);\n    \n    openPanel('feature');\n  }\n  \n  // --- Navigation Functions ---\n  function navigateWithApp(app, lat, lng) {\n    switch(app) {\n      case 'apple':\n        window.open(`maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`);\n        break;\n      case 'google':\n        window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);\n        break;\n      case 'waze':\n        window.open(`https://waze.com/ul?ll=${lat},${lng}&navigate=yes`);\n        break;\n    }\n  }\n  \n  // Make functions global\n  window.navigateWithApp = navigateWithApp;\n  \n  // --- Panel Management ---\n  function openPanel(panelName) {\n    document.querySelectorAll('.sliding-panel').forEach(p => {\n      p.classList.remove('open');\n      p.style.transform = 'translateX(-50%) translateY(130%)';\n    });\n    document.querySelectorAll('.panel-overlay').forEach(o => o.classList.remove('active'));\n    \n    const panel = document.getElementById(`${panelName}-panel`);\n    const overlay = document.getElementById(`${panelName}-overlay`);\n    \n    if (panel && overlay) {\n      panel.classList.add('open');\n      overlay.classList.add('active');\n      panel.style.transform = 'translateX(-50%) translateY(0)';\n      initializeDrag(panel);\n    }\n  }\n  \n  function closeAllPanels() {\n    document.querySelectorAll('.sliding-panel').forEach(p => {\n      p.classList.remove('open');\n      p.style.transform = 'translateX(-50%) translateY(130%)';\n    });\n    document.querySelectorAll('.panel-overlay').forEach(o => o.classList.remove('active'));\n  }\n  \n  // --- Drag Functionality ---\n  let currentDragPanel = null;\n  let dragHandlers = { start: null, move: null, end: null };\n  \n  function initializeDrag(panel) {\n    const dragBar = panel.querySelector('.panel-drag-bar');\n    if (!dragBar) return;\n    \n    let isDragging = false;\n    let startY = 0;\n    let currentY = 0;\n    let initialTranslateY = 0;\n    \n    function handleStart(e) {\n      if (!panel.classList.contains('open')) return;\n      \n      const rect = dragBar.getBoundingClientRect();\n      const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;\n      const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;\n      \n      const extendedTop = rect.top - 30;\n      const extendedBottom = rect.bottom + 15;\n      const extendedLeft = rect.left - 50;\n      const extendedRight = rect.right + 50;\n      \n      if (clientY < extendedTop || clientY > extendedBottom || \n          clientX < extendedLeft || clientX > extendedRight) {\n        return;\n      }\n      \n      if (currentDragPanel && currentDragPanel !== panel) {\n        cleanupDragHandlers();\n      }\n      \n      currentDragPanel = panel;\n      isDragging = true;\n      startY = clientY;\n      \n      const transform = getComputedStyle(panel).transform;\n      const matrix = new DOMMatrix(transform);\n      initialTranslateY = matrix.m42;\n      \n      panel.style.transition = 'none';\n      e.preventDefault();\n      e.stopPropagation();\n    }\n    \n    function handleMove(e) {\n      if (!isDragging || currentDragPanel !== panel) return;\n      \n      const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;\n      currentY = clientY - startY;\n      \n      if (currentY < 0) {\n        currentY = 0;\n        return;\n      }\n      \n      const newTranslateY = initialTranslateY + currentY;\n      panel.style.transform = `translateX(-50%) translateY(${newTranslateY}px)`;\n      \n      e.preventDefault();\n    }\n    \n    function handleEnd(e) {\n      if (!isDragging || currentDragPanel !== panel) return;\n      isDragging = false;\n      currentDragPanel = null;\n      \n      panel.style.transition = 'transform 0.35s cubic-bezier(.25,.8,.25,1)';\n      \n      const threshold = window.innerHeight * 0.2;\n      \n      if (currentY > threshold) {\n        closeAllPanels();\n      } else {\n        panel.style.transform = 'translateX(-50%) translateY(0)';\n      }\n      \n      currentY = 0;\n    }\n    \n    dragHandlers = { start: handleStart, move: handleMove, end: handleEnd };\n    \n    const panelContent = panel.querySelector('.panel-content');\n    if (panelContent) {\n      panelContent.addEventListener('touchstart', (e) => {\n        const rect = dragBar.getBoundingClientRect();\n        const clientY = e.touches[0].clientY;\n        if (clientY > rect.bottom + 15) {\n          e.stopPropagation();\n        }\n      }, { passive: true });\n    }\n  }\n  \n  function cleanupDragHandlers() {\n    if (dragHandlers.start) {\n      document.removeEventListener('touchstart', dragHandlers.start);\n      document.removeEventListener('mousedown', dragHandlers.start);\n    }\n    if (dragHandlers.move) {\n      document.removeEventListener('touchmove', dragHandlers.move);\n      document.removeEventListener('mousemove', dragHandlers.move);\n    }\n    if (dragHandlers.end) {\n      document.removeEventListener('touchend', dragHandlers.end);\n      document.removeEventListener('mouseup', dragHandlers.end);\n    }\n  }\n  \n  function setupGlobalDragListeners() {\n    document.addEventListener('touchstart', (e) => {\n      const openPanel = document.querySelector('.sliding-panel.open');\n      if (openPanel && dragHandlers.start) {\n        dragHandlers.start(e);\n      }\n    }, { passive: false });\n    \n    document.addEventListener('touchmove', (e) => {\n      if (dragHandlers.move) {\n        dragHandlers.move(e);\n      }\n    }, { passive: false });\n    \n    document.addEventListener('touchend', (e) => {\n      if (dragHandlers.end) {\n        dragHandlers.end(e);\n      }\n    });\n    \n    document.addEventListener('mousedown', (e) => {\n      const openPanel = document.querySelector('.sliding-panel.open');\n      if (openPanel && dragHandlers.start) {\n        dragHandlers.start(e);\n      }\n    });\n    \n    document.addEventListener('mousemove', (e) => {\n      if (dragHandlers.move) {\n        dragHandlers.move(e);\n      }\n    });\n    \n    document.addEventListener('mouseup', (e) => {\n      if (dragHandlers.end) {\n        dragHandlers.end(e);\n      }\n    });\n  }\n  \n  // --- Event Listeners ---\n  const searchInput = document.getElementById('search-input');\n  const suburbList = document.getElementById('suburb-list');\n  \n  function showAllSuburbs() {\n    const sortedSuburbs = QLD_SUBURBS.sort((a, b) => a.suburb.localeCompare(b.suburb));\n    \n    suburbList.innerHTML = '';\n    sortedSuburbs.forEach(suburb => {\n      const li = document.createElement('li');\n      li.className = 'suburb-list-item';\n      li.textContent = suburb.suburb;\n      li.addEventListener('click', (e) => {\n        e.preventDefault();\n        e.stopPropagation();\n        searchSuburb(suburb.suburb, suburb.postcode);\n      });\n      suburbList.appendChild(li);\n    });\n  }\n  \n  if (searchInput && suburbList) {\n    showAllSuburbs();\n    \n    searchInput.addEventListener('input', e => {\n      const query = e.target.value.toLowerCase();\n      if (query.length === 0) {\n        showAllSuburbs();\n        return;\n      }\n      \n      const matchingSuburbs = QLD_SUBURBS\n        .filter(suburb => suburb.suburb.toLowerCase().includes(query))\n        .sort((a, b) => a.suburb.localeCompare(b.suburb));\n      \n      suburbList.innerHTML = '';\n      \n      matchingSuburbs.forEach(suburb => {\n        const li = document.createElement('li');\n        li.className = 'suburb-list-item';\n        li.textContent = suburb.suburb;\n        li.addEventListener('click', (e) => {\n          e.preventDefault();\n          e.stopPropagation();\n          searchSuburb(suburb.suburb, suburb.postcode);\n        });\n        suburbList.appendChild(li);\n      });\n    });\n  }\n  \n  window.searchSuburb = function(suburbName, postcode) {\n    if (!myMap) return;\n    \n    const sites = allSites.filter(s => s.P === postcode);\n    if (sites.length > 0) {\n      const avgLat = sites.reduce((sum, s) => sum + s.Lat, 0) / sites.length;\n      const avgLng = sites.reduce((sum, s) => sum + s.Lng, 0) / sites.length;\n      myMap.center = new mapkit.Coordinate(avgLat, avgLng);\n      myMap.region = new mapkit.CoordinateRegion(\n        new mapkit.Coordinate(avgLat, avgLng),\n        new mapkit.CoordinateSpan(0.1, 0.1)\n      );\n      closeAllPanels();\n    } else {\n      const suburbData = QLD_SUBURBS.find(s => s.suburb.toLowerCase() === suburbName.toLowerCase());\n      if (suburbData) {\n        myMap.center = new mapkit.Coordinate(suburbData.lat, suburbData.lng);\n        myMap.region = new mapkit.CoordinateRegion(\n          new mapkit.Coordinate(suburbData.lat, suburbData.lng),\n          new mapkit.CoordinateSpan(0.1, 0.1)\n        );\n        closeAllPanels();\n      }\n    }\n  };\n  \n  // Fuel selector dropdown\n  const fuelBtn = document.getElementById('fuel-dropdown-btn');\n  const fuelContent = document.getElementById('fuel-dropdown-content');\n  \n  if (fuelBtn && fuelContent) {\n    FUEL_TYPES.forEach(fuel => {\n      const item = document.createElement('div');\n      item.className = 'fuel-dropdown-item';\n      item.textContent = fuel.fullName;\n      if (fuel.key === currentFuel) item.classList.add('selected');\n      \n      item.addEventListener('click', () => {\n        currentFuel = fuel.key;\n        savePreferences();\n        fuelBtn.innerHTML = `${fuel.fullName} <span class="arrow">▼</span>`;\n        fuelContent.classList.remove('show');\n        document.querySelectorAll('.fuel-dropdown-item').forEach(i => i.classList.remove('selected'));\n        item.classList.add('selected');\n        findCheapestStation();\n        updateVisibleStationsAndList();\n      });\n      \n      fuelContent.appendChild(item);\n    });\n    \n    fuelBtn.innerHTML = `${FUEL_TYPES.find(f => f.key === currentFuel).fullName} <span class="arrow">▼</span>`;\n    \n    fuelBtn.addEventListener('click', e => {\n      e.stopPropagation();\n      fuelContent.classList.toggle('show');\n    });\n    \n    document.addEventListener('click', () => {\n      fuelContent.classList.remove('show');\n    });\n  }\n  \n  // Toolbar buttons\n  document.getElementById('toolbar-search-btn')?.addEventListener('click', () => {\n    openPanel('search');\n    document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));\n    document.getElementById('toolbar-search-btn').classList.add('sc-current');\n  });\n  \n  document.getElementById('toolbar-center-btn')?.addEventListener('click', () => {\n    if (!myMap) return;\n    \n    if (userLocation) {\n      myMap.center = new mapkit.Coordinate(userLocation.lat, userLocation.lng);\n      createUserLocationAnnotation(userLocation.lat, userLocation.lng);\n    } else {\n      if (navigator.geolocation) {\n        navigator.geolocation.getCurrentPosition(\n          position => {\n            userLocation = {\n              lat: position.coords.latitude,\n              lng: position.coords.longitude\n            };\n            myMap.center = new mapkit.Coordinate(userLocation.lat, userLocation.lng);\n            createUserLocationAnnotation(userLocation.lat, userLocation.lng);\n          },\n          error => {\n            console.log("Location error:", error);\n            myMap.center = new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng);\n          }\n        );\n      } else {\n        myMap.center = new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng);\n      }\n    }\n    closeAllPanels();\n    document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));\n    document.getElementById('toolbar-center-btn').classList.add('sc-current');\n  });\n  \n  document.getElementById('toolbar-list-btn')?.addEventListener('click', () => {\n    openPanel('list');\n    document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));\n    document.getElementById('toolbar-list-btn').classList.add('sc-current');\n  });\n  \n  // Overlays close panels\n  document.querySelectorAll('.panel-overlay').forEach(overlay => {\n    overlay.addEventListener('click', closeAllPanels);\n  });\n  \n  // Get user location\n  if (navigator.geolocation) {\n    navigator.geolocation.getCurrentPosition(\n      position => {\n        userLocation = {\n          lat: position.coords.latitude,\n          lng: position.coords.longitude\n        };\n        if (myMap) {\n          myMap.center = new mapkit.Coordinate(userLocation.lat, userLocation.lng);\n          createUserLocationAnnotation(userLocation.lat, userLocation.lng);\n        }\n      },\n      error => console.log("Location error:", error)\n    );\n  }\n  \n  // Make functions global\n  window.showFeatureCard = showFeatureCard;\n  \n  // Initialize drag functionality\n  setupGlobalDragListeners();\n});\n
