@@ -4,6 +4,16 @@ import { QLD_SUBURBS } from './data/qld-suburbs.js';
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Script loaded!");
   
+  // Initialize MapKit with your team ID and key ID
+  // You'll need to replace these with your actual Apple Developer credentials
+  mapkit.init({
+    authorizationCallback: function(done) {
+      // You'll need to implement server-side JWT token generation
+      // For now, using a placeholder - you'll need to get this from Apple Developer
+      done("YOUR_MAPKIT_JS_TOKEN_HERE");
+    }
+  });
+  
   // --- Constants & Config ---
   const BRISBANE_COORDS = { lat: -27.4698, lng: 153.0251 };
   
@@ -51,40 +61,32 @@ document.addEventListener("DOMContentLoaded", () => {
     return BRAND_LOGOS[brandId] || BRAND_LOGOS[12]; // Default to generic logo
   };
   
-  // Create custom marker with mymarker.png base, station logo, and price in black box
-  function createCustomMarker(price, brandId, isCheapest = false) {
+  // Create custom marker annotation with MapKit
+  function createCustomMarkerAnnotation(site, price, isCheapest = false) {
     const priceText = (price / 10).toFixed(1);
-    const logoUrl = getBrandLogo(brandId);
+    const logoUrl = getBrandLogo(site.B);
     
-    // Create a custom marker element
-    const markerDiv = document.createElement('div');
-    markerDiv.className = `custom-marker ${isCheapest ? 'cheapest' : ''}`;
+    // Create annotation
+    const annotation = new mapkit.MarkerAnnotation(
+      new mapkit.Coordinate(site.Lat, site.Lng),
+      {
+        color: isCheapest ? "#22C55E" : "#387CC2",
+        title: site.N,
+        subtitle: `${priceText}c - ${site.A}`,
+        data: {
+          site: site,
+          price: price,
+          isCheapest: isCheapest
+        }
+      }
+    );
     
-    // Base marker image (mymarker.png)
-    const baseMarker = document.createElement('img');
-    baseMarker.src = 'images/mymarker.png';
-    baseMarker.className = `marker-base ${isCheapest ? 'cheapest' : ''}`;
-    
-    // Station logo on top of marker
-    const stationLogo = document.createElement('img');
-    stationLogo.src = logoUrl;
-    stationLogo.className = 'marker-logo';
-    
-    // Error handling for logo loading
-    stationLogo.onerror = function() {
-      this.src = 'images/default.png';
+    // Custom appearance using DOM element
+    annotation.appearance = {
+      markerAnimationType: mapkit.Annotation.AnimationType.Rise
     };
     
-    // Price box (black background with white text)
-    const priceBox = document.createElement('div');
-    priceBox.textContent = priceText;
-    priceBox.className = 'marker-price';
-    
-    markerDiv.appendChild(baseMarker);
-    markerDiv.appendChild(stationLogo);
-    markerDiv.appendChild(priceBox);
-    
-    return markerDiv;
+    return annotation;
   }
   
   const BRAND_NAMES = {
@@ -116,8 +118,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentFuel = localStorage.getItem('preferredFuel') || "E10";
   let userLocation = null;
   let cheapestStationId = null;
-  let currentMarkers = []; // Track current markers for cleanup
-  let userLocationMarker = null; // Track user location marker
+  let currentAnnotations = []; // Track current annotations for cleanup
+  let userLocationAnnotation = null; // Track user location annotation
   
   // Create postcode to suburb mapping
   const postcodeToSuburb = {};
@@ -152,82 +154,39 @@ document.addEventListener("DOMContentLoaded", () => {
     return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
   };
   
-  // --- Google Maps Initialization ---
-  myMap = new google.maps.Map(document.getElementById("google-map"), {
-    center: BRISBANE_COORDS,
-    zoom: 14,
-    minZoom: 12,                 // Minimum zoom level (more zoomed out)
-    maxZoom: 16,                 // Maximum zoom level (more zoomed in)
-    mapId: "AIzaSyAQ0Ba7zICGUy5zCVijkkDNrNVdKAG1FGU", 
-    tilt: 45, // Enable 3D tilt
-    heading: 0, // Initial compass heading
-    clickableIcons: false, // Disable POI clicking
-    styles: [
-      {
-        featureType: "poi",
-        stylers: [{ visibility: "off" }]
-      },
-      {
-        featureType: "poi.business",
-        stylers: [{ visibility: "off" }]
-      },
-      {
-        featureType: "poi.government",
-        stylers: [{ visibility: "off" }]
-      },
-      {
-        featureType: "poi.medical",
-        stylers: [{ visibility: "off" }]
-      },
-      {
-        featureType: "poi.park",
-        stylers: [{ visibility: "off" }]
-      },
-      {
-        featureType: "poi.place_of_worship",
-        stylers: [{ visibility: "off" }]
-      },
-      {
-        featureType: "poi.school",
-        stylers: [{ visibility: "off" }]
-      },
-      {
-        featureType: "poi.sports_complex",
-        stylers: [{ visibility: "off" }]
-      },
-      {
-        featureType: "transit",
-        stylers: [{ visibility: "off" }]
-      },
-      {
-        featureType: "transit.station",
-        stylers: [{ visibility: "off" }]
-      }
-    ],
-    disableDefaultUI: true, // Disable all default controls
-    zoomControl: false,
-    mapTypeControl: false,
-    scaleControl: false,
-    streetViewControl: false,
-    rotateControl: false,
-    fullscreenControl: false
+  // --- Apple Maps MapKit JS Initialization ---
+  myMap = new mapkit.Map("map", {
+    center: new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng),
+    region: new mapkit.CoordinateRegion(
+      new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng),
+      new mapkit.CoordinateSpan(0.5, 0.5) // Roughly equivalent to zoom 14
+    ),
+    mapType: mapkit.Map.MapTypes.Standard,
+    showsMapTypeControl: false,
+    showsZoomControl: false,
+    showsUserLocationControl: false,
+    showsCompass: mapkit.FeatureVisibility.Hidden,
+    showsScale: mapkit.FeatureVisibility.Hidden,
+    showsPointsOfInterest: false
   });
   
   // Custom control functions
   window.changeMapType = function(type) {
-    myMap.setMapTypeId(type);
+    switch(type) {
+      case 'roadmap':
+        myMap.mapType = mapkit.Map.MapTypes.Standard;
+        break;
+      case 'satellite':
+        myMap.mapType = mapkit.Map.MapTypes.Satellite;
+        break;
+      case 'hybrid':
+        myMap.mapType = mapkit.Map.MapTypes.Hybrid;
+        break;
+      case 'terrain':
+        myMap.mapType = mapkit.Map.MapTypes.Standard; // MapKit doesn't have terrain, use standard
+        break;
+    }
     document.getElementById('maptype-dropdown').classList.remove('show');
-  };
-  
-  window.toggleStreetView = function() {
-    const streetView = myMap.getStreetView();
-    const visible = streetView.getVisible();
-    streetView.setVisible(!visible);
-  };
-  
-  window.rotateMap = function() {
-    const currentHeading = myMap.getHeading() || 0;
-    myMap.setHeading(currentHeading + 90);
   };
   
   // Map type dropdown toggle
@@ -240,82 +199,25 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener('click', function() {
     document.getElementById('maptype-dropdown').classList.remove('show');
   });
-  
-  // Initialize Directions Service and Renderer
-  const directionsService = new google.maps.DirectionsService();
-  const directionsRenderer = new google.maps.DirectionsRenderer({
-    suppressMarkers: true, // Don't show default markers
-    polylineOptions: {
-      strokeColor: '#007AFF',
-      strokeOpacity: 0.8,
-      strokeWeight: 6
-    }
-  });
-  directionsRenderer.setMap(myMap);
 
-  // --- User Location Marker ---
-  function createUserLocationMarker(lat, lng) {
-    // Remove existing user location marker
-    if (userLocationMarker) {
-      userLocationMarker.setMap(null);
+  // --- User Location Annotation ---
+  function createUserLocationAnnotation(lat, lng) {
+    // Remove existing user location annotation
+    if (userLocationAnnotation) {
+      myMap.removeAnnotation(userLocationAnnotation);
     }
     
-    // Create custom user location marker element
-    const markerDiv = document.createElement('div');
-    markerDiv.className = 'user-location-marker';
-    
-    // Blue dot with white border and pulse animation
-    const blueDot = document.createElement('div');
-    blueDot.className = 'user-location-dot';
-    
-    const pulseRing = document.createElement('div');
-    pulseRing.className = 'user-location-pulse';
-    
-    markerDiv.appendChild(pulseRing);
-    markerDiv.appendChild(blueDot);
-    
-    // Create custom marker using OverlayView
-    class UserLocationMarker extends google.maps.OverlayView {
-      constructor(position, content, map) {
-        super();
-        this.position = position;
-        this.content = content;
-        this.div = null;
-        this.setMap(map);
+    // Create user location annotation
+    userLocationAnnotation = new mapkit.MarkerAnnotation(
+      new mapkit.Coordinate(lat, lng),
+      {
+        color: "#007AFF",
+        title: "Your Location",
+        animationType: mapkit.Annotation.AnimationType.Rise
       }
-      
-      onAdd() {
-        this.div = document.createElement('div');
-        this.div.style.position = 'absolute';
-        this.div.appendChild(this.content);
-        
-        const panes = this.getPanes();
-        panes.overlayMouseTarget.appendChild(this.div);
-      }
-      
-      draw() {
-        const overlayProjection = this.getProjection();
-        const sw = overlayProjection.fromLatLngToDivPixel(this.position);
-        
-        if (this.div) {
-          this.div.style.left = (sw.x - 15) + 'px';
-          this.div.style.top = (sw.y - 15) + 'px';
-        }
-      }
-      
-      onRemove() {
-        if (this.div) {
-          this.div.parentNode.removeChild(this.div);
-          this.div = null;
-        }
-      }
-    }
-    
-    userLocationMarker = new UserLocationMarker(
-      new google.maps.LatLng(lat, lng), 
-      markerDiv, 
-      myMap
     );
+    
+    myMap.addAnnotation(userLocationAnnotation);
   }
 
   // --- Weather API ---
@@ -415,21 +317,15 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Cheapest station:", cheapestStationId, "Price:", cheapestPrice, "Stations with fuel:", stationsWithFuel);
   }
 
-  // --- Map Markers ---
+  // --- Map Annotations ---
   function updateVisibleStationsAndList() {
     console.log("Updating stations and list...");
     
-    // Clear existing markers
-    currentMarkers.forEach(marker => {
-      if (marker.setMap) {
-        marker.setMap(null);
-      }
-    });
-    currentMarkers = [];
+    // Clear existing annotations
+    myMap.removeAnnotations(currentAnnotations);
+    currentAnnotations = [];
     
-    const bounds = myMap.getBounds();
-    if (!bounds) return;
-    
+    const visibleRegion = myMap.visibleMapRect;
     const visibleStations = [];
     
     // Find cheapest station among visible ones
@@ -438,7 +334,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // First pass: find all visible stations and their cheapest price
     allSites.forEach(site => {
-      const position = new google.maps.LatLng(site.Lat, site.Lng);
+      const coordinate = new mapkit.Coordinate(site.Lat, site.Lng);
       const fuel = FUEL_TYPES.find(f => f.key === currentFuel);
       let price;
       
@@ -451,7 +347,7 @@ document.addEventListener("DOMContentLoaded", () => {
         price = priceMap[site.S]?.[fuel.id];
       }
       
-      if (!price || !bounds.contains(position)) return;
+      if (!price || !mapkit.MapRect.containsCoordinate(visibleRegion, coordinate)) return;
       
       visibleStations.push({ site, price });
       
@@ -461,63 +357,25 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
     
-    // Second pass: create markers with correct cheapest highlighting
+    // Second pass: create annotations with correct cheapest highlighting
     visibleStations.forEach(({ site, price }) => {
-      const position = new google.maps.LatLng(site.Lat, site.Lng);
       const isCheapest = site.S === cheapestVisibleStationId;
-      const brandId = site.B;
       
       console.log(`Station ${site.N}: Price ${price}, isCheapest: ${isCheapest}`);
       
-      // Create the custom marker
-      const markerElement = createCustomMarker(price, brandId, isCheapest);
+      // Create the custom annotation
+      const annotation = createCustomMarkerAnnotation(site, price, isCheapest);
       
-      // Create marker using OverlayView for custom HTML content
-      class CustomMarker extends google.maps.OverlayView {
-        constructor(position, content, map) {
-          super();
-          this.position = position;
-          this.content = content;
-          this.div = null;
-          this.setMap(map);
-        }
-        
-        onAdd() {
-          this.div = document.createElement('div');
-          this.div.style.position = 'absolute';
-          this.div.appendChild(this.content);
-          
-          const panes = this.getPanes();
-          panes.overlayMouseTarget.appendChild(this.div);
-        }
-        
-        draw() {
-          const overlayProjection = this.getProjection();
-          const sw = overlayProjection.fromLatLngToDivPixel(this.position);
-          
-          if (this.div) {
-            this.div.style.left = (sw.x - 25) + 'px';
-            this.div.style.top = (sw.y - 50) + 'px';
-          }
-        }
-        
-        onRemove() {
-          if (this.div) {
-            this.div.parentNode.removeChild(this.div);
-            this.div = null;
-          }
-        }
-      }
-      
-      const marker = new CustomMarker(position, markerElement, myMap);
-      
-      // Add click listener
-      markerElement.addEventListener('click', () => {
+      // Add click listener via delegation
+      annotation.addEventListener('select', () => {
         showFeatureCard(site, price);
       });
       
-      currentMarkers.push(marker);
+      currentAnnotations.push(annotation);
     });
+    
+    // Add all annotations to map
+    myMap.addAnnotations(currentAnnotations);
     
     updateList(visibleStations);
   }
@@ -568,11 +426,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const isCheapest = site.S === cheapestStationId;
     
     // Find cheapest visible station price
-    const bounds = myMap.getBounds();
+    const visibleRegion = myMap.visibleMapRect;
     let cheapestVisiblePrice = Infinity;
     allSites.forEach(s => {
-      const position = new google.maps.LatLng(s.Lat, s.Lng);
-      if (bounds && bounds.contains(position)) {
+      const coordinate = new mapkit.Coordinate(s.Lat, s.Lng);
+      if (mapkit.MapRect.containsCoordinate(visibleRegion, coordinate)) {
         const fuel = FUEL_TYPES.find(f => f.key === currentFuel);
         let p;
         if (fuel.altId) {
@@ -677,56 +535,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   
   // --- Navigation Functions ---
-  let currentDirections = null;
-  
-  // Get directions to a station
-  function getDirections(destinationLat, destinationLng) {
-    if (!userLocation) {
-      // Fallback to external navigation if no user location
-      navigateExternal(destinationLat, destinationLng);
-      return;
-    }
-    
-    const origin = new google.maps.LatLng(userLocation.lat, userLocation.lng);
-    const destination = new google.maps.LatLng(destinationLat, destinationLng);
-    
-    const request = {
-      origin: origin,
-      destination: destination,
-      travelMode: google.maps.TravelMode.DRIVING,
-      unitSystem: google.maps.UnitSystem.METRIC,
-      avoidHighways: false,
-      avoidTolls: false
-    };
-    
-    directionsService.route(request, (result, status) => {
-      if (status === 'OK') {
-        directionsRenderer.setDirections(result);
-        currentDirections = result;
-        
-        // Show directions info
-        const route = result.routes[0];
-        const leg = route.legs[0];
-        showDirectionsInfo(leg.duration.text, leg.distance.text);
-        
-        // Fit map to show entire route
-        const bounds = new google.maps.LatLngBounds();
-        route.overview_path.forEach(point => bounds.extend(point));
-        myMap.fitBounds(bounds);
-      } else {
-        console.error('Directions request failed:', status);
-        // Fallback to external navigation
-        navigateExternal(destinationLat, destinationLng);
-      }
-    });
-  }
-  
-  // Clear current directions
-  function clearDirections() {
-    directionsRenderer.setDirections({routes: []});
-    currentDirections = null;
-    hideDirectionsInfo();
-  }
   
   // Navigate with specific app
   function navigateWithApp(app, lat, lng) {
@@ -770,57 +578,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
   
-  // Show directions info panel
-  function showDirectionsInfo(duration, distance) {
-    let directionsInfo = document.getElementById('directions-info');
-    if (!directionsInfo) {
-      directionsInfo = document.createElement('div');
-      directionsInfo.id = 'directions-info';
-      directionsInfo.className = 'directions-info';
-      document.body.appendChild(directionsInfo);
-    }
-    
-    directionsInfo.innerHTML = `
-      <div class="directions-content">
-        <div class="directions-text">
-          <div class="directions-time">${duration}</div>
-          <div class="directions-distance">${distance}</div>
-        </div>
-        <button class="directions-close" onclick="clearDirections()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-    `;
-    directionsInfo.style.display = 'block';
-  }
-  
-  // Hide directions info panel
-  function hideDirectionsInfo() {
-    const directionsInfo = document.getElementById('directions-info');
-    if (directionsInfo) {
-      directionsInfo.style.display = 'none';
-    }
-  }
-  
-  // Main navigation function (called from feature cards)
-  window.navigate = function(lat, lng) {
-    getDirections(lat, lng);
-  };
-  
-  // Zoom functions
+  // Zoom functions for MapKit
   window.zoomIn = function() {
-    const currentZoom = myMap.getZoom();
-    myMap.setZoom(Math.min(currentZoom + 1, 16)); // Max zoom 16
+    const currentRegion = myMap.region;
+    const newSpan = new mapkit.CoordinateSpan(
+      currentRegion.span.latitudeDelta * 0.5,
+      currentRegion.span.longitudeDelta * 0.5
+    );
+    myMap.region = new mapkit.CoordinateRegion(currentRegion.center, newSpan);
   };
   
   window.zoomOut = function() {
-    const currentZoom = myMap.getZoom();
-    myMap.setZoom(Math.max(currentZoom - 1, 12)); // Min zoom 12
+    const currentRegion = myMap.region;
+    const newSpan = new mapkit.CoordinateSpan(
+      currentRegion.span.latitudeDelta * 2.0,
+      currentRegion.span.longitudeDelta * 2.0
+    );
+    myMap.region = new mapkit.CoordinateRegion(currentRegion.center, newSpan);
   };
   
   // Make functions global
-  window.clearDirections = clearDirections;
-  window.getDirections = getDirections;
+  window.navigateWithApp = navigateWithApp;
+  window.navigateExternal = navigateExternal;
   
   // --- Panel Management ---
   function openPanel(panelName) {
@@ -1078,15 +857,21 @@ document.addEventListener("DOMContentLoaded", () => {
     if (sites.length > 0) {
       const avgLat = sites.reduce((sum, s) => sum + s.Lat, 0) / sites.length;
       const avgLng = sites.reduce((sum, s) => sum + s.Lng, 0) / sites.length;
-      myMap.setCenter(new google.maps.LatLng(avgLat, avgLng));
-      myMap.setZoom(14);
+      myMap.center = new mapkit.Coordinate(avgLat, avgLng);
+      myMap.region = new mapkit.CoordinateRegion(
+        new mapkit.Coordinate(avgLat, avgLng),
+        new mapkit.CoordinateSpan(0.1, 0.1)
+      );
       closeAllPanels();
     } else {
       // If no sites found with exact postcode, try to find the suburb in our mapping
       const suburbData = QLD_SUBURBS.find(s => s.suburb.toLowerCase() === suburbName.toLowerCase());
       if (suburbData) {
-        myMap.setCenter(new google.maps.LatLng(suburbData.lat, suburbData.lng));
-        myMap.setZoom(14);
+        myMap.center = new mapkit.Coordinate(suburbData.lat, suburbData.lng);
+        myMap.region = new mapkit.CoordinateRegion(
+          new mapkit.Coordinate(suburbData.lat, suburbData.lng),
+          new mapkit.CoordinateSpan(0.1, 0.1)
+        );
         closeAllPanels();
       }
     }
@@ -1140,8 +925,8 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById('toolbar-center-btn')?.addEventListener('click', () => {
     // Navigate to user's location or default Brisbane location
     if (userLocation) {
-      myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
-      createUserLocationMarker(userLocation.lat, userLocation.lng);
+      myMap.center = new mapkit.Coordinate(userLocation.lat, userLocation.lng);
+      createUserLocationAnnotation(userLocation.lat, userLocation.lng);
     } else {
       // Try to get location again if not available
       if (navigator.geolocation) {
@@ -1151,17 +936,17 @@ document.addEventListener("DOMContentLoaded", () => {
               lat: position.coords.latitude,
               lng: position.coords.longitude
             };
-            myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
-            createUserLocationMarker(userLocation.lat, userLocation.lng);
+            myMap.center = new mapkit.Coordinate(userLocation.lat, userLocation.lng);
+            createUserLocationAnnotation(userLocation.lat, userLocation.lng);
           },
           error => {
             console.log("Location error:", error);
             // Fallback to Brisbane
-            myMap.setCenter(new google.maps.LatLng(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng));
+            myMap.center = new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng);
           }
         );
       } else {
-        myMap.setCenter(new google.maps.LatLng(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng));
+        myMap.center = new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng);
       }
     }
     closeAllPanels();
@@ -1180,8 +965,8 @@ document.addEventListener("DOMContentLoaded", () => {
     overlay.addEventListener('click', closeAllPanels);
   });
   
-  // Map events
-  myMap.addListener('bounds_changed', () => {
+  // Map events - use MapKit event listeners
+  myMap.addEventListener('region-change-end', () => {
     // Debounce the update to avoid too many calls
     clearTimeout(window.boundsUpdateTimeout);
     window.boundsUpdateTimeout = setTimeout(() => {
@@ -1189,13 +974,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 300);
   });
   
-  // Update weather when map center changes (less frequent than bounds)
-  myMap.addListener('center_changed', () => {
+  // Update weather when map center changes
+  myMap.addEventListener('region-change-end', () => {
     clearTimeout(window.weatherUpdateTimeout);
     window.weatherUpdateTimeout = setTimeout(() => {
-      const center = myMap.getCenter();
+      const center = myMap.center;
       if (center) {
-        fetchWeather(center.lat(), center.lng());
+        fetchWeather(center.latitude, center.longitude);
       }
     }, 1000); // Longer delay for weather updates
   });
@@ -1208,8 +993,8 @@ document.addEventListener("DOMContentLoaded", () => {
           lat: position.coords.latitude,
           lng: position.coords.longitude
         };
-        myMap.setCenter(new google.maps.LatLng(userLocation.lat, userLocation.lng));
-        createUserLocationMarker(userLocation.lat, userLocation.lng);
+        myMap.center = new mapkit.Coordinate(userLocation.lat, userLocation.lng);
+        createUserLocationAnnotation(userLocation.lat, userLocation.lng);
       },
       error => console.log("Location error:", error)
     );
@@ -1217,8 +1002,6 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // Make functions global for onclick handlers
   window.showFeatureCard = showFeatureCard;
-  window.navigateExternal = navigateExternal;
-  window.navigateWithApp = navigateWithApp;
   
   // Initialize drag functionality
   setupGlobalDragListeners();

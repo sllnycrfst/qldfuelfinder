@@ -16,7 +16,7 @@ html, body {
 }
 
 /* ========== MAIN MAP ========== */
-#google-map {
+#map {
   width: 100vw;
   height: 100vh;
   position: absolute;
