@@ -1323,6 +1323,6 @@ padding: 0 15px;
   }
   
   .sc-center-btn {
-    bottom: calc(15px + 3.5px);
+    bottom: calc(10px + 3.5px);
   }
 }
