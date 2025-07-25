@@ -37,8 +37,75 @@ document.addEventListener("DOMContentLoaded", () => {
   
   const getBrandLogo = (brandId) => BRAND_LOGOS[brandId] || BRAND_LOGOS[12];
   
-
-  
+  // Create custom marker with station logo and price box
+  function createCustomMarkerElement(site, price, isCheapest = false, addAnimation = false) {
+    const priceText = (price / 10).toFixed(1);
+    const logoUrl = getBrandLogo(site.B);
+    
+    // Create the main marker container
+    const markerDiv = document.createElement('div');
+    markerDiv.className = `custom-marker ${isCheapest ? 'cheapest' : ''} ${addAnimation ? 'initial-load' : ''}`;
+    markerDiv.style.zIndex = isCheapest ? '1002' : '1001';
+    
+    // Create the teardrop shape base
+    const baseMarker = document.createElement('div');
+    baseMarker.className = `marker-base ${isCheapest ? 'cheapest' : ''}`;
+    
+    // Station logo (centered inside the marker)
+    const stationLogo = document.createElement('img');
+    stationLogo.src = logoUrl;
+    stationLogo.className = 'marker-logo';
+    
+    // Error handling for logo loading
+    stationLogo.onerror = function() {
+      this.style.display = 'none';
+      const fallback = document.createElement('div');
+      fallback.textContent = '⛽';
+      fallback.style.cssText = `
+        position: absolute;
+        bottom: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 16px;
+        color: ${isCheapest ? '#22C55E' : '#387CC2'};
+        z-index: 2;
+        pointer-events: none;
+      `;
+      markerDiv.appendChild(fallback);
+    };
+    
+    // Price box (above the marker)
+    const priceBox = document.createElement('div');
+    priceBox.textContent = priceText;
+    priceBox.className = 'marker-price';
+    
+    // Add hover effects
+    markerDiv.addEventListener('mouseenter', () => {
+      markerDiv.style.zIndex = '1003';
+    });
+    
+    markerDiv.addEventListener('mouseleave', () => {
+      markerDiv.style.zIndex = isCheapest ? '1002' : '1001';
+    });
+    
+    // Remove animation class after animation completes
+    if (addAnimation) {
+      setTimeout(() => {
+        markerDiv.classList.remove('initial-load');
+      }, 600);
+    }
+    
+    // Assemble the marker
+    markerDiv.appendChild(baseMarker);
+    markerDiv.appendChild(stationLogo);
+    markerDiv.appendChild(priceBox);
+    
+    // Store data for click handling
+    markerDiv.dataset.siteId = site.S;
+    markerDiv.dataset.price = price;
+    
+    return markerDiv;
+  }
   // Create user location marker element
   function createUserLocationElement() {
     const markerDiv = document.createElement('div');
@@ -115,6 +182,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let cheapestStationId = null;
   let currentAnnotations = [];
   let userLocationAnnotation = null;
+  let customMarkers = []; // Track custom marker elements
+  let isInitialLoad = true; // Track if this is the first load for animations
   
   // Create postcode to suburb mapping
   const postcodeToSuburb = {};
@@ -275,14 +344,44 @@ document.addEventListener("DOMContentLoaded", () => {
     // Create user location marker element
     const markerElement = createUserLocationElement();
     
-    // Create annotation 
-    userLocationAnnotation = new mapkit.Annotation(new mapkit.Coordinate(lat, lng), {
-      title: "Your Location",
-      subtitle: "Current position"
-    });
+    // Add to map container with positioning
+    const coordinate = new mapkit.Coordinate(lat, lng);
     
-    myMap.addAnnotation(userLocationAnnotation);
-    console.log("User location annotation added");
+    const updateUserLocationPosition = () => {
+      try {
+        const point = myMap.convertCoordinateToPointOnPage(coordinate);
+        const mapContainer = document.getElementById('map');
+        const mapRect = mapContainer.getBoundingClientRect();
+        
+        markerElement.style.position = 'absolute';
+        markerElement.style.left = (point.x - mapRect.left) + 'px';
+        markerElement.style.top = (point.y - mapRect.top) + 'px';
+        markerElement.style.transform = 'translate(-50%, -50%)';
+        markerElement.style.zIndex = '2000';
+      } catch (e) {
+        console.warn('Error updating user location position:', e);
+      }
+    };
+    
+    // Initial positioning
+    updateUserLocationPosition();
+    
+    // Add to map container
+    const mapContainer = document.getElementById('map');
+    mapContainer.appendChild(markerElement);
+    
+    // Store reference for cleanup
+    userLocationAnnotation = {
+      element: markerElement,
+      updatePosition: updateUserLocationPosition,
+      coordinate: coordinate
+    };
+    
+    // Update position when map moves
+    myMap.addEventListener('region-change-start', updateUserLocationPosition);
+    myMap.addEventListener('region-change-end', updateUserLocationPosition);
+    
+    console.log("User location marker added");
   }
 
   // --- Weather API ---
@@ -378,9 +477,8 @@ document.addEventListener("DOMContentLoaded", () => {
     
     console.log("Updating stations and list...");
     
-    // Clear existing annotations
-    myMap.removeAnnotations(currentAnnotations);
-    currentAnnotations = [];
+    // Clean up existing custom markers
+    cleanupCustomMarkers();
     
     const visibleStations = [];
     let cheapestVisiblePrice = Infinity;
@@ -414,33 +512,91 @@ document.addEventListener("DOMContentLoaded", () => {
     
     console.log("Found", visibleStations.length, "visible stations");
     
-    // Create annotations for each station
-    visibleStations.forEach(({ site, price }) => {
+    // Create custom markers for each station
+    visibleStations.forEach(({ site, price }, index) => {
       const isCheapest = site.S === cheapestVisibleStationId;
       
-      // Create annotation
-      const annotation = new mapkit.MarkerAnnotation(new mapkit.Coordinate(site.Lat, site.Lng), {
-        title: site.N,
-        subtitle: `${(price / 10).toFixed(1)} - ${BRAND_NAMES[site.B] || 'Unknown'}`,
-        color: isCheapest ? '#22C55E' : '#387CC2',
-        glyphText: (price / 10).toFixed(1)
-      });
+      // Create the custom marker element (with animation only on initial load)
+      const markerElement = createCustomMarkerElement(site, price, isCheapest, isInitialLoad);
       
-      // Store site data for feature card
-      annotation.data = { site, price };
+      // Add staggered animation delay for initial load
+      if (isInitialLoad) {
+        markerElement.style.animationDelay = `${index * 50}ms`;
+      }
       
-      // Add click handler
-      annotation.addEventListener('select', () => {
+      // Add click handler to open feature card
+      markerElement.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         showFeatureCard(site, price);
       });
       
-      currentAnnotations.push(annotation);
+      // Create coordinate object
+      const coordinate = new mapkit.Coordinate(site.Lat, site.Lng);
+      
+      // Position the marker using map projection
+      const updateMarkerPosition = () => {
+        try {
+          const point = myMap.convertCoordinateToPointOnPage(coordinate);
+          const mapContainer = document.getElementById('map');
+          const mapRect = mapContainer.getBoundingClientRect();
+          
+          markerElement.style.left = (point.x - mapRect.left) + 'px';
+          markerElement.style.top = (point.y - mapRect.top) + 'px';
+          markerElement.style.transform = 'translate(-50%, -100%)';
+        } catch (e) {
+          console.warn('Error updating marker position:', e);
+        }
+      };
+      
+      // Initial positioning
+      updateMarkerPosition();
+      
+      // Add to map container
+      const mapContainer = document.getElementById('map');
+      mapContainer.appendChild(markerElement);
+      
+      // Store marker for cleanup and updates
+      customMarkers.push({
+        element: markerElement,
+        updatePosition: updateMarkerPosition,
+        coordinate: coordinate
+      });
     });
     
-    // Add all annotations to map
-    myMap.addAnnotations(currentAnnotations);
+    // After initial load, don't animate markers anymore
+    if (isInitialLoad) {
+      isInitialLoad = false;
+    }
+    
+    // Set up smooth position updates (no animation, just smooth positioning)
+    const updateAllPositions = () => {
+      customMarkers.forEach(marker => {
+        marker.updatePosition();
+      });
+    };
+    
+    // Update positions during map movement (smooth, no animation)
+    myMap.addEventListener('region-change-start', updateAllPositions);
+    myMap.addEventListener('region-change-end', updateAllPositions);
     
     updateList(visibleStations);
+  }
+  
+  // Clean up custom marker elements
+  function cleanupCustomMarkers() {
+    customMarkers.forEach(marker => {
+      if (marker.element && marker.element.parentNode) {
+        marker.element.parentNode.removeChild(marker.element);
+      }
+    });
+    customMarkers = [];
+    
+    // Clean up user location marker if it exists
+    if (userLocationAnnotation && userLocationAnnotation.element && userLocationAnnotation.element.parentNode) {
+      userLocationAnnotation.element.parentNode.removeChild(userLocationAnnotation.element);
+      userLocationAnnotation = null;
+    }
   }
 
   
@@ -931,7 +1087,6 @@ document.addEventListener("DOMContentLoaded", () => {
           lng: position.coords.longitude
         };
         if (myMap) {
-          myMap.center = new mapkit.Coordinate(userLocation.lat, userLocation.lng);
           createUserLocationAnnotation(userLocation.lat, userLocation.lng);
         }
       },

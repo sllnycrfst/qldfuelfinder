@@ -318,6 +318,24 @@ html, body {
   transition: transform 0.2s ease;
 }
 
+/* Initial animation for markers (only on first load) */
+.custom-marker.initial-load {
+  animation: markerDrop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+  opacity: 0;
+  transform: translateY(-30px) scale(0.3);
+}
+
+@keyframes markerDrop {
+  0% {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.3);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .marker-base {
   position: absolute;
   bottom: 0;
@@ -1137,6 +1155,53 @@ html, body {
     transform: translate(-50%, -50%) scale(2.5);
     opacity: 0;
   }
+}
+
+/* ========== USER LOCATION MARKER ========== */
+.user-location-marker {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  animation: userLocationAppear 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+  opacity: 0;
+  transform: scale(0.3);
+}
+
+@keyframes userLocationAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.user-location-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  background: #007AFF;
+  border: 3px solid white;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+  z-index: 2;
+}
+
+.user-location-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  background: rgba(0, 122, 255, 0.2);
+  border-radius: 50%;
+  animation: userLocationPulse 2s infinite;
 }
 
 /* ========== RESPONSIVE DESIGN ========== */
