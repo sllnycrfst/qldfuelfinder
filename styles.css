@@ -34,23 +34,60 @@ html, body {
   touch-action: pan-x pan-y pinch-zoom;
 }
 
-/* Prevent zoom on everything except the map */
+/* CRITICAL: Prevent zoom on everything except the map */
 * {
-  touch-action: manipulation;
+  touch-action: manipulation !important;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
+/* Only allow pan and zoom on the map itself */
 #map {
   touch-action: pan-x pan-y pinch-zoom !important;
 }
 
-/* Ensure map and its children allow pinch zoom */
-#map *, .mapkit-map, .mapkit-map * {
-  touch-action: pan-x pan-y pinch-zoom !important;
+/* Force all UI elements to NOT zoom */
+.weather-display,
+.map-controls-wrapper,
+.custom-map-controls,
+.zoom-controls-container,
+.custom-zoom-control,
+.custom-maptype-control,
+.fuel-selector,
+.sc-bottom-bar,
+.sc-center-btn,
+.sliding-panel,
+.panel-overlay,
+.custom-marker,
+.user-location-marker {
+  touch-action: manipulation !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
 }
 
-/* But UI elements on top should not */
-.custom-marker, .user-location-marker, .map-controls-wrapper *, .sliding-panel *, .sc-bottom-bar * {
+/* Ensure all child elements also don't zoom */
+.weather-display *,
+.map-controls-wrapper *,
+.custom-map-controls *,
+.zoom-controls-container *,
+.custom-zoom-control *,
+.custom-maptype-control *,
+.fuel-selector *,
+.sc-bottom-bar *,
+.sc-center-btn *,
+.sliding-panel *,
+.panel-overlay *,
+.custom-marker *,
+.user-location-marker * {
   touch-action: manipulation !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
 }
 
 /* ========== WEATHER DISPLAY ========== */
@@ -324,28 +361,19 @@ html, body {
   color: white;
 }
 
-/* ========== CUSTOM MARKERS ========== */
-.custom-marker {
-  position: absolute;
-  width: 50px;
-  height: 60px;
-  cursor: pointer;
-  transform-origin: center bottom;
-  pointer-events: all;
-  z-index: 1000;
+/* ========== CUSTOM MARKERS (now handled via MapKit) ========== */
+/* MapKit markers are customized via JavaScript */
+
+/* Hide default MapKit marker content when we customize it */
+.mk-marker {
   transition: transform 0.2s ease;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  will-change: transform;
+}
+
+.mk-marker:hover {
+  z-index: 1003 !important;
 }
 
 /* Initial animation for markers (only on first load) */
-.custom-marker.initial-load {
-  animation: markerDrop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
-  opacity: 0;
-  transform: translateY(-30px) scale(0.3);
-}
-
 @keyframes markerDrop {
   0% {
     opacity: 0;
@@ -355,91 +383,6 @@ html, body {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
-}
-
-.marker-base {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%) rotate(-45deg);
-  width: 38px;
-  height: 38px;
-  background: rgba(255, 255, 255, 0.95);
-  border: 2px solid #387CC2;
-  border-radius: 50% 50% 50% 0;
-  box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.25),
-    0 2px 6px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  transition: all 0.2s ease;
-}
-
-.marker-base.cheapest {
-  background: rgba(255, 255, 255, 0.95);
-  border: 2px solid #22C55E;
-  box-shadow: 
-    0 4px 16px rgba(34, 197, 94, 0.3),
-    0 2px 8px rgba(34, 197, 94, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-}
-
-.marker-logo {
-  position: absolute;
-  bottom: 7px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 22px;
-  height: 22px;
-  border-radius: 3px;
-  object-fit: contain;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 1.5px;
-  z-index: 2;
-  pointer-events: none;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-.marker-price {
-  position: absolute;
-  top: -2px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.9);
-  color: white;
-  padding: 3px 7px;
-  border-radius: 5px;
-  font-size: 11px;
-  font-weight: 700;
-  white-space: nowrap;
-  box-shadow: 
-    0 3px 8px rgba(0, 0, 0, 0.3),
-    0 1px 3px rgba(0, 0, 0, 0.2);
-  z-index: 3;
-  pointer-events: none;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.custom-marker.cheapest .marker-price {
-  background: rgba(34, 197, 94, 0.95);
-  box-shadow: 
-    0 3px 8px rgba(34, 197, 94, 0.4),
-    0 1px 3px rgba(34, 197, 94, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.custom-marker:hover {
-  transform: scale(1.1);
-  z-index: 1001;
-}
-
-.custom-marker:hover .marker-base {
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-}
-
-/* Hide default MapKit markers when using custom elements */
-.mk-marker {
-  opacity: 0 !important;
-  pointer-events: none !important;
 }
 
 /* ========== USER LOCATION MARKER ========== */
