@@ -318,15 +318,23 @@ document.addEventListener("DOMContentLoaded", () => {
     
     const updateUserLocationPosition = () => {
       try {
+        if (!myMap || !coordinate) return;
+        
         const point = myMap.convertCoordinateToPointOnPage(coordinate);
         const mapContainer = document.getElementById('map');
+        
+        if (!point || !mapContainer) return;
+        
         const mapRect = mapContainer.getBoundingClientRect();
+        const x = point.x - mapRect.left;
+        const y = point.y - mapRect.top;
         
         markerElement.style.position = 'absolute';
-        markerElement.style.left = (point.x - mapRect.left) + 'px';
-        markerElement.style.top = (point.y - mapRect.top) + 'px';
-        markerElement.style.transform = 'translate(-50%, -50%)';
+        markerElement.style.left = '0px';
+        markerElement.style.top = '0px';
+        markerElement.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
         markerElement.style.zIndex = '2000';
+        markerElement.style.willChange = 'transform';
       } catch (e) {
         console.warn('Error updating user location position:', e);
       }
@@ -346,7 +354,14 @@ document.addEventListener("DOMContentLoaded", () => {
       coordinate: coordinate
     };
     
-    // Update position when map moves
+    // Remove old user location listeners
+    if (window.userLocationUpdater) {
+      myMap.removeEventListener('region-change-start', window.userLocationUpdater);
+      myMap.removeEventListener('region-change-end', window.userLocationUpdater);
+    }
+    
+    // Add new listeners for smooth user location updates
+    window.userLocationUpdater = updateUserLocationPosition;
     myMap.addEventListener('region-change-start', updateUserLocationPosition);
     myMap.addEventListener('region-change-end', updateUserLocationPosition);
     
@@ -503,16 +518,27 @@ document.addEventListener("DOMContentLoaded", () => {
       // Create coordinate object
       const coordinate = new mapkit.Coordinate(site.Lat, site.Lng);
       
-      // Position the marker using map projection
+      // Position the marker using map projection with improved accuracy
       const updateMarkerPosition = () => {
         try {
+          if (!myMap || !coordinate) return;
+          
           const point = myMap.convertCoordinateToPointOnPage(coordinate);
           const mapContainer = document.getElementById('map');
+          
+          if (!point || !mapContainer) return;
+          
           const mapRect = mapContainer.getBoundingClientRect();
           
-          markerElement.style.left = (point.x - mapRect.left) + 'px';
-          markerElement.style.top = (point.y - mapRect.top) + 'px';
-          markerElement.style.transform = 'translate(-50%, -100%)';
+          // Use transform for smoother positioning
+          const x = point.x - mapRect.left;
+          const y = point.y - mapRect.top;
+          
+          markerElement.style.position = 'absolute';
+          markerElement.style.left = '0px';
+          markerElement.style.top = '0px';
+          markerElement.style.transform = `translate(${x}px, ${y}px) translate(-50%, -100%)`;
+          markerElement.style.willChange = 'transform';
         } catch (e) {
           console.warn('Error updating marker position:', e);
         }
@@ -538,24 +564,75 @@ document.addEventListener("DOMContentLoaded", () => {
       isInitialLoad = false;
     }
     
-    // Set up smooth position updates (no animation, just smooth positioning)
+    // Set up continuous position updates during map movement
     const updateAllPositions = () => {
-      customMarkers.forEach(marker => {
-        marker.updatePosition();
-      });
+      try {
+        customMarkers.forEach(marker => {
+          if (marker.element && marker.element.parentNode) {
+            marker.updatePosition();
+          }
+        });
+      } catch (e) {
+        console.warn('Error updating marker positions:', e);
+      }
     };
     
-    // Update positions during map movement (smooth, no animation)
-    myMap.addEventListener('region-change-start', updateAllPositions);
-    myMap.addEventListener('region-change-end', updateAllPositions);
+    // Remove existing listeners first
+    if (window.currentPositionUpdater) {
+      myMap.removeEventListener('region-change-start', window.currentPositionUpdater);
+      myMap.removeEventListener('region-change-end', window.currentPositionUpdater);
+    }
+    
+    // Clear any existing animation frame
+    if (window.markerUpdateFrame) {
+      cancelAnimationFrame(window.markerUpdateFrame);
+    }
+    
+    // Add new listeners for smooth updates
+    window.currentPositionUpdater = updateAllPositions;
+    
+    // Update positions continuously during map movement
+    let isMapMoving = false;
+    let lastUpdateTime = 0;
+    
+    const smoothUpdateLoop = () => {
+      if (isMapMoving) {
+        const now = performance.now();
+        if (now - lastUpdateTime > 16) { // 60fps throttling
+          updateAllPositions();
+          lastUpdateTime = now;
+        }
+        window.markerUpdateFrame = requestAnimationFrame(smoothUpdateLoop);
+      }
+    };
+    
+    myMap.addEventListener('region-change-start', () => {
+      isMapMoving = true;
+      smoothUpdateLoop();
+    });
+    
+    myMap.addEventListener('region-change-end', () => {
+      isMapMoving = false;
+      if (window.markerUpdateFrame) {
+        cancelAnimationFrame(window.markerUpdateFrame);
+      }
+      // Final update
+      setTimeout(updateAllPositions, 50);
+    });
     
     updateList(visibleStations);
   }
   
   // Clean up custom marker elements
   function cleanupCustomMarkers() {
+    // Cancel any pending updates
+    if (window.markerUpdateFrame) {
+      cancelAnimationFrame(window.markerUpdateFrame);
+    }
+    
     customMarkers.forEach(marker => {
       if (marker.element && marker.element.parentNode) {
+        marker.element.style.willChange = 'auto'; // Reset will-change
         marker.element.parentNode.removeChild(marker.element);
       }
     });
