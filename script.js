@@ -459,8 +459,8 @@ document.addEventListener("DOMContentLoaded", () => {
       markerEl.className = 'fuel-marker';
       markerEl.style.cssText = `
         position: absolute;
-        width: 60px;
-        height: 80px;
+        width: 50px;
+        height: 50px;
         cursor: pointer;
         z-index: ${isCheapest ? '1002' : '1001'};
         pointer-events: auto;
@@ -470,14 +470,14 @@ document.addEventListener("DOMContentLoaded", () => {
       markerEl.innerHTML = `
         <div class="marker-container" style="
           position: relative;
-          width: 60px;
-          height: 80px;
+          width: 50px;
+          height: 50px;
         ">
           <!-- Custom marker background -->
           <img src="images/mymarker.png" class="marker-bg" style="
             position: absolute;
-            width: 60px;
-            height: 80px;
+            width: 50px;
+            height: 50px;
             z-index: 1;
             filter: ${isCheapest ? 'hue-rotate(120deg) saturate(1.2)' : 'none'};
           ">
@@ -501,10 +501,9 @@ document.addEventListener("DOMContentLoaded", () => {
           <!-- Price in black box -->
           <div class="price-display" style="
             position: absolute;
-            top: 6px;
+            top: 4px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.9);
             color: white;
             padding: 2px 6px;
             border-radius: 4px;
