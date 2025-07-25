@@ -361,7 +361,7 @@ html, body {
   position: absolute;
   bottom: 0;
   left: 50%;
-  transform: translateX(-50%) rotate(-90deg);
+  transform: translateX(-50%) rotate(-45deg);
   width: 38px;
   height: 38px;
   background: rgba(255, 255, 255, 0.95);
@@ -401,7 +401,7 @@ html, body {
 
 .marker-price {
   position: absolute;
-  top: -12px;
+  top: -2px;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.9);
