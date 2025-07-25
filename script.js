@@ -4,6 +4,9 @@ import { QLD_SUBURBS } from './data/qld-suburbs.js';
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Script loaded!");
   
+  // Setup touch handling FIRST
+  setupTouchHandling();
+  
   // Initialize MapKit with your token
   mapkit.init({
     authorizationCallback: function(done) {
@@ -146,10 +149,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 300);
       });
       
-      // Update marker positions during map movement - improved
+      // Update user location marker during map movement
       let animationId;
       myMap.addEventListener('region-change-start', () => {
         const updateAllMarkers = () => {
+          // Update fuel markers
           const markers = document.querySelectorAll('.fuel-marker');
           markers.forEach(marker => {
             if (marker.updatePosition && marker.isConnected) {
@@ -160,6 +164,12 @@ document.addEventListener("DOMContentLoaded", () => {
               }
             }
           });
+          
+          // Update user location marker
+          if (userLocationAnnotation && userLocationAnnotation.updatePosition) {
+            userLocationAnnotation.updatePosition();
+          }
+          
           animationId = requestAnimationFrame(updateAllMarkers);
         };
         
@@ -254,78 +264,87 @@ document.addEventListener("DOMContentLoaded", () => {
     // Clean up existing user location marker
     if (userLocationAnnotation) {
       myMap.removeAnnotation(userLocationAnnotation);
+      userLocationAnnotation = null;
     }
     
-    // Create a simple annotation first
-    userLocationAnnotation = new mapkit.MarkerAnnotation(
-      new mapkit.Coordinate(lat, lng)
-    );
+    // Remove any existing custom user location markers
+    document.querySelectorAll('.custom-user-location').forEach(el => el.remove());
     
-    userLocationAnnotation.title = "Your Location";
+    // Create our own custom blue dot marker (not using MapKit annotation)
+    const userMarker = document.createElement('div');
+    userMarker.className = 'custom-user-location';
+    userMarker.style.cssText = `
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      z-index: 2000;
+      pointer-events: none;
+    `;
     
-    // Add to map
-    myMap.addAnnotation(userLocationAnnotation);
+    // Create pulse ring
+    const pulseRing = document.createElement('div');
+    pulseRing.style.cssText = `
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 30px;
+      height: 30px;
+      background: rgba(0, 122, 255, 0.2);
+      border-radius: 50%;
+      animation: userLocationPulse 2s infinite;
+    `;
     
-    // Customize the marker after it's added to the DOM
-    setTimeout(() => {
-      const markers = document.querySelectorAll('.mk-marker');
-      // Find the last added marker (should be our user location)
-      const userMarker = markers[markers.length - 1];
-      
-      if (userMarker) {
-        // Clear default content
-        userMarker.innerHTML = '';
-        
-        // Style the container
-        userMarker.style.cssText = `
-          width: 30px !important;
-          height: 30px !important;
-          position: relative;
-          z-index: 2000;
-          background: transparent !important;
-          border: none !important;
-          box-shadow: none !important;
-        `;
-        
-        // Create pulse ring
-        const pulseRing = document.createElement('div');
-        pulseRing.style.cssText = `
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 30px;
-          height: 30px;
-          background: rgba(0, 122, 255, 0.2);
-          border-radius: 50%;
-          animation: userLocationPulse 2s infinite;
-          z-index: 1;
-        `;
-        
-        // Create blue dot
-        const blueDot = document.createElement('div');
-        blueDot.style.cssText = `
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 12px;
-          height: 12px;
-          background: #007AFF;
-          border: 3px solid white;
-          border-radius: 50%;
-          box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
-          z-index: 2;
-        `;
-        
-        userMarker.appendChild(pulseRing);
-        userMarker.appendChild(blueDot);
-        
-        console.log("User location marker customized");
+    // Create blue dot
+    const blueDot = document.createElement('div');
+    blueDot.style.cssText = `
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 12px;
+      height: 12px;
+      background: #007AFF;
+      border: 3px solid white;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+      z-index: 2;
+    `;
+    
+    userMarker.appendChild(pulseRing);
+    userMarker.appendChild(blueDot);
+    
+    // Position the marker
+    const coordinate = new mapkit.Coordinate(lat, lng);
+    const updateUserPosition = () => {
+      try {
+        const point = myMap.convertCoordinateToPointOnPage(coordinate);
+        if (point) {
+          const mapContainer = document.getElementById('map');
+          const mapRect = mapContainer.getBoundingClientRect();
+          
+          userMarker.style.left = (point.x - mapRect.left) + 'px';
+          userMarker.style.top = (point.y - mapRect.top) + 'px';
+          userMarker.style.transform = 'translate(-50%, -50%)';
+        }
+      } catch (e) {
+        console.warn('Error positioning user marker:', e);
       }
-    }, 200);
+    };
     
-    console.log("User location marker added");
+    // Initial positioning
+    updateUserPosition();
+    
+    // Add to map container
+    document.getElementById('map').appendChild(userMarker);
+    
+    // Store update function for map movement
+    userMarker.updatePosition = updateUserPosition;
+    
+    // Store reference for cleanup
+    userLocationAnnotation = { element: userMarker, updatePosition: updateUserPosition };
+    
+    console.log("Custom user location marker created");
   }
 
   // --- Weather API ---
@@ -431,6 +450,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll('.fuel-marker').forEach(marker => marker.remove());
     
     const visibleStations = [];
+    let cheapestVisiblePrice = Infinity;
+    const cheapestVisibleStationIds = [];
     
     // Find all visible stations
     allSites.forEach(site => {
@@ -451,15 +472,22 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!price) return;
       
       visibleStations.push({ site, price });
+      
+      // Track cheapest visible price
+      if (price < cheapestVisiblePrice) {
+        cheapestVisiblePrice = price;
+        cheapestVisibleStationIds.length = 0;
+        cheapestVisibleStationIds.push(site.S);
+      } else if (price === cheapestVisiblePrice) {
+        cheapestVisibleStationIds.push(site.S);
+      }
     });
     
     console.log("Found", visibleStations.length, "visible stations");
     
     // Create custom HTML markers positioned manually
     visibleStations.forEach(({ site, price }) => {
-      const isCheapest = Array.isArray(cheapestStationId) ? 
-        cheapestStationId.includes(site.S) : 
-        site.S === cheapestStationId;
+      const isCheapest = cheapestVisibleStationIds.includes(site.S);
       const priceText = (price / 10).toFixed(1);
       const logoUrl = getBrandLogo(site.B);
       
@@ -1089,42 +1117,68 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Setup touch handling to prevent pinch zoom on UI elements
 function setupTouchHandling() {
-  // Prevent pinch zoom anywhere except the map
+  // Aggressive prevention of all zooming outside the map
+  
+  // Prevent gesture events (Safari)
   document.addEventListener('gesturestart', (e) => {
-    if (e.target.closest('#map')) return;
-    e.preventDefault();
-  }, { passive: false });
+    if (!e.target.closest('#map')) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+  }, { capture: true, passive: false });
   
   document.addEventListener('gesturechange', (e) => {
-    if (e.target.closest('#map')) return;
-    e.preventDefault();
-  }, { passive: false });
+    if (!e.target.closest('#map')) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+  }, { capture: true, passive: false });
   
   document.addEventListener('gestureend', (e) => {
-    if (e.target.closest('#map')) return;
-    e.preventDefault();
-  }, { passive: false });
-  
-  // Prevent multi-touch zoom
-  document.addEventListener('touchstart', (e) => {
-    if (e.target.closest('#map')) return;
-    if (e.touches.length > 1) {
+    if (!e.target.closest('#map')) {
       e.preventDefault();
+      e.stopPropagation();
+      return false;
     }
-  }, { passive: false });
+  }, { capture: true, passive: false });
+  
+  // Prevent multi-touch anywhere except map
+  document.addEventListener('touchstart', (e) => {
+    if (!e.target.closest('#map') && e.touches.length > 1) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+  }, { capture: true, passive: false });
   
   document.addEventListener('touchmove', (e) => {
-    if (e.target.closest('#map')) return;
-    if (e.touches.length > 1) {
+    if (!e.target.closest('#map') && e.touches.length > 1) {
       e.preventDefault();
+      e.stopPropagation();
+      return false;
     }
-  }, { passive: false });
+  }, { capture: true, passive: false });
   
-  // Prevent wheel zoom on desktop
+  // Prevent wheel zoom with modifiers outside map
   document.addEventListener('wheel', (e) => {
-    if (e.target.closest('#map')) return;
-    if (e.ctrlKey || e.metaKey) {
+    if (!e.target.closest('#map') && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
+      e.stopPropagation();
+      return false;
     }
-  }, { passive: false });
+  }, { capture: true, passive: false });
+  
+  // Prevent double-tap zoom on everything except map
+  let lastTouchEnd = 0;
+  document.addEventListener('touchend', (e) => {
+    const now = (new Date()).getTime();
+    if (!e.target.closest('#map') && now - lastTouchEnd <= 300) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+    lastTouchEnd = now;
+  }, { capture: true, passive: false });
 }

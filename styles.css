@@ -34,9 +34,13 @@ html, body {
   touch-action: pan-x pan-y pinch-zoom;
 }
 
-/* Prevent zoom on everything */
 html {
   touch-action: manipulation;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-text-size-adjust: none;
+  user-zoom: fixed;
+  -webkit-user-zoom: fixed;
 }
 
 body {
@@ -44,14 +48,10 @@ body {
   zoom: 1;
   -webkit-user-zoom: fixed;
   -webkit-text-size-adjust: 100%;
+  -ms-touch-action: manipulation;
 }
 
-/* Only allow pan and zoom on the map itself */
-#map {
-  touch-action: pan-x pan-y pinch-zoom !important;
-}
-
-/* Prevent zoom on all other elements */
+/* Prevent zoom on everything except map */
 * {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -59,10 +59,16 @@ body {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  touch-action: manipulation !important;
 }
 
-*:not(#map) {
-  touch-action: manipulation !important;
+/* Only the map can zoom */
+#map {
+  touch-action: pan-x pan-y pinch-zoom !important;
+}
+
+#map * {
+  touch-action: pan-x pan-y pinch-zoom !important;
 }
 
 
