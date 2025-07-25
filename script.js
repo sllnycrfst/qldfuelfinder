@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let priceMap = {};
   let currentFuel = localStorage.getItem('preferredFuel') || "E10";
   let userLocation = null;
-  let cheapestStationId = null;
+  let cheapestStationId = [];
   let userLocationAnnotation = null;
   let isInitialLoad = true; // Track if this is the first load for animations
   
@@ -129,7 +129,10 @@ document.addEventListener("DOMContentLoaded", () => {
         showsUserLocationControl: false,
         showsCompass: mapkit.FeatureVisibility.Hidden,
         showsScale: mapkit.FeatureVisibility.Hidden,
-        showsPointsOfInterest: false
+        showsPointsOfInterest: false,
+        // Set zoom limits
+        minCameraDistance: 1000, // Closest zoom
+        maxCameraDistance: 50000 // Furthest zoom (city level)
       });
       
       console.log("Map initialized successfully");
@@ -253,60 +256,74 @@ document.addEventListener("DOMContentLoaded", () => {
       myMap.removeAnnotation(userLocationAnnotation);
     }
     
-    // Create the blue dot HTML element
-    const blueDotElement = document.createElement('div');
-    blueDotElement.style.cssText = `
-      width: 30px;
-      height: 30px;
-      position: relative;
-    `;
-    
-    // Blue dot
-    const blueDot = document.createElement('div');
-    blueDot.style.cssText = `
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 12px;
-      height: 12px;
-      background: #007AFF;
-      border: 3px solid white;
-      border-radius: 50%;
-      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
-      z-index: 2;
-    `;
-    
-    // Pulse ring
-    const pulseRing = document.createElement('div');
-    pulseRing.style.cssText = `
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 30px;
-      height: 30px;
-      background: rgba(0, 122, 255, 0.2);
-      border-radius: 50%;
-      animation: userLocationPulse 2s infinite;
-    `;
-    
-    blueDotElement.appendChild(pulseRing);
-    blueDotElement.appendChild(blueDot);
-    
-    // Create annotation with custom element
+    // Create a simple annotation first
     userLocationAnnotation = new mapkit.MarkerAnnotation(
-      new mapkit.Coordinate(lat, lng),
-      {
-        element: blueDotElement,
-        anchorOffset: new DOMPoint(0, 0)
-      }
+      new mapkit.Coordinate(lat, lng)
     );
     
     userLocationAnnotation.title = "Your Location";
     
     // Add to map
     myMap.addAnnotation(userLocationAnnotation);
+    
+    // Customize the marker after it's added to the DOM
+    setTimeout(() => {
+      const markers = document.querySelectorAll('.mk-marker');
+      // Find the last added marker (should be our user location)
+      const userMarker = markers[markers.length - 1];
+      
+      if (userMarker) {
+        // Clear default content
+        userMarker.innerHTML = '';
+        
+        // Style the container
+        userMarker.style.cssText = `
+          width: 30px !important;
+          height: 30px !important;
+          position: relative;
+          z-index: 2000;
+          background: transparent !important;
+          border: none !important;
+          box-shadow: none !important;
+        `;
+        
+        // Create pulse ring
+        const pulseRing = document.createElement('div');
+        pulseRing.style.cssText = `
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 30px;
+          height: 30px;
+          background: rgba(0, 122, 255, 0.2);
+          border-radius: 50%;
+          animation: userLocationPulse 2s infinite;
+          z-index: 1;
+        `;
+        
+        // Create blue dot
+        const blueDot = document.createElement('div');
+        blueDot.style.cssText = `
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 12px;
+          height: 12px;
+          background: #007AFF;
+          border: 3px solid white;
+          border-radius: 50%;
+          box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+          z-index: 2;
+        `;
+        
+        userMarker.appendChild(pulseRing);
+        userMarker.appendChild(blueDot);
+        
+        console.log("User location marker customized");
+      }
+    }, 200);
     
     console.log("User location marker added");
   }
@@ -373,7 +390,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function findCheapestStation() {
     const fuel = FUEL_TYPES.find(f => f.key === currentFuel);
     let cheapestPrice = Infinity;
-    cheapestStationId = null;
+    const cheapestStationIds = [];
     
     allSites.forEach(site => {
       let price;
@@ -386,13 +403,19 @@ document.addEventListener("DOMContentLoaded", () => {
         price = priceMap[site.S]?.[fuel.id];
       }
       
-      if (price && price < cheapestPrice) {
-        cheapestPrice = price;
-        cheapestStationId = site.S;
+      if (price) {
+        if (price < cheapestPrice) {
+          cheapestPrice = price;
+          cheapestStationIds.length = 0; // Clear array
+          cheapestStationIds.push(site.S);
+        } else if (price === cheapestPrice) {
+          cheapestStationIds.push(site.S);
+        }
       }
     });
     
-    console.log("Cheapest station:", cheapestStationId, "Price:", cheapestPrice);
+    cheapestStationId = cheapestStationIds; // Now an array
+    console.log("Cheapest stations:", cheapestStationIds, "Price:", cheapestPrice);
   }
 
   // --- Map Annotations ---
@@ -408,8 +431,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll('.fuel-marker').forEach(marker => marker.remove());
     
     const visibleStations = [];
-    let cheapestVisiblePrice = Infinity;
-    let cheapestVisibleStationId = null;
     
     // Find all visible stations
     allSites.forEach(site => {
@@ -430,18 +451,15 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!price) return;
       
       visibleStations.push({ site, price });
-      
-      if (price < cheapestVisiblePrice) {
-        cheapestVisiblePrice = price;
-        cheapestVisibleStationId = site.S;
-      }
     });
     
     console.log("Found", visibleStations.length, "visible stations");
     
     // Create custom HTML markers positioned manually
     visibleStations.forEach(({ site, price }) => {
-      const isCheapest = site.S === cheapestVisibleStationId;
+      const isCheapest = Array.isArray(cheapestStationId) ? 
+        cheapestStationId.includes(site.S) : 
+        site.S === cheapestStationId;
       const priceText = (price / 10).toFixed(1);
       const logoUrl = getBrandLogo(site.B);
       
@@ -457,6 +475,7 @@ document.addEventListener("DOMContentLoaded", () => {
         pointer-events: auto;
         transform-origin: center bottom;
         touch-action: auto;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
       `;
       
       markerEl.innerHTML = `
@@ -471,7 +490,6 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 50px;
             height: 50px;
             z-index: 1;
-            filter: ${isCheapest ? 'hue-rotate(120deg) saturate(1.2)' : 'none'};
           ">
           
           <!-- Brand logo -->
@@ -487,16 +505,15 @@ document.addEventListener("DOMContentLoaded", () => {
             background: white;
             padding: 2px;
             z-index: 2;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
           " onerror="this.style.display='none'">
           
-          <!-- Price in black box -->
+          <!-- Price text -->
           <div class="price-display" style="
             position: absolute;
             top: 1px;
             left: 50%;
             transform: translateX(-50%);
-            color: white;
+            color: ${isCheapest ? '#22C55E' : 'white'};
             padding: 2px 6px;
             border-radius: 4px;
             font-size: 10px;
@@ -504,6 +521,7 @@ document.addEventListener("DOMContentLoaded", () => {
             z-index: 2;
             min-width: 30px;
             text-align: center;
+            background: rgba(0, 0, 0, 0.8);
           ">${priceText}</div>
         </div>
       `;
@@ -575,7 +593,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const distance = userLocation ?
         getDistance(userLocation.lat, userLocation.lng, site.Lat, site.Lng).toFixed(1) : '?';
-      const isCheapest = site.S === cheapestStationId;
+      const isCheapest = Array.isArray(cheapestStationId) ? 
+        cheapestStationId.includes(site.S) : 
+        site.S === cheapestStationId;
 
       li.innerHTML = `
         <img class="list-item-logo" src="${getBrandLogo(site.B)}" alt="Brand logo" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTIwIDdoLTkiIHN0cm9rZT0iIzM4N0NDMiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPHBhdGggZD0iTTE0IDE3SDUiIHN0cm9rZT0iIzM4N0NDMiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPGNpcmNsZSBjeD0iMTciIGN5PSIxNyIgcj0iMyIgc3Ryb2tlPSIjMzg3Q0MyIiBzdHJva2Utd2lkdGg9IjIiLz4KPGNpcmNsZSBjeD0iNyIgY3k9IjciIHI9IjMiIHN0cm9rZT0iIzM4N0NDMiIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjwvc3ZnPgo=" />
@@ -603,7 +623,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Feature Card ---
   function showFeatureCard(site, price) {
     const content = document.getElementById('feature-card-content');
-    const isCheapest = site.S === cheapestStationId;
+    const isCheapest = Array.isArray(cheapestStationId) ? 
+      cheapestStationId.includes(site.S) : 
+      site.S === cheapestStationId;
     
     const allPrices = FUEL_TYPES.map(fuel => {
       let p;
