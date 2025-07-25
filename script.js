@@ -263,7 +263,17 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Clean up existing user location marker
     if (userLocationAnnotation) {
-      myMap.removeAnnotation(userLocationAnnotation);
+      if (userLocationAnnotation.element) {
+        // Custom marker - remove from DOM
+        userLocationAnnotation.element.remove();
+      } else {
+        // MapKit annotation - remove from map
+        try {
+          myMap.removeAnnotation(userLocationAnnotation);
+        } catch (e) {
+          console.warn('Error removing annotation:', e);
+        }
+      }
       userLocationAnnotation = null;
     }
     
@@ -1117,68 +1127,63 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Setup touch handling to prevent pinch zoom on UI elements
 function setupTouchHandling() {
-  // Aggressive prevention of all zooming outside the map
+  // ONLY prevent zoom on UI elements, NOT on the map
   
-  // Prevent gesture events (Safari)
+  // Get UI elements that should NOT zoom
+  const getUIElements = () => {
+    return document.querySelectorAll(`
+      .weather-display,
+      .map-controls-wrapper,
+      .zoom-controls-container,
+      .sc-bottom-bar,
+      .sc-center-btn,
+      .sliding-panel,
+      .fuel-marker
+    `);
+  };
+  
+  // Helper to check if element is UI (not map)
+  const isUIElement = (element) => {
+    if (element.closest('#map')) return false; // Map or map child
+    return element.closest('.weather-display, .map-controls-wrapper, .zoom-controls-container, .sc-bottom-bar, .sc-center-btn, .sliding-panel') !== null;
+  };
+  
+  // Prevent gesture zoom on UI elements only
   document.addEventListener('gesturestart', (e) => {
-    if (!e.target.closest('#map')) {
+    if (isUIElement(e.target)) {
       e.preventDefault();
-      e.stopPropagation();
-      return false;
     }
-  }, { capture: true, passive: false });
+  }, { passive: false });
   
   document.addEventListener('gesturechange', (e) => {
-    if (!e.target.closest('#map')) {
+    if (isUIElement(e.target)) {
       e.preventDefault();
-      e.stopPropagation();
-      return false;
     }
-  }, { capture: true, passive: false });
+  }, { passive: false });
   
   document.addEventListener('gestureend', (e) => {
-    if (!e.target.closest('#map')) {
+    if (isUIElement(e.target)) {
       e.preventDefault();
-      e.stopPropagation();
-      return false;
     }
-  }, { capture: true, passive: false });
+  }, { passive: false });
   
-  // Prevent multi-touch anywhere except map
+  // Prevent multi-touch on UI elements only
   document.addEventListener('touchstart', (e) => {
-    if (!e.target.closest('#map') && e.touches.length > 1) {
+    if (isUIElement(e.target) && e.touches.length > 1) {
       e.preventDefault();
-      e.stopPropagation();
-      return false;
     }
-  }, { capture: true, passive: false });
+  }, { passive: false });
   
   document.addEventListener('touchmove', (e) => {
-    if (!e.target.closest('#map') && e.touches.length > 1) {
+    if (isUIElement(e.target) && e.touches.length > 1) {
       e.preventDefault();
-      e.stopPropagation();
-      return false;
     }
-  }, { capture: true, passive: false });
+  }, { passive: false });
   
-  // Prevent wheel zoom with modifiers outside map
+  // Prevent wheel zoom on UI elements only
   document.addEventListener('wheel', (e) => {
-    if (!e.target.closest('#map') && (e.ctrlKey || e.metaKey)) {
+    if (isUIElement(e.target) && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
-      e.stopPropagation();
-      return false;
     }
-  }, { capture: true, passive: false });
-  
-  // Prevent double-tap zoom on everything except map
-  let lastTouchEnd = 0;
-  document.addEventListener('touchend', (e) => {
-    const now = (new Date()).getTime();
-    if (!e.target.closest('#map') && now - lastTouchEnd <= 300) {
-      e.preventDefault();
-      e.stopPropagation();
-      return false;
-    }
-    lastTouchEnd = now;
-  }, { capture: true, passive: false });
+  }, { passive: false });
 }
