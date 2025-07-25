@@ -4,9 +4,6 @@ import { QLD_SUBURBS } from './data/qld-suburbs.js';
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Script loaded!");
   
-  // Setup touch handling FIRST
-  setupTouchHandling();
-  
   // Initialize MapKit with your token
   mapkit.init({
     authorizationCallback: function(done) {
@@ -1120,70 +1117,6 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // Initialize drag functionality
   setupGlobalDragListeners();
-  
-  // Prevent pinch zoom on UI elements
-  setupTouchHandling();
 });
 
-// Setup touch handling to prevent pinch zoom on UI elements
-function setupTouchHandling() {
-  // ONLY prevent zoom on UI elements, NOT on the map
-  
-  // Get UI elements that should NOT zoom
-  const getUIElements = () => {
-    return document.querySelectorAll(`
-      .weather-display,
-      .map-controls-wrapper,
-      .zoom-controls-container,
-      .sc-bottom-bar,
-      .sc-center-btn,
-      .sliding-panel,
-      .fuel-marker
-    `);
-  };
-  
-  // Helper to check if element is UI (not map)
-  const isUIElement = (element) => {
-    if (element.closest('#map')) return false; // Map or map child
-    return element.closest('.weather-display, .map-controls-wrapper, .zoom-controls-container, .sc-bottom-bar, .sc-center-btn, .sliding-panel') !== null;
-  };
-  
-  // Prevent gesture zoom on UI elements only
-  document.addEventListener('gesturestart', (e) => {
-    if (isUIElement(e.target)) {
-      e.preventDefault();
-    }
-  }, { passive: false });
-  
-  document.addEventListener('gesturechange', (e) => {
-    if (isUIElement(e.target)) {
-      e.preventDefault();
-    }
-  }, { passive: false });
-  
-  document.addEventListener('gestureend', (e) => {
-    if (isUIElement(e.target)) {
-      e.preventDefault();
-    }
-  }, { passive: false });
-  
-  // Prevent multi-touch on UI elements only
-  document.addEventListener('touchstart', (e) => {
-    if (isUIElement(e.target) && e.touches.length > 1) {
-      e.preventDefault();
-    }
-  }, { passive: false });
-  
-  document.addEventListener('touchmove', (e) => {
-    if (isUIElement(e.target) && e.touches.length > 1) {
-      e.preventDefault();
-    }
-  }, { passive: false });
-  
-  // Prevent wheel zoom on UI elements only
-  document.addEventListener('wheel', (e) => {
-    if (isUIElement(e.target) && (e.ctrlKey || e.metaKey)) {
-      e.preventDefault();
-    }
-  }, { passive: false });
-}
+
