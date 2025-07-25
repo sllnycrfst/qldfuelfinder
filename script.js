@@ -391,8 +391,11 @@ document.addEventListener("DOMContentLoaded", () => {
     
     console.log("Updating stations and list...");
     
-    // Remove all existing annotations
-    myMap.removeAnnotations(myMap.annotations);
+    // Remove all existing annotations except user location
+    const annotationsToRemove = myMap.annotations.filter(annotation => 
+      annotation !== userLocationAnnotation
+    );
+    myMap.removeAnnotations(annotationsToRemove);
     
     const visibleStations = [];
     let cheapestVisiblePrice = Infinity;
@@ -426,162 +429,89 @@ document.addEventListener("DOMContentLoaded", () => {
     
     console.log("Found", visibleStations.length, "visible stations");
     
-    // Create MapKit annotations for each station
-    const annotations = visibleStations.map(({ site, price }) => {
+    // Create custom HTML markers for each station
+    visibleStations.forEach(({ site, price }) => {
       const isCheapest = site.S === cheapestVisibleStationId;
       const priceText = (price / 10).toFixed(1);
+      const logoUrl = getBrandLogo(site.B);
       
-      // Create custom annotation (simplified)
-      const annotation = new mapkit.MarkerAnnotation(
-        new mapkit.Coordinate(site.Lat, site.Lng)
-      );
-      
-      // Set custom properties
-      annotation.title = site.N;
-      annotation.subtitle = `${priceText}¢`;
-      annotation.data = { site, price, isCheapest };
+      // Create marker element
+      const markerEl = document.createElement('div');
+      markerEl.className = 'fuel-marker';
+      markerEl.innerHTML = `
+        <div class="marker-container" style="
+          position: relative;
+          width: 60px;
+          height: 80px;
+          cursor: pointer;
+        ">
+          <!-- Custom marker background -->
+          <img src="images/mymarker.png" class="marker-bg" style="
+            position: absolute;
+            width: 60px;
+            height: 80px;
+            z-index: 1;
+            filter: ${isCheapest ? 'hue-rotate(120deg)' : 'none'};
+          ">
+          
+          <!-- Brand logo -->
+          <img src="${logoUrl}" class="brand-logo" style="
+            position: absolute;
+            top: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: white;
+            padding: 2px;
+            z-index: 2;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+          " onerror="this.style.display='none'">
+          
+          <!-- Price in black box -->
+          <div class="price-display" style="
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            z-index: 2;
+            min-width: 30px;
+            text-align: center;
+          ">${priceText}</div>
+        </div>
+      `;
       
       // Add click handler
-      annotation.addEventListener('select', () => {
+      markerEl.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         showFeatureCard(site, price);
       });
       
-      return annotation;
-    });
-    
-    // Add all annotations to the map
-    annotations.forEach(annotation => {
+      // Create annotation with custom element
+      const annotation = new mapkit.MarkerAnnotation(
+        new mapkit.Coordinate(site.Lat, site.Lng),
+        {
+          element: markerEl
+        }
+      );
+      
+      annotation.title = site.N;
+      annotation.subtitle = `${priceText}¢`;
+      
       myMap.addAnnotation(annotation);
     });
     
-    // After initial load, don't animate markers anymore
-    if (isInitialLoad) {
-      isInitialLoad = false;
-    }
-    
-    // Customize the appearance of markers after they're added
-    setTimeout(() => {
-      customizeMarkerAppearance(annotations);
-    }, 200);
-    
     updateList(visibleStations);
-  }
-  
-  // Customize marker appearance
-  function customizeMarkerAppearance(annotations) {
-    const markerElements = document.querySelectorAll('.mk-marker');
-    
-    markerElements.forEach((markerEl, index) => {
-      if (index < annotations.length) {
-        const annotation = annotations[index];
-        const { site, price, isCheapest } = annotation.data;
-        const priceText = (price / 10).toFixed(1);
-        const logoUrl = getBrandLogo(site.B);
-        
-        // Clear existing content
-        markerEl.innerHTML = '';
-        
-        // Create custom marker structure
-        markerEl.style.width = '50px';
-        markerEl.style.height = '60px';
-        markerEl.style.position = 'relative';
-        markerEl.style.cursor = 'pointer';
-        
-        // Create the teardrop base
-        const baseDiv = document.createElement('div');
-        baseDiv.style.cssText = `
-          position: absolute;
-          bottom: 0;
-          left: 50%;
-          transform: translateX(-50%) rotate(-90deg);
-          width: 38px;
-          height: 38px;
-          background: rgba(255, 255, 255, 0.95);
-          border: 2px solid ${isCheapest ? '#22C55E' : '#387CC2'};
-          border-radius: 50% 50% 50% 0;
-          box-shadow: 
-            0 4px 12px rgba(0, 0, 0, 0.25),
-            0 2px 6px rgba(0, 0, 0, 0.15),
-            inset 0 1px 0 rgba(255, 255, 255, 0.8);
-        `;
-        
-        // Create the logo
-        const logoImg = document.createElement('img');
-        logoImg.src = logoUrl;
-        logoImg.style.cssText = `
-          position: absolute;
-          bottom: 7px;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 22px;
-          height: 22px;
-          border-radius: 3px;
-          object-fit: contain;
-          background: rgba(255, 255, 255, 0.9);
-          padding: 1.5px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-        `;
-        
-        // Error handling for logo
-        logoImg.onerror = function() {
-          this.style.display = 'none';
-          const fallback = document.createElement('div');
-          fallback.textContent = '⛽';
-          fallback.style.cssText = `
-            position: absolute;
-            bottom: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 16px;
-            color: ${isCheapest ? '#22C55E' : '#387CC2'};
-          `;
-          markerEl.appendChild(fallback);
-        };
-        
-        // Create the price box
-        const priceDiv = document.createElement('div');
-        priceDiv.textContent = priceText;
-        priceDiv.style.cssText = `
-          position: absolute;
-          top: -12px;
-          left: 50%;
-          transform: translateX(-50%);
-          background: ${isCheapest ? 'rgba(34, 197, 94, 0.95)' : 'rgba(0, 0, 0, 0.9)'};
-          color: white;
-          padding: 3px 7px;
-          border-radius: 5px;
-          font-size: 11px;
-          font-weight: 700;
-          white-space: nowrap;
-          box-shadow: 
-            0 3px 8px rgba(0, 0, 0, 0.3),
-            0 1px 3px rgba(0, 0, 0, 0.2);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-        `;
-        
-        // Assemble the marker
-        markerEl.appendChild(baseDiv);
-        markerEl.appendChild(logoImg);
-        markerEl.appendChild(priceDiv);
-        
-        // Set z-index for cheapest markers
-        markerEl.style.zIndex = isCheapest ? '1002' : '1001';
-        
-        // Add hover effect
-        markerEl.addEventListener('mouseenter', () => {
-          markerEl.style.transform = 'scale(1.1)';
-          markerEl.style.zIndex = '1003';
-        });
-        
-        markerEl.addEventListener('mouseleave', () => {
-          markerEl.style.transform = 'scale(1)';
-          markerEl.style.zIndex = isCheapest ? '1002' : '1001';
-        });
-      }
-    });
-  }
-
-  
+  }  
   // --- List Panel ---
   function updateList(stations) {
     const list = document.getElementById('list');
