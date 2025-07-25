@@ -510,8 +510,8 @@ document.addEventListener("DOMContentLoaded", () => {
           <!-- Price text -->
           <div class="price-display" style="
             position: absolute;
-            top: 0px;
-            left: 50%;
+            top: 1px;
+            left: 51%;
             transform: translateX(-50%);
             color: ${isCheapest ? '#22C55E' : 'white'};
             padding: 2px 6px;
