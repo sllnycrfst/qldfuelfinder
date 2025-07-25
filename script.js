@@ -157,6 +157,28 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 300);
       });
       
+      // Update marker positions during map movement
+      myMap.addEventListener('region-change-start', () => {
+        const markers = document.querySelectorAll('.fuel-marker');
+        const updateAllMarkers = () => {
+          markers.forEach(marker => {
+            if (marker.updatePosition) {
+              marker.updatePosition();
+            }
+          });
+        };
+        
+        // Update positions during movement
+        const moveInterval = setInterval(updateAllMarkers, 16); // 60fps
+        
+        // Clean up when movement ends
+        const cleanup = () => {
+          clearInterval(moveInterval);
+          myMap.removeEventListener('region-change-end', cleanup);
+        };
+        myMap.addEventListener('region-change-end', cleanup);
+      });
+      
       // Weather update on center change
       myMap.addEventListener('region-change-end', () => {
         clearTimeout(window.weatherUpdateTimeout);
@@ -391,11 +413,8 @@ document.addEventListener("DOMContentLoaded", () => {
     
     console.log("Updating stations and list...");
     
-    // Remove all existing annotations except user location
-    const annotationsToRemove = myMap.annotations.filter(annotation => 
-      annotation !== userLocationAnnotation
-    );
-    myMap.removeAnnotations(annotationsToRemove);
+    // Remove all existing custom markers
+    document.querySelectorAll('.fuel-marker').forEach(marker => marker.remove());
     
     const visibleStations = [];
     let cheapestVisiblePrice = Infinity;
@@ -429,7 +448,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     console.log("Found", visibleStations.length, "visible stations");
     
-    // Create custom HTML markers for each station
+    // Create custom HTML markers positioned manually
     visibleStations.forEach(({ site, price }) => {
       const isCheapest = site.S === cheapestVisibleStationId;
       const priceText = (price / 10).toFixed(1);
@@ -438,12 +457,21 @@ document.addEventListener("DOMContentLoaded", () => {
       // Create marker element
       const markerEl = document.createElement('div');
       markerEl.className = 'fuel-marker';
+      markerEl.style.cssText = `
+        position: absolute;
+        width: 60px;
+        height: 80px;
+        cursor: pointer;
+        z-index: ${isCheapest ? '1002' : '1001'};
+        pointer-events: auto;
+        transform-origin: center bottom;
+      `;
+      
       markerEl.innerHTML = `
         <div class="marker-container" style="
           position: relative;
           width: 60px;
           height: 80px;
-          cursor: pointer;
         ">
           <!-- Custom marker background -->
           <img src="images/mymarker.png" class="marker-bg" style="
@@ -451,7 +479,7 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 60px;
             height: 80px;
             z-index: 1;
-            filter: ${isCheapest ? 'hue-rotate(120deg)' : 'none'};
+            filter: ${isCheapest ? 'hue-rotate(120deg) saturate(1.2)' : 'none'};
           ">
           
           <!-- Brand logo -->
@@ -496,18 +524,32 @@ document.addEventListener("DOMContentLoaded", () => {
         showFeatureCard(site, price);
       });
       
-      // Create annotation with custom element
-      const annotation = new mapkit.MarkerAnnotation(
-        new mapkit.Coordinate(site.Lat, site.Lng),
-        {
-          element: markerEl
+      // Position the marker
+      const coordinate = new mapkit.Coordinate(site.Lat, site.Lng);
+      const updatePosition = () => {
+        try {
+          const point = myMap.convertCoordinateToPointOnPage(coordinate);
+          if (point) {
+            const mapContainer = document.getElementById('map');
+            const mapRect = mapContainer.getBoundingClientRect();
+            
+            markerEl.style.left = (point.x - mapRect.left) + 'px';
+            markerEl.style.top = (point.y - mapRect.top) + 'px';
+            markerEl.style.transform = 'translate(-50%, -100%)';
+          }
+        } catch (e) {
+          console.warn('Error positioning marker:', e);
         }
-      );
+      };
       
-      annotation.title = site.N;
-      annotation.subtitle = `${priceText}¢`;
+      // Initial positioning
+      updatePosition();
       
-      myMap.addAnnotation(annotation);
+      // Add to map container
+      document.getElementById('map').appendChild(markerEl);
+      
+      // Store update function for map movement
+      markerEl.updatePosition = updatePosition;
     });
     
     updateList(visibleStations);
