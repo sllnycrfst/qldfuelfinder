@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
         center: new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng),
         region: new mapkit.CoordinateRegion(
           new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng),
-          new mapkit.CoordinateSpan(0.1, 0.1)
+          new mapkit.CoordinateSpan(0.05, 0.05)
         ),
         mapType: mapkit.Map.MapTypes.Standard,
         showsMapTypeControl: false,
@@ -157,23 +157,32 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 300);
       });
       
-      // Update marker positions during map movement
+      // Update marker positions during map movement - improved
+      let animationId;
       myMap.addEventListener('region-change-start', () => {
-        const markers = document.querySelectorAll('.fuel-marker');
         const updateAllMarkers = () => {
+          const markers = document.querySelectorAll('.fuel-marker');
           markers.forEach(marker => {
-            if (marker.updatePosition) {
-              marker.updatePosition();
+            if (marker.updatePosition && marker.isConnected) {
+              try {
+                marker.updatePosition();
+              } catch (e) {
+                console.warn('Error updating marker position:', e);
+              }
             }
           });
+          animationId = requestAnimationFrame(updateAllMarkers);
         };
         
-        // Update positions during movement
-        const moveInterval = setInterval(updateAllMarkers, 16); // 60fps
+        // Start updating positions
+        updateAllMarkers();
         
         // Clean up when movement ends
         const cleanup = () => {
-          clearInterval(moveInterval);
+          if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+          }
           myMap.removeEventListener('region-change-end', cleanup);
         };
         myMap.addEventListener('region-change-end', cleanup);
@@ -258,64 +267,22 @@ document.addEventListener("DOMContentLoaded", () => {
       myMap.removeAnnotation(userLocationAnnotation);
     }
     
-    // Create a simple blue dot annotation (simplified)
+    // Create custom HTML element for the user location
+    const userLocationElement = createUserLocationElement();
+    
+    // Create annotation with custom element
     userLocationAnnotation = new mapkit.MarkerAnnotation(
-      new mapkit.Coordinate(lat, lng)
+      new mapkit.Coordinate(lat, lng),
+      {
+        element: userLocationElement,
+        anchorOffset: new DOMPoint(0, -15)
+      }
     );
     
     userLocationAnnotation.title = "Your Location";
     
     // Add to map
     myMap.addAnnotation(userLocationAnnotation);
-    
-    // Customize appearance after adding
-    setTimeout(() => {
-      const userMarkers = document.querySelectorAll('.mk-marker');
-      const lastMarker = userMarkers[userMarkers.length - 1];
-      
-      if (lastMarker) {
-        lastMarker.innerHTML = '';
-        lastMarker.style.cssText = `
-          width: 30px !important;
-          height: 30px !important;
-          position: relative;
-          z-index: 2000;
-        `;
-        
-        // Blue dot
-        const blueDot = document.createElement('div');
-        blueDot.style.cssText = `
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 12px;
-          height: 12px;
-          background: #007AFF;
-          border: 3px solid white;
-          border-radius: 50%;
-          box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
-          z-index: 2;
-        `;
-        
-        // Pulse ring
-        const pulseRing = document.createElement('div');
-        pulseRing.style.cssText = `
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 30px;
-          height: 30px;
-          background: rgba(0, 122, 255, 0.2);
-          border-radius: 50%;
-          animation: userLocationPulse 2s infinite;
-        `;
-        
-        lastMarker.appendChild(pulseRing);
-        lastMarker.appendChild(blueDot);
-      }
-    }, 100);
     
     console.log("User location marker added");
   }
@@ -465,6 +432,7 @@ document.addEventListener("DOMContentLoaded", () => {
         z-index: ${isCheapest ? '1002' : '1001'};
         pointer-events: auto;
         transform-origin: center bottom;
+        touch-action: auto;
       `;
       
       markerEl.innerHTML = `
@@ -522,6 +490,22 @@ document.addEventListener("DOMContentLoaded", () => {
         e.stopPropagation();
         showFeatureCard(site, price);
       });
+      
+      // Allow panning on markers but handle taps
+      let touchStarted = false;
+      markerEl.addEventListener('touchstart', (e) => {
+        touchStarted = true;
+        // Don't prevent default - allow map panning
+      }, { passive: true });
+      
+      markerEl.addEventListener('touchend', (e) => {
+        if (touchStarted) {
+          e.preventDefault();
+          e.stopPropagation();
+          showFeatureCard(site, price);
+        }
+        touchStarted = false;
+      }, { passive: false });
       
       // Position the marker
       const coordinate = new mapkit.Coordinate(site.Lat, site.Lng);
@@ -929,7 +913,7 @@ document.addEventListener("DOMContentLoaded", () => {
       myMap.center = new mapkit.Coordinate(avgLat, avgLng);
       myMap.region = new mapkit.CoordinateRegion(
         new mapkit.Coordinate(avgLat, avgLng),
-        new mapkit.CoordinateSpan(0.1, 0.1)
+        new mapkit.CoordinateSpan(0.05, 0.05)
       );
       closeAllPanels();
     } else {
@@ -938,7 +922,7 @@ document.addEventListener("DOMContentLoaded", () => {
         myMap.center = new mapkit.Coordinate(suburbData.lat, suburbData.lng);
         myMap.region = new mapkit.CoordinateRegion(
           new mapkit.Coordinate(suburbData.lat, suburbData.lng),
-          new mapkit.CoordinateSpan(0.1, 0.1)
+          new mapkit.CoordinateSpan(0.05, 0.05)
         );
         closeAllPanels();
       }
@@ -1077,7 +1061,7 @@ function setupTouchHandling() {
     }, { passive: false });
   };
   
-  // Apply to all UI elements
+  // Apply to all UI elements EXCEPT fuel markers
   const uiElements = document.querySelectorAll(`
     .weather-display,
     .map-controls-wrapper,
@@ -1101,6 +1085,7 @@ function setupTouchHandling() {
               node.closest('.sliding-panel')) {
             preventZoomOnElement(node);
           }
+          // Do NOT prevent zoom on fuel-marker elements
         }
       });
     });

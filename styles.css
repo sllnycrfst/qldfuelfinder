@@ -70,6 +70,12 @@ html, body {
   user-select: none !important;
 }
 
+/* Fuel markers should allow map panning but still be clickable */
+.fuel-marker {
+  touch-action: auto !important;
+  pointer-events: auto !important;
+}
+
 /* Ensure all child elements also don't zoom */
 .weather-display *,
 .map-controls-wrapper *,
