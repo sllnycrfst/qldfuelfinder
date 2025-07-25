@@ -241,8 +241,7 @@ document.addEventListener("DOMContentLoaded", () => {
       new mapkit.Coordinate(lat, lng),
       {
         color: "#007AFF",
-        size: { width: 16, height: 16 },
-        anchorOffset: new mapkit.DOMPoint(0, -8)
+        size: { width: 16, height: 16 }
       }
     );
     
@@ -441,8 +440,7 @@ document.addEventListener("DOMContentLoaded", () => {
         new mapkit.Coordinate(site.Lat, site.Lng),
         {
           color: isCheapest ? "#22C55E" : "#387CC2",
-          size: { width: 40, height: 40 },
-          anchorOffset: new mapkit.DOMPoint(0, -20)
+          size: { width: 40, height: 40 }
         }
       );
       
