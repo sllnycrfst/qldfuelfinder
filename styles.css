@@ -34,9 +34,25 @@ html, body {
   touch-action: pan-x pan-y pinch-zoom;
 }
 
-/* CRITICAL: Prevent zoom on everything except the map */
+/* Prevent zoom on everything */
+html {
+  touch-action: manipulation;
+}
+
+body {
+  touch-action: manipulation;
+  zoom: 1;
+  -webkit-user-zoom: fixed;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Only allow pan and zoom on the map itself */
+#map {
+  touch-action: pan-x pan-y pinch-zoom !important;
+}
+
+/* Prevent zoom on all other elements */
 * {
-  touch-action: manipulation !important;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -45,56 +61,11 @@ html, body {
   user-select: none;
 }
 
-/* Only allow pan and zoom on the map itself */
-#map {
-  touch-action: pan-x pan-y pinch-zoom !important;
-}
-
-/* Force all UI elements to NOT zoom */
-.weather-display,
-.map-controls-wrapper,
-.custom-map-controls,
-.zoom-controls-container,
-.custom-zoom-control,
-.custom-maptype-control,
-.fuel-selector,
-.sc-bottom-bar,
-.sc-center-btn,
-.sliding-panel,
-.panel-overlay,
-.custom-marker,
-.user-location-marker {
+*:not(#map) {
   touch-action: manipulation !important;
-  -webkit-touch-callout: none !important;
-  -webkit-user-select: none !important;
-  user-select: none !important;
 }
 
-/* Fuel markers should allow map panning but still be clickable */
-.fuel-marker {
-  touch-action: auto !important;
-  pointer-events: auto !important;
-}
 
-/* Ensure all child elements also don't zoom */
-.weather-display *,
-.map-controls-wrapper *,
-.custom-map-controls *,
-.zoom-controls-container *,
-.custom-zoom-control *,
-.custom-maptype-control *,
-.fuel-selector *,
-.sc-bottom-bar *,
-.sc-center-btn *,
-.sliding-panel *,
-.panel-overlay *,
-.custom-marker *,
-.user-location-marker * {
-  touch-action: manipulation !important;
-  -webkit-touch-callout: none !important;
-  -webkit-user-select: none !important;
-  user-select: none !important;
-}
 
 /* ========== WEATHER DISPLAY ========== */
 .weather-display {

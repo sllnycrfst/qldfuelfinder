@@ -37,21 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
   const getBrandLogo = (brandId) => BRAND_LOGOS[brandId] || BRAND_LOGOS[12];
   
-  const createUserLocationElement = () => {
-    const markerDiv = document.createElement('div');
-    markerDiv.className = 'user-location-marker';
-    
-    const blueDot = document.createElement('div');
-    blueDot.className = 'user-location-dot';
-    
-    const pulseRing = document.createElement('div');
-    pulseRing.className = 'user-location-pulse';
-    
-    markerDiv.appendChild(pulseRing);
-    markerDiv.appendChild(blueDot);
-    
-    return markerDiv;
-  };
+
   
   const BRAND_NAMES = {
     2: "Caltex", 5: "BP", 7: "Budget", 12: "Independent", 16: "Mobil", 20: "Shell", 
@@ -267,15 +253,53 @@ document.addEventListener("DOMContentLoaded", () => {
       myMap.removeAnnotation(userLocationAnnotation);
     }
     
-    // Create custom HTML element for the user location
-    const userLocationElement = createUserLocationElement();
+    // Create the blue dot HTML element
+    const blueDotElement = document.createElement('div');
+    blueDotElement.style.cssText = `
+      width: 30px;
+      height: 30px;
+      position: relative;
+    `;
+    
+    // Blue dot
+    const blueDot = document.createElement('div');
+    blueDot.style.cssText = `
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 12px;
+      height: 12px;
+      background: #007AFF;
+      border: 3px solid white;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+      z-index: 2;
+    `;
+    
+    // Pulse ring
+    const pulseRing = document.createElement('div');
+    pulseRing.style.cssText = `
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 30px;
+      height: 30px;
+      background: rgba(0, 122, 255, 0.2);
+      border-radius: 50%;
+      animation: userLocationPulse 2s infinite;
+    `;
+    
+    blueDotElement.appendChild(pulseRing);
+    blueDotElement.appendChild(blueDot);
     
     // Create annotation with custom element
     userLocationAnnotation = new mapkit.MarkerAnnotation(
       new mapkit.Coordinate(lat, lng),
       {
-        element: userLocationElement,
-        anchorOffset: new DOMPoint(0, -15)
+        element: blueDotElement,
+        anchorOffset: new DOMPoint(0, 0)
       }
     );
     
@@ -1037,62 +1061,48 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize drag functionality
   setupGlobalDragListeners();
   
-  // Prevent pinch zoom on UI elements as backup
+  // Prevent pinch zoom on UI elements
   setupTouchHandling();
 });
 
 // Setup touch handling to prevent pinch zoom on UI elements
 function setupTouchHandling() {
-  let lastTouchDistance = 0;
+  // Prevent pinch zoom anywhere except the map
+  document.addEventListener('gesturestart', (e) => {
+    if (e.target.closest('#map')) return;
+    e.preventDefault();
+  }, { passive: false });
   
-  const preventZoomOnElement = (element) => {
-    element.addEventListener('touchstart', (e) => {
-      if (e.touches.length > 1) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    }, { passive: false });
-    
-    element.addEventListener('touchmove', (e) => {
-      if (e.touches.length > 1) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    }, { passive: false });
-  };
+  document.addEventListener('gesturechange', (e) => {
+    if (e.target.closest('#map')) return;
+    e.preventDefault();
+  }, { passive: false });
   
-  // Apply to all UI elements EXCEPT fuel markers
-  const uiElements = document.querySelectorAll(`
-    .weather-display,
-    .map-controls-wrapper,
-    .zoom-controls-container,
-    .sc-bottom-bar,
-    .sc-center-btn,
-    .sliding-panel,
-    .custom-marker,
-    .user-location-marker
-  `);
+  document.addEventListener('gestureend', (e) => {
+    if (e.target.closest('#map')) return;
+    e.preventDefault();
+  }, { passive: false });
   
-  uiElements.forEach(preventZoomOnElement);
+  // Prevent multi-touch zoom
+  document.addEventListener('touchstart', (e) => {
+    if (e.target.closest('#map')) return;
+    if (e.touches.length > 1) {
+      e.preventDefault();
+    }
+  }, { passive: false });
   
-  // Also prevent on dynamically created elements
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      mutation.addedNodes.forEach((node) => {
-        if (node.nodeType === 1) { // Element node
-          if (node.classList.contains('custom-marker') || 
-              node.classList.contains('user-location-marker') ||
-              node.closest('.sliding-panel')) {
-            preventZoomOnElement(node);
-          }
-          // Do NOT prevent zoom on fuel-marker elements
-        }
-      });
-    });
-  });
+  document.addEventListener('touchmove', (e) => {
+    if (e.target.closest('#map')) return;
+    if (e.touches.length > 1) {
+      e.preventDefault();
+    }
+  }, { passive: false });
   
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
+  // Prevent wheel zoom on desktop
+  document.addEventListener('wheel', (e) => {
+    if (e.target.closest('#map')) return;
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+    }
+  }, { passive: false });
 }
