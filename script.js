@@ -37,125 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
   const getBrandLogo = (brandId) => BRAND_LOGOS[brandId] || BRAND_LOGOS[12];
   
-  // Create custom marker with station logo and price box
-  function createCustomMarkerElement(site, price, isCheapest = false) {
-    const priceText = (price / 10).toFixed(1);
-    const logoUrl = getBrandLogo(site.B);
-    
-    // Create the main marker container
-    const markerDiv = document.createElement('div');
-    markerDiv.className = `custom-marker ${isCheapest ? 'cheapest' : ''}`;
-    markerDiv.style.cssText = `
-      position: absolute;
-      width: 50px;
-      height: 60px;
-      cursor: pointer;
-      transform-origin: center bottom;
-      pointer-events: all;
-      z-index: ${isCheapest ? '1002' : '1001'};
-      transition: transform 0.2s ease;
-    `;
-    
-    // Create the teardrop shape base
-    const baseMarker = document.createElement('div');
-    baseMarker.className = `marker-base ${isCheapest ? 'cheapest' : ''}`;
-    baseMarker.style.cssText = `
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%) rotate(-45deg);
-      width: 40px;
-      height: 40px;
-      background: ${isCheapest ? '#22C55E' : '#387CC2'};
-      border: 3px solid white;
-      border-radius: 50% 50% 50% 0;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      transition: all 0.2s ease;
-    `;
-    
-    // Station logo (centered inside the marker)
-    const stationLogo = document.createElement('img');
-    stationLogo.src = logoUrl;
-    stationLogo.className = 'marker-logo';
-    stationLogo.style.cssText = `
-      position: absolute;
-      bottom: 8px;
-      left: 50%;
-      transform: translateX(-50%) rotate(45deg);
-      width: 24px;
-      height: 24px;
-      border-radius: 4px;
-      object-fit: contain;
-      background: white;
-      padding: 2px;
-      z-index: 2;
-      pointer-events: none;
-    `;
-    
-    // Error handling for logo loading
-    stationLogo.onerror = function() {
-      this.style.display = 'none';
-      const fallback = document.createElement('div');
-      fallback.textContent = '⛽';
-      fallback.style.cssText = `
-        position: absolute;
-        bottom: 8px;
-        left: 50%;
-        transform: translateX(-50%) rotate(45deg);
-        font-size: 16px;
-        color: ${isCheapest ? '#22C55E' : '#387CC2'};
-        z-index: 2;
-        pointer-events: none;
-      `;
-      markerDiv.appendChild(fallback);
-    };
-    
-    // Price box (above the marker)
-    const priceBox = document.createElement('div');
-    priceBox.textContent = priceText;
-    priceBox.className = 'marker-price';
-    priceBox.style.cssText = `
-      position: absolute;
-      top: -10px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: ${isCheapest ? 'rgba(34, 197, 94, 0.95)' : 'rgba(0, 0, 0, 0.85)'};
-      color: white;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      white-space: nowrap;
-      box-shadow: 0 2px 8px ${isCheapest ? 'rgba(34, 197, 94, 0.4)' : 'rgba(0, 0, 0, 0.3)'};
-      z-index: 3;
-      pointer-events: none;
-      font-family: 'Inter', Arial, sans-serif;
-    `;
-    
-    // Add hover effects
-    markerDiv.addEventListener('mouseenter', () => {
-      markerDiv.style.transform = 'scale(1.1)';
-      markerDiv.style.zIndex = '1003';
-      baseMarker.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.4)';
-    });
-    
-    markerDiv.addEventListener('mouseleave', () => {
-      markerDiv.style.transform = 'scale(1)';
-      markerDiv.style.zIndex = isCheapest ? '1002' : '1001';
-      baseMarker.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
-    });
-    
-    // Assemble the marker
-    markerDiv.appendChild(baseMarker);
-    markerDiv.appendChild(stationLogo);
-    markerDiv.appendChild(priceBox);
-    
-    // Store data for click handling
-    markerDiv.dataset.siteId = site.S;
-    markerDiv.dataset.price = price;
-    
-    return markerDiv;
-  }
+
   
   // Create user location marker element
   function createUserLocationElement() {
@@ -233,7 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let cheapestStationId = null;
   let currentAnnotations = [];
   let userLocationAnnotation = null;
-  let customMarkers = []; // Track custom marker elements
   
   // Create postcode to suburb mapping
   const postcodeToSuburb = {};
@@ -497,8 +378,9 @@ document.addEventListener("DOMContentLoaded", () => {
     
     console.log("Updating stations and list...");
     
-    // Clean up existing custom markers
-    cleanupCustomMarkers();
+    // Clear existing annotations
+    myMap.removeAnnotations(currentAnnotations);
+    currentAnnotations = [];
     
     const visibleStations = [];
     let cheapestVisiblePrice = Infinity;
@@ -532,96 +414,35 @@ document.addEventListener("DOMContentLoaded", () => {
     
     console.log("Found", visibleStations.length, "visible stations");
     
-    // Create custom markers for each station
+    // Create annotations for each station
     visibleStations.forEach(({ site, price }) => {
       const isCheapest = site.S === cheapestVisibleStationId;
       
-      // Create the custom marker element
-      const markerElement = createCustomMarkerElement(site, price, isCheapest);
+      // Create annotation
+      const annotation = new mapkit.MarkerAnnotation(new mapkit.Coordinate(site.Lat, site.Lng), {
+        title: site.N,
+        subtitle: `${(price / 10).toFixed(1)} - ${BRAND_NAMES[site.B] || 'Unknown'}`,
+        color: isCheapest ? '#22C55E' : '#387CC2',
+        glyphText: (price / 10).toFixed(1)
+      });
       
-      // Add click handler to open feature card
-      markerElement.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+      // Store site data for feature card
+      annotation.data = { site, price };
+      
+      // Add click handler
+      annotation.addEventListener('select', () => {
         showFeatureCard(site, price);
       });
       
-      // Calculate position using map coordinates
-      const coordinate = new mapkit.Coordinate(site.Lat, site.Lng);
-      
-      // Position the marker on the map
-      const updateMarkerPosition = () => {
-        try {
-          const point = myMap.convertCoordinateToPointOnPage(coordinate);
-          const mapContainer = document.getElementById('map');
-          const mapRect = mapContainer.getBoundingClientRect();
-          
-          markerElement.style.left = (point.x - mapRect.left) + 'px';
-          markerElement.style.top = (point.y - mapRect.top) + 'px';
-          markerElement.style.transform = 'translate(-50%, -100%)';
-        } catch (e) {
-          console.warn('Error updating marker position:', e);
-        }
-      };
-      
-      // Initial positioning
-      updateMarkerPosition();
-      
-      // Add to map container
-      const mapContainer = document.getElementById('map');
-      mapContainer.appendChild(markerElement);
-      
-      // Store marker for cleanup
-      customMarkers.push({
-        element: markerElement,
-        updatePosition: updateMarkerPosition,
-        coordinate: coordinate
-      });
+      currentAnnotations.push(annotation);
     });
     
-    // Update marker positions when map moves
-    const throttledUpdatePositions = throttle(() => {
-      customMarkers.forEach(marker => {
-        marker.updatePosition();
-      });
-    }, 50);
-    
-    // Remove old listener and add new one
-    myMap.removeEventListener('region-change-start', window.currentPositionUpdater);
-    window.currentPositionUpdater = throttledUpdatePositions;
-    myMap.addEventListener('region-change-start', window.currentPositionUpdater);
+    // Add all annotations to map
+    myMap.addAnnotations(currentAnnotations);
     
     updateList(visibleStations);
   }
-  
-  // Clean up custom marker elements
-  function cleanupCustomMarkers() {
-    customMarkers.forEach(marker => {
-      if (marker.element && marker.element.parentNode) {
-        marker.element.parentNode.removeChild(marker.element);
-      }
-    });
-    customMarkers = [];
-    
-    // Remove the position update listener
-    if (window.currentPositionUpdater) {
-      myMap.removeEventListener('region-change-start', window.currentPositionUpdater);
-    }
-  }
-  
-  // Throttle function to limit how often position updates happen
-  function throttle(func, limit) {
-    let inThrottle;
-    return function() {
-      const args = arguments;
-      const context = this;
-      if (!inThrottle) {
-        func.apply(context, args);
-        inThrottle = true;
-        setTimeout(() => inThrottle = false, limit);
-      }
-    }
-  }
+
   
   // --- List Panel ---
   function updateList(stations) {
