@@ -485,11 +485,11 @@ document.addEventListener("DOMContentLoaded", () => {
           <!-- Brand logo -->
           <img src="${logoUrl}" class="brand-logo" style="
             position: absolute;
-            top: 32px;
+            top: 22px;
             left: 50%;
             transform: translateX(-50%);
-            width: 24px;
-            height: 24px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
             object-fit: cover;
             background: white;
@@ -501,13 +501,13 @@ document.addEventListener("DOMContentLoaded", () => {
           <!-- Price in black box -->
           <div class="price-display" style="
             position: absolute;
-            top: 4px;
+            top: 2px;
             left: 50%;
             transform: translateX(-50%);
             color: white;
             padding: 2px 6px;
             border-radius: 4px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
             z-index: 2;
             min-width: 30px;
