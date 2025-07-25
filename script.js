@@ -485,7 +485,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <!-- Brand logo -->
           <img src="${logoUrl}" class="brand-logo" style="
             position: absolute;
-            top: 22px;
+            top: 16px;
             left: 50%;
             transform: translateX(-50%);
             width: 26px;
@@ -501,7 +501,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <!-- Price in black box -->
           <div class="price-display" style="
             position: absolute;
-            top: 2px;
+            top: 1px;
             left: 50%;
             transform: translateX(-50%);
             color: white;
