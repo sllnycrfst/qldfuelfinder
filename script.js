@@ -106,47 +106,19 @@ document.addEventListener("DOMContentLoaded", () => {
     
     return markerDiv;
   }
+  
   // Create user location marker element
   function createUserLocationElement() {
     const markerDiv = document.createElement('div');
     markerDiv.className = 'user-location-marker';
-    markerDiv.style.cssText = `
-      position: relative;
-      width: 30px;
-      height: 30px;
-    `;
     
     // Blue dot with white border
     const blueDot = document.createElement('div');
     blueDot.className = 'user-location-dot';
-    blueDot.style.cssText = `
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 12px;
-      height: 12px;
-      background: #007AFF;
-      border: 3px solid white;
-      border-radius: 50%;
-      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
-      z-index: 2;
-    `;
     
     // Pulse animation ring
     const pulseRing = document.createElement('div');
     pulseRing.className = 'user-location-pulse';
-    pulseRing.style.cssText = `
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 30px;
-      height: 30px;
-      background: rgba(0, 122, 255, 0.2);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    `;
     
     markerDiv.appendChild(pulseRing);
     markerDiv.appendChild(blueDot);
@@ -167,9 +139,6 @@ document.addEventListener("DOMContentLoaded", () => {
     3421202: "Atlas", 3421204: "Woodham", 3421207: "Tas Petroleum"
   };
   
-  const isAppleDevice = () => /iPad|iPhone|iPod|Mac/.test(navigator.userAgent) || 
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  
   const bannedStations = ["Stargazers Yarraman"];
   
   // --- State ---
@@ -180,7 +149,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentFuel = localStorage.getItem('preferredFuel') || "E10";
   let userLocation = null;
   let cheapestStationId = null;
-  let currentAnnotations = [];
   let userLocationAnnotation = null;
   let customMarkers = []; // Track custom marker elements
   let isInitialLoad = true; // Track if this is the first load for animations
@@ -307,8 +275,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!myMap) return;
     const currentRegion = myMap.region;
     const newSpan = new mapkit.CoordinateSpan(
-      currentRegion.span.latitudeDelta * 0.05,
-      currentRegion.span.longitudeDelta * 0.05
+      currentRegion.span.latitudeDelta * 0.5,
+      currentRegion.span.longitudeDelta * 0.5
     );
     myMap.region = new mapkit.CoordinateRegion(currentRegion.center, newSpan);
   };
@@ -317,8 +285,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!myMap) return;
     const currentRegion = myMap.region;
     const newSpan = new mapkit.CoordinateSpan(
-      currentRegion.span.latitudeDelta * 0.8,
-      currentRegion.span.longitudeDelta * 0.8
+      currentRegion.span.latitudeDelta * 2.0,
+      currentRegion.span.longitudeDelta * 2.0
     );
     myMap.region = new mapkit.CoordinateRegion(currentRegion.center, newSpan);
   };
@@ -337,8 +305,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function createUserLocationAnnotation(lat, lng) {
     if (!myMap) return;
     
-    if (userLocationAnnotation) {
-      myMap.removeAnnotation(userLocationAnnotation);
+    // Clean up existing user location marker
+    if (userLocationAnnotation && userLocationAnnotation.element && userLocationAnnotation.element.parentNode) {
+      userLocationAnnotation.element.parentNode.removeChild(userLocationAnnotation.element);
     }
     
     // Create user location marker element
@@ -512,7 +481,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     console.log("Found", visibleStations.length, "visible stations");
     
-    // Create custom markers for each station
+    // Create custom markers for each station with staggered animation
     visibleStations.forEach(({ site, price }, index) => {
       const isCheapest = site.S === cheapestVisibleStationId;
       
@@ -591,14 +560,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
     customMarkers = [];
-    
-    // Clean up user location marker if it exists
-    if (userLocationAnnotation && userLocationAnnotation.element && userLocationAnnotation.element.parentNode) {
-      userLocationAnnotation.element.parentNode.removeChild(userLocationAnnotation.element);
-      userLocationAnnotation = null;
-    }
   }
-
   
   // --- List Panel ---
   function updateList(stations) {
