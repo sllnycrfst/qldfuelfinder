@@ -236,13 +236,9 @@ document.addEventListener("DOMContentLoaded", () => {
       myMap.removeAnnotation(userLocationAnnotation);
     }
     
-    // Create a simple blue dot annotation
+    // Create a simple blue dot annotation (simplified)
     userLocationAnnotation = new mapkit.MarkerAnnotation(
-      new mapkit.Coordinate(lat, lng),
-      {
-        color: "#007AFF",
-        size: { width: 16, height: 16 }
-      }
+      new mapkit.Coordinate(lat, lng)
     );
     
     userLocationAnnotation.title = "Your Location";
@@ -435,13 +431,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const isCheapest = site.S === cheapestVisibleStationId;
       const priceText = (price / 10).toFixed(1);
       
-      // Create custom annotation
+      // Create custom annotation (simplified)
       const annotation = new mapkit.MarkerAnnotation(
-        new mapkit.Coordinate(site.Lat, site.Lng),
-        {
-          color: isCheapest ? "#22C55E" : "#387CC2",
-          size: { width: 40, height: 40 }
-        }
+        new mapkit.Coordinate(site.Lat, site.Lng)
       );
       
       // Set custom properties
@@ -458,8 +450,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     
     // Add all annotations to the map
-    myMap.showAnnotations(annotations, {
-      animate: isInitialLoad
+    annotations.forEach(annotation => {
+      myMap.addAnnotation(annotation);
     });
     
     // After initial load, don't animate markers anymore
