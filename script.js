@@ -498,8 +498,8 @@ document.addEventListener("DOMContentLoaded", () => {
             top: 16px;
             left: 50%;
             transform: translateX(-50%);
-            width: 26px;
-            height: 26px;
+            width: 29px;
+            height: 29px;
             border-radius: 50%;
             object-fit: cover;
             background: white;
