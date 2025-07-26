@@ -20,7 +20,8 @@ document.addEventListener("DOMContentLoaded", () => {
     { key: "91", id: 2, label: "U91", fullName: "Unleaded 91" },
     { key: "95", id: 5, label: "P95", fullName: "Premium 95" },
     { key: "98", id: 8, label: "P98", fullName: "Premium 98" },
-    { key: "Diesel", id: 3, label: "DSL", fullName: "Diesel", altId: 14 }
+    { key: "Diesel", id: 3, label: "DSL", fullName: "Diesel", altId: 14 },
+    { key: "PremiumDiesel", id: 14, label: "PDL", fullName: "Premium Diesel" }
   ];
   
   // Brand logos for stations
@@ -59,12 +60,13 @@ document.addEventListener("DOMContentLoaded", () => {
   let allSites = [];
   let allPrices = [];
   let priceMap = {};
-  let currentFuel = localStorage.getItem('preferredFuel') || "E10";
-  let currentBrand = localStorage.getItem('preferredBrand') || "all";
+  let selectedFuels = new Set(['E10']); // Multi-select fuel types
+  let currentBrand = 'all';
   let userLocation = null;
   let cheapestStationId = [];
   let userLocationAnnotation = null;
   let isInitialLoad = true; // Track if this is the first load for animations
+  let isToolbarExpanded = false;
   
   // Create postcode to suburb mapping
   const postcodeToSuburb = {};
@@ -82,8 +84,16 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // --- User Preferences ---
   function savePreferences() {
-    localStorage.setItem('preferredFuel', currentFuel);
+    localStorage.setItem('selectedFuels', JSON.stringify(Array.from(selectedFuels)));
     localStorage.setItem('preferredBrand', currentBrand);
+  }
+  
+  function loadPreferences() {
+    const savedFuels = localStorage.getItem('selectedFuels');
+    if (savedFuels) {
+      selectedFuels = new Set(JSON.parse(savedFuels));
+    }
+    currentBrand = localStorage.getItem('preferredBrand') || 'all';
   }
   
   // --- Utility Functions ---
@@ -503,28 +513,40 @@ document.addEventListener("DOMContentLoaded", () => {
       // Filter by brand if not "all"
       if (currentBrand !== "all" && site.B.toString() !== currentBrand) return;
       
-      const fuel = FUEL_TYPES.find(f => f.key === currentFuel);
-      let price;
+      // Check if station has any of the selected fuel types
+      let hasSelectedFuel = false;
+      let bestPrice = Infinity;
       
-      if (fuel && fuel.altId) {
-        const dieselPrice = priceMap[site.S]?.[fuel.id];
-        const premiumDieselPrice = priceMap[site.S]?.[fuel.altId];
-        price = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);
-        if (price === Infinity) price = null;
-      } else {
-        price = priceMap[site.S]?.[fuel?.id];
+      for (const fuelKey of selectedFuels) {
+        const fuel = FUEL_TYPES.find(f => f.key === fuelKey);
+        if (!fuel) continue;
+        
+        let price;
+        if (fuel.altId) {
+          const dieselPrice = priceMap[site.S]?.[fuel.id];
+          const premiumDieselPrice = priceMap[site.S]?.[fuel.altId];
+          price = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);
+          if (price === Infinity) price = null;
+        } else {
+          price = priceMap[site.S]?.[fuel.id];
+        }
+        
+        if (price && price < bestPrice) {
+          bestPrice = price;
+          hasSelectedFuel = true;
+        }
       }
       
-      if (!price) return;
+      if (!hasSelectedFuel || bestPrice === Infinity) return;
       
-      visibleStations.push({ site, price });
+      visibleStations.push({ site, price: bestPrice });
       
       // Track cheapest visible price
-      if (price < cheapestVisiblePrice) {
-        cheapestVisiblePrice = price;
+      if (bestPrice < cheapestVisiblePrice) {
+        cheapestVisiblePrice = bestPrice;
         cheapestVisibleStationIds.length = 0;
         cheapestVisibleStationIds.push(site.S);
-      } else if (price === cheapestVisiblePrice) {
+      } else if (bestPrice === cheapestVisiblePrice) {
         cheapestVisibleStationIds.push(site.S);
       }
     });
@@ -794,7 +816,163 @@ document.addEventListener("DOMContentLoaded", () => {
   // Make functions global
   window.navigateWithApp = navigateWithApp;
   
-  // --- Fuel & Brand Panel Management ---
+  // --- Expandable Toolbar Management ---
+  function initializeExpandableToolbar() {
+    const toolbar = document.getElementById('expandable-toolbar');
+    const dragBar = document.getElementById('toolbar-drag-bar');
+    
+    if (!toolbar || !dragBar) return;
+    
+    let isDragging = false;
+    let startY = 0;
+    let currentY = 0;
+    
+    const handleStart = (e) => {
+      isDragging = true;
+      startY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+      currentY = 0;
+      e.preventDefault();
+    };
+    
+    const handleMove = (e) => {
+      if (!isDragging) return;
+      
+      const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+      currentY = startY - clientY;
+      e.preventDefault();
+    };
+    
+    const handleEnd = (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      
+      const threshold = 50;
+      
+      if (!isToolbarExpanded && currentY > threshold) {
+        // Expand toolbar
+        expandToolbar();
+      } else if (isToolbarExpanded && currentY < -threshold) {
+        // Collapse toolbar
+        collapseToolbar();
+      }
+      
+      e.preventDefault();
+    };
+    
+    // Touch events
+    dragBar.addEventListener('touchstart', handleStart, { passive: false });
+    document.addEventListener('touchmove', handleMove, { passive: false });
+    document.addEventListener('touchend', handleEnd, { passive: false });
+    
+    // Mouse events
+    dragBar.addEventListener('mousedown', handleStart);
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('mouseup', handleEnd);
+  }
+  
+  function expandToolbar() {
+    const toolbar = document.getElementById('expandable-toolbar');
+    toolbar.classList.add('expanded');
+    isToolbarExpanded = true;
+    
+    // Populate brand options
+    populateToolbarBrands();
+    
+    // Update selections
+    updateToolbarSelections();
+  }
+  
+  function collapseToolbar() {
+    const toolbar = document.getElementById('expandable-toolbar');
+    toolbar.classList.remove('expanded');
+    isToolbarExpanded = false;
+  }
+  
+  function populateToolbarBrands() {
+    const brandGrid = document.getElementById('toolbar-brand-grid');
+    if (!brandGrid) return;
+    
+    // Get top 15 brands by station count
+    const brandCounts = {};
+    allSites.forEach(site => {
+      if (BRAND_NAMES[site.B]) {
+        brandCounts[site.B] = (brandCounts[site.B] || 0) + 1;
+      }
+    });
+    
+    const topBrands = Object.entries(brandCounts)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 15)
+      .map(([brandId]) => brandId);
+    
+    // Clear and populate
+    brandGrid.innerHTML = '';
+    
+    // Add "All" option first
+    const allOption = document.createElement('div');
+    allOption.className = 'toolbar-brand-option selected';
+    allOption.dataset.brand = 'all';
+    allOption.innerHTML = `<span class="toolbar-brand-name">All</span>`;
+    allOption.addEventListener('click', () => selectBrand('all'));
+    brandGrid.appendChild(allOption);
+    
+    // Add top brands
+    topBrands.forEach(brandId => {
+      const option = document.createElement('div');
+      option.className = 'toolbar-brand-option';
+      option.dataset.brand = brandId;
+      option.innerHTML = `<span class="toolbar-brand-name">${BRAND_NAMES[brandId]}</span>`;
+      option.addEventListener('click', () => selectBrand(brandId));
+      brandGrid.appendChild(option);
+    });
+  }
+  
+  function updateToolbarSelections() {
+    // Update fuel selections
+    document.querySelectorAll('.toolbar-fuel-option').forEach(option => {
+      const fuelKey = option.dataset.fuel;
+      if (selectedFuels.has(fuelKey)) {
+        option.classList.add('selected');
+      } else {
+        option.classList.remove('selected');
+      }
+    });
+    
+    // Update brand selection
+    document.querySelectorAll('.toolbar-brand-option').forEach(option => {
+      if (option.dataset.brand === currentBrand) {
+        option.classList.add('selected');
+      } else {
+        option.classList.remove('selected');
+      }
+    });
+  }
+  
+  function selectFuel(fuelKey) {
+    if (selectedFuels.has(fuelKey)) {
+      selectedFuels.delete(fuelKey);
+    } else {
+      selectedFuels.add(fuelKey);
+    }
+    
+    // Ensure at least one fuel is selected
+    if (selectedFuels.size === 0) {
+      selectedFuels.add('E10');
+    }
+    
+    updateToolbarSelections();
+    savePreferences();
+    findCheapestStation();
+    updateVisibleStationsAndList();
+  }
+  
+  function selectBrand(brandId) {
+    currentBrand = brandId;
+    updateToolbarSelections();
+    savePreferences();
+    findCheapestStation();
+    updateVisibleStationsAndList();
+  }
   function openFuelBrandPanel() {
     // Close other panels
     document.querySelectorAll('.sliding-panel').forEach(p => {
@@ -1103,110 +1281,26 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // --- Event Listeners ---
   
-  // Toolbar drag functionality
-  const toolbar = document.querySelector('.sc-bottom-bar');
-  const dragHandle = document.querySelector('.toolbar-drag-handle');
+  // Initialize toolbar
+  loadPreferences();
+  initializeExpandableToolbar();
   
-  if (dragHandle && toolbar) {
-    let isDragging = false;
-    let startY = 0;
-    let hasDragged = false;
-    
-    const handleStart = (e) => {
-      isDragging = true;
-      hasDragged = false;
-      startY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
-      e.preventDefault();
-    };
-    
-    const handleMove = (e) => {
-      if (!isDragging) return;
-      
-      const currentY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
-      const deltaY = startY - currentY;
-      
-      // If dragged up more than 30px, consider it a drag up gesture
-      if (deltaY > 30) {
-        hasDragged = true;
-      }
-      
-      e.preventDefault();
-    };
-    
-    const handleEnd = (e) => {
-      if (!isDragging) return;
-      isDragging = false;
-      
-      if (hasDragged) {
-        openFuelBrandPanel();
-      }
-      
-      e.preventDefault();
-    };
-    
-    dragHandle.addEventListener('touchstart', handleStart, { passive: false });
-    dragHandle.addEventListener('touchmove', handleMove, { passive: false });
-    dragHandle.addEventListener('touchend', handleEnd, { passive: false });
-    
-    dragHandle.addEventListener('mousedown', handleStart);
-    document.addEventListener('mousemove', handleMove);
-    document.addEventListener('mouseup', handleEnd);
-  }
+  // Map type dropdown
+  document.getElementById('map-type-select')?.addEventListener('change', (e) => {
+    changeMapType(e.target.value);
+  });
   
-  // Fuel option click handlers
+  // Toolbar fuel option click handlers
   document.addEventListener('click', (e) => {
-    if (e.target.closest('.fuel-option')) {
-      const option = e.target.closest('.fuel-option');
+    if (e.target.closest('.toolbar-fuel-option')) {
+      const option = e.target.closest('.toolbar-fuel-option');
       const fuelType = option.dataset.fuel;
       
       if (fuelType) {
-        document.querySelectorAll('.fuel-option').forEach(o => o.classList.remove('selected'));
-        option.classList.add('selected');
-        currentFuel = fuelType;
-        
-        const fuel = FUEL_TYPES.find(f => f.key === fuelType);
-        if (fuel) {
-          document.getElementById('current-fuel-display').textContent = fuel.fullName;
-        }
+        selectFuel(fuelType);
       }
     }
   });
-  
-  // Map type option click handlers
-  document.addEventListener('click', (e) => {
-    if (e.target.closest('.maptype-option')) {
-      const option = e.target.closest('.maptype-option');
-      const mapType = option.dataset.maptype;
-      
-      if (mapType) {
-        document.querySelectorAll('.maptype-option').forEach(o => o.classList.remove('selected'));
-        option.classList.add('selected');
-        changeMapType(mapType);
-      }
-    }
-  });
-  
-  // "All Brands" click handler
-  document.addEventListener('click', (e) => {
-    if (e.target.closest('[data-brand="all"]')) {
-      document.querySelectorAll('.brand-option').forEach(o => o.classList.remove('selected'));
-      e.target.closest('.brand-option').classList.add('selected');
-      currentBrand = 'all';
-      updateFuelPrices();
-      document.getElementById('current-brand-display').textContent = 'All Brands';
-    }
-  });
-  
-  // Apply filters button
-  document.getElementById('apply-filters-btn')?.addEventListener('click', () => {
-    savePreferences();
-    findCheapestStation();
-    updateVisibleStationsAndList();
-    closeAllPanels();
-  });
-  
-  // Panel overlays close panels
-  document.getElementById('fuel-brand-overlay')?.addEventListener('click', closeAllPanels);
   const searchInput = document.getElementById('search-input');
   const suburbList = document.getElementById('suburb-list');
   
