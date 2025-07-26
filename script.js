@@ -60,6 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let allPrices = [];
   let priceMap = {};
   let currentFuel = localStorage.getItem('preferredFuel') || "E10";
+  let currentBrand = localStorage.getItem('preferredBrand') || "all";
   let userLocation = null;
   let cheapestStationId = [];
   let userLocationAnnotation = null;
@@ -82,6 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- User Preferences ---
   function savePreferences() {
     localStorage.setItem('preferredFuel', currentFuel);
+    localStorage.setItem('preferredBrand', currentBrand);
   }
   
   // --- Utility Functions ---
@@ -508,6 +510,9 @@ document.addEventListener("DOMContentLoaded", () => {
     allSites.forEach(site => {
       if (!isCoordinateInVisibleRegion(site.Lat, site.Lng)) return;
       
+      // Filter by brand if not "all"
+      if (currentBrand !== "all" && site.B.toString() !== currentBrand) return;
+      
       const fuel = FUEL_TYPES.find(f => f.key === currentFuel);
       let price;
       
@@ -799,7 +804,136 @@ document.addEventListener("DOMContentLoaded", () => {
   // Make functions global
   window.navigateWithApp = navigateWithApp;
   
-  // --- Panel Management ---
+  // --- Fuel & Brand Panel Management ---
+  function openFuelBrandPanel() {
+    // Close other panels
+    document.querySelectorAll('.sliding-panel').forEach(p => {
+      p.classList.remove('open');
+      p.style.transform = 'translateX(-50%) translateY(130%)';
+    });
+    document.querySelectorAll('.panel-overlay').forEach(o => o.classList.remove('active'));
+    
+    // Open fuel/brand panel
+    const panel = document.getElementById('fuel-brand-panel');
+    const overlay = document.getElementById('fuel-brand-overlay');
+    
+    if (panel && overlay) {
+      panel.classList.add('open');
+      overlay.classList.add('active');
+      initializeFuelBrandPanel();
+      initializeDrag(panel);
+    }
+  }
+  
+  function initializeFuelBrandPanel() {
+    // Update current selection display
+    const fuelDisplay = document.getElementById('current-fuel-display');
+    const brandDisplay = document.getElementById('current-brand-display');
+    
+    if (fuelDisplay) {
+      const fuel = FUEL_TYPES.find(f => f.key === currentFuel);
+      fuelDisplay.textContent = fuel ? fuel.fullName : 'Unknown';
+    }
+    
+    if (brandDisplay) {
+      const brandName = currentBrand === 'all' ? 'All Brands' : BRAND_NAMES[currentBrand] || 'Unknown';
+      brandDisplay.textContent = brandName;
+    }
+    
+    // Update fuel option selections
+    document.querySelectorAll('.fuel-option').forEach(option => {
+      option.classList.remove('selected');
+      if (option.dataset.fuel === currentFuel) {
+        option.classList.add('selected');
+      }
+    });
+    
+    // Update fuel prices
+    updateFuelPrices();
+    
+    // Populate and update brand options
+    populateBrandOptions();
+    
+    // Update brand selections
+    document.querySelectorAll('.brand-option').forEach(option => {
+      option.classList.remove('selected');
+      if (option.dataset.brand === currentBrand) {
+        option.classList.add('selected');
+      }
+    });
+  }
+  
+  function updateFuelPrices() {
+    // Find cheapest price for each fuel type
+    FUEL_TYPES.forEach(fuel => {
+      let cheapestPrice = Infinity;
+      
+      allSites.forEach(site => {
+        if (currentBrand !== "all" && site.B.toString() !== currentBrand) return;
+        
+        let price;
+        if (fuel.altId) {
+          const dieselPrice = priceMap[site.S]?.[fuel.id];
+          const premiumDieselPrice = priceMap[site.S]?.[fuel.altId];
+          price = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);
+          if (price === Infinity) price = null;
+        } else {
+          price = priceMap[site.S]?.[fuel.id];
+        }
+        
+        if (price && price < cheapestPrice) {
+          cheapestPrice = price;
+        }
+      });
+      
+      const priceElement = document.getElementById(`price-${fuel.key}`);
+      if (priceElement) {
+        priceElement.textContent = cheapestPrice === Infinity ? '-' : (cheapestPrice / 10).toFixed(1);
+      }
+    });
+  }
+  
+  function populateBrandOptions() {
+    const brandGrid = document.getElementById('brand-options-grid');
+    if (!brandGrid) return;
+    
+    // Get unique brands from sites
+    const brands = new Set();
+    allSites.forEach(site => {
+      if (BRAND_NAMES[site.B]) {
+        brands.add(site.B);
+      }
+    });
+    
+    // Clear existing options except "All Brands"
+    const allBrandsOption = brandGrid.querySelector('[data-brand="all"]');
+    brandGrid.innerHTML = '';
+    if (allBrandsOption) {
+      brandGrid.appendChild(allBrandsOption);
+    }
+    
+    // Add brand options
+    Array.from(brands).sort((a, b) => {
+      const nameA = BRAND_NAMES[a] || 'Unknown';
+      const nameB = BRAND_NAMES[b] || 'Unknown';
+      return nameA.localeCompare(nameB);
+    }).forEach(brandId => {
+      const option = document.createElement('div');
+      option.className = 'brand-option';
+      option.dataset.brand = brandId;
+      option.innerHTML = `<span class="brand-name">${BRAND_NAMES[brandId]}</span>`;
+      
+      option.addEventListener('click', () => {
+        document.querySelectorAll('.brand-option').forEach(o => o.classList.remove('selected'));
+        option.classList.add('selected');
+        currentBrand = brandId;
+        updateFuelPrices();
+        document.getElementById('current-brand-display').textContent = BRAND_NAMES[brandId];
+      });
+      
+      brandGrid.appendChild(option);
+    });
+  }
   function openPanel(panelName) {
     document.querySelectorAll('.sliding-panel').forEach(p => {
       p.classList.remove('open');
@@ -978,6 +1112,97 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   
   // --- Event Listeners ---
+  
+  // Toolbar drag functionality
+  const toolbar = document.querySelector('.sc-bottom-bar');
+  const dragHandle = document.querySelector('.toolbar-drag-handle');
+  
+  if (dragHandle && toolbar) {
+    let isDragging = false;
+    let startY = 0;
+    let hasDragged = false;
+    
+    const handleStart = (e) => {
+      isDragging = true;
+      hasDragged = false;
+      startY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+      e.preventDefault();
+    };
+    
+    const handleMove = (e) => {
+      if (!isDragging) return;
+      
+      const currentY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+      const deltaY = startY - currentY;
+      
+      // If dragged up more than 30px, consider it a drag up gesture
+      if (deltaY > 30) {
+        hasDragged = true;
+      }
+      
+      e.preventDefault();
+    };
+    
+    const handleEnd = (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      
+      if (hasDragged) {
+        openFuelBrandPanel();
+      }
+      
+      e.preventDefault();
+    };
+    
+    dragHandle.addEventListener('touchstart', handleStart, { passive: false });
+    dragHandle.addEventListener('touchmove', handleMove, { passive: false });
+    dragHandle.addEventListener('touchend', handleEnd, { passive: false });
+    
+    dragHandle.addEventListener('mousedown', handleStart);
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('mouseup', handleEnd);
+  }
+  
+  // Fuel option click handlers
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.fuel-option')) {
+      const option = e.target.closest('.fuel-option');
+      const fuelType = option.dataset.fuel;
+      
+      if (fuelType) {
+        document.querySelectorAll('.fuel-option').forEach(o => o.classList.remove('selected'));
+        option.classList.add('selected');
+        currentFuel = fuelType;
+        
+        const fuel = FUEL_TYPES.find(f => f.key === fuelType);
+        if (fuel) {
+          document.getElementById('current-fuel-display').textContent = fuel.fullName;
+        }
+      }
+    }
+  });
+  
+  // "All Brands" click handler
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('[data-brand="all"]')) {
+      document.querySelectorAll('.brand-option').forEach(o => o.classList.remove('selected'));
+      e.target.closest('.brand-option').classList.add('selected');
+      currentBrand = 'all';
+      updateFuelPrices();
+      document.getElementById('current-brand-display').textContent = 'All Brands';
+    }
+  });
+  
+  // Apply filters button
+  document.getElementById('apply-filters-btn')?.addEventListener('click', () => {
+    savePreferences();
+    findCheapestStation();
+    updateVisibleStationsAndList();
+    closeAllPanels();
+  });
+  
+  // Panel overlays close panels
+  document.getElementById('fuel-brand-overlay')?.addEventListener('click', closeAllPanels);
   const searchInput = document.getElementById('search-input');
   const suburbList = document.getElementById('suburb-list');
   
@@ -1053,43 +1278,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   };
-  
-  // Fuel selector dropdown
-  const fuelBtn = document.getElementById('fuel-dropdown-btn');
-  const fuelContent = document.getElementById('fuel-dropdown-content');
-  
-  if (fuelBtn && fuelContent) {
-    FUEL_TYPES.forEach(fuel => {
-      const item = document.createElement('div');
-      item.className = 'fuel-dropdown-item';
-      item.textContent = fuel.fullName;
-      if (fuel.key === currentFuel) item.classList.add('selected');
-      
-      item.addEventListener('click', () => {
-        currentFuel = fuel.key;
-        savePreferences();
-        fuelBtn.innerHTML = `${fuel.fullName} <span class="arrow">▼</span>`;
-        fuelContent.classList.remove('show');
-        document.querySelectorAll('.fuel-dropdown-item').forEach(i => i.classList.remove('selected'));
-        item.classList.add('selected');
-        findCheapestStation();
-        updateVisibleStationsAndList();
-      });
-      
-      fuelContent.appendChild(item);
-    });
-    
-    fuelBtn.innerHTML = `${FUEL_TYPES.find(f => f.key === currentFuel)?.fullName || 'Unknown'} <span class="arrow">▼</span>`;
-    
-    fuelBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      fuelContent.classList.toggle('show');
-    });
-    
-    document.addEventListener('click', () => {
-      fuelContent.classList.remove('show');
-    });
-  }
+
   
   // Toolbar buttons
   document.getElementById('toolbar-search-btn')?.addEventListener('click', () => {
