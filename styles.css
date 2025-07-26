@@ -215,6 +215,49 @@
   transform: translateY(0) scale(0.98);
 }
 
+/* ========== MAP TYPE OPTIONS ========== */
+.maptype-options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.maptype-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 12px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  text-align: center;
+  gap: 8px;
+}
+
+.maptype-option:hover {
+  background: rgba(255, 255, 255, 0.6);
+  transform: translateY(-1px);
+}
+
+.maptype-option.selected {
+  background: rgba(56, 124, 194, 0.2);
+  border-color: #387CC2;
+}
+
+.maptype-option i {
+  font-size: 20px;
+  color: #387CC2;
+}
+
+.maptype-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #2a2d3f;
+}
+
 /* ========== IMPORTS & RESET ========== */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
@@ -372,70 +415,6 @@ html, body {
 
 .zoom-out-btn {
   border-radius: 6px 6px 12px 12px !important;
-}
-
-/* ========== MAP TYPE CONTROL ========== */
-.custom-maptype-control {
-  position: fixed;
-  top: 100px;
-  right: 16px;
-  z-index: 10000;
-}
-
-.maptype-btn {
-  width: 44px;
-  height: 44px;
-  font-size: 18px;
-}
-
-.maptype-dropdown {
-  position: absolute;
-  top: 20px;
-  right: 0;
-  min-width: 100px;
-  border-radius: 12px;
-  padding: 8px;
-  display: none;
-  z-index: 11000;
-  animation: dropdownSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(24px) saturate(50%);
-  -webkit-backdrop-filter: blur(24px) saturate(50%);
-  box-shadow: 
-   0 16px 64px rgba(0, 0, 0, 0.25),
-    0 8px 32px rgba(0, 0, 0, 0.15),
-    inset 0 2px 4px rgba(255, 255, 255, 0.8),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.1),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.maptype-dropdown.show {
-  display: block;
-}
-
-.maptype-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  font-size: 14px;
-  font-weight: 500;
-  color: #4a5568;
-}
-
-.maptype-item:hover {
-  background: rgba(56, 124, 194, 0.1);
-  color: #387CC2;
-}
-
-.maptype-item i {
-  width: 16px;
-  text-align: center;
-  font-size: 14px;
 }
 
 /* ========== CUSTOM MARKERS (now handled via MapKit) ========== */
@@ -1015,7 +994,7 @@ html, body {
 .toolbar-content {
   flex: 1;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
   padding: 0 30px;
 }

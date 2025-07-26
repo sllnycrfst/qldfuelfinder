@@ -267,7 +267,6 @@ document.addEventListener("DOMContentLoaded", () => {
         myMap.mapType = mapkit.Map.MapTypes.Standard;
         break;
     }
-    document.getElementById('maptype-dropdown').classList.remove('show');
   };
   
   window.zoomIn = function() {
@@ -289,16 +288,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
     myMap.region = new mapkit.CoordinateRegion(currentRegion.center, newSpan);
   };
-  
-  // Map type dropdown toggle
-  document.getElementById('maptype-btn')?.addEventListener('click', function(e) {
-    e.stopPropagation();
-    document.getElementById('maptype-dropdown').classList.toggle('show');
-  });
-  
-  document.addEventListener('click', function() {
-    document.getElementById('maptype-dropdown')?.classList.remove('show');
-  });
+
 
   // --- User Location Annotation ---
   function createUserLocationAnnotation(lat, lng) {
@@ -1178,6 +1168,20 @@ document.addEventListener("DOMContentLoaded", () => {
         if (fuel) {
           document.getElementById('current-fuel-display').textContent = fuel.fullName;
         }
+      }
+    }
+  });
+  
+  // Map type option click handlers
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.maptype-option')) {
+      const option = e.target.closest('.maptype-option');
+      const mapType = option.dataset.maptype;
+      
+      if (mapType) {
+        document.querySelectorAll('.maptype-option').forEach(o => o.classList.remove('selected'));
+        option.classList.add('selected');
+        changeMapType(mapType);
       }
     }
   });

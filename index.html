@@ -20,31 +20,7 @@
 
 <!-- Map Controls Wrapper -->
 <div class="map-controls-wrapper">
-  <!-- Custom Map Controls -->
-  <div class="custom-map-controls">
-    <!-- Fuel Selector (moved to top) -->
-    <div class="fuel-selector">
-      <div class="fuel-dropdown">
-        <button class="fuel-dropdown-btn" id="fuel-dropdown-btn">Unleaded E10 <span class="arrow">▼</span></button>
-        <div class="fuel-dropdown-content" id="fuel-dropdown-content">
-          <!-- Populated by JavaScript -->
-        </div>
-      </div>
-    </div>
-
-    <!-- Map Type Control (moved to bottom) -->
-    <div class="custom-maptype-control">
-      <button class="maptype-btn" id="maptype-btn">
-        <i class="fas fa-layer-group"></i>
-      </button>
-      <div class="maptype-dropdown" id="maptype-dropdown">
-        <div class="maptype-item" onclick="changeMapType('roadmap')"><i class="fas fa-road"></i> Map</div>
-        <div class="maptype-item" onclick="changeMapType('satellite')"><i class="fas fa-satellite"></i> Satellite</div>
-        <div class="maptype-item" onclick="changeMapType('hybrid')"><i class="fas fa-globe"></i> Hybrid</div>
-        <div class="maptype-item" onclick="changeMapType('terrain')"><i class="fas fa-mountain"></i> Terrain</div>
-      </div>
-    </div>
-  </div>
+  <!-- Only Weather Display now -->
 </div>
 
 <!-- Zoom Controls (separate) -->
@@ -67,12 +43,18 @@
 
 <!--Bottom Toolbar-->
 <div class="sc-bottom-bar">
-  <a class="sc-menu-item" id="toolbar-search-btn">
-    <i class="fas fa-search"></i>
-  </a>
-  <a class="sc-menu-item" id="toolbar-list-btn">
-    <i class="fas fa-list"></i>
-  </a>
+  <div class="toolbar-drag-handle">
+    <div class="drag-indicator"></div>
+  </div>
+  
+  <div class="toolbar-content">
+    <a class="sc-menu-item" id="toolbar-search-btn">
+      <i class="fas fa-search"></i>
+    </a>
+    <a class="sc-menu-item" id="toolbar-list-btn">
+      <i class="fas fa-list"></i>
+    </a>
+  </div>
 </div>
 
 <!-- Center Floating Action Button -->
@@ -80,7 +62,119 @@
   <i class="fa-solid fa-location-arrow"></i>
 </button>
 
-<!-- Search Panel -->
+<!-- Fuel & Brand Selector Panel -->
+<div class="panel-overlay" id="fuel-brand-overlay"></div>
+<div class="fuel-brand-panel" id="fuel-brand-panel">
+  <div class="panel-drag-bar"></div>
+  
+  <div class="panel-content">
+    <h3 class="panel-title">Filters</h3>
+    
+    <!-- Current Selection Display -->
+    <div class="current-selection">
+      <div class="current-fuel">
+        <span class="selection-label">Fuel:</span>
+        <span class="selection-value" id="current-fuel-display">Unleaded E10</span>
+      </div>
+      <div class="current-brand">
+        <span class="selection-label">Brand:</span>
+        <span class="selection-value" id="current-brand-display">All Brands</span>
+      </div>
+    </div>
+    
+    <!-- Fuel Type Selector -->
+    <div class="selector-section">
+      <h4 class="section-title">Fuel Type</h4>
+      
+      <div class="fuel-group">
+        <div class="fuel-group-header">Specific Fuel Types</div>
+        <div class="fuel-options-grid">
+          <div class="fuel-option" data-fuel="E10">
+            <span class="fuel-name">Unleaded E10</span>
+            <span class="fuel-price" id="price-E10">-</span>
+          </div>
+          <div class="fuel-option" data-fuel="91">
+            <span class="fuel-name">Unleaded 91</span>
+            <span class="fuel-price" id="price-91">-</span>
+          </div>
+          <div class="fuel-option" data-fuel="95">
+            <span class="fuel-name">Premium 95</span>
+            <span class="fuel-price" id="price-95">-</span>
+          </div>
+          <div class="fuel-option" data-fuel="98">
+            <span class="fuel-name">Premium 98</span>
+            <span class="fuel-price" id="price-98">-</span>
+          </div>
+          <div class="fuel-option" data-fuel="Diesel">
+            <span class="fuel-name">Diesel</span>
+            <span class="fuel-price" id="price-Diesel">-</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="separator-line"></div>
+      
+      <div class="fuel-group">
+        <div class="fuel-group-header">Fuel Categories</div>
+        <div class="fuel-options-grid">
+          <div class="fuel-option category" data-fuel="any-unleaded">
+            <span class="fuel-name">Any Unleaded</span>
+            <span class="fuel-desc">E10 & 91</span>
+          </div>
+          <div class="fuel-option category" data-fuel="any-premium">
+            <span class="fuel-name">Any Premium</span>
+            <span class="fuel-desc">95 & 98</span>
+          </div>
+          <div class="fuel-option category" data-fuel="any-diesel">
+            <span class="fuel-name">Any Diesel</span>
+            <span class="fuel-desc">All diesel types</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Map Type Selector -->
+    <div class="selector-section">
+      <h4 class="section-title">Map Type</h4>
+      <div class="maptype-options-grid">
+        <div class="maptype-option selected" data-maptype="roadmap">
+          <i class="fas fa-road"></i>
+          <span class="maptype-name">Map</span>
+        </div>
+        <div class="maptype-option" data-maptype="satellite">
+          <i class="fas fa-satellite"></i>
+          <span class="maptype-name">Satellite</span>
+        </div>
+        <div class="maptype-option" data-maptype="hybrid">
+          <i class="fas fa-globe"></i>
+          <span class="maptype-name">Hybrid</span>
+        </div>
+        <div class="maptype-option" data-maptype="terrain">
+          <i class="fas fa-mountain"></i>
+          <span class="maptype-name">Terrain</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Brand Selector -->
+    <div class="selector-section">
+      <h4 class="section-title">Brand</h4>
+      <div class="brand-options-grid" id="brand-options-grid">
+        <div class="brand-option selected" data-brand="all">
+          <span class="brand-name">All Brands</span>
+        </div>
+        <!-- Brands will be populated by JavaScript -->
+      </div>
+    </div>
+    
+    <!-- Apply Button -->
+    <div class="apply-section">
+      <button class="apply-filters-btn" id="apply-filters-btn">
+        Apply Filters
+      </button>
+    </div>
+  </div>
+</div>
 <div class="panel-overlay" id="search-overlay"></div>
 <div class="sliding-panel" id="search-panel">
   <div class="panel-drag-bar"></div>
