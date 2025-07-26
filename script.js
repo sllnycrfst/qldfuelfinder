@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { key: "91", id: 2, label: "U91", fullName: "Unleaded 91" },
     { key: "95", id: 5, label: "P95", fullName: "Premium 95" },
     { key: "98", id: 8, label: "P98", fullName: "Premium 98" },
-    { key: "Diesel", id: 3, label: "DSL", fullName: "Diesel", altId: 14 },
+    { key: "Diesel", id: 3, label: "DSL", fullName: "Diesel" },
     { key: "PremiumDiesel", id: 14, label: "PDL", fullName: "Premium Diesel" }
   ];
   
@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let allSites = [];
   let allPrices = [];
   let priceMap = {};
-  let selectedFuels = new Set(['E10']); // Multi-select fuel types
+  let currentFuel = 'E10'; // Single-select fuel type
   let currentBrand = 'all';
   let userLocation = null;
   let cheapestStationId = [];
@@ -84,15 +84,12 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // --- User Preferences ---
   function savePreferences() {
-    localStorage.setItem('selectedFuels', JSON.stringify(Array.from(selectedFuels)));
+    localStorage.setItem('currentFuel', currentFuel);
     localStorage.setItem('preferredBrand', currentBrand);
   }
   
   function loadPreferences() {
-    const savedFuels = localStorage.getItem('selectedFuels');
-    if (savedFuels) {
-      selectedFuels = new Set(JSON.parse(savedFuels));
-    }
+    currentFuel = localStorage.getItem('currentFuel') || 'E10';
     currentBrand = localStorage.getItem('preferredBrand') || 'all';
   }
   
@@ -466,11 +463,9 @@ document.addEventListener("DOMContentLoaded", () => {
     
     allSites.forEach(site => {
       let price;
-      if (fuel && fuel.altId) {
-        const dieselPrice = priceMap[site.S]?.[fuel.id];
-        const premiumDieselPrice = priceMap[site.S]?.[fuel.altId];
-        price = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);
-        if (price === Infinity) price = null;
+      if (fuel.key === 'Diesel') {
+        // For diesel, use only the regular diesel price (ID 3)
+        price = priceMap[site.S]?.[fuel.id];
       } else {
         price = priceMap[site.S]?.[fuel?.id];
       }
@@ -513,31 +508,20 @@ document.addEventListener("DOMContentLoaded", () => {
       // Filter by brand if not "all"
       if (currentBrand !== "all" && site.B.toString() !== currentBrand) return;
       
-      // Check if station has any of the selected fuel types
-      let hasSelectedFuel = false;
-      let bestPrice = Infinity;
+      // Check if station has the selected fuel type
+      const fuel = FUEL_TYPES.find(f => f.key === currentFuel);
+      if (!fuel) return;
       
-      for (const fuelKey of selectedFuels) {
-        const fuel = FUEL_TYPES.find(f => f.key === fuelKey);
-        if (!fuel) continue;
-        
-        let price;
-        if (fuel.altId) {
-          const dieselPrice = priceMap[site.S]?.[fuel.id];
-          const premiumDieselPrice = priceMap[site.S]?.[fuel.altId];
-          price = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);
-          if (price === Infinity) price = null;
-        } else {
-          price = priceMap[site.S]?.[fuel.id];
-        }
-        
-        if (price && price < bestPrice) {
-          bestPrice = price;
-          hasSelectedFuel = true;
-        }
+      let price;
+      if (fuel.key === 'Diesel') {
+        // For diesel, use only the regular diesel price (ID 3)
+        price = priceMap[site.S]?.[fuel.id];
+      } else {
+        price = priceMap[site.S]?.[fuel.id];
       }
       
-      if (!hasSelectedFuel || bestPrice === Infinity) return;
+      if (!price) return;
+      const bestPrice = price;
       
       visibleStations.push({ site, price: bestPrice });
       
@@ -725,15 +709,13 @@ document.addEventListener("DOMContentLoaded", () => {
     
     const allPrices = FUEL_TYPES.map(fuel => {
       let p;
-      if (fuel.altId) {
-        const dieselPrice = priceMap[site.S]?.[fuel.id];
-        const premiumDieselPrice = priceMap[site.S]?.[fuel.altId];
-        p = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);
-        if (p === Infinity) p = null;
+      if (fuel.key === 'Diesel') {
+        // For diesel, use only the regular diesel price (ID 3)
+        p = priceMap[site.S]?.[fuel.id];
       } else {
         p = priceMap[site.S]?.[fuel.id];
       }
-      const displayLabel = (fuel.key === 'Diesel') ? 'Diesel' : fuel.fullName;
+      const displayLabel = fuel.fullName;
       return p ? `
         <div class="fuel-price-row">
           <span class="fuel-type-label">${displayLabel}</span>
@@ -912,7 +894,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const allOption = document.createElement('div');
     allOption.className = 'toolbar-brand-option selected';
     allOption.dataset.brand = 'all';
-    allOption.innerHTML = `<span class="toolbar-brand-name">All</span>`;
+    allOption.innerHTML = `<img src="images/default.png" alt="All" class="toolbar-brand-logo" onerror="this.style.display='none'"><span class="toolbar-brand-name">All</span>`;
     allOption.addEventListener('click', () => selectBrand('all'));
     brandGrid.appendChild(allOption);
     
@@ -921,7 +903,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const option = document.createElement('div');
       option.className = 'toolbar-brand-option';
       option.dataset.brand = brandId;
-      option.innerHTML = `<span class="toolbar-brand-name">${BRAND_NAMES[brandId]}</span>`;
+      const logoUrl = getBrandLogo(brandId);
+      option.innerHTML = `<img src="${logoUrl}" alt="${BRAND_NAMES[brandId]}" class="toolbar-brand-logo" onerror="this.style.display='none'"><span class="toolbar-brand-name">${BRAND_NAMES[brandId]}</span>`;
       option.addEventListener('click', () => selectBrand(brandId));
       brandGrid.appendChild(option);
     });
@@ -931,7 +914,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Update fuel selections
     document.querySelectorAll('.toolbar-fuel-option').forEach(option => {
       const fuelKey = option.dataset.fuel;
-      if (selectedFuels.has(fuelKey)) {
+      if (fuelKey === currentFuel) {
         option.classList.add('selected');
       } else {
         option.classList.remove('selected');
@@ -948,19 +931,31 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
   
+  function updateFuelBrandPanelSelections() {
+    // Update fuel selections in the main panel
+    document.querySelectorAll('.fuel-option').forEach(option => {
+      const fuelKey = option.dataset.fuel;
+      if (fuelKey === currentFuel) {
+        option.classList.add('selected');
+      } else {
+        option.classList.remove('selected');
+      }
+    });
+    
+    // Update brand selection in the main panel
+    document.querySelectorAll('.brand-option').forEach(option => {
+      if (option.dataset.brand === currentBrand) {
+        option.classList.add('selected');
+      } else {
+        option.classList.remove('selected');
+      }
+    });
+  }
+  
   function selectFuel(fuelKey) {
-    if (selectedFuels.has(fuelKey)) {
-      selectedFuels.delete(fuelKey);
-    } else {
-      selectedFuels.add(fuelKey);
-    }
-    
-    // Ensure at least one fuel is selected
-    if (selectedFuels.size === 0) {
-      selectedFuels.add('E10');
-    }
-    
+    currentFuel = fuelKey;
     updateToolbarSelections();
+    updateFuelBrandPanelSelections();
     savePreferences();
     findCheapestStation();
     updateVisibleStationsAndList();
@@ -1040,11 +1035,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (currentBrand !== "all" && site.B.toString() !== currentBrand) return;
         
         let price;
-        if (fuel.altId) {
-          const dieselPrice = priceMap[site.S]?.[fuel.id];
-          const premiumDieselPrice = priceMap[site.S]?.[fuel.altId];
-          price = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);
-          if (price === Infinity) price = null;
+        if (fuel.key === 'Diesel') {
+          // For diesel, use only the regular diesel price (ID 3)
+          price = priceMap[site.S]?.[fuel.id];
         } else {
           price = priceMap[site.S]?.[fuel.id];
         }
@@ -1073,12 +1066,21 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
     
-    // Clear existing options except "All Brands"
-    const allBrandsOption = brandGrid.querySelector('[data-brand="all"]');
+    // Clear existing options
     brandGrid.innerHTML = '';
-    if (allBrandsOption) {
-      brandGrid.appendChild(allBrandsOption);
-    }
+    
+    // Add "All Brands" option first
+    const allOption = document.createElement('div');
+    allOption.className = 'brand-option';
+    allOption.dataset.brand = 'all';
+    allOption.innerHTML = `<img src="images/default.png" alt="All Brands" class="brand-logo-img" onerror="this.style.display='none'"><span class="brand-name">All Brands</span>`;
+    allOption.addEventListener('click', () => {
+      document.querySelectorAll('.brand-option').forEach(o => o.classList.remove('selected'));
+      allOption.classList.add('selected');
+      currentBrand = 'all';
+      updateFuelPrices();
+    });
+    brandGrid.appendChild(allOption);
     
     // Add brand options
     Array.from(brands).sort((a, b) => {
@@ -1089,14 +1091,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const option = document.createElement('div');
       option.className = 'brand-option';
       option.dataset.brand = brandId;
-      option.innerHTML = `<span class="brand-name">${BRAND_NAMES[brandId]}</span>`;
+      const logoUrl = getBrandLogo(brandId);
+      option.innerHTML = `<img src="${logoUrl}" alt="${BRAND_NAMES[brandId]}" class="brand-logo-img" onerror="this.style.display='none'"><span class="brand-name">${BRAND_NAMES[brandId]}</span>`;
       
       option.addEventListener('click', () => {
         document.querySelectorAll('.brand-option').forEach(o => o.classList.remove('selected'));
         option.classList.add('selected');
         currentBrand = brandId;
         updateFuelPrices();
-        document.getElementById('current-brand-display').textContent = BRAND_NAMES[brandId];
       });
       
       brandGrid.appendChild(option);
@@ -1416,10 +1418,61 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('toolbar-center-btn').classList.add('sc-current');
   });
   
+  document.getElementById('toolbar-filters-btn')?.addEventListener('click', () => {
+    openFuelBrandPanel();
+    document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));
+    document.getElementById('toolbar-filters-btn').classList.add('sc-current');
+  });
+  
   document.getElementById('toolbar-list-btn')?.addEventListener('click', () => {
     openPanel('list');
     document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));
     document.getElementById('toolbar-list-btn').classList.add('sc-current');
+  });
+  
+  // Reset and confirm buttons
+  document.getElementById('filter-reset-btn')?.addEventListener('click', () => {
+    currentFuel = 'E10';
+    currentBrand = 'all';
+    updateToolbarSelections();
+    updateFuelBrandPanelSelections();
+    savePreferences();
+    findCheapestStation();
+    updateVisibleStationsAndList();
+  });
+  
+  document.getElementById('filter-confirm-btn')?.addEventListener('click', () => {
+    savePreferences();
+    findCheapestStation();
+    updateVisibleStationsAndList();
+    closeAllPanels();
+    
+    // Clear button highlights
+    document.querySelectorAll('.sc-menu-item').forEach(item => item.classList.remove('sc-current'));
+  });
+  
+  // Fuel option click handlers for main panel
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.fuel-option')) {
+      const option = e.target.closest('.fuel-option');
+      const fuelType = option.dataset.fuel;
+      
+      if (fuelType) {
+        selectFuel(fuelType);
+      }
+    }
+  });
+  
+  // Brand option click handlers for main panel
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.brand-option')) {
+      const option = e.target.closest('.brand-option');
+      const brandId = option.dataset.brand;
+      
+      if (brandId) {
+        selectBrand(brandId);
+      }
+    }
   });
   
   // Overlays close panels
