@@ -129,10 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
         showsUserLocationControl: false,
         showsCompass: mapkit.FeatureVisibility.Hidden,
         showsScale: mapkit.FeatureVisibility.Hidden,
-        showsPointsOfInterest: false,
-        // Set zoom limits
-        minCameraDistance: 1000, // Closest zoom
-        maxCameraDistance: 50000 // Furthest zoom (city level)
+        showsPointsOfInterest: false
       });
       
       console.log("Map initialized successfully");
@@ -140,6 +137,45 @@ document.addEventListener("DOMContentLoaded", () => {
       // Add map event listeners
       myMap.addEventListener('region-change-end', () => {
         console.log("Map region changed");
+        
+        // Enforce zoom limits
+        const currentRegion = myMap.region;
+        const maxSpan = 0.5; // Maximum zoom out (city level)
+        const minSpan = 0.001; // Maximum zoom in
+        
+        let needsUpdate = false;
+        let newLatSpan = currentRegion.span.latitudeDelta;
+        let newLngSpan = currentRegion.span.longitudeDelta;
+        
+        // Prevent zooming out too far
+        if (newLatSpan > maxSpan) {
+          newLatSpan = maxSpan;
+          needsUpdate = true;
+        }
+        if (newLngSpan > maxSpan) {
+          newLngSpan = maxSpan;
+          needsUpdate = true;
+        }
+        
+        // Prevent zooming in too far
+        if (newLatSpan < minSpan) {
+          newLatSpan = minSpan;
+          needsUpdate = true;
+        }
+        if (newLngSpan < minSpan) {
+          newLngSpan = minSpan;
+          needsUpdate = true;
+        }
+        
+        if (needsUpdate) {
+          const newRegion = new mapkit.CoordinateRegion(
+            currentRegion.center,
+            new mapkit.CoordinateSpan(newLatSpan, newLngSpan)
+          );
+          myMap.region = newRegion;
+          return; // Don't process station updates if we're adjusting zoom
+        }
+        
         clearTimeout(window.boundsUpdateTimeout);
         window.boundsUpdateTimeout = setTimeout(() => {
           updateVisibleStationsAndList();
