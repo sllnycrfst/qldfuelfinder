@@ -134,11 +134,16 @@ document.addEventListener("DOMContentLoaded", () => {
       
       console.log("Map initialized successfully");
       
-      // Add map event listeners
+      // Add map event listeners with smooth zoom limiting
+      myMap.addEventListener('region-change-start', () => {
+        // Store the current region when zoom starts
+        window.lastValidRegion = myMap.region;
+      });
+      
       myMap.addEventListener('region-change-end', () => {
         console.log("Map region changed");
         
-        // Enforce zoom limits
+        // Enforce zoom limits smoothly
         const currentRegion = myMap.region;
         const maxSpan = 0.5; // Maximum zoom out (city level)
         const minSpan = 0.001; // Maximum zoom in
@@ -168,11 +173,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         
         if (needsUpdate) {
+          // Smooth transition to the limit instead of snapping
           const newRegion = new mapkit.CoordinateRegion(
             currentRegion.center,
             new mapkit.CoordinateSpan(newLatSpan, newLngSpan)
           );
-          myMap.region = newRegion;
+          
+          // Set with animation for smoother feel
+          myMap.setRegionAnimated(newRegion, true);
           return; // Don't process station updates if we're adjusting zoom
         }
         
