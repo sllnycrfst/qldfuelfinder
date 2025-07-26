@@ -1114,9 +1114,9 @@ html, body {
 
 .toolbar-content {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-evenly;
   align-items: center;
-  padding: 10px 40px 20px 40px;
+  padding: 10px 20px 20px 20px;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   margin-top: auto;
 }
@@ -1266,58 +1266,6 @@ html, body {
   border: 2px solid rgba(56, 124, 194, 0.4);
 }
 
-/* ========== CENTER BUTTON (positioned in middle of toolbar) ========== */
-.sc-center-btn {
-  position: fixed;
-  bottom: 55px; /* Adjust for new larger toolbar */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 56px;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 14px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-  color: #3b4664;
-  text-decoration: none;
-  background: transparent;
-  border: none;
-  z-index: 15001; /* Above the toolbar */
-  touch-action: manipulation;
-}
-
-.sc-center-btn i {
-  font-size: 26px;
-}
-
-.sc-center-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
-  box-shadow: 
-    0 4px 16px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  transform: translateX(-50%) translateY(-2px);
-  color: #387CC2;
-}
-
-.sc-center-btn:active {
-  transform: translateX(-50%) scale(0.95);
-}
-
-.sc-center-btn:focus {
-  outline: none;
-}
-
-.sc-center-btn.sc-current {
-  color: #387CC2;
-  background: rgba(56, 124, 194, 0.2);
-  box-shadow: 
-    0 2px 8px rgba(56, 124, 194, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  border: 2px solid rgba(56, 124, 194, 0.4);
-}
-
 /* ========== SCROLLBAR STYLING ========== */
 .panel-content, 
 .suburb-list {
@@ -1359,18 +1307,9 @@ html, body {
     padding: 0 25px;
   }
   
-  .sc-center-btn {
-    bottom: 50px; /* Adjust for larger mobile toolbar */
-    width: 60px;
-    height: 60px;
-  }
-  
-  .sc-center-btn i {
-    font-size: 28px;
-  }
-  
   .toolbar-content {
-    padding: 8px 30px 16px 30px;
+    padding: 8px 15px 16px 15px;
+    justify-content: space-evenly;
   }
   
   .sc-menu-item {
