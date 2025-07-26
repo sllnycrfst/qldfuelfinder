@@ -10,126 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
       // Replace with your actual JWT token
       done("eyJraWQiOiJCTVQ1NzVTUFc5IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUyOTg5NjYyLCJvcmlnaW4iOiJzbGxueWNyZnN0LmdpdGh1Yi5pbyJ9.dF_WYx3PZly0Fo1dec9KYc1ZJAxRS_WO7pvyXq04Fr7kWVXGGuRFYgzeA3K7DvH2JZEwgB6V-gidn3HfPIXpQQ");
     }
-  }
-  
-  function populateToolbarSearch() {
-    const searchInput = document.getElementById('toolbar-search-input');
-    const suburbList = document.getElementById('toolbar-suburb-list');
-    
-    if (!searchInput || !suburbList) return;
-    
-    const showAllSuburbs = () => {
-      const sortedSuburbs = QLD_SUBURBS.sort((a, b) => a.suburb.localeCompare(b.suburb));
-      
-      suburbList.innerHTML = '';
-      sortedSuburbs.slice(0, 50).forEach(suburb => {
-        const li = document.createElement('li');
-        li.className = 'toolbar-suburb-list-item';
-        li.textContent = suburb.suburb;
-        li.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          searchSuburb(suburb.suburb, suburb.postcode);
-          showToolbarContent('collapsed');
-        });
-        suburbList.appendChild(li);
-      });
-    };
-    
-    showAllSuburbs();
-    
-    searchInput.addEventListener('input', e => {
-      const query = e.target.value.toLowerCase();
-      if (query.length === 0) {
-        showAllSuburbs();
-        return;
-      }
-      
-      const matchingSuburbs = QLD_SUBURBS
-        .filter(suburb => suburb.suburb.toLowerCase().includes(query))
-        .sort((a, b) => a.suburb.localeCompare(b.suburb))
-        .slice(0, 50);
-      
-      suburbList.innerHTML = '';
-      
-      matchingSuburbs.forEach(suburb => {
-        const li = document.createElement('li');
-        li.className = 'toolbar-suburb-list-item';
-        li.textContent = suburb.suburb;
-        li.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          searchSuburb(suburb.suburb, suburb.postcode);
-          showToolbarContent('collapsed');
-        });
-        suburbList.appendChild(li);
-      });
-    });
-  }
-  
-  function updateToolbarList() {
-    const list = document.getElementById('toolbar-list');
-    if (!list) return;
-    
-    // Get visible stations from the main list
-    const visibleStations = [];
-    
-    allSites.forEach(site => {
-      if (!isCoordinateInVisibleRegion(site.Lat, site.Lng)) return;
-      if (currentBrand !== "all" && site.B.toString() !== currentBrand) return;
-      
-      const fuel = FUEL_TYPES.find(f => f.key === currentFuel);
-      if (!fuel) return;
-      
-      let price;
-      if (fuel.key === 'Diesel') {
-        price = priceMap[site.S]?.[fuel.id];
-      } else {
-        price = priceMap[site.S]?.[fuel.id];
-      }
-      
-      if (!price) return;
-      visibleStations.push({ site, price });
-    });
-    
-    list.innerHTML = '';
-    visibleStations.sort((a, b) => a.price - b.price).slice(0, 20).forEach(({ site, price }) => {
-      const li = document.createElement('li');
-      li.className = 'toolbar-station-item';
-      
-      const distance = userLocation ?
-        getDistance(userLocation.lat, userLocation.lng, site.Lat, site.Lng).toFixed(1) : '?';
-      const isCheapest = Array.isArray(cheapestStationId) ? 
-        cheapestStationId.includes(site.S) : 
-        site.S === cheapestStationId;
-      
-      li.innerHTML = `
-        <img class="list-item-logo" src="${getBrandLogo(site.B)}" alt="Brand logo" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;" onerror="this.style.display='none'" />
-        <div style="flex: 1; min-width: 0;">
-          <div style="font-size: 14px; font-weight: 600; color: #2a2d3f; margin-bottom: 2px;">${site.N}</div>
-          <div style="font-size: 12px; color: #666; margin-bottom: 1px;">${site.A}</div>
-          <div style="font-size: 12px; color: #999;">${distance} km</div>
-        </div>
-        <span style="font-size: 14px; color: ${isCheapest ? '#22C55E' : '#387CC2'}; font-weight: 700;">${(price / 10).toFixed(1)}</span>
-      `;
-      
-      li.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        showFeatureCard(site, price);
-        showToolbarContent('collapsed');
-      });
-      list.appendChild(li);
-    });
-  }
-  
-  function selectBrand(brandId) {
-    currentBrand = brandId;
-    updateToolbarSelections();
-    updateFuelBrandPanelSelections();
-    savePreferences();
-    findCheapestStation();
-    updateVisibleStationsAndList();
   });
   
   // --- Constants & Config ---
@@ -960,6 +840,130 @@ document.addEventListener("DOMContentLoaded", () => {
       const activeBtn = document.getElementById(`toolbar-${mode}-btn`);
       if (activeBtn) activeBtn.classList.add('sc-current');
     }
+  }
+  
+  function populateToolbarSearch() {
+    const searchInput = document.getElementById('toolbar-search-input');
+    const suburbList = document.getElementById('toolbar-suburb-list');
+    
+    if (!searchInput || !suburbList) return;
+    
+    const showAllSuburbs = () => {
+      const sortedSuburbs = QLD_SUBURBS.sort((a, b) => a.suburb.localeCompare(b.suburb));
+      
+      suburbList.innerHTML = '';
+      sortedSuburbs.slice(0, 50).forEach(suburb => {
+        const li = document.createElement('li');
+        li.className = 'toolbar-suburb-list-item';
+        li.textContent = suburb.suburb;
+        li.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          searchSuburb(suburb.suburb, suburb.postcode);
+          showToolbarContent('collapsed');
+        });
+        suburbList.appendChild(li);
+      });
+    };
+    
+    showAllSuburbs();
+    
+    // Clear and re-add input listener
+    const newInput = searchInput.cloneNode(true);
+    searchInput.parentNode.replaceChild(newInput, searchInput);
+    
+    newInput.addEventListener('input', e => {
+      const query = e.target.value.toLowerCase();
+      if (query.length === 0) {
+        showAllSuburbs();
+        return;
+      }
+      
+      const matchingSuburbs = QLD_SUBURBS
+        .filter(suburb => suburb.suburb.toLowerCase().includes(query))
+        .sort((a, b) => a.suburb.localeCompare(b.suburb))
+        .slice(0, 50);
+      
+      suburbList.innerHTML = '';
+      
+      matchingSuburbs.forEach(suburb => {
+        const li = document.createElement('li');
+        li.className = 'toolbar-suburb-list-item';
+        li.textContent = suburb.suburb;
+        li.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          searchSuburb(suburb.suburb, suburb.postcode);
+          showToolbarContent('collapsed');
+        });
+        suburbList.appendChild(li);
+      });
+    });
+  }
+  
+  function updateToolbarList() {
+    const list = document.getElementById('toolbar-list');
+    if (!list) return;
+    
+    // Get visible stations
+    const visibleStations = [];
+    
+    allSites.forEach(site => {
+      if (!isCoordinateInVisibleRegion(site.Lat, site.Lng)) return;
+      if (currentBrand !== "all" && site.B.toString() !== currentBrand) return;
+      
+      const fuel = FUEL_TYPES.find(f => f.key === currentFuel);
+      if (!fuel) return;
+      
+      let price;
+      if (fuel.key === 'Diesel') {
+        price = priceMap[site.S]?.[fuel.id];
+      } else {
+        price = priceMap[site.S]?.[fuel.id];
+      }
+      
+      if (!price) return;
+      visibleStations.push({ site, price });
+    });
+    
+    list.innerHTML = '';
+    visibleStations.sort((a, b) => a.price - b.price).slice(0, 20).forEach(({ site, price }) => {
+      const li = document.createElement('li');
+      li.className = 'toolbar-station-item';
+      
+      const distance = userLocation ?
+        getDistance(userLocation.lat, userLocation.lng, site.Lat, site.Lng).toFixed(1) : '?';
+      const isCheapest = Array.isArray(cheapestStationId) ? 
+        cheapestStationId.includes(site.S) : 
+        site.S === cheapestStationId;
+      
+      li.innerHTML = `
+        <img src="${getBrandLogo(site.B)}" alt="Brand logo" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; flex-shrink: 0;" onerror="this.style.display='none'" />
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-size: 14px; font-weight: 600; color: #2a2d3f; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${site.N}</div>
+          <div style="font-size: 12px; color: #666; margin-bottom: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${site.A}</div>
+          <div style="font-size: 12px; color: #999;">${distance} km</div>
+        </div>
+        <span style="font-size: 14px; color: ${isCheapest ? '#22C55E' : '#387CC2'}; font-weight: 700; flex-shrink: 0;">${(price / 10).toFixed(1)}</span>
+      `;
+      
+      li.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        showFeatureCard(site, price);
+        showToolbarContent('collapsed');
+      });
+      list.appendChild(li);
+    });
+  }
+  
+  function selectBrand(brandId) {
+    currentBrand = brandId;
+    updateToolbarSelections();
+    updateFuelBrandPanelSelections();
+    savePreferences();
+    findCheapestStation();
+    updateVisibleStationsAndList();
   }
   
   function populateToolbarSearch() {
