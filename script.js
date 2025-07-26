@@ -420,13 +420,13 @@ document.addEventListener("DOMContentLoaded", () => {
     
     allSites.forEach(site => {
       let price;
-      if (fuel.altId) {
+      if (fuel && fuel.altId) {
         const dieselPrice = priceMap[site.S]?.[fuel.id];
         const premiumDieselPrice = priceMap[site.S]?.[fuel.altId];
         price = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);
         if (price === Infinity) price = null;
       } else {
-        price = priceMap[site.S]?.[fuel.id];
+        price = priceMap[site.S]?.[fuel?.id];
       }
       
       if (price) {
@@ -467,13 +467,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const fuel = FUEL_TYPES.find(f => f.key === currentFuel);
       let price;
       
-      if (fuel.altId) {
+      if (fuel && fuel.altId) {
         const dieselPrice = priceMap[site.S]?.[fuel.id];
         const premiumDieselPrice = priceMap[site.S]?.[fuel.altId];
         price = Math.min(dieselPrice || Infinity, premiumDieselPrice || Infinity);
         if (price === Infinity) price = null;
       } else {
-        price = priceMap[site.S]?.[fuel.id];
+        price = priceMap[site.S]?.[fuel?.id];
       }
       
       if (!price) return;
@@ -1035,7 +1035,7 @@ document.addEventListener("DOMContentLoaded", () => {
       fuelContent.appendChild(item);
     });
     
-    fuelBtn.innerHTML = `${FUEL_TYPES.find(f => f.key === currentFuel).fullName} <span class="arrow">▼</span>`;
+    fuelBtn.innerHTML = `${FUEL_TYPES.find(f => f.key === currentFuel)?.fullName || 'Unknown'} <span class="arrow">▼</span>`;
     
     fuelBtn.addEventListener('click', e => {
       e.stopPropagation();
