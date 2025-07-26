@@ -54,49 +54,81 @@
   <!-- Drag Handle -->
   <div class="toolbar-drag-bar" id="toolbar-drag-bar"></div>
   
-  <!-- Expanded Content (hidden by default) -->
-  <div class="toolbar-expanded-content" id="toolbar-expanded-content">
-    <!-- Fuel Type Selector -->
-    <div class="toolbar-section">
-      <h4 class="toolbar-section-title">Fuel Types</h4>
-      <div class="toolbar-fuel-grid">
-        <div class="toolbar-fuel-option selected" data-fuel="E10">
-          <span class="toolbar-fuel-name">E10</span>
+  <!-- Dynamic Content Area -->
+  <div class="toolbar-content-area" id="toolbar-content-area">
+    <!-- Search Content -->
+    <div class="toolbar-panel" id="toolbar-search-content" style="display: none;">
+      <h3 class="toolbar-panel-title">Search</h3>
+      <div class="search-bar-toolbar">
+        <i class="fas fa-search"></i>
+        <input type="text" id="toolbar-search-input" placeholder="Search by suburb" />
+      </div>
+      <ul id="toolbar-suburb-list" class="toolbar-suburb-list"></ul>
+    </div>
+    
+    <!-- Filters Content -->
+    <div class="toolbar-panel" id="toolbar-filters-content">
+      <h3 class="toolbar-panel-title">Filters</h3>
+      
+      <!-- Fuel Type Selector -->
+      <div class="toolbar-section">
+        <h4 class="toolbar-section-title">Fuel Types</h4>
+        <div class="toolbar-fuel-grid">
+          <div class="toolbar-fuel-option selected" data-fuel="E10">
+            <span class="toolbar-fuel-name">E10</span>
+          </div>
+          <div class="toolbar-fuel-option" data-fuel="91">
+            <span class="toolbar-fuel-name">U91</span>
+          </div>
+          <div class="toolbar-fuel-option" data-fuel="95">
+            <span class="toolbar-fuel-name">P95</span>
+          </div>
+          <div class="toolbar-fuel-option" data-fuel="98">
+            <span class="toolbar-fuel-name">P98</span>
+          </div>
+          <div class="toolbar-fuel-option" data-fuel="Diesel">
+            <span class="toolbar-fuel-name">Diesel</span>
+          </div>
+          <div class="toolbar-fuel-option" data-fuel="PremiumDiesel">
+            <span class="toolbar-fuel-name">P Diesel</span>
+          </div>
         </div>
-        <div class="toolbar-fuel-option" data-fuel="91">
-          <span class="toolbar-fuel-name">U91</span>
+      </div>
+      
+      <!-- Brand Selector -->
+      <div class="toolbar-section">
+        <h4 class="toolbar-section-title">Brands</h4>
+        <div class="toolbar-brand-grid" id="toolbar-brand-grid">
+          <!-- Will be populated by JavaScript -->
         </div>
-        <div class="toolbar-fuel-option" data-fuel="95">
-          <span class="toolbar-fuel-name">P95</span>
-        </div>
-        <div class="toolbar-fuel-option" data-fuel="98">
-          <span class="toolbar-fuel-name">P98</span>
-        </div>
-        <div class="toolbar-fuel-option" data-fuel="Diesel">
-          <span class="toolbar-fuel-name">Diesel</span>
-        </div>
-        <div class="toolbar-fuel-option" data-fuel="PremiumDiesel">
-          <span class="toolbar-fuel-name">P Diesel</span>
-        </div>
+      </div>
+      
+      <!-- Action Buttons -->
+      <div class="toolbar-filter-actions">
+        <button class="toolbar-reset-btn" id="toolbar-reset-btn">
+          <i class="fas fa-undo"></i>
+          Reset
+        </button>
+        <button class="toolbar-confirm-btn" id="toolbar-confirm-btn">
+          <i class="fas fa-check"></i>
+          Confirm
+        </button>
       </div>
     </div>
     
-    <!-- Brand Selector -->
-    <div class="toolbar-section">
-      <h4 class="toolbar-section-title">Brands</h4>
-      <div class="toolbar-brand-grid" id="toolbar-brand-grid">
+    <!-- List Content -->
+    <div class="toolbar-panel" id="toolbar-list-content" style="display: none;">
+      <h3 class="toolbar-panel-title">Nearby Stations</h3>
+      <ul id="toolbar-list" class="toolbar-station-list">
         <!-- Will be populated by JavaScript -->
-      </div>
+      </ul>
     </div>
   </div>
   
-  <!-- Fixed Toolbar Content (always visible at bottom) -->
-  <div class="toolbar-content" id="toolbar-fixed-content">
+  <!-- Fixed Toolbar Buttons (always visible at bottom) -->
+  <div class="toolbar-buttons" id="toolbar-buttons">
     <a class="sc-menu-item" id="toolbar-search-btn">
       <i class="fas fa-search"></i>
-    </a>
-    <a class="sc-menu-item" id="toolbar-filters-btn">
-      <i class="fas fa-filter"></i>
     </a>
     <a class="sc-menu-item" id="toolbar-center-btn">
       <i class="fa-solid fa-location-arrow"></i>
