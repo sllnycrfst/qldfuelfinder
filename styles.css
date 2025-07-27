@@ -1047,8 +1047,8 @@ html, body {
   max-width: 500px;
   height: 120px;
   background: rgba(255, 255, 255, 0.1) !important;
-  backdrop-filter: blur(2px) saturate(120%) !important;
-  -webkit-backdrop-filter: blur(2px) saturate(120%) !important;
+  backdrop-filter: blur(2px) saturate(70%) !important;
+  -webkit-backdrop-filter: blur(2px) saturate(70%) !important;
   box-shadow: 
     0 16px 64px rgba(0, 0, 0, 0.25),
     0 8px 32px rgba(0, 0, 0, 0.15),
