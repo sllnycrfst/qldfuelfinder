@@ -9,8 +9,8 @@
 .map-type-select {
   padding: 8px 12px;
   background: rgba(255, 255, 255, 0.35) !important;
-  backdrop-filter: blur(32px) saturate(50%) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(50%) !important;
+  backdrop-filter: blur(2px) saturate(100%) !important;
+  -webkit-backdrop-filter: blur(2px) saturate(100%) !important;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 12px;
   color: #3b4664;
@@ -1047,8 +1047,8 @@ html, body {
   max-width: 500px;
   height: 120px;
   background: rgba(255, 255, 255, 0.1) !important;
-  backdrop-filter: blur(0px) saturate(40%) !important;
-  -webkit-backdrop-filter: blur(0px) saturate(40%) !important;
+  backdrop-filter: blur(4px) saturate(40%) !important;
+  -webkit-backdrop-filter: blur(4px) saturate(40%) !important;
   box-shadow: 
     0 16px 64px rgba(0, 0, 0, 0.25),
     0 8px 32px rgba(0, 0, 0, 0.15),
