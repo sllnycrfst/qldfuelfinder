@@ -1,5 +1,4 @@
 {
-  `content`: `// QLD Fuel Finder - Consolidated Script
 
 // ========== CONSTANTS ==========
 const FUEL_TYPES = [
