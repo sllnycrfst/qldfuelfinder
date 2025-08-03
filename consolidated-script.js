@@ -177,11 +177,48 @@ function initializeMap() {
 
 // ========== UI HANDLERS ==========
 function setupUIHandlers() {
+  // Map type selector
+  document.querySelectorAll('.map-type-option').forEach(option => {
+    option.addEventListener('click', function(e) {
+      e.stopPropagation();
+      
+      if (this.classList.contains('selected')) return;
+      
+      const overlay = document.getElementById('map-transition-overlay');
+      overlay?.classList.add('active');
+      
+      setTimeout(() => {
+        document.querySelectorAll('.map-type-option').forEach(o => o.classList.remove('selected'));
+        this.classList.add('selected');
+        
+        if (!myMap) return;
+        const type = this.dataset.type;
+        
+        if (type === 'standard') {
+          myMap.mapType = mapkit.Map.MapTypes.Standard;
+        } else if (type === 'hybrid') {
+          myMap.mapType = mapkit.Map.MapTypes.Hybrid;
+        }
+        
+        overlay?.classList.remove('active');
+      }, 200);
+    });
+  });
+  
   setupSelectors();
   setupToolbar();
   populateBrands();
   setupFilters();
   setupSearch();
+  
+  // Map click to close panels
+  document.getElementById('map')?.addEventListener('click', function(e) {
+    if (!e.target.closest('.fuel-marker') && !e.target.closest('.bottom-toolbar')) {
+      document.getElementById('bottom-toolbar')?.classList.remove('expanded');
+      document.getElementById('station-select-grid')?.classList.remove('active');
+      document.getElementById('fuel-select-grid')?.classList.remove('active');
+    }
+  });
   
   // Check for shared station
   const urlParams = new URLSearchParams(window.location.search);
@@ -192,17 +229,67 @@ function setupUIHandlers() {
 }
 
 function setupSelectors() {
-  // Basic selector setup
-  console.log("Setting up selectors...");
+  const stationSelectBtn = document.getElementById('station-select-button');
+  const stationSelectGrid = document.getElementById('station-select-grid');
+  const fuelSelectBtn = document.getElementById('fuel-select-button');
+  const fuelSelectGrid = document.getElementById('fuel-select-grid');
+  
+  if (stationSelectBtn && stationSelectGrid) {
+    stationSelectBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isActive = stationSelectGrid.classList.contains('active');
+      
+      fuelSelectGrid?.classList.remove('active');
+      
+      if (isActive) {
+        stationSelectGrid.classList.remove('active');
+      } else {
+        stationSelectGrid.classList.add('active');
+      }
+    });
+  }
+  
+  if (fuelSelectBtn && fuelSelectGrid) {
+    fuelSelectBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isActive = fuelSelectGrid.classList.contains('active');
+      
+      stationSelectGrid?.classList.remove('active');
+      
+      if (isActive) {
+        fuelSelectGrid.classList.remove('active');
+      } else {
+        fuelSelectGrid.classList.add('active');
+      }
+    });
+  }
+  
+  // Close selectors when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.station-select-button') && !e.target.closest('.station-select-grid')) {
+      stationSelectGrid?.classList.remove('active');
+    }
+    if (!e.target.closest('.fuel-select-button') && !e.target.closest('.fuel-select-grid')) {
+      fuelSelectGrid?.classList.remove('active');
+    }
+  });
 }
 
 function setupToolbar() {
+  const toolbar = document.getElementById('bottom-toolbar');
   const searchBtn = document.getElementById('search-btn');
   const locationBtn = document.getElementById('location-btn');
   const listBtn = document.getElementById('list-btn');
   
+  searchBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleToolbarPanel('search');
+  });
+  
   locationBtn?.addEventListener('click', (e) => {
     e.stopPropagation();
+    toolbar?.classList.remove('expanded');
+    resetActiveButtons();
     
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -233,6 +320,45 @@ function setupToolbar() {
       );
     }
   });
+  
+  listBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleToolbarPanel('list');
+    updateStationList();
+  });
+}
+
+function toggleToolbarPanel(panelName) {
+  const toolbar = document.getElementById('bottom-toolbar');
+  
+  const isExpanded = toolbar?.classList.contains('expanded');
+  const currentPanel = ['search', 'list', 'feature'].find(p => 
+    document.getElementById(`${p}-panel`)?.style.display !== 'none'
+  );
+  
+  if (isExpanded && currentPanel === panelName) {
+    toolbar.classList.remove('expanded');
+    resetActiveButtons();
+  } else {
+    toolbar?.classList.add('expanded');
+    showToolbarPanel(panelName);
+    
+    resetActiveButtons();
+    if (panelName === 'search') {
+      document.getElementById('search-btn')?.classList.add('active');
+    } else if (panelName === 'list') {
+      document.getElementById('list-btn')?.classList.add('active');
+    }
+  }
+}
+
+function showToolbarPanel(panelName) {
+  ['search', 'list', 'feature'].forEach(name => {
+    const panel = document.getElementById(`${name}-panel`);
+    if (panel) {
+      panel.style.display = name === panelName ? 'flex' : 'none';
+    }
+  });
 }
 
 function resetActiveButtons() {
@@ -249,25 +375,130 @@ function setupSearch() {
   
   if (!searchInput || !suburbListEl) return;
   
-  const majorSuburbs = [
+  // Use QLD_MAJOR_SUBURBS from the loaded script if available
+  const majorSuburbs = window.QLD_MAJOR_SUBURBS || [
     'Brisbane City', 'Gold Coast', 'Sunshine Coast', 'Cairns', 'Townsville',
-    'Toowoomba', 'Rockhampton', 'Mackay', 'Bundaberg', 'Ipswich'
+    'Toowoomba', 'Rockhampton', 'Mackay', 'Bundaberg', 'Hervey Bay',
+    'Gladstone', 'Maryborough', 'Mount Isa', 'Gympie', 'Caboolture',
+    'Redcliffe', 'Ipswich', 'Logan Central', 'Redland Bay', 'Cleveland',
+    'Southport', 'Surfers Paradise', 'Broadbeach', 'Burleigh Heads',
+    'Robina', 'Nerang', 'Coolangatta', 'Caloundra', 'Maroochydore',
+    'Noosa Heads', 'Nambour', 'Buderim', 'Mooloolaba'
   ];
   
+  // Simple coordinate lookup for major areas
+  const suburbCoords = {
+    'Brisbane City': { lat: -27.4698, lng: 153.0251 },
+    'Gold Coast': { lat: -28.0167, lng: 153.4000 },
+    'Sunshine Coast': { lat: -26.6500, lng: 153.0667 },
+    'Cairns': { lat: -16.9186, lng: 145.7781 },
+    'Townsville': { lat: -19.2590, lng: 146.8169 },
+    'Toowoomba': { lat: -27.5598, lng: 151.9507 },
+    'Rockhampton': { lat: -23.3781, lng: 150.5069 },
+    'Mackay': { lat: -21.1551, lng: 149.1867 },
+    'Bundaberg': { lat: -24.8661, lng: 152.3489 },
+    'Ipswich': { lat: -27.6171, lng: 152.7564 },
+    'Logan Central': { lat: -27.6386, lng: 153.1094 },
+    'Southport': { lat: -27.9717, lng: 153.4014 },
+    'Surfers Paradise': { lat: -28.0023, lng: 153.4145 },
+    'Broadbeach': { lat: -28.0364, lng: 153.4296 },
+    'Burleigh Heads': { lat: -28.1028, lng: 153.4506 },
+    'Robina': { lat: -28.0714, lng: 153.4064 },
+    'Nerang': { lat: -28.0011, lng: 153.3358 },
+    'Coolangatta': { lat: -28.1681, lng: 153.5342 },
+    'Caloundra': { lat: -26.7989, lng: 153.1311 },
+    'Maroochydore': { lat: -26.6564, lng: 153.0881 },
+    'Noosa Heads': { lat: -26.3906, lng: 153.0919 },
+    'Nambour': { lat: -26.6281, lng: 152.9594 },
+    'Buderim': { lat: -26.6833, lng: 153.0556 },
+    'Mooloolaba': { lat: -26.6814, lng: 153.1189 }
+  };
+  
   function displaySuburbs(filteredSuburbs = null) {
-    const suburmsToShow = filteredSuburbs || majorSuburbs;
+    const suburmsToShow = filteredSuburbs || majorSuburbs.slice(0, 20);
     
     suburbListEl.innerHTML = suburmsToShow.map(suburb => 
       `<li class="suburb-item" data-suburb="${suburb}">${suburb}</li>`
     ).join('');
     
+    // Add click handlers
     suburbListEl.querySelectorAll('.suburb-item').forEach(item => {
       item.addEventListener('click', () => {
-        console.log('Selected suburb:', item.dataset.suburb);
+        const suburbName = item.dataset.suburb;
+        navigateToSuburb(suburbName);
+        
+        // Close search panel
+        document.getElementById('bottom-toolbar')?.classList.remove('expanded');
+        resetActiveButtons();
       });
     });
   }
   
+  function navigateToSuburb(suburbName) {
+    console.log('Navigating to suburb:', suburbName);
+    
+    // Try to find coordinates for the suburb
+    let coords = suburbCoords[suburbName];
+    
+    if (!coords) {
+      // Try partial matches
+      const matchKey = Object.keys(suburbCoords).find(key => 
+        key.toLowerCase().includes(suburbName.toLowerCase()) ||
+        suburbName.toLowerCase().includes(key.toLowerCase())
+      );
+      
+      if (matchKey) {
+        coords = suburbCoords[matchKey];
+      }
+    }
+    
+    if (!coords) {
+      // Fallback coordinates for general regions
+      if (suburbName.toLowerCase().includes('gold coast')) {
+        coords = { lat: -28.0167, lng: 153.4000 };
+      } else if (suburbName.toLowerCase().includes('sunshine coast')) {
+        coords = { lat: -26.6500, lng: 153.0667 };
+      } else if (suburbName.toLowerCase().includes('brisbane')) {
+        coords = { lat: -27.4698, lng: 153.0251 };
+      } else {
+        // Default to Brisbane if no match found
+        coords = { lat: -27.4698, lng: 153.0251 };
+      }
+    }
+    
+    if (myMap && coords) {
+      const targetCoordinate = new mapkit.Coordinate(coords.lat, coords.lng);
+      const targetRegion = new mapkit.CoordinateRegion(
+        targetCoordinate,
+        new mapkit.CoordinateSpan(0.05, 0.05)
+      );
+      
+      myMap.setRegionAnimated(targetRegion, true);
+      console.log('Navigated to:', suburbName, 'at coordinates:', coords);
+    }
+  }
+  
+  // Setup search input handler
+  let searchTimeout;
+  searchInput.addEventListener('input', (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      const query = e.target.value.toLowerCase().trim();
+      
+      if (!query) {
+        displaySuburbs();
+        return;
+      }
+      
+      const filtered = majorSuburbs.filter(suburb => 
+        suburb.toLowerCase().includes(query)
+      ).slice(0, 20);
+      
+      displaySuburbs(filtered);
+    }, 300);
+  });
+  
+  // Show initial suburbs
   displaySuburbs();
 }
 
@@ -292,24 +523,60 @@ function populateBrands() {
 }
 
 function setupFilters() {
+  // Station selectors
   document.addEventListener('click', (e) => {
     const stationOption = e.target.closest('.station-option');
     if (stationOption) {
+      e.preventDefault();
+      e.stopPropagation();
+      
       const brand = stationOption.dataset.brand;
-      if (brand) {
-        currentBrand = brand;
-        window.currentBrand = currentBrand;
-        console.log('Selected brand:', brand);
+      if (!brand) return;
+      
+      document.querySelectorAll('.station-option').forEach(o => o.classList.remove('selected'));
+      stationOption.classList.add('selected');
+      
+      currentBrand = brand;
+      window.currentBrand = currentBrand;
+      
+      const stationSelectButton = document.getElementById('station-select-button');
+      if (stationSelectButton) {
+        if (brand === 'all') {
+          stationSelectButton.innerHTML = '<span class="station-select-text">ALL</span>';
+        } else {
+          stationSelectButton.innerHTML = `<img class="station-select-logo" src="${getBrandLogo(brand)}" onerror="handleImageError(this)">`;
+        }
       }
+      
+      findCheapestStation();
+      updateVisibleStations();
+      
+      setTimeout(() => {
+        document.getElementById('station-select-grid')?.classList.remove('active');
+      }, 150);
     }
   });
   
+  // Fuel selectors
   document.querySelectorAll('.fuel-option').forEach(option => {
     option.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
       const fuel = this.dataset.fuel;
+      
+      document.querySelectorAll('.fuel-option').forEach(o => o.classList.remove('selected'));
+      this.classList.add('selected');
+      
       currentFuel = fuel;
       window.currentFuel = currentFuel;
-      console.log('Selected fuel:', fuel);
+      
+      findCheapestStation();
+      updateVisibleStations();
+      
+      setTimeout(() => {
+        document.getElementById('fuel-select-grid')?.classList.remove('active');
+      }, 150);
     });
   });
 }
@@ -348,29 +615,384 @@ async function fetchSitesAndPrices() {
 // ========== STATION MANAGEMENT ==========
 function findCheapestStation() {
   if (!allSites.length || !myMap) return;
-  console.log("Finding cheapest stations...");
+  
+  const fuelIds = getFuelIds(currentFuel);
+  if (!fuelIds.length) return;
+  
+  const region = myMap.region;
+  const centerLat = region.center.latitude;
+  const centerLng = region.center.longitude;
+  const latDelta = region.span.latitudeDelta;
+  const lngDelta = region.span.longitudeDelta;
+  
+  let cheapestPrice = Infinity;
   cheapestStationId = [];
+  
+  allSites.forEach(site => {
+    if (currentBrand !== 'all' && site.B != currentBrand) return;
+    
+    if (site.Lat < centerLat - latDelta/2 || site.Lat > centerLat + latDelta/2 ||
+        site.Lng < centerLng - lngDelta/2 || site.Lng > centerLng + lngDelta/2) {
+      return;
+    }
+    
+    let lowestPrice = Infinity;
+    fuelIds.forEach(fuelId => {
+      const price = priceMap[site.S]?.[fuelId];
+      if (price && price > 1000 && price < 6000 && price < lowestPrice) {
+        lowestPrice = price;
+      }
+    });
+    
+    if (lowestPrice < Infinity) {
+      if (lowestPrice < cheapestPrice) {
+        cheapestPrice = lowestPrice;
+        cheapestStationId = [site.S];
+      } else if (lowestPrice === cheapestPrice) {
+        cheapestStationId.push(site.S);
+      }
+    }
+  });
+  
   window.cheapestStationId = cheapestStationId;
+  console.log("Cheapest stations in viewport:", cheapestStationId.length, "at price:", cheapestPrice);
 }
 
 function updateVisibleStations() {
   if (!myMap || !allSites.length) return;
-  console.log("Updating visible stations...");
+  
+  const fuelIds = getFuelIds(currentFuel);
+  if (!fuelIds.length) return;
+  
+  const region = myMap.region;
+  const centerLat = region.center.latitude;
+  const centerLng = region.center.longitude;
+  const latDelta = region.span.latitudeDelta;
+  const lngDelta = region.span.longitudeDelta;
+  
+  let visibleStations = allSites.filter(site => {
+    if (currentBrand !== 'all' && site.B != currentBrand) return false;
+    
+    return site.Lat >= centerLat - latDelta/2 &&
+           site.Lat <= centerLat + latDelta/2 &&
+           site.Lng >= centerLng - lngDelta/2 &&
+           site.Lng <= centerLng + lngDelta/2;
+  });
+  
+  const stationsWithPrices = [];
+  visibleStations.forEach(site => {
+    let lowestPrice = Infinity;
+    fuelIds.forEach(fuelId => {
+      const price = priceMap[site.S]?.[fuelId];
+      if (price && price > 1000 && price < 6000 && price < lowestPrice) {
+        lowestPrice = price;
+      }
+    });
+    
+    if (lowestPrice < Infinity) {
+      const distance = userLocation ? 
+        getDistance(userLocation.lat, userLocation.lng, site.Lat, site.Lng) : 
+        getDistance(centerLat, centerLng, site.Lat, site.Lng);
+      
+      stationsWithPrices.push({
+        site,
+        price: lowestPrice,
+        distance,
+        isCheapest: cheapestStationId.includes(site.S)
+      });
+    }
+  });
+  
+  stationsWithPrices.sort((a, b) => a.distance - b.distance);
+  const limitedStations = stationsWithPrices.slice(0, 50); // Show up to 50 stations
+  
+  console.log("Showing stations:", limitedStations.length, "of", stationsWithPrices.length);
+  
+  // Clear existing markers
+  document.querySelectorAll('.fuel-marker').forEach(m => m.remove());
+  
+  // Add new markers (simplified version)
+  limitedStations.forEach(({ site, price, isCheapest }) => {
+    const priceText = (price / 10).toFixed(1);
+    const logoUrl = getBrandLogo(site.B);
+    
+    const markerEl = document.createElement('div');
+    markerEl.className = 'fuel-marker';
+    if (isCheapest) markerEl.classList.add('cheapest');
+    markerEl.dataset.stationId = site.S;
+    
+    markerEl.style.cssText = `
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      z-index: ${isCheapest ? 1002 : 1001};
+      pointer-events: auto;
+      background: ${isCheapest ? '#22C55E' : '#387CC2'};
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: bold;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    `;
+    
+    markerEl.innerHTML = priceText;
+    
+    const coordinate = new mapkit.Coordinate(site.Lat, site.Lng);
+    const updatePosition = () => {
+      try {
+        const point = myMap.convertCoordinateToPointOnPage(coordinate);
+        const mapContainer = document.getElementById('map');
+        const mapRect = mapContainer.getBoundingClientRect();
+        
+        markerEl.style.left = (point.x - mapRect.left) + 'px';
+        markerEl.style.top = (point.y - mapRect.top) + 'px';
+        markerEl.style.transform = 'translate(-50%, -50%)';
+      } catch (e) {
+        // Position update failed
+      }
+    };
+    
+    updatePosition();
+    document.getElementById('map').appendChild(markerEl);
+    
+    markerEl.updatePosition = updatePosition;
+    
+    markerEl.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('Clicked station:', site.N, 'Price:', priceText + '¢/L');
+    });
+  });
+  
+  // Update marker positions on map changes
+  const updateAllMarkers = () => {
+    document.querySelectorAll('.fuel-marker').forEach(marker => {
+      if (marker.updatePosition) marker.updatePosition();
+    });
+  };
+  
+  let animationId;
+  if (myMap) {
+    myMap.removeEventListener('region-change-start', updateAllMarkers);
+    myMap.removeEventListener('region-change-end', updateAllMarkers);
+    
+    myMap.addEventListener('region-change-start', () => {
+      const animate = () => {
+        updateAllMarkers();
+        animationId = requestAnimationFrame(animate);
+      };
+      animate();
+    });
+    
+    myMap.addEventListener('region-change-end', () => {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+      }
+    });
+  }
 }
 
 function updateStationList() {
-  console.log("Updating station list...");
+  const list = document.getElementById('station-list');
+  if (!list) return;
+  
+  const fuelIds = getFuelIds(currentFuel);
+  if (!fuelIds.length) return;
+  
+  const region = myMap.region;
+  const centerLat = region.center.latitude;
+  const centerLng = region.center.longitude;
+  const latDelta = region.span.latitudeDelta;
+  const lngDelta = region.span.longitudeDelta;
+  
+  const stations = [];
+  allSites.forEach(site => {
+    if (currentBrand !== 'all' && site.B != currentBrand) return;
+    
+    if (site.Lat < centerLat - latDelta/2 || site.Lat > centerLat + latDelta/2 ||
+        site.Lng < centerLng - lngDelta/2 || site.Lng > centerLng + lngDelta/2) {
+      return;
+    }
+    
+    let lowestPrice = Infinity;
+    fuelIds.forEach(fuelId => {
+      const price = priceMap[site.S]?.[fuelId];
+      if (price && price > 1000 && price < 6000 && price < lowestPrice) {
+        lowestPrice = price;
+      }
+    });
+    
+    if (lowestPrice < Infinity) {
+      const distance = userLocation ? 
+        getDistance(userLocation.lat, userLocation.lng, site.Lat, site.Lng) : null;
+      
+      stations.push({
+        site,
+        price: lowestPrice,
+        distance,
+        isCheapest: cheapestStationId.includes(site.S)
+      });
+    }
+  });
+  
+  stations.sort((a, b) => a.price - b.price);
+  
+  list.innerHTML = '';
+  stations.slice(0, 20).forEach(({ site, price, distance, isCheapest }) => {
+    const logoUrl = getBrandLogo(site.B);
+    const priceText = (price / 10).toFixed(1);
+    const distanceText = distance ? `${distance.toFixed(1)} km` : '';
+    
+    const li = document.createElement('li');
+    li.className = 'station-item';
+    li.innerHTML = `
+      <img class="station-logo" src="${logoUrl}" alt="Brand logo" 
+           onerror="handleImageError(this)">
+      <div class="station-details">
+        <span class="station-name">${site.N}</span>
+        <span class="station-address">${site.A}</span>
+        <span class="station-distance">${distanceText}</span>
+      </div>
+      <span class="station-price" style="color:${isCheapest ? '#22C55E' : '#387CC2'};">
+        ${isCheapest ? '<i class="fas fa-crown" style="margin-right: 4px; color: #FFD700;"></i>' : ''}
+        ${priceText}¢/L
+      </span>
+    `;
+    
+    li.addEventListener('click', () => {
+      document.getElementById('bottom-toolbar')?.classList.remove('expanded');
+      resetActiveButtons();
+      setTimeout(() => {
+        console.log('Selected station from list:', site.N);
+      }, 200);
+    });
+    
+    list.appendChild(li);
+  });
 }
 
 function createUserLocationMarker(lat, lng) {
-  console.log("Creating user location marker at:", lat, lng);
+  document.querySelectorAll('.user-location-marker').forEach(m => m.remove());
+  
+  const userMarker = document.createElement('div');
+  userMarker.className = 'user-location-marker';
+  userMarker.style.cssText = `
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: #007AFF;
+    border: 3px solid white;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+    z-index: 2000;
+    pointer-events: none;
+  `;
+  
+  const coordinate = new mapkit.Coordinate(lat, lng);
+  const updatePosition = () => {
+    try {
+      const point = myMap.convertCoordinateToPointOnPage(coordinate);
+      const mapContainer = document.getElementById('map');
+      const mapRect = mapContainer.getBoundingClientRect();
+      
+      userMarker.style.left = (point.x - mapRect.left) + 'px';
+      userMarker.style.top = (point.y - mapRect.top) + 'px';
+      userMarker.style.transform = 'translate(-50%, -50%)';
+    } catch (e) {
+      console.log('User marker position update failed:', e);
+    }
+  };
+  
+  updatePosition();
+  document.getElementById('map').appendChild(userMarker);
+  userMarker.updatePosition = updatePosition;
+  
+  if (myMap) {
+    myMap.addEventListener('region-change-start', updatePosition);
+    myMap.addEventListener('region-change-end', updatePosition);
+  }
+  
+  console.log("User location marker created at:", lat, lng);
 }
 
 async function fetchWeather(lat = BRISBANE_COORDS.lat, lng = BRISBANE_COORDS.lng) {
   try {
-    console.log("Fetching weather for:", lat, lng);
+    const weatherIcons = {
+      '0': '☀️', '1': '🌤️', '2': '⛅', '3': '☁️', '45': '☁️', '48': '☁️',
+      '51': '🌦️', '53': '🌦️', '55': '🌦️', '61': '🌧️', '63': '🌧️', '65': '🌧️',
+      '71': '🌨️', '73': '🌨️', '75': '🌨️', '77': '🌨️', '80': '🌦️', '81': '🌦️',
+      '82': '🌧️', '85': '🌨️', '86': '🌨️', '95': '⛈️', '96': '⛈️', '99': '⛈️'
+    };
+    
+    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=4`);
+    const data = await res.json();
+    const { temperature, weathercode } = data.current_weather;
+    
+    const weatherTemp = document.getElementById('weather-temp');
+    const weatherIcon = document.getElementById('weather-icon');
+    
+    if (weatherTemp) weatherTemp.textContent = `${Math.round(temperature)}°`;
+    if (weatherIcon) weatherIcon.textContent = weatherIcons[weathercode] || '☀️';
+    
+    weatherForecast = data.daily;
+    
+    const weatherDisplay = document.getElementById('weather-display');
+    if (weatherDisplay) {
+      weatherDisplay.addEventListener('click', toggleWeatherForecast);
+    }
+    
   } catch (err) {
     console.error("Weather fetch error:", err);
+  }
+}
+
+function toggleWeatherForecast() {
+  const weatherDisplay = document.getElementById('weather-display');
+  const forecastEl = document.getElementById('weather-forecast');
+  
+  if (!weatherDisplay || !forecastEl) return;
+  
+  const isExpanded = weatherDisplay.classList.contains('expanded');
+  
+  if (isExpanded) {
+    weatherDisplay.classList.remove('expanded');
+  } else {
+    weatherDisplay.classList.add('expanded');
+    
+    if (weatherForecast && weatherForecast.time) {
+      const weatherIcons = {
+        '0': '☀️', '1': '🌤️', '2': '⛅', '3': '☁️', '45': '☁️', '48': '☁️',
+        '51': '🌦️', '53': '🌦️', '55': '🌦️', '61': '🌧️', '63': '🌧️', '65': '🌧️',
+        '71': '🌨️', '73': '🌨️', '75': '🌨️', '77': '🌨️', '80': '🌦️', '81': '🌦️',
+        '82': '🌧️', '85': '🌨️', '86': '🌨️', '95': '⛈️', '96': '⛈️', '99': '⛈️'
+      };
+      
+      const forecastHTML = weatherForecast.time.slice(1, 4).map((date, index) => {
+        const dayIndex = index + 1;
+        const dayName = new Date(date).toLocaleDateString('en-AU', { weekday: 'short' });
+        const maxTemp = Math.round(weatherForecast.temperature_2m_max[dayIndex]);
+        const minTemp = Math.round(weatherForecast.temperature_2m_min[dayIndex]);
+        const weatherCode = weatherForecast.weathercode[dayIndex];
+        const icon = weatherIcons[weatherCode] || '☀️';
+        
+        return `
+          <div class="forecast-day">
+            <div class="forecast-day-name">${dayName}</div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 14px;">${icon}</span>
+              <div class="forecast-temps">${maxTemp}°/${minTemp}°</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      forecastEl.innerHTML = forecastHTML;
+    }
   }
 }
 
