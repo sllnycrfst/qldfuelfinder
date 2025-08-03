@@ -722,27 +722,34 @@ function updateVisibleStations() {
     if (isCheapest) canvas.classList.add('cheapest');
     canvas.dataset.stationId = site.S;
     
-    // Set canvas size - no pixel ratio scaling to avoid transparency
+    // Set canvas size for high quality
     const canvasWidth = 56;
     const canvasHeight = 70;
+    const pixelRatio = window.devicePixelRatio || 1;
     
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
+    canvas.width = canvasWidth * pixelRatio;
+    canvas.height = canvasHeight * pixelRatio;
     canvas.style.width = canvasWidth + 'px';
     canvas.style.height = canvasHeight + 'px';
     
-    canvas.style.cssText += `
-      position: absolute;
-      cursor: pointer;
-      z-index: ${isCheapest ? 1002 : 1001};
-      pointer-events: auto;
-      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+    // Override CSS styles that cause issues
+    canvas.style.cssText = `
+      position: absolute !important;
+      cursor: pointer !important;
+      z-index: ${isCheapest ? 1002 : 1001} !important;
+      pointer-events: auto !important;
+      transition: none !important;
+      filter: none !important;
+      opacity: 1 !important;
+      transform: none !important;
       image-rendering: -webkit-optimize-contrast;
       image-rendering: crisp-edges;
+      will-change: left, top;
     `;
     
     const ctx = canvas.getContext('2d');
-    ctx.imageSmoothingEnabled = false; // Prevent blurriness
+    ctx.scale(pixelRatio, pixelRatio);
+    ctx.imageSmoothingEnabled = true;
     
     // Function to draw crown
     const drawCrown = (ctx, x, y) => {
@@ -800,11 +807,11 @@ function updateVisibleStations() {
       
       // Text shadow
       ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-      ctx.fillText(text, x + 1, y + 4); // +3px down from original +1
+      ctx.fillText(text, x + 1, y + 4);
       
       // Main text
       ctx.fillStyle = isCheapest ? '#00e153' : 'white';
-      ctx.fillText(text, x, y + 3); // +3px down
+      ctx.fillText(text, x, y + 3);
       
       ctx.restore();
     };
@@ -831,7 +838,7 @@ function updateVisibleStations() {
           // Create circular clipping path for logo
           ctx.save();
           ctx.beginPath();
-          ctx.arc(28, yOffset + 30, 15, 0, 2 * Math.PI); // +2px down (was 28)
+          ctx.arc(28, yOffset + 30, 15, 0, 2 * Math.PI);
           ctx.clip();
           
           // White background
@@ -839,7 +846,7 @@ function updateVisibleStations() {
           ctx.fill();
           
           // Draw logo
-          ctx.drawImage(logoImg, 13, yOffset + 15, 30, 30); // +2px down (was 13)
+          ctx.drawImage(logoImg, 13, yOffset + 15, 30, 30);
           ctx.restore();
           
           // Draw price text
@@ -850,7 +857,7 @@ function updateVisibleStations() {
           // Draw default logo if image fails
           ctx.save();
           ctx.beginPath();
-          ctx.arc(28, yOffset + 30, 15, 0, 2 * Math.PI); // +2px down
+          ctx.arc(28, yOffset + 30, 15, 0, 2 * Math.PI);
           ctx.fillStyle = 'white';
           ctx.fill();
           ctx.strokeStyle = '#ccc';
@@ -870,7 +877,7 @@ function updateVisibleStations() {
         ctx.save();
         ctx.fillStyle = isCheapest ? '#22C55E' : '#387CC2';
         ctx.beginPath();
-        ctx.arc(28, yOffset + 30, 20, 0, 2 * Math.PI); // +2px down
+        ctx.arc(28, yOffset + 30, 20, 0, 2 * Math.PI);
         ctx.fill();
         ctx.restore();
         
@@ -891,9 +898,12 @@ function updateVisibleStations() {
         const mapContainer = document.getElementById('map');
         const mapRect = mapContainer.getBoundingClientRect();
         
-        // Simple positioning without transforms
-        canvas.style.left = Math.round(point.x - mapRect.left - 28) + 'px'; // Center horizontally
-        canvas.style.top = Math.round(point.y - mapRect.top - canvasHeight + 14) + 'px'; // Bottom anchor
+        // Precise positioning - no transforms
+        const left = Math.round(point.x - mapRect.left - 28);
+        const top = Math.round(point.y - mapRect.top - 56);
+        
+        canvas.style.left = left + 'px';
+        canvas.style.top = top + 'px';
       } catch (e) {
         // Position update failed
       }
@@ -904,6 +914,17 @@ function updateVisibleStations() {
     
     canvas.updatePosition = updatePosition;
     
+    // Add hover effect manually since CSS is overridden
+    canvas.addEventListener('mouseenter', () => {
+      canvas.style.transform = 'scale(1.1)';
+      canvas.style.zIndex = '1003';
+    });
+    
+    canvas.addEventListener('mouseleave', () => {
+      canvas.style.transform = 'scale(1)';
+      canvas.style.zIndex = isCheapest ? '1002' : '1001';
+    });
+    
     canvas.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -911,7 +932,7 @@ function updateVisibleStations() {
     });
   });
   
-  // Immediate and smooth position updates
+  // Real-time position updates
   const updateAllMarkers = () => {
     document.querySelectorAll('.fuel-marker, .user-location-marker').forEach(marker => {
       if (marker.updatePosition) {
@@ -920,14 +941,38 @@ function updateVisibleStations() {
     });
   };
   
+  // Use immediate region-change listener for smooth movement
   if (myMap) {
-    // Remove any existing listeners
+    // Clean up old listeners
     myMap.removeEventListener('region-change-start', updateAllMarkers);
     myMap.removeEventListener('region-change-end', updateAllMarkers);
     myMap.removeEventListener('region-change', updateAllMarkers);
     
-    // Use only the most responsive listener
+    // Add immediate update listener
     myMap.addEventListener('region-change', updateAllMarkers);
+    
+    // Also add animation frame updates during movement for ultra-smooth positioning
+    let isMoving = false;
+    let animationId;
+    
+    myMap.addEventListener('region-change-start', () => {
+      isMoving = true;
+      const animate = () => {
+        if (isMoving) {
+          updateAllMarkers();
+          animationId = requestAnimationFrame(animate);
+        }
+      };
+      animate();
+    });
+    
+    myMap.addEventListener('region-change-end', () => {
+      isMoving = false;
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+      updateAllMarkers(); // Final position
+    });
   }
 }
 
