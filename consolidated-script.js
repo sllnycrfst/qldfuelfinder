@@ -722,13 +722,12 @@ function updateVisibleStations() {
     if (isCheapest) canvas.classList.add('cheapest');
     canvas.dataset.stationId = site.S;
     
-    // Set canvas size for high quality
-    const canvasWidth = 28;
-    const canvasHeight = 35;
-    const pixelRatio = window.devicePixelRatio || 1;
+    // Set canvas size - normal size, no pixel ratio scaling
+    const canvasWidth = 56;
+    const canvasHeight = 70;
     
-    canvas.width = canvasWidth * pixelRatio;
-    canvas.height = canvasHeight * pixelRatio;
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
     canvas.style.width = canvasWidth + 'px';
     canvas.style.height = canvasHeight + 'px';
     
@@ -748,7 +747,6 @@ function updateVisibleStations() {
     `;
     
     const ctx = canvas.getContext('2d');
-    ctx.scale(pixelRatio, pixelRatio);
     ctx.imageSmoothingEnabled = true;
     
     // Function to draw crown
