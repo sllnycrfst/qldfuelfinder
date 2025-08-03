@@ -1173,7 +1173,7 @@ function updateStationList() {
       </div>
       <span class="station-price" style="color:${isCheapest ? '#22C55E' : '#387CC2'};">
         ${isCheapest ? '<i class="fas fa-crown" style="margin-right: 4px; color: #FFD700;"></i>' : ''}
-        ${priceText}¢/L
+        ${priceText}
       </span>
     `;
     
