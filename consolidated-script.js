@@ -423,8 +423,8 @@ function showFeatureCard(station) {
       <div class="feature-image-container">
         <img class="feature-background-image" src="images/feature-card-image" alt="Station background" onerror="this.style.display='none'">
         
-        <!-- Top Right: Station Info -->
-        <div class="feature-top-right">
+        <!-- Top Left: Station Info -->
+        <div class="feature-top-left">
           <div class="feature-station-name-overlay">${site.N}</div>
           <div class="feature-address-overlay">${site.A}</div>
         </div>
