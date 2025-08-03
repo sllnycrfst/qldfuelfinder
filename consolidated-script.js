@@ -722,13 +722,12 @@ function updateVisibleStations() {
     if (isCheapest) canvas.classList.add('cheapest');
     canvas.dataset.stationId = site.S;
     
-    // Set canvas size for crisp rendering
-    const pixelRatio = window.devicePixelRatio || 1;
+    // Set canvas size - no pixel ratio scaling to avoid transparency
     const canvasWidth = 56;
     const canvasHeight = 70;
     
-    canvas.width = canvasWidth * pixelRatio;
-    canvas.height = canvasHeight * pixelRatio;
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
     canvas.style.width = canvasWidth + 'px';
     canvas.style.height = canvasHeight + 'px';
     
@@ -737,12 +736,13 @@ function updateVisibleStations() {
       cursor: pointer;
       z-index: ${isCheapest ? 1002 : 1001};
       pointer-events: auto;
-      transform-origin: center bottom;
       filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
     `;
     
     const ctx = canvas.getContext('2d');
-    ctx.scale(pixelRatio, pixelRatio);
+    ctx.imageSmoothingEnabled = false; // Prevent blurriness
     
     // Function to draw crown
     const drawCrown = (ctx, x, y) => {
@@ -789,7 +789,7 @@ function updateVisibleStations() {
       ctx.restore();
     };
     
-    // Function to draw price text
+    // Function to draw price text (moved down 3px)
     const drawPriceText = (ctx, text, x, y, isCheapest) => {
       ctx.save();
       
@@ -800,11 +800,11 @@ function updateVisibleStations() {
       
       // Text shadow
       ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-      ctx.fillText(text, x + 1, y + 1);
+      ctx.fillText(text, x + 1, y + 4); // +3px down from original +1
       
       // Main text
       ctx.fillStyle = isCheapest ? '#00e153' : 'white';
-      ctx.fillText(text, x, y);
+      ctx.fillText(text, x, y + 3); // +3px down
       
       ctx.restore();
     };
@@ -822,18 +822,16 @@ function updateVisibleStations() {
       
       // Draw marker base image
       const markerImg = new Image();
-      markerImg.crossOrigin = 'anonymous';
       markerImg.onload = () => {
         ctx.drawImage(markerImg, 0, yOffset, 56, 56);
         
-        // Draw station logo
+        // Draw station logo (moved down 2px)
         const logoImg = new Image();
-        logoImg.crossOrigin = 'anonymous';
         logoImg.onload = () => {
           // Create circular clipping path for logo
           ctx.save();
           ctx.beginPath();
-          ctx.arc(28, yOffset + 28, 15, 0, 2 * Math.PI);
+          ctx.arc(28, yOffset + 30, 15, 0, 2 * Math.PI); // +2px down (was 28)
           ctx.clip();
           
           // White background
@@ -841,7 +839,7 @@ function updateVisibleStations() {
           ctx.fill();
           
           // Draw logo
-          ctx.drawImage(logoImg, 13, yOffset + 13, 30, 30);
+          ctx.drawImage(logoImg, 13, yOffset + 15, 30, 30); // +2px down (was 13)
           ctx.restore();
           
           // Draw price text
@@ -852,7 +850,7 @@ function updateVisibleStations() {
           // Draw default logo if image fails
           ctx.save();
           ctx.beginPath();
-          ctx.arc(28, yOffset + 28, 15, 0, 2 * Math.PI);
+          ctx.arc(28, yOffset + 30, 15, 0, 2 * Math.PI); // +2px down
           ctx.fillStyle = 'white';
           ctx.fill();
           ctx.strokeStyle = '#ccc';
@@ -872,12 +870,12 @@ function updateVisibleStations() {
         ctx.save();
         ctx.fillStyle = isCheapest ? '#22C55E' : '#387CC2';
         ctx.beginPath();
-        ctx.arc(28, yOffset + 28, 20, 0, 2 * Math.PI);
+        ctx.arc(28, yOffset + 30, 20, 0, 2 * Math.PI); // +2px down
         ctx.fill();
         ctx.restore();
         
         // Draw price text on fallback
-        drawPriceText(ctx, priceText, 28, yOffset + 28, isCheapest);
+        drawPriceText(ctx, priceText, 28, yOffset + 30, isCheapest);
       };
       
       markerImg.src = 'images/mymarker.png';
@@ -893,8 +891,9 @@ function updateVisibleStations() {
         const mapContainer = document.getElementById('map');
         const mapRect = mapContainer.getBoundingClientRect();
         
-        canvas.style.left = (point.x - mapRect.left - canvasWidth/2) + 'px';
-        canvas.style.top = (point.y - mapRect.top - canvasHeight) + 'px';
+        // Simple positioning without transforms
+        canvas.style.left = Math.round(point.x - mapRect.left - 28) + 'px'; // Center horizontally
+        canvas.style.top = Math.round(point.y - mapRect.top - canvasHeight + 14) + 'px'; // Bottom anchor
       } catch (e) {
         // Position update failed
       }
@@ -912,38 +911,22 @@ function updateVisibleStations() {
     });
   });
   
-  // Update marker positions on map changes
+  // Immediate and smooth position updates
   const updateAllMarkers = () => {
     document.querySelectorAll('.fuel-marker, .user-location-marker').forEach(marker => {
-      if (marker.updatePosition) marker.updatePosition();
+      if (marker.updatePosition) {
+        marker.updatePosition();
+      }
     });
   };
   
-  // Immediate position updates for smooth panning
   if (myMap) {
-    // Remove old listeners to avoid duplicates
+    // Remove any existing listeners
     myMap.removeEventListener('region-change-start', updateAllMarkers);
     myMap.removeEventListener('region-change-end', updateAllMarkers);
+    myMap.removeEventListener('region-change', updateAllMarkers);
     
-    // Add continuous update during pan/zoom
-    let animationId;
-    myMap.addEventListener('region-change-start', () => {
-      const animate = () => {
-        updateAllMarkers();
-        animationId = requestAnimationFrame(animate);
-      };
-      animate();
-    });
-    
-    myMap.addEventListener('region-change-end', () => {
-      if (animationId) {
-        cancelAnimationFrame(animationId);
-        animationId = null;
-      }
-      updateAllMarkers();
-    });
-    
-    // Also update on any region change
+    // Use only the most responsive listener
     myMap.addEventListener('region-change', updateAllMarkers);
   }
 }
