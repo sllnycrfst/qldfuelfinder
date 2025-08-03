@@ -711,35 +711,157 @@ function updateVisibleStations() {
   // Clear existing markers
   document.querySelectorAll('.fuel-marker').forEach(m => m.remove());
   
-  // Add new markers (simplified version)
+  // Add new canvas-based markers
   limitedStations.forEach(({ site, price, isCheapest }) => {
     const priceText = (price / 10).toFixed(1);
     const logoUrl = getBrandLogo(site.B);
     
-    const markerEl = document.createElement('div');
-    markerEl.className = 'fuel-marker';
-    if (isCheapest) markerEl.classList.add('cheapest');
-    markerEl.dataset.stationId = site.S;
+    // Create canvas element
+    const canvas = document.createElement('canvas');
+    canvas.className = 'fuel-marker';
+    if (isCheapest) canvas.classList.add('cheapest');
+    canvas.dataset.stationId = site.S;
+    canvas.width = 56;
+    canvas.height = 70; // Extra height for crown
     
-    markerEl.style.cssText = `
+    canvas.style.cssText = `
       position: absolute;
-      width: 40px;
-      height: 40px;
+      width: 56px;
+      height: 70px;
       cursor: pointer;
       z-index: ${isCheapest ? 1002 : 1001};
       pointer-events: auto;
-      background: ${isCheapest ? '#22C55E' : '#387CC2'};
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      font-weight: bold;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      transform-origin: center bottom;
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
     `;
     
-    markerEl.innerHTML = priceText;
+    const ctx = canvas.getContext('2d');
+    
+    // Function to draw the complete marker
+    const drawMarker = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw crown if cheapest (at top)
+      if (isCheapest) {
+        drawCrown(ctx, 28, 8); // Centered at top
+      }
+      
+      // Draw marker base image
+      const markerImg = new Image();
+      markerImg.onload = () => {
+        const yOffset = isCheapest ? 14 : 0;
+        ctx.drawImage(markerImg, 0, yOffset, 56, 56);
+        
+        // Draw station logo
+        const logoImg = new Image();
+        logoImg.onload = () => {
+          // Create circular clipping path for logo
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(28, yOffset + 28, 15, 0, 2 * Math.PI);
+          ctx.clip();
+          
+          // White background
+          ctx.fillStyle = 'white';
+          ctx.fill();
+          
+          // Draw logo
+          ctx.drawImage(logoImg, 13, yOffset + 13, 30, 30);
+          ctx.restore();
+          
+          // Draw price text
+          drawPriceText(ctx, priceText, 28, yOffset + 3, isCheapest);
+        };
+        
+        logoImg.onerror = () => {
+          // Draw default logo if image fails
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(28, yOffset + 28, 15, 0, 2 * Math.PI);
+          ctx.fillStyle = 'white';
+          ctx.fill();
+          ctx.strokeStyle = '#ccc';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.restore();
+          
+          // Draw price text
+          drawPriceText(ctx, priceText, 28, yOffset + 3, isCheapest);
+        };
+        
+        logoImg.src = logoUrl;
+      };
+      
+      markerImg.src = 'images/mymarker.png';
+    };
+    
+    // Function to draw crown
+    const drawCrown = (ctx, x, y) => {
+      ctx.save();
+      ctx.fillStyle = '#FFD700';
+      ctx.strokeStyle = '#DAA520';
+      ctx.lineWidth = 1;
+      
+      // Crown base
+      ctx.beginPath();
+      ctx.rect(x - 8, y + 4, 16, 4);
+      ctx.fill();
+      ctx.stroke();
+      
+      // Crown points
+      ctx.beginPath();
+      ctx.moveTo(x - 8, y + 4);
+      ctx.lineTo(x - 6, y);
+      ctx.lineTo(x - 2, y + 2);
+      ctx.lineTo(x, y - 1);
+      ctx.lineTo(x + 2, y + 2);
+      ctx.lineTo(x + 6, y);
+      ctx.lineTo(x + 8, y + 4);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      
+      // Crown jewels
+      ctx.fillStyle = '#FF6B6B';
+      ctx.beginPath();
+      ctx.arc(x - 4, y + 2, 1, 0, 2 * Math.PI);
+      ctx.fill();
+      
+      ctx.fillStyle = '#4ECDC4';
+      ctx.beginPath();
+      ctx.arc(x, y + 1, 1, 0, 2 * Math.PI);
+      ctx.fill();
+      
+      ctx.fillStyle = '#45B7D1';
+      ctx.beginPath();
+      ctx.arc(x + 4, y + 2, 1, 0, 2 * Math.PI);
+      ctx.fill();
+      
+      ctx.restore();
+    };
+    
+    // Function to draw price text
+    const drawPriceText = (ctx, text, x, y, isCheapest) => {
+      ctx.save();
+      
+      // Text styling
+      ctx.font = 'bold 11px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      // Text shadow
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+      ctx.fillText(text, x + 1, y + 1);
+      
+      // Main text
+      ctx.fillStyle = isCheapest ? '#00e153' : 'white';
+      ctx.fillText(text, x, y);
+      
+      ctx.restore();
+    };
+    
+    // Draw the marker
+    drawMarker();
     
     const coordinate = new mapkit.Coordinate(site.Lat, site.Lng);
     const updatePosition = () => {
@@ -748,20 +870,20 @@ function updateVisibleStations() {
         const mapContainer = document.getElementById('map');
         const mapRect = mapContainer.getBoundingClientRect();
         
-        markerEl.style.left = (point.x - mapRect.left) + 'px';
-        markerEl.style.top = (point.y - mapRect.top) + 'px';
-        markerEl.style.transform = 'translate(-50%, -50%)';
+        canvas.style.left = (point.x - mapRect.left) + 'px';
+        canvas.style.top = (point.y - mapRect.top) + 'px';
+        canvas.style.transform = 'translate(-50%, -100%)';
       } catch (e) {
         // Position update failed
       }
     };
     
     updatePosition();
-    document.getElementById('map').appendChild(markerEl);
+    document.getElementById('map').appendChild(canvas);
     
-    markerEl.updatePosition = updatePosition;
+    canvas.updatePosition = updatePosition;
     
-    markerEl.addEventListener('click', (e) => {
+    canvas.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
       console.log('Clicked station:', site.N, 'Price:', priceText + '¢/L');
@@ -770,7 +892,7 @@ function updateVisibleStations() {
   
   // Update marker positions on map changes
   const updateAllMarkers = () => {
-    document.querySelectorAll('.fuel-marker').forEach(marker => {
+    document.querySelectorAll('.fuel-marker, .user-location-marker').forEach(marker => {
       if (marker.updatePosition) marker.updatePosition();
     });
   };
