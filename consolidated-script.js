@@ -722,14 +722,13 @@ function updateVisibleStations() {
     if (isCheapest) canvas.classList.add('cheapest');
     canvas.dataset.stationId = site.S;
     
-    // Set canvas size - high quality with proper scaling
+    // Set canvas size - simple approach for correct size
     const canvasWidth = 56;
     const canvasHeight = 70;
-    const pixelRatio = window.devicePixelRatio || 1;
     
-    // Scale canvas for high DPI but keep display size correct
-    canvas.width = canvasWidth * pixelRatio;
-    canvas.height = canvasHeight * pixelRatio;
+    // Use 1:1 canvas sizing
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
     canvas.style.width = canvasWidth + 'px';
     canvas.style.height = canvasHeight + 'px';
     
@@ -749,9 +748,9 @@ function updateVisibleStations() {
     `;
     
     const ctx = canvas.getContext('2d');
-    // Scale context to match pixel ratio for crisp rendering
-    ctx.scale(pixelRatio, pixelRatio);
+    // Use better rendering settings for quality
     ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
     
     // Function to draw crown
     const drawCrown = (ctx, x, y) => {
