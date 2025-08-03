@@ -755,7 +755,7 @@ function updateVisibleStations() {
     const drawPriceText = (ctx, text, x, y, isCheapest) => {
       ctx.save();
       
-      ctx.font = 'bold 12px system-ui, -apple-system, Arial'; // 1px smaller (was 13px)
+      ctx.font = 'bold 11px system-ui, -apple-system, Arial'; // smaller again (was 12px)
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       
@@ -785,26 +785,26 @@ function updateVisibleStations() {
           // Create circular clipping path for logo
           ctx.save();
           ctx.beginPath();
-          ctx.arc(32, 40, 15, 0, 2 * Math.PI); // moved down 2px (was 38)
+          ctx.arc(32, 41, 15, 0, 2 * Math.PI); // moved down 1px more (was 40)
           ctx.clip();
           
           // White background
           ctx.fillStyle = 'white';
           ctx.fill();
           
-          // Draw logo (moved down 2px)
-          ctx.drawImage(logoImg, 17, 25, 30, 30); // was 23, now 25
+          // Draw logo (moved down 1px more)
+          ctx.drawImage(logoImg, 17, 26, 30, 30); // was 25, now 26
           ctx.restore();
           
-          // Draw price text (moved down 3px)
-          drawPriceText(ctx, priceText, 32, 14, isCheapest); // was 11, now 14
+          // Draw price text (moved down 2px more)
+          drawPriceText(ctx, priceText, 32, 16, isCheapest); // was 14, now 16
         };
         
         logoImg.onerror = () => {
           // Draw default logo if image fails
           ctx.save();
           ctx.beginPath();
-          ctx.arc(32, 40, 15, 0, 2 * Math.PI); // moved down 2px
+          ctx.arc(32, 41, 15, 0, 2 * Math.PI); // moved down 1px more
           ctx.fillStyle = 'white';
           ctx.fill();
           ctx.strokeStyle = '#ccc';
@@ -812,7 +812,7 @@ function updateVisibleStations() {
           ctx.stroke();
           ctx.restore();
           
-          drawPriceText(ctx, priceText, 32, 14, isCheapest); // was 11, now 14
+          drawPriceText(ctx, priceText, 32, 16, isCheapest); // was 14, now 16
         };
         
         logoImg.src = logoUrl;
