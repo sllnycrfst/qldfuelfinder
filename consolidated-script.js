@@ -722,12 +722,14 @@ function updateVisibleStations() {
     if (isCheapest) canvas.classList.add('cheapest');
     canvas.dataset.stationId = site.S;
     
-    // Set canvas size - normal size, no pixel ratio scaling
+    // Set canvas size - high quality with proper scaling
     const canvasWidth = 56;
     const canvasHeight = 70;
+    const pixelRatio = window.devicePixelRatio || 1;
     
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
+    // Scale canvas for high DPI but keep display size correct
+    canvas.width = canvasWidth * pixelRatio;
+    canvas.height = canvasHeight * pixelRatio;
     canvas.style.width = canvasWidth + 'px';
     canvas.style.height = canvasHeight + 'px';
     
@@ -747,6 +749,8 @@ function updateVisibleStations() {
     `;
     
     const ctx = canvas.getContext('2d');
+    // Scale context to match pixel ratio for crisp rendering
+    ctx.scale(pixelRatio, pixelRatio);
     ctx.imageSmoothingEnabled = true;
     
     // Function to draw crown
