@@ -899,6 +899,14 @@ html, body {
   margin: 0;
 }
 
+.feature-card-standalone .feature-suburb-overlay {
+  font-size: 11px;
+  color: #999;
+  text-shadow: none;
+  font-weight: 500;
+  margin: 0;
+}
+
 .feature-card-standalone .feature-distance-overlay {
   font-size: 11px;
   color: #999;
@@ -971,14 +979,15 @@ html, body {
   justify-content: center;
   transition: all 0.3s ease;
   font-size: 16px;
+  color: #666; /* Default color */
 }
 
 .feature-card-standalone .feature-icon-btn.navigation {
-  color: #22C55E;
+  color: #22C55E; /* Green for navigation */
 }
 
 .feature-card-standalone .feature-icon-btn.share {
-  color: #387cc2;
+  color: #387cc2; /* Blue for share */
 }
 
 .feature-card-standalone .feature-icon-btn:hover {

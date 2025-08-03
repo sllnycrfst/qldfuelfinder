@@ -83,6 +83,18 @@ window.handleImageError = function(img) {
   img.src = 'images/default.png';
 }
 
+function extractSuburb(address) {
+  // Extract suburb from address - typically the last part before state/postcode
+  const parts = address.split(',');
+  if (parts.length >= 2) {
+    // Get the second-to-last part (suburb is usually before state)
+    const suburb = parts[parts.length - 2].trim();
+    // Remove any numbers (postcodes) from the end
+    return suburb.replace(/\s+\d+.*$/, '').trim();
+  }
+  return '';
+}
+
 function getFuelIds(fuelKey) {
   const fuel = FUEL_TYPES.find(f => f.key === fuelKey);
   if (!fuel) return [];
@@ -417,6 +429,7 @@ function showFeatureCard(station) {
   const logoUrl = getBrandLogo(site.B);
   const priceText = (price / 10).toFixed(1);
   const distanceText = distance ? `${distance.toFixed(1)} km away` : '';
+  const suburb = extractSuburb(site.A);
   
   // Get all prices for this station
   const stationPrices = priceMap[site.S] || {};
@@ -447,6 +460,7 @@ function showFeatureCard(station) {
             <div class="station-info">
               <div class="feature-station-name-overlay">${site.N}</div>
               <div class="feature-address-overlay">${site.A}</div>
+              ${suburb ? `<div class="feature-suburb-overlay">${suburb}</div>` : ''}
               ${distanceText ? `<div class="feature-distance-overlay">${distanceText}</div>` : ''}
             </div>
           </div>
@@ -1017,9 +1031,10 @@ function updateVisibleStations() {
     const drawPriceText = (ctx, text, x, y, isCheapest) => {
       ctx.save();
       
-      ctx.font = 'bold 10px system-ui, -apple-system, Arial'; // smaller again (was 12px)
+      ctx.font = 'bold 10px system-ui, -apple-system, Arial'; // smaller and tighter (was 11px)
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
+      ctx.letterSpacing = '-0.5px'; // Tighter letter spacing
       
       // Text shadow
       ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
@@ -1058,8 +1073,8 @@ function updateVisibleStations() {
           ctx.drawImage(logoImg, 17, 26, 30, 30); // was 25, now 26
           ctx.restore();
           
-          // Draw price text (moved down and closer spacing)
-          drawPriceText(ctx, priceText, 32, 18, isCheapest); // was 18, now 16
+          // Draw price text (moved down and tighter spacing)
+          drawPriceText(ctx, priceText, 32, 18, isCheapest); // was 16, now 18
         };
         
         logoImg.onerror = () => {
@@ -1074,7 +1089,7 @@ function updateVisibleStations() {
           ctx.stroke();
           ctx.restore();
           
-          drawPriceText(ctx, priceText, 32, 16, isCheapest); // was 18, now 16
+          drawPriceText(ctx, priceText, 32, 18, isCheapest); // was 16, now 18
         };
         
         logoImg.src = logoUrl;
