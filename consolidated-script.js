@@ -934,7 +934,7 @@ function updateVisibleStations() {
     const drawPriceText = (ctx, text, x, y, isCheapest) => {
       ctx.save();
       
-      ctx.font = 'bold 11px system-ui, -apple-system, Arial'; // smaller again (was 12px)
+      ctx.font = 'bold 10px system-ui, -apple-system, Arial'; // reduced from 11px to 10px
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       
@@ -971,12 +971,12 @@ function updateVisibleStations() {
           ctx.fillStyle = 'white';
           ctx.fill();
           
-          // Draw logo (moved down 1px more)
-          ctx.drawImage(logoImg, 17, 26, 30, 30); // was 25, now 26
+          // Draw logo (reduced size by 2px)
+          ctx.drawImage(logoImg, 17, 26, 28, 28); // was 30x30, now 28x28
           ctx.restore();
           
           // Draw price text (moved down 2px more)
-          drawPriceText(ctx, priceText, 32, 16, isCheapest); // was 14, now 16
+          drawPriceText(ctx, priceText, 32, 18, isCheapest); // was 16, now 18
         };
         
         logoImg.onerror = () => {
@@ -991,7 +991,7 @@ function updateVisibleStations() {
           ctx.stroke();
           ctx.restore();
           
-          drawPriceText(ctx, priceText, 32, 16, isCheapest); // was 14, now 16
+          drawPriceText(ctx, priceText, 32, 18, isCheapest); // was 16, now 18
         };
         
         logoImg.src = logoUrl;

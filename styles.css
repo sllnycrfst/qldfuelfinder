@@ -103,7 +103,7 @@ html, body {
 /* ========== STATION SELECT (BRAND SELECT) ========== */
 .station-select-button {
   position: fixed;
-  top: 77px;
+  top: 197px; /* moved down 120px from 77px */
   right: 20px;
   width: 50px;
   height: 44px;
@@ -151,8 +151,8 @@ html, body {
 /* FIXED: Station select grid now extends LEFT and DOWN from the button */
 .station-select-grid {
   position: fixed;
-  top: 121px; /* Position below the button */
-  right: 20px; /* Align with button */
+  top: 241px; /* Position below the button (197px + 44px) */
+  right: 82px; /* Position 12px to the left of button (20px + 50px + 12px) */
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
@@ -173,8 +173,8 @@ html, body {
     inset 0 2px 4px rgba(255, 255, 255, 0.9),
     inset 0 -2px 4px rgba(0, 0, 0, 0.05);
   width: 320px;
-  max-height: 280px;
-  overflow-y: auto;
+  height: 240px; /* Fixed height to prevent scrolling */
+  overflow: visible; /* Remove scrolling */
 }
 
 .station-select-grid.active {
@@ -250,7 +250,7 @@ html, body {
 /* ========== FUEL SELECT ========== */
 .fuel-select-button {
   position: fixed;
-  top: 131px;
+  top: 251px; /* moved down 120px from 131px */
   right: 20px;
   width: 50px;
   height: 44px;
@@ -285,8 +285,8 @@ html, body {
 /* FIXED: Fuel select grid now extends LEFT and DOWN from the button */
 .fuel-select-grid {
   position: fixed;
-  top: 175px; /* Position below the button */
-  right: 20px; /* Align with button */
+  top: 295px; /* Position below the button (251px + 44px) */
+  right: 82px; /* Position 12px to the left of button (20px + 50px + 12px) */
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
@@ -307,6 +307,8 @@ html, body {
     inset 0 2px 4px rgba(255, 255, 255, 0.9),
     inset 0 -2px 4px rgba(0, 0, 0, 0.05);
   width: 250px;
+  height: 160px; /* Fixed height to fit all content */
+  overflow: visible; /* Remove scrolling */
 }
 
 .fuel-select-grid.active {
@@ -1433,21 +1435,27 @@ html, body {
     font-size: 26px;
   }
   
+  /* Move map type control down to same height as weather widget on mobile */
+  .map-type-control {
+    top: 35px; /* Same as weather widget mobile positioning */
+  }
+  
   .fuel-select-grid {
     width: 260px;
     grid-template-columns: repeat(3, 1fr);
-    right: 60px;
+    right: 82px; /* Keep same positioning relative to button */
   }
   
   .fuel-select-grid.active {
     width: 280px;
-    height: 200px;
+    height: 160px; /* Keep fixed height */
   }
 
   .station-select-grid {
     width: 300px;
-    right: 60px;
+    right: 82px; /* Keep same positioning relative to button */
     grid-template-columns: repeat(3, 1fr);
+    height: 240px; /* Keep fixed height */
   }
 
   .weather-display {
@@ -1487,16 +1495,18 @@ html, body {
     filter: blur(0.3px) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
   }
   
-  /* Smaller fuel select grids on mobile */
+  /* Adjust grids for smaller screens but keep positioning relative to buttons */
   .fuel-select-grid.active {
-    width: calc(100vw - 40px);
-    right: 20px;
-    max-width: 300px;
+    width: calc(100vw - 120px); /* Account for button position and margins */
+    right: 82px;
+    max-width: 280px;
+    height: 160px;
   }
 
   .station-select-grid.active {
-    width: calc(100vw - 40px);
-    right: 20px;
-    max-width: 320px;
+    width: calc(100vw - 120px); /* Account for button position and margins */
+    right: 82px;
+    max-width: 300px;
+    height: 240px;
   }
 }
