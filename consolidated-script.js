@@ -39,7 +39,7 @@ const TOP_BRANDS = [
   '111', // Coles Express
   '3421066', // Ampol
   '16', // Mobil
-  '72', // Gull
+  '3421139', // Pearl
   '86', // Liberty
   '169', // On the Run
   '167', // Speedway
