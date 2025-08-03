@@ -835,19 +835,6 @@ html, body {
   border-radius: 20px;
 }
 
-/* Text overlay with dark gradient for readability */
-.feature-image-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: none;
-  pointer-events: none;
-  border-radius: 20px;
-}
-
 /* Top Right: Station Name & Address */
 .feature-top-left {
   position: absolute;
