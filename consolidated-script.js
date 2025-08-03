@@ -439,7 +439,7 @@ function showFeatureCard(station) {
     <div class="feature-card-overlay" style="opacity: 0; transition: all 0.4s ease;">
       <div class="feature-card-standalone">
         <div class="feature-image-container">
-          <img class="feature-background-image" src="images/feature-card-image.png" alt="Station background" onerror="this.src='images/feature-card-image.png'">
+          <img class="feature-background-image" src="images/feature-card-image.png" alt="Station background" onerror="this.style.display='none'">
           
           <!-- Top Left: Station Info -->
           <div class="feature-top-left">
