@@ -441,21 +441,23 @@ function showFeatureCard(station) {
         <div class="feature-image-container">
           <img class="feature-background-image" src="images/feature-card-image.png" alt="Station background" onerror="this.style.display='none'">
           
-          <!-- Top Left: Station Info -->
+          <!-- Top Left: Station Info with Logo -->
           <div class="feature-top-left">
-            <div class="feature-station-name-overlay">${site.N}</div>
-            <div class="feature-address-overlay">${site.A}</div>
+            <img class="station-logo" src="${logoUrl}" alt="${brandName} logo" onerror="handleImageError(this)">
+            <div class="station-info">
+              <div class="feature-station-name-overlay">${site.N}</div>
+              <div class="feature-address-overlay">${site.A}</div>
+              ${distanceText ? `<div class="feature-distance-overlay">${distanceText}</div>` : ''}
+            </div>
           </div>
           
           <!-- Bottom Left: Fuel & Price -->
           <div class="feature-bottom-left">
             <div class="feature-fuel-type">${getFuelDisplayName(currentFuel)}</div>
             <div class="feature-price-overlay">
-              ${isCheapest ? '<i class="fas fa-crown" style="color: #FFD700; margin-right: 4px;"></i>' : ''}
               <span class="price-value-overlay">${priceText}</span>
-              ${isCheapest ? '<div class="cheapest-badge">Cheapest</div>' : ''}
+              ${isCheapest ? '<i class="fas fa-crown" style="color: #FFD700; margin-left: 6px;"></i>' : ''}
             </div>
-            ${distanceText ? `<div class="feature-distance-overlay">${distanceText}</div>` : ''}
           </div>
           
           <!-- Bottom Right: Action Buttons -->
@@ -1056,8 +1058,8 @@ function updateVisibleStations() {
           ctx.drawImage(logoImg, 17, 26, 30, 30); // was 25, now 26
           ctx.restore();
           
-          // Draw price text (moved down 2px more)
-          drawPriceText(ctx, priceText, 32, 18, isCheapest); // was 14, now 18
+          // Draw price text (moved down and closer spacing)
+          drawPriceText(ctx, priceText, 32, 16, isCheapest); // was 18, now 16
         };
         
         logoImg.onerror = () => {
@@ -1072,7 +1074,7 @@ function updateVisibleStations() {
           ctx.stroke();
           ctx.restore();
           
-          drawPriceText(ctx, priceText, 32, 18, isCheapest); // was 14, now 18
+          drawPriceText(ctx, priceText, 32, 16, isCheapest); // was 18, now 16
         };
         
         logoImg.src = logoUrl;
