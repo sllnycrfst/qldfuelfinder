@@ -100,10 +100,157 @@ html, body {
   transition: opacity 0.2s ease-in;
 }
 
+/* ========== STATION SELECT (BRAND SELECT) ========== */
+.station-select-button {
+  position: fixed;
+  top: 77px;
+  right: 20px;
+  width: 50px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 1000;
+  font-size: 14px;
+  font-weight: 600;
+  color: #3b4664;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 0px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    inset 0 2px 4px rgba(255, 255, 255, 0.9),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.station-select-button:hover {
+  background: rgba(255, 255, 255, 0.85);
+  transform: translateY(-1px);
+}
+
+.station-select-button:active {
+  transform: translateY(0) scale(0.95);
+}
+
+.station-select-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: contain;
+}
+
+.station-select-text {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* FIXED: Station select grid now expands FROM the button */
+.station-select-grid {
+  position: fixed;
+  top: 77px;
+  right: 80px; /* Start from button position */
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 12px;
+  border-radius: 16px;
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(20px) scale(0.9);
+  transform-origin: right center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px) saturate(200%);
+  -webkit-backdrop-filter: blur(16px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 
+    0 12px 48px rgba(0, 0, 0, 0.15),
+    inset 0 2px 4px rgba(255, 255, 255, 0.9),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.05);
+  width: 320px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.station-select-grid.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0) scale(1);
+}
+
+.station-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 6px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  min-height: 60px;
+  opacity: 0;
+  transform: scale(0.8);
+  animation: fadeInScale 0.3s ease forwards;
+}
+
+.station-option:nth-child(1) { animation-delay: 0.05s; }
+.station-option:nth-child(2) { animation-delay: 0.1s; }
+.station-option:nth-child(3) { animation-delay: 0.15s; }
+.station-option:nth-child(4) { animation-delay: 0.2s; }
+.station-option:nth-child(5) { animation-delay: 0.25s; }
+.station-option:nth-child(6) { animation-delay: 0.3s; }
+.station-option:nth-child(7) { animation-delay: 0.35s; }
+.station-option:nth-child(8) { animation-delay: 0.4s; }
+.station-option:nth-child(9) { animation-delay: 0.45s; }
+.station-option:nth-child(10) { animation-delay: 0.5s; }
+.station-option:nth-child(11) { animation-delay: 0.55s; }
+.station-option:nth-child(12) { animation-delay: 0.6s; }
+.station-option:nth-child(13) { animation-delay: 0.65s; }
+.station-option:nth-child(14) { animation-delay: 0.7s; }
+.station-option:nth-child(15) { animation-delay: 0.75s; }
+.station-option:nth-child(16) { animation-delay: 0.8s; }
+
+.station-option:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.station-option.selected {
+  background: rgba(56, 124, 194, 0.25);
+  border-color: #387cc2;
+  box-shadow: 0 2px 8px rgba(56, 124, 194, 0.3);
+}
+
+.station-logo {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: contain;
+  background: white;
+  padding: 2px;
+}
+
+.station-option-name {
+  font-size: 9px;
+  font-weight: 600;
+  color: #2a2d3f;
+  text-align: center;
+  line-height: 1.1;
+}
+
 /* ========== FUEL SELECT ========== */
 .fuel-select-button {
   position: fixed;
-  top: 87px;
+  top: 131px;
   right: 20px;
   width: 50px;
   height: 44px;
@@ -135,10 +282,11 @@ html, body {
   transform: translateY(0) scale(0.95);
 }
 
+/* FIXED: Fuel select grid now expands FROM the button */
 .fuel-select-grid {
   position: fixed;
-  top: 67px;
-  right: 80px;
+  top: 131px;
+  right: 80px; /* Start from button position */
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
@@ -147,25 +295,24 @@ html, body {
   z-index: 999;
   opacity: 0;
   visibility: hidden;
-  transform: translateX(10px);
+  transform: translateX(20px) scale(0.9);
+  transform-origin: right center;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px) saturate(200%);
+  -webkit-backdrop-filter: blur(16px) saturate(200%);
   border: 1px solid rgba(255, 255, 255, 0.6);
   box-shadow: 
     0 12px 48px rgba(0, 0, 0, 0.15),
     inset 0 2px 4px rgba(255, 255, 255, 0.9),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.05),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-  overflow: hidden;
-  width: max-content;
+    inset 0 -2px 4px rgba(0, 0, 0, 0.05);
+  width: 250px;
 }
 
 .fuel-select-grid.active {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0);
+  transform: translateX(0) scale(1);
 }
 
 .fuel-option {
@@ -274,22 +421,23 @@ html, body {
   transform: scale(0.95);
 }
 
-/* ========== WEATHER DISPLAY ========== */
+/* ========== WEATHER DISPLAY - FIXED TO EXPAND DOWN ========== */
 .weather-display {
   position: fixed;
   top: 20px;
   left: 20px;
   z-index: 1000;
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
   padding: 12px 16px;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
   max-height: 48px;
   overflow: hidden;
-  transform-origin: top left;
+  min-width: 80px;
   /* Updated to match glassy controls */
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(12px) saturate(180%);
@@ -306,10 +454,11 @@ html, body {
   transform: translateY(-1px);
 }
 
+/* FIXED: Expand down, not across */
 .weather-display.expanded {
   max-height: 200px;
   padding: 16px;
-  width: 280px;
+  width: 200px; /* Fixed width instead of expanding */
 }
 
 .weather-main {
@@ -334,6 +483,7 @@ html, body {
 .weather-forecast {
   margin-top: 12px;
   display: none;
+  width: 100%;
 }
 
 .weather-display.expanded .weather-forecast {
@@ -607,7 +757,7 @@ html, body {
   transform: translateX(4px);
 }
 
-.station-logo {
+.station-item .station-logo {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -713,26 +863,30 @@ html, body {
 /* ========== SCROLLBAR ========== */
 .toolbar-content,
 .suburb-list,
-.station-list {
+.station-list,
+.station-select-grid {
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
 
 .toolbar-content::-webkit-scrollbar,
 .suburb-list::-webkit-scrollbar,
-.station-list::-webkit-scrollbar {
+.station-list::-webkit-scrollbar,
+.station-select-grid::-webkit-scrollbar {
   width: 6px;
 }
 
 .toolbar-content::-webkit-scrollbar-track,
 .suburb-list::-webkit-scrollbar-track,
-.station-list::-webkit-scrollbar-track {
+.station-list::-webkit-scrollbar-track,
+.station-select-grid::-webkit-scrollbar-track {
   background: transparent;
 }
 
 .toolbar-content::-webkit-scrollbar-thumb,
 .suburb-list::-webkit-scrollbar-thumb,
-.station-list::-webkit-scrollbar-thumb {
+.station-list::-webkit-scrollbar-thumb,
+.station-select-grid::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.2);
   border-radius: 3px;
 }
@@ -819,6 +973,12 @@ html, body {
     height: 200px;
   }
 
+  .station-select-grid {
+    width: 300px;
+    right: 60px;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
   .weather-display {
     top: 35px;
     left: 15px;
@@ -826,7 +986,7 @@ html, body {
   }
   
   .weather-display.expanded {
-    width: 240px;
+    width: 180px;
   }
   
   /* Mobile-specific feature card adjustments */
@@ -861,5 +1021,11 @@ html, body {
     width: calc(100vw - 40px);
     right: 20px;
     max-width: 300px;
+  }
+
+  .station-select-grid.active {
+    width: calc(100vw - 40px);
+    right: 20px;
+    max-width: 320px;
   }
 }

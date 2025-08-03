@@ -1,4 +1,4 @@
-// QLD Fuel Finder - Consolidated Script
+// QLD Fuel Finder - Consolidated Script (Fixed)
 
 // ========== CONSTANTS ==========
 const FUEL_TYPES = [
@@ -28,6 +28,25 @@ const BRAND_NAMES = {
   '3421195': 'Ultra Petroleum', '3421196': 'Bennetts Petroleum', '3421202': 'Atlas Fuel',
   '3421204': 'Woodham Petroleum', '3421207': 'Tas Petroleum'
 };
+
+// Top 15 brands for the brand selector
+const TOP_BRANDS = [
+  '2031031', // Costco
+  '2', // Caltex
+  '5', // BP
+  '20', // Shell
+  '113', // 7 Eleven
+  '111', // Coles Express
+  '3421066', // Ampol
+  '16', // Mobil
+  '72', // Gull
+  '86', // Liberty
+  '169', // On the Run
+  '167', // Speedway
+  '23', // United
+  '5094', // Puma Energy
+  '12' // Independent
+];
 
 const BRISBANE_COORDS = { lat: -27.4698, lng: 153.0251 };
 
@@ -369,6 +388,12 @@ function resetActiveButtons() {
 
 window.resetActiveButtons = resetActiveButtons;
 
+// Close toolbar panel function - FIXED
+window.closeToolbarPanel = function() {
+  document.getElementById('bottom-toolbar')?.classList.remove('expanded');
+  resetActiveButtons();
+};
+
 function setupSearch() {
   const searchInput = document.getElementById('search-input');
   const suburbListEl = document.getElementById('suburb-list');
@@ -461,8 +486,10 @@ function setupSearch() {
       } else if (suburbName.toLowerCase().includes('brisbane')) {
         coords = { lat: -27.4698, lng: 153.0251 };
       } else {
-        // Default to Brisbane if no match found
-        coords = { lat: -27.4698, lng: 153.0251 };
+        // FIXED: Don't navigate if we don't have coordinates
+        console.log('No coordinates found for:', suburbName);
+        alert(`Sorry, we don't have coordinates for "${suburbName}". Please try a different location.`);
+        return;
       }
     }
     
@@ -503,18 +530,25 @@ function setupSearch() {
 }
 
 function populateBrands() {
-  const topBrandIds = ['2031031', '2', '5', '20', '113', '111'];
   const stationGrid = document.getElementById('station-select-grid');
   
   if (stationGrid) {
-    topBrandIds.forEach((id) => {
-      if (BRAND_NAMES[id]) {
+    // Clear existing options (keep "All" option)
+    const allOption = stationGrid.querySelector('.station-option[data-brand="all"]');
+    stationGrid.innerHTML = '';
+    if (allOption) {
+      stationGrid.appendChild(allOption);
+    }
+    
+    // Add top 15 brands
+    TOP_BRANDS.forEach((brandId) => {
+      if (BRAND_NAMES[brandId]) {
         const stationDiv = document.createElement('div');
         stationDiv.className = 'station-option';
-        stationDiv.dataset.brand = id;
+        stationDiv.dataset.brand = brandId;
         stationDiv.innerHTML = `
-          <img class="station-logo" src="${getBrandLogo(id)}" alt="${BRAND_NAMES[id]} logo" onerror="handleImageError(this)">
-          <span class="station-option-name">${BRAND_NAMES[id]}</span>
+          <img class="station-logo" src="${getBrandLogo(brandId)}" alt="${BRAND_NAMES[brandId]} logo" onerror="handleImageError(this)">
+          <span class="station-option-name">${BRAND_NAMES[brandId]}</span>
         `;
         stationGrid.appendChild(stationDiv);
       }
@@ -797,7 +831,7 @@ function updateVisibleStations() {
           ctx.restore();
           
           // Draw price text (moved down 2px more)
-          drawPriceText(ctx, priceText, 32, 14, isCheapest); // was 14, now 16
+          drawPriceText(ctx, priceText, 32, 16, isCheapest); // was 14, now 16
         };
         
         logoImg.onerror = () => {
