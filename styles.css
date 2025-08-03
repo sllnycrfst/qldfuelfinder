@@ -1316,6 +1316,19 @@ html, body {
   border-bottom: none;
 }
 
+.suburb-item.search-suggestion {
+  background: rgba(56, 124, 194, 0.1);
+  border: 1px solid rgba(56, 124, 194, 0.2);
+  border-radius: 8px;
+  font-weight: 600;
+  color: #387cc2;
+}
+
+.suburb-item.search-suggestion:hover {
+  background: rgba(56, 124, 194, 0.2);
+  border-color: rgba(56, 124, 194, 0.4);
+}
+
 @media (max-width: 768px) {
   .bottom-toolbar {
     bottom: 20px;

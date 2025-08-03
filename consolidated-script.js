@@ -39,13 +39,13 @@ const TOP_BRANDS = [
   '111', // Coles Express
   '3421066', // Ampol
   '16', // Mobil
-  '3421139', // Pearl Energy
+  '72', // Gull
   '86', // Liberty
   '169', // On the Run
-  '3421183', // U-Go
+  '167', // Speedway
   '23', // United
   '5094', // Puma Energy
-  '3421073' // EG Ampol
+  '12' // Independent
 ];
 
 const BRISBANE_COORDS = { lat: -27.4698, lng: 153.0251 };
@@ -616,14 +616,14 @@ function setupSearch() {
     });
   }
   
-  function navigateToSuburb(suburbName) {
+  async function navigateToSuburb(suburbName) {
     console.log('Navigating to suburb:', suburbName);
     
-    // Try to find coordinates for the suburb
+    // Try to find coordinates in our hardcoded list first
     let coords = suburbCoords[suburbName];
     
     if (!coords) {
-      // Try partial matches
+      // Try partial matches in hardcoded list
       const matchKey = Object.keys(suburbCoords).find(key => 
         key.toLowerCase().includes(suburbName.toLowerCase()) ||
         suburbName.toLowerCase().includes(key.toLowerCase())
@@ -635,18 +635,49 @@ function setupSearch() {
     }
     
     if (!coords) {
-      // Fallback coordinates for general regions
-      if (suburbName.toLowerCase().includes('gold coast')) {
-        coords = { lat: -28.0167, lng: 153.4000 };
-      } else if (suburbName.toLowerCase().includes('sunshine coast')) {
-        coords = { lat: -26.6500, lng: 153.0667 };
-      } else if (suburbName.toLowerCase().includes('brisbane')) {
-        coords = { lat: -27.4698, lng: 153.0251 };
-      } else {
-        // FIXED: Don't navigate if we don't have coordinates
-        console.log('No coordinates found for:', suburbName);
-        alert(`Sorry, we don't have coordinates for "${suburbName}". Please try a different location.`);
-        return;
+      // Use Apple's geocoding API to find the location
+      try {
+        console.log('Geocoding with Apple Maps:', suburbName);
+        
+        const geocoder = new mapkit.Geocoder();
+        const searchQuery = `${suburbName}, Queensland, Australia`;
+        
+        const response = await new Promise((resolve, reject) => {
+          geocoder.lookup(searchQuery, (error, data) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(data);
+            }
+          });
+        });
+        
+        if (response && response.results && response.results.length > 0) {
+          const result = response.results[0];
+          coords = {
+            lat: result.coordinate.latitude,
+            lng: result.coordinate.longitude
+          };
+          console.log('Geocoded coordinates for', suburbName, ':', coords);
+        } else {
+          throw new Error('No results found');
+        }
+        
+      } catch (error) {
+        console.error('Geocoding failed:', error);
+        
+        // Fallback coordinates for general regions
+        if (suburbName.toLowerCase().includes('gold coast')) {
+          coords = { lat: -28.0167, lng: 153.4000 };
+        } else if (suburbName.toLowerCase().includes('sunshine coast')) {
+          coords = { lat: -26.6500, lng: 153.0667 };
+        } else if (suburbName.toLowerCase().includes('brisbane')) {
+          coords = { lat: -27.4698, lng: 153.0251 };
+        } else {
+          console.log('No coordinates found for:', suburbName);
+          alert(`Sorry, we couldn't find "${suburbName}". Please try a different location or check the spelling.`);
+          return;
+        }
       }
     }
     
@@ -678,8 +709,46 @@ function setupSearch() {
         suburb.toLowerCase().includes(query)
       ).slice(0, 20);
       
-      displaySuburbs(filtered);
+      // If no matches in our predefined list, show the search term as an option
+      if (filtered.length === 0 && query.length > 2) {
+        const searchTerm = e.target.value.trim();
+        // Capitalize first letter of each word
+        const formattedSearchTerm = searchTerm
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+          .join(' ');
+        
+        suburbListEl.innerHTML = `
+          <li class="suburb-item search-suggestion" data-suburb="${searchTerm}">
+            <i class="fas fa-search" style="margin-right: 8px; color: #666;"></i>
+            Search for "${formattedSearchTerm}"
+          </li>
+        `;
+        
+        // Add click handler for the search suggestion
+        suburbListEl.querySelector('.search-suggestion').addEventListener('click', () => {
+          navigateToSuburb(searchTerm);
+          // Close search panel
+          document.getElementById('bottom-toolbar')?.classList.remove('expanded');
+          resetActiveButtons();
+        });
+      } else {
+        displaySuburbs(filtered);
+      }
     }, 300);
+  });
+  
+  // Handle Enter key to search for any location
+  searchInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      const query = e.target.value.trim();
+      if (query.length > 2) {
+        navigateToSuburb(query);
+        // Close search panel
+        document.getElementById('bottom-toolbar')?.classList.remove('expanded');
+        resetActiveButtons();
+      }
+    }
   });
   
   // Show initial suburbs
