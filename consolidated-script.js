@@ -797,7 +797,7 @@ function updateVisibleStations() {
           ctx.restore();
           
           // Draw price text (moved down 2px more)
-          drawPriceText(ctx, priceText, 32, 16, isCheapest); // was 14, now 16
+          drawPriceText(ctx, priceText, 32, 14, isCheapest); // was 14, now 16
         };
         
         logoImg.onerror = () => {
