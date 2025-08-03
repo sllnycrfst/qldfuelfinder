@@ -755,7 +755,7 @@ function updateVisibleStations() {
     const drawPriceText = (ctx, text, x, y, isCheapest) => {
       ctx.save();
       
-      ctx.font = 'bold 13px system-ui, -apple-system, Arial';
+      ctx.font = 'bold 12px system-ui, -apple-system, Arial'; // 1px smaller (was 13px)
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       
@@ -785,26 +785,26 @@ function updateVisibleStations() {
           // Create circular clipping path for logo
           ctx.save();
           ctx.beginPath();
-          ctx.arc(32, 38, 15, 0, 2 * Math.PI);
+          ctx.arc(32, 40, 15, 0, 2 * Math.PI); // moved down 2px (was 38)
           ctx.clip();
           
           // White background
           ctx.fillStyle = 'white';
           ctx.fill();
           
-          // Draw logo
-          ctx.drawImage(logoImg, 17, 23, 30, 30);
+          // Draw logo (moved down 2px)
+          ctx.drawImage(logoImg, 17, 25, 30, 30); // was 23, now 25
           ctx.restore();
           
-          // Draw price text
-          drawPriceText(ctx, priceText, 32, 11, isCheapest);
+          // Draw price text (moved down 3px)
+          drawPriceText(ctx, priceText, 32, 14, isCheapest); // was 11, now 14
         };
         
         logoImg.onerror = () => {
           // Draw default logo if image fails
           ctx.save();
           ctx.beginPath();
-          ctx.arc(32, 38, 15, 0, 2 * Math.PI);
+          ctx.arc(32, 40, 15, 0, 2 * Math.PI); // moved down 2px
           ctx.fillStyle = 'white';
           ctx.fill();
           ctx.strokeStyle = '#ccc';
@@ -812,7 +812,7 @@ function updateVisibleStations() {
           ctx.stroke();
           ctx.restore();
           
-          drawPriceText(ctx, priceText, 32, 11, isCheapest);
+          drawPriceText(ctx, priceText, 32, 14, isCheapest); // was 11, now 14
         };
         
         logoImg.src = logoUrl;
@@ -843,11 +843,12 @@ function updateVisibleStations() {
         const mapContainer = document.getElementById('map');
         const mapRect = mapContainer.getBoundingClientRect();
         
-        // FIXED positioning - use requestAnimationFrame for smooth updates
-        requestAnimationFrame(() => {
-          canvas.style.left = Math.round(point.x - mapRect.left - displayWidth/2) + 'px';
-          canvas.style.top = Math.round(point.y - mapRect.top - displayHeight + 8) + 'px';
-        });
+        // FIXED positioning - direct style updates for no lag
+        const left = Math.round(point.x - mapRect.left - displayWidth/2);
+        const top = Math.round(point.y - mapRect.top - displayHeight + 8);
+        
+        canvas.style.left = left + 'px';
+        canvas.style.top = top + 'px';
       } catch (e) {
         // Position update failed
       }
