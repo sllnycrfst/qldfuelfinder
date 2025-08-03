@@ -722,13 +722,13 @@ function updateVisibleStations() {
     if (isCheapest) canvas.classList.add('cheapest');
     canvas.dataset.stationId = site.S;
     
-    // SIMPLE 1:1 canvas setup - no scaling tricks
-    canvas.width = 56;
-    canvas.height = 70;
+    // SIMPLE canvas setup - slightly bigger and better quality
+    canvas.width = 64;  // Was 56, now 64 (+8px)
+    canvas.height = 78; // Was 70, now 78 (+8px)
     canvas.style.cssText = `
       position: absolute !important;
-      width: 56px !important;
-      height: 70px !important;
+      width: 64px !important;
+      height: 78px !important;
       cursor: pointer !important;
       z-index: ${isCheapest ? 1002 : 1001} !important;
       pointer-events: auto !important;
@@ -736,21 +736,23 @@ function updateVisibleStations() {
       filter: none !important;
       opacity: 1 !important;
       transform: none !important;
-      image-rendering: pixelated;
+      image-rendering: auto;
     `;
     
     const ctx = canvas.getContext('2d');
-    // NO SCALING - just draw directly
+    // Better text rendering
+    ctx.textRenderingOptimization = 'optimizeQuality';
+    ctx.imageSmoothingEnabled = true;
     
-    // Draw marker base (black rectangle for now to test size)
+    // Draw marker base (bigger rectangle)
     ctx.fillStyle = isCheapest ? '#22C55E' : '#387CC2';
-    ctx.fillRect(18, 20, 20, 30); // Simple rectangle in center
+    ctx.fillRect(20, 22, 24, 34); // Bigger rectangle
     
-    // Draw price text
+    // Draw price text with better quality
     ctx.fillStyle = 'white';
-    ctx.font = 'bold 10px Arial';
+    ctx.font = 'bold 12px Arial'; // Bigger font
     ctx.textAlign = 'center';
-    ctx.fillText(priceText, 28, 25);
+    ctx.fillText(priceText, 32, 30); // Centered in bigger rectangle
     
     // Position the canvas
     const coordinate = new mapkit.Coordinate(site.Lat, site.Lng);
@@ -760,8 +762,8 @@ function updateVisibleStations() {
         const mapContainer = document.getElementById('map');
         const mapRect = mapContainer.getBoundingClientRect();
         
-        canvas.style.left = Math.round(point.x - mapRect.left - 28) + 'px';
-        canvas.style.top = Math.round(point.y - mapRect.top - 56) + 'px';
+        canvas.style.left = Math.round(point.x - mapRect.left - 32) + 'px'; // Center on new 64px width
+        canvas.style.top = Math.round(point.y - mapRect.top - 64) + 'px';  // Bottom anchor on new 78px height
       } catch (e) {
         // Position update failed
       }
