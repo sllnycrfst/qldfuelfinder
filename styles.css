@@ -664,15 +664,32 @@ html, body {
 
 /* ========== FUEL MARKERS ========== */
 .fuel-marker {
+  /* Canvas markers - minimal CSS to avoid conflicts */
+  position: absolute;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* Hover effects are now handled in JavaScript for canvas markers */
+.fuel-marker:hover {
+  /* Effects handled by JS to avoid transform conflicts */
+}
+
+.fuel-marker.cheapest {
+  /* Z-index handled in JS */
+}
+
+/* Remove old DOM marker styles that conflict with canvas */
+.fuel-marker.old-dom-marker {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.fuel-marker:hover {
+.fuel-marker.old-dom-marker:hover {
   transform: translate(-50%, -100%) scale(1.1) !important;
   z-index: 1003 !important;
 }
 
-.fuel-marker.cheapest {
+.fuel-marker.old-dom-marker.cheapest {
   z-index: 1002 !important;
 }
 
@@ -731,14 +748,14 @@ html, body {
   transition: filter 0.3s ease;
 }
 
-/* Station marker blur when not focused */
-.fuel-marker:not(.focused) {
+/* Station marker styles - only for non-canvas markers */
+.fuel-marker:not(.canvas-marker):not(.focused) {
   filter: blur(1px) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
   opacity: 0.7;
   transition: all 0.3s ease;
 }
 
-.fuel-marker.focused {
+.fuel-marker:not(.canvas-marker).focused {
   filter: blur(0px) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
   opacity: 1;
   transform: scale(1.1);
@@ -817,8 +834,8 @@ html, body {
     border-radius: 24px 24px 0 0;
   }
   
-  /* Mobile blur effects */
-  .fuel-marker:not(.focused) {
+  /* Mobile blur effects - only for non-canvas markers */
+  .fuel-marker:not(.canvas-marker):not(.focused) {
     filter: blur(0.5px) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
   }
 }
@@ -834,8 +851,8 @@ html, body {
     font-size: 24px;
   }
   
-  /* Smaller blur effects on small screens */
-  .fuel-marker:not(.focused) {
+  /* Smaller blur effects on small screens - only for non-canvas markers */
+  .fuel-marker:not(.canvas-marker):not(.focused) {
     filter: blur(0.3px) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
   }
   
