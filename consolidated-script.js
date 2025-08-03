@@ -740,19 +740,98 @@ function updateVisibleStations() {
     `;
     
     const ctx = canvas.getContext('2d');
-    // Better text rendering
-    ctx.textRenderingOptimization = 'optimizeQuality';
+    // High quality text rendering
     ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.textRenderingOptimization = 'optimizeQuality';
     
-    // Draw marker base (bigger rectangle)
-    ctx.fillStyle = isCheapest ? '#22C55E' : '#387CC2';
-    ctx.fillRect(20, 22, 24, 34); // Bigger rectangle
+    // Function to draw price text with high quality
+    const drawPriceText = (ctx, text, x, y, isCheapest) => {
+      ctx.save();
+      
+      // High quality text settings
+      ctx.font = 'bold 13px system-ui, -apple-system, Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      // Text shadow for better contrast
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+      ctx.fillText(text, x + 1, y + 1);
+      
+      // Main text
+      ctx.fillStyle = isCheapest ? '#00e153' : 'white';
+      ctx.fillText(text, x, y);
+      
+      ctx.restore();
+    };
     
-    // Draw price text with better quality
-    ctx.fillStyle = 'white';
-    ctx.font = 'bold 12px Arial'; // Bigger font
-    ctx.textAlign = 'center';
-    ctx.fillText(priceText, 32, 30); // Centered in bigger rectangle
+    // Function to draw the complete marker (no crown)
+    const drawMarker = () => {
+      ctx.clearRect(0, 0, 64, 78);
+      
+      // Draw marker base image
+      const markerImg = new Image();
+      markerImg.onload = () => {
+        ctx.drawImage(markerImg, 4, 8, 56, 56); // Center the 56px marker in 64px canvas
+        
+        // Draw station logo (moved down 2px from original)
+        const logoImg = new Image();
+        logoImg.onload = () => {
+          // Create circular clipping path for logo
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(32, 38, 15, 0, 2 * Math.PI); // Centered in new canvas
+          ctx.clip();
+          
+          // White background
+          ctx.fillStyle = 'white';
+          ctx.fill();
+          
+          // Draw logo
+          ctx.drawImage(logoImg, 17, 23, 30, 30);
+          ctx.restore();
+          
+          // Draw price text (no crown, so no offset needed)
+          drawPriceText(ctx, priceText, 32, 11, isCheapest);
+        };
+        
+        logoImg.onerror = () => {
+          // Draw default logo if image fails
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(32, 38, 15, 0, 2 * Math.PI);
+          ctx.fillStyle = 'white';
+          ctx.fill();
+          ctx.strokeStyle = '#ccc';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.restore();
+          
+          // Draw price text
+          drawPriceText(ctx, priceText, 32, 11, isCheapest);
+        };
+        
+        logoImg.src = logoUrl;
+      };
+      
+      markerImg.onerror = () => {
+        // Fallback: draw a simple marker shape if image fails
+        ctx.save();
+        ctx.fillStyle = isCheapest ? '#22C55E' : '#387CC2';
+        ctx.beginPath();
+        ctx.arc(32, 38, 20, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.restore();
+        
+        // Draw price text on fallback
+        drawPriceText(ctx, priceText, 32, 38, isCheapest);
+      };
+      
+      markerImg.src = 'images/mymarker.png';
+    };
+    
+    // Draw the marker immediately
+    drawMarker();
     
     // Position the canvas
     const coordinate = new mapkit.Coordinate(site.Lat, site.Lng);
