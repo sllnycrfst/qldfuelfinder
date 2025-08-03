@@ -723,8 +723,8 @@ function updateVisibleStations() {
     canvas.dataset.stationId = site.S;
     
     // Set canvas size for high quality
-    const canvasWidth = 56;
-    const canvasHeight = 70;
+    const canvasWidth = 28;
+    const canvasHeight = 35;
     const pixelRatio = window.devicePixelRatio || 1;
     
     canvas.width = canvasWidth * pixelRatio;
