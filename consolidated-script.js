@@ -711,24 +711,31 @@ function updateVisibleStations() {
   // Clear existing markers
   document.querySelectorAll('.fuel-marker').forEach(m => m.remove());
   
-  // Add new canvas-based markers - SIMPLE APPROACH
+  // Add new canvas-based markers - ORIGINAL QUALITY with movement fixes
   limitedStations.forEach(({ site, price, isCheapest }) => {
     const priceText = (price / 10).toFixed(1);
     const logoUrl = getBrandLogo(site.B);
     
-    // Create canvas element with EXACT sizing
+    // Create canvas element
     const canvas = document.createElement('canvas');
     canvas.className = 'fuel-marker';
     if (isCheapest) canvas.classList.add('cheapest');
     canvas.dataset.stationId = site.S;
     
-    // SIMPLE canvas setup - slightly bigger and better quality
-    canvas.width = 64;  // Was 56, now 64 (+8px)
-    canvas.height = 78; // Was 70, now 78 (+8px)
+    // HIGH QUALITY canvas setup like the original
+    const displayWidth = 64;
+    const displayHeight = 78;
+    const pixelRatio = window.devicePixelRatio || 1;
+    
+    // Set actual canvas size in memory (scaled for high-DPI)
+    canvas.width = displayWidth * pixelRatio;
+    canvas.height = displayHeight * pixelRatio;
+    
+    // Set display size (what user sees) with CSS override
     canvas.style.cssText = `
       position: absolute !important;
-      width: 64px !important;
-      height: 78px !important;
+      width: ${displayWidth}px !important;
+      height: ${displayHeight}px !important;
       cursor: pointer !important;
       z-index: ${isCheapest ? 1002 : 1001} !important;
       pointer-events: auto !important;
@@ -736,26 +743,24 @@ function updateVisibleStations() {
       filter: none !important;
       opacity: 1 !important;
       transform: none !important;
-      image-rendering: auto;
     `;
     
     const ctx = canvas.getContext('2d');
-    // High quality text rendering
+    // Scale the drawing context for high-DPI
+    ctx.scale(pixelRatio, pixelRatio);
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
-    ctx.textRenderingOptimization = 'optimizeQuality';
     
-    // Function to draw price text with high quality
+    // Function to draw price text
     const drawPriceText = (ctx, text, x, y, isCheapest) => {
       ctx.save();
       
-      // High quality text settings
       ctx.font = 'bold 13px system-ui, -apple-system, Arial';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       
-      // Text shadow for better contrast
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+      // Text shadow
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
       ctx.fillText(text, x + 1, y + 1);
       
       // Main text
@@ -765,22 +770,22 @@ function updateVisibleStations() {
       ctx.restore();
     };
     
-    // Function to draw the complete marker (no crown)
+    // Function to draw the complete marker
     const drawMarker = () => {
-      ctx.clearRect(0, 0, 64, 78);
+      ctx.clearRect(0, 0, displayWidth, displayHeight);
       
       // Draw marker base image
       const markerImg = new Image();
       markerImg.onload = () => {
-        ctx.drawImage(markerImg, 4, 8, 56, 56); // Center the 56px marker in 64px canvas
+        ctx.drawImage(markerImg, 4, 8, 56, 56);
         
-        // Draw station logo (moved down 2px from original)
+        // Draw station logo
         const logoImg = new Image();
         logoImg.onload = () => {
           // Create circular clipping path for logo
           ctx.save();
           ctx.beginPath();
-          ctx.arc(32, 38, 15, 0, 2 * Math.PI); // Centered in new canvas
+          ctx.arc(32, 38, 15, 0, 2 * Math.PI);
           ctx.clip();
           
           // White background
@@ -791,7 +796,7 @@ function updateVisibleStations() {
           ctx.drawImage(logoImg, 17, 23, 30, 30);
           ctx.restore();
           
-          // Draw price text (no crown, so no offset needed)
+          // Draw price text
           drawPriceText(ctx, priceText, 32, 11, isCheapest);
         };
         
@@ -807,7 +812,6 @@ function updateVisibleStations() {
           ctx.stroke();
           ctx.restore();
           
-          // Draw price text
           drawPriceText(ctx, priceText, 32, 11, isCheapest);
         };
         
@@ -815,7 +819,7 @@ function updateVisibleStations() {
       };
       
       markerImg.onerror = () => {
-        // Fallback: draw a simple marker shape if image fails
+        // Fallback
         ctx.save();
         ctx.fillStyle = isCheapest ? '#22C55E' : '#387CC2';
         ctx.beginPath();
@@ -823,7 +827,6 @@ function updateVisibleStations() {
         ctx.fill();
         ctx.restore();
         
-        // Draw price text on fallback
         drawPriceText(ctx, priceText, 32, 38, isCheapest);
       };
       
@@ -833,7 +836,6 @@ function updateVisibleStations() {
     // Draw the marker immediately
     drawMarker();
     
-    // Position the canvas
     const coordinate = new mapkit.Coordinate(site.Lat, site.Lng);
     const updatePosition = () => {
       try {
@@ -841,8 +843,11 @@ function updateVisibleStations() {
         const mapContainer = document.getElementById('map');
         const mapRect = mapContainer.getBoundingClientRect();
         
-        canvas.style.left = Math.round(point.x - mapRect.left - 32) + 'px'; // Center on new 64px width
-        canvas.style.top = Math.round(point.y - mapRect.top - 64) + 'px';  // Bottom anchor on new 78px height
+        // FIXED positioning - use requestAnimationFrame for smooth updates
+        requestAnimationFrame(() => {
+          canvas.style.left = Math.round(point.x - mapRect.left - displayWidth/2) + 'px';
+          canvas.style.top = Math.round(point.y - mapRect.top - displayHeight + 8) + 'px';
+        });
       } catch (e) {
         // Position update failed
       }
@@ -852,6 +857,17 @@ function updateVisibleStations() {
     document.getElementById('map').appendChild(canvas);
     canvas.updatePosition = updatePosition;
     
+    // Manual hover effects to override CSS
+    canvas.addEventListener('mouseenter', () => {
+      canvas.style.transform = 'scale(1.1)';
+      canvas.style.zIndex = '1003';
+    });
+    
+    canvas.addEventListener('mouseleave', () => {
+      canvas.style.transform = 'none';
+      canvas.style.zIndex = isCheapest ? '1002' : '1001';
+    });
+    
     canvas.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -859,7 +875,7 @@ function updateVisibleStations() {
     });
   });
   
-  // Real-time position updates
+  // IMPROVED movement system - multiple update methods for ultra-smooth tracking
   const updateAllMarkers = () => {
     document.querySelectorAll('.fuel-marker, .user-location-marker').forEach(marker => {
       if (marker.updatePosition) {
@@ -868,29 +884,27 @@ function updateVisibleStations() {
     });
   };
   
-  // Use immediate region-change listener for smooth movement
   if (myMap) {
     // Clean up old listeners
     myMap.removeEventListener('region-change-start', updateAllMarkers);
     myMap.removeEventListener('region-change-end', updateAllMarkers);
     myMap.removeEventListener('region-change', updateAllMarkers);
     
-    // Add immediate update listener
-    myMap.addEventListener('region-change', updateAllMarkers);
+    // Triple update system for perfect movement
+    myMap.addEventListener('region-change', updateAllMarkers); // Immediate
     
-    // Also add animation frame updates during movement for ultra-smooth positioning
     let isMoving = false;
     let animationId;
     
     myMap.addEventListener('region-change-start', () => {
       isMoving = true;
-      const animate = () => {
+      const smoothUpdate = () => {
         if (isMoving) {
           updateAllMarkers();
-          animationId = requestAnimationFrame(animate);
+          animationId = requestAnimationFrame(smoothUpdate);
         }
       };
-      animate();
+      smoothUpdate();
     });
     
     myMap.addEventListener('region-change-end', () => {
@@ -898,7 +912,8 @@ function updateVisibleStations() {
       if (animationId) {
         cancelAnimationFrame(animationId);
       }
-      updateAllMarkers(); // Final position
+      // Final position update
+      setTimeout(updateAllMarkers, 10);
     });
   }
 }
