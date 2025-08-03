@@ -421,7 +421,7 @@ function showFeatureCard(station) {
   const cardHTML = `
     <div class="feature-card" style="opacity: 0; transform: translateY(20px); transition: all 0.4s ease;">
       <div class="feature-image-container">
-        <img class="feature-background-image" src="images/feature-card-image" alt="Station background" onerror="this.style.display='none'">
+        <img class="feature-background-image" src="images/feature-card-image.png" alt="Station background" onerror="this.style.display='none'">
         
         <!-- Top Left: Station Info -->
         <div class="feature-top-left">
