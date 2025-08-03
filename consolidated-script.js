@@ -738,7 +738,7 @@ function updateVisibleStations() {
   });
   
   stationsWithPrices.sort((a, b) => a.distance - b.distance);
-  const limitedStations = stationsWithPrices.slice(0, 50); // Show up to 50 stations
+  const limitedStations = stationsWithPrices.slice(0, 90); // Show up to 50 stations
   
   console.log("Showing stations:", limitedStations.length, "of", stationsWithPrices.length);
   
@@ -831,7 +831,7 @@ function updateVisibleStations() {
           ctx.restore();
           
           // Draw price text (moved down 2px more)
-          drawPriceText(ctx, priceText, 32, 16, isCheapest); // was 14, now 16
+          drawPriceText(ctx, priceText, 32, 18, isCheapest); // was 14, now 16
         };
         
         logoImg.onerror = () => {
