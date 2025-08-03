@@ -397,6 +397,11 @@ window.closeToolbarPanel = function() {
 };
 
 // ========== FEATURE CARD FUNCTIONS ==========
+function getFuelDisplayName(fuelKey) {
+  const fuel = FUEL_TYPES.find(f => f.key === fuelKey);
+  return fuel ? fuel.name : fuelKey;
+}
+
 function showFeatureCard(station) {
   selectedStation = station;
   const site = station.site;
@@ -415,41 +420,39 @@ function showFeatureCard(station) {
   // Create feature card HTML
   const cardHTML = `
     <div class="feature-card" style="opacity: 0; transform: translateY(20px); transition: all 0.4s ease;">
-      <div class="feature-header">
-        <div class="feature-station-info">
-          <img class="feature-logo" src="${logoUrl}" alt="${brandName} logo" onerror="handleImageError(this)">
-          <div class="feature-station-details">
-            <h3 class="feature-station-name">${site.N}</h3>
-            <p class="feature-station-brand">${brandName}</p>
+      <div class="feature-image-container">
+        <img class="feature-background-image" src="images/feature-card-image" alt="Station background" onerror="this.style.display='none'">
+        
+        <!-- Top Right: Station Info -->
+        <div class="feature-top-right">
+          <div class="feature-station-name-overlay">${site.N}</div>
+          <div class="feature-address-overlay">${site.A}</div>
+        </div>
+        
+        <!-- Bottom Left: Fuel & Price -->
+        <div class="feature-bottom-left">
+          <div class="feature-fuel-type">${getFuelDisplayName(currentFuel)}</div>
+          <div class="feature-price-overlay">
+            ${isCheapest ? '<i class="fas fa-crown" style="color: #FFD700; margin-right: 4px;"></i>' : ''}
+            <span class="price-value-overlay" style="color: ${isCheapest ? '#22C55E' : 'white'};">${priceText}¢/L</span>
+            ${isCheapest ? '<div class="cheapest-badge">Cheapest</div>' : ''}
           </div>
+          ${distanceText ? `<div class="feature-distance-overlay">${distanceText}</div>` : ''}
         </div>
-        <button class="feature-close-btn" onclick="hideFeatureCard()">
+        
+        <!-- Bottom Right: Action Buttons -->
+        <div class="feature-bottom-right">
+          <button class="feature-icon-btn" onclick="getDirections('${site.Lat}', '${site.Lng}', '${site.N.replace(/'/g, "\\'")}')
+            <i class="fas fa-directions"></i>
+          </button>
+          <button class="feature-icon-btn" onclick="shareStation('${site.S}', '${site.N.replace(/'/g, "\\'")}')
+            <i class="fas fa-share"></i>
+          </button>
+        </div>
+        
+        <!-- Close Button -->
+        <button class="feature-close-btn-overlay" onclick="hideFeatureCard()">
           <i class="fas fa-times"></i>
-        </button>
-      </div>
-      
-      <div class="feature-price-section">
-        <div class="feature-price">
-          ${isCheapest ? '<i class="fas fa-crown" style="color: #FFD700; margin-right: 8px;"></i>' : ''}
-          <span class="price-value" style="color: ${isCheapest ? '#22C55E' : '#387CC2'};">${priceText}¢/L</span>
-          ${isCheapest ? '<span class="cheapest-label">Cheapest in area</span>' : ''}
-        </div>
-        ${distanceText ? `<div class="feature-distance">${distanceText}</div>` : ''}
-      </div>
-      
-      <div class="feature-address">
-        <i class="fas fa-map-marker-alt"></i>
-        <span>${site.A}</span>
-      </div>
-      
-      <div class="feature-actions">
-        <button class="feature-btn feature-btn-primary" onclick="getDirections('${site.Lat}', '${site.Lng}', '${site.N.replace(/'/g, "\\'")}')
-          <i class="fas fa-directions"></i>
-          Directions
-        </button>
-        <button class="feature-btn feature-btn-secondary" onclick="shareStation('${site.S}', '${site.N.replace(/'/g, "\\'")}')
-          <i class="fas fa-share"></i>
-          Share
         </button>
       </div>
     </div>
