@@ -1017,7 +1017,7 @@ function updateVisibleStations() {
     const drawPriceText = (ctx, text, x, y, isCheapest) => {
       ctx.save();
       
-      ctx.font = 'bold 11px system-ui, -apple-system, Arial'; // smaller again (was 12px)
+      ctx.font = 'bold 10px system-ui, -apple-system, Arial'; // smaller again (was 12px)
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       
@@ -1059,7 +1059,7 @@ function updateVisibleStations() {
           ctx.restore();
           
           // Draw price text (moved down and closer spacing)
-          drawPriceText(ctx, priceText, 32, 16, isCheapest); // was 18, now 16
+          drawPriceText(ctx, priceText, 32, 18, isCheapest); // was 18, now 16
         };
         
         logoImg.onerror = () => {
