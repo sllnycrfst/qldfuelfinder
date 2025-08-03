@@ -682,7 +682,7 @@ function setupSearch() {
 }
 
 function populateBrands() {
-  const topBrandIds = ['113', '3421066', '5', '2', '111', '2031031', '20', '87'];
+  const topBrandIds = ['113', '3421066', '5', '2', '111', '2031031', '20', '86'];
   const stationGrid = document.getElementById('station-select-grid');
   
   if (stationGrid) {
