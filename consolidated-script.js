@@ -1,4 +1,5 @@
-// QLD Fuel Finder - Consolidated Script (Fixed)
+{
+  `content`: `// QLD Fuel Finder - Consolidated Script (Fixed)
 
 // ========== CONSTANTS ==========
 const FUEL_TYPES = [
@@ -136,12 +137,12 @@ window.zoomOut = function() {
 };
 
 // ========== INITIALIZATION ==========
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("Initializing QLD Fuel Finder...");
+document.addEventListener(\"DOMContentLoaded\", () => {
+  console.log(\"Initializing QLD Fuel Finder...\");
   
   mapkit.init({
     authorizationCallback: function(done) {
-      done("eyJraWQiOiJCTVQ1NzVTUFc5IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUyOTg5NjYyLCJvcmlnaW4iOiJzbGxueWNyZnN0LmdpdGh1Yi5pbyJ9.dF_WYx3PZly0Fo1dec9KYc1ZJAxRS_WO7pvyXq04Fr7kWVXGGuRFYgzeA3K7DvH2JZEwgB6V-gidn3HfPIXpQQ");
+      done(\"eyJraWQiOiJCTVQ1NzVTUFc5IiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJDUzNISEM3NjJaIiwiaWF0IjoxNzUyOTg5NjYyLCJvcmlnaW4iOiJzbGxueWNyZnN0LmdpdGh1Yi5pbyJ9.dF_WYx3PZly0Fo1dec9KYc1ZJAxRS_WO7pvyXq04Fr7kWVXGGuRFYgzeA3K7DvH2JZEwgB6V-gidn3HfPIXpQQ\");
     }
   });
   
@@ -160,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // ========== MAP INITIALIZATION ==========
 function initializeMap() {
   try {
-    myMap = new mapkit.Map("map", {
+    myMap = new mapkit.Map(\"map\", {
       center: new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng),
       region: new mapkit.CoordinateRegion(
         new mapkit.Coordinate(BRISBANE_COORDS.lat, BRISBANE_COORDS.lng),
@@ -177,7 +178,7 @@ function initializeMap() {
       maxZoomLevel: 18
     });
 
-    console.log("Map initialized successfully");
+    console.log(\"Map initialized successfully\");
     window.myMap = myMap;
 
     myMap.addEventListener('region-change-end', () => {
@@ -192,7 +193,7 @@ function initializeMap() {
     fetchWeather();
 
   } catch (error) {
-    console.error("Map initialization failed:", error);
+    console.error(\"Map initialization failed:\", error);
   }
 }
 
@@ -232,12 +233,16 @@ function setupUIHandlers() {
   setupFilters();
   setupSearch();
   
-  // Map click to close panels
+  // Map click to close panels and feature cards
   document.getElementById('map')?.addEventListener('click', function(e) {
-    if (!e.target.closest('.fuel-marker') && !e.target.closest('.bottom-toolbar')) {
+    if (!e.target.closest('.fuel-marker') && !e.target.closest('.bottom-toolbar') && 
+        !e.target.closest('.feature-card-overlay') && !e.target.closest('.weather-display') &&
+        !e.target.closest('.station-select-grid') && !e.target.closest('.fuel-select-grid')) {
       document.getElementById('bottom-toolbar')?.classList.remove('expanded');
       document.getElementById('station-select-grid')?.classList.remove('active');
       document.getElementById('fuel-select-grid')?.classList.remove('active');
+      document.getElementById('weather-display')?.classList.remove('expanded');
+      hideFeatureCard();
     }
   });
   
@@ -333,9 +338,9 @@ function setupToolbar() {
           }
         },
         error => {
-          console.log("Location error:", error);
+          console.log(\"Location error:\", error);
           if (error.code === 1) {
-            alert("Please enable location access to use this feature.");
+            alert(\"Please enable location access to use this feature.\");
           }
         }
       );
@@ -353,7 +358,7 @@ function toggleToolbarPanel(panelName) {
   const toolbar = document.getElementById('bottom-toolbar');
   
   const isExpanded = toolbar?.classList.contains('expanded');
-  const currentPanel = ['search', 'list', 'feature'].find(p => 
+  const currentPanel = ['search', 'list'].find(p => 
     document.getElementById(`${p}-panel`)?.style.display !== 'none'
   );
   
@@ -374,7 +379,7 @@ function toggleToolbarPanel(panelName) {
 }
 
 function showToolbarPanel(panelName) {
-  ['search', 'list', 'feature'].forEach(name => {
+  ['search', 'list'].forEach(name => {
     const panel = document.getElementById(`${name}-panel`);
     if (panel) {
       panel.style.display = name === panelName ? 'flex' : 'none';
@@ -414,94 +419,108 @@ function showFeatureCard(station) {
   const priceText = (price / 10).toFixed(1);
   const distanceText = distance ? `${distance.toFixed(1)} km away` : '';
   
-  const featureContent = document.getElementById('feature-content');
-  if (!featureContent) return;
+  // Get all prices for this station
+  const stationPrices = priceMap[site.S] || {};
+  const allPricesHTML = FUEL_TYPES.map(fuel => {
+    if (Array.isArray(fuel.id)) return ''; // Skip combined types
+    const fuelPrice = stationPrices[fuel.id];
+    if (fuelPrice && fuelPrice > 1000 && fuelPrice < 6000) {
+      return `
+        <div class=\"additional-price\">
+          <span class=\"fuel-name\">${fuel.name}</span>
+          <span class=\"fuel-price\">${(fuelPrice / 10).toFixed(1)}</span>
+        </div>
+      `;
+    }
+    return '';
+  }).filter(html => html).join('');
   
-  // Create feature card HTML
+  // Create feature card HTML - separate from toolbar
   const cardHTML = `
-    <div class="feature-card" style="opacity: 0; transform: translateY(20px); transition: all 0.4s ease;">
-      <div class="feature-image-container">
-        <img class="feature-background-image" src="images/feature-card-image.png" alt="Station background" onerror="this.style.display='none'">
-        
-        <!-- Top Left: Station Info -->
-        <div class="feature-top-left">
-          <div class="feature-station-name-overlay">${site.N}</div>
-          <div class="feature-address-overlay">${site.A}</div>
-        </div>
-        
-        <!-- Bottom Left: Fuel & Price -->
-        <div class="feature-bottom-left">
-          <div class="feature-fuel-type">${getFuelDisplayName(currentFuel)}</div>
-          <div class="feature-price-overlay">
-            ${isCheapest ? '<i class="fas fa-crown" style="color: #FFD700; margin-right: 4px;"></i>' : ''}
-            <span class="price-value-overlay" style="color: ${isCheapest ? '#22C55E' : 'white'};">${priceText}¢/L</span>
-            ${isCheapest ? '<div class="cheapest-badge">Cheapest</div>' : ''}
+    <div class=\"feature-card-overlay\" style=\"opacity: 0; transition: all 0.4s ease;\">
+      <div class=\"feature-card-standalone\">
+        <div class=\"feature-image-container\">
+          <img class=\"feature-background-image\" src=\"images/feature-card-image.jpg\" alt=\"Station background\" onerror=\"this.src='images/feature-card-image.png'\">
+          
+          <!-- Top Left: Station Info -->
+          <div class=\"feature-top-left\">
+            <div class=\"feature-station-name-overlay\">${site.N}</div>
+            <div class=\"feature-address-overlay\">${site.A}</div>
           </div>
-          ${distanceText ? `<div class="feature-distance-overlay">${distanceText}</div>` : ''}
+          
+          <!-- Bottom Left: Fuel & Price -->
+          <div class=\"feature-bottom-left\">
+            <div class=\"feature-fuel-type\">${getFuelDisplayName(currentFuel)}</div>
+            <div class=\"feature-price-overlay\">
+              ${isCheapest ? '<i class=\"fas fa-crown\" style=\"color: #FFD700; margin-right: 4px;\"></i>' : ''}
+              <span class=\"price-value-overlay\">${priceText}</span>
+              ${isCheapest ? '<div class=\"cheapest-badge\">Cheapest</div>' : ''}
+            </div>
+            ${distanceText ? `<div class=\"feature-distance-overlay\">${distanceText}</div>` : ''}
+          </div>
+          
+          <!-- Bottom Right: Action Buttons -->
+          <div class=\"feature-bottom-right\">
+            <button class=\"feature-icon-btn\" onclick=\"getDirections(${site.Lat}, ${site.Lng}, '${site.N.replace(/'/g, \"\\\\'\")}')\">
+              <i class=\"fas fa-directions\"></i>
+            </button>
+            <button class=\"feature-icon-btn\" onclick=\"shareStation('${site.S}', '${site.N.replace(/'/g, \"\\\\'\")}')\">
+              <i class=\"fas fa-share\"></i>
+            </button>
+          </div>
+          
+          <!-- Close Button -->
+          <button class=\"feature-close-btn-overlay\" onclick=\"hideFeatureCard()\">
+            <i class=\"fas fa-times\"></i>
+          </button>
         </div>
         
-        <!-- Bottom Right: Action Buttons -->
-        <div class="feature-bottom-right">
-          <button class="feature-icon-btn" onclick="getDirections('${site.Lat}', '${site.Lng}', '${site.N.replace(/'/g, "\\'")}')
-            <i class="fas fa-directions"></i>
-          </button>
-          <button class="feature-icon-btn" onclick="shareStation('${site.S}', '${site.N.replace(/'/g, "\\'")}')
-            <i class="fas fa-share"></i>
-          </button>
-        </div>
-        
-        <!-- Close Button -->
-        <button class="feature-close-btn-overlay" onclick="hideFeatureCard()">
-          <i class="fas fa-times"></i>
-        </button>
+        <!-- Additional Prices Section -->
+        ${allPricesHTML ? `
+          <div class=\"additional-prices-section\">
+            <h4 class=\"additional-prices-title\">All Fuel Prices</h4>
+            <div class=\"additional-prices-grid\">
+              ${allPricesHTML}
+            </div>
+          </div>
+        ` : ''}
       </div>
     </div>
   `;
   
-  featureContent.innerHTML = cardHTML;
+  // Remove any existing feature card
+  const existingCard = document.querySelector('.feature-card-overlay');
+  if (existingCard) {
+    existingCard.remove();
+  }
   
-  // Show the toolbar panel
-  showToolbarPanel('feature');
-  document.getElementById('bottom-toolbar')?.classList.add('expanded');
-  resetActiveButtons();
+  // Add to body instead of toolbar
+  document.body.insertAdjacentHTML('beforeend', cardHTML);
   
   // Fade in the card
   clearTimeout(featureCardTimeout);
   featureCardTimeout = setTimeout(() => {
-    const card = featureContent.querySelector('.feature-card');
+    const card = document.querySelector('.feature-card-overlay');
     if (card) {
       card.style.opacity = '1';
-      card.style.transform = 'translateY(0)';
     }
-  }, 100);
+  }, 50);
 }
 
 function hideFeatureCard() {
-  const featureContent = document.getElementById('feature-content');
-  const card = featureContent?.querySelector('.feature-card');
+  const card = document.querySelector('.feature-card-overlay');
   
   if (card) {
     // Fade out animation
     card.style.opacity = '0';
-    card.style.transform = 'translateY(20px)';
     
     clearTimeout(featureCardTimeout);
     featureCardTimeout = setTimeout(() => {
-      document.getElementById('bottom-toolbar')?.classList.remove('expanded');
-      resetActiveButtons();
+      card.remove();
       selectedStation = null;
-      if (featureContent) {
-        featureContent.innerHTML = '';
-      }
     }, 400);
   } else {
-    // Immediate close if no card
-    document.getElementById('bottom-toolbar')?.classList.remove('expanded');
-    resetActiveButtons();
     selectedStation = null;
-    if (featureContent) {
-      featureContent.innerHTML = '';
-    }
   }
 }
 
@@ -582,7 +601,7 @@ function setupSearch() {
     const suburmsToShow = filteredSuburbs || majorSuburbs.slice(0, 20);
     
     suburbListEl.innerHTML = suburmsToShow.map(suburb => 
-      `<li class="suburb-item" data-suburb="${suburb}">${suburb}</li>`
+      `<li class=\"suburb-item\" data-suburb=\"${suburb}\">${suburb}</li>`
     ).join('');
     
     // Add click handlers
@@ -627,7 +646,7 @@ function setupSearch() {
       } else {
         // FIXED: Don't navigate if we don't have coordinates
         console.log('No coordinates found for:', suburbName);
-        alert(`Sorry, we don't have coordinates for "${suburbName}". Please try a different location.`);
+        alert(`Sorry, we don't have coordinates for \"${suburbName}\". Please try a different location.`);
         return;
       }
     }
@@ -672,8 +691,8 @@ function populateBrands() {
   const stationGrid = document.getElementById('station-select-grid');
   
   if (stationGrid) {
-    // Clear existing options (keep "All" option)
-    const allOption = stationGrid.querySelector('.station-option[data-brand="all"]');
+    // Clear existing options (keep \"All\" option)
+    const allOption = stationGrid.querySelector('.station-option[data-brand=\"all\"]');
     stationGrid.innerHTML = '';
     if (allOption) {
       stationGrid.appendChild(allOption);
@@ -686,8 +705,8 @@ function populateBrands() {
         stationDiv.className = 'station-option';
         stationDiv.dataset.brand = brandId;
         stationDiv.innerHTML = `
-          <img class="station-logo" src="${getBrandLogo(brandId)}" alt="${BRAND_NAMES[brandId]} logo" onerror="handleImageError(this)">
-          <span class="station-option-name">${BRAND_NAMES[brandId]}</span>
+          <img class=\"station-logo\" src=\"${getBrandLogo(brandId)}\" alt=\"${BRAND_NAMES[brandId]} logo\" onerror=\"handleImageError(this)\">
+          <span class=\"station-option-name\">${BRAND_NAMES[brandId]}</span>
         `;
         stationGrid.appendChild(stationDiv);
       }
@@ -715,9 +734,9 @@ function setupFilters() {
       const stationSelectButton = document.getElementById('station-select-button');
       if (stationSelectButton) {
         if (brand === 'all') {
-          stationSelectButton.innerHTML = '<span class="station-select-text">ALL</span>';
+          stationSelectButton.innerHTML = '<span class=\"station-select-text\">ALL</span>';
         } else {
-          stationSelectButton.innerHTML = `<img class="station-select-logo" src="${getBrandLogo(brand)}" onerror="handleImageError(this)">`;
+          stationSelectButton.innerHTML = `<img class=\"station-select-logo\" src=\"${getBrandLogo(brand)}\" onerror=\"handleImageError(this)\">`;
         }
       }
       
@@ -757,16 +776,16 @@ function setupFilters() {
 // ========== DATA FETCHING ==========
 async function fetchSitesAndPrices() {
   try {
-    console.log("Fetching sites and prices...");
+    console.log(\"Fetching sites and prices...\");
     
     const [siteRes, priceRes] = await Promise.all([
-      fetch("data/sites.json").then(r => r.json()),
-      fetch("https://fuel-proxy-1l9d.onrender.com/prices").then(r => r.json())
+      fetch(\"data/sites.json\").then(r => r.json()),
+      fetch(\"https://fuel-proxy-1l9d.onrender.com/prices\").then(r => r.json())
     ]);
     
     allSites = Array.isArray(siteRes) ? siteRes : siteRes.S || [];
     window.allSites = allSites;
-    console.log("Sites loaded:", allSites.length);
+    console.log(\"Sites loaded:\", allSites.length);
     
     const allPrices = priceRes.SitePrices || [];
     priceMap = {};
@@ -775,13 +794,13 @@ async function fetchSitesAndPrices() {
       priceMap[p.SiteId][p.FuelId] = p.Price;
     });
     window.priceMap = priceMap;
-    console.log("Prices loaded");
+    console.log(\"Prices loaded\");
     
     findCheapestStation();
     updateVisibleStations();
     
   } catch (err) {
-    console.error("Error loading data:", err);
+    console.error(\"Error loading data:\", err);
   }
 }
 
@@ -828,7 +847,7 @@ function findCheapestStation() {
   });
   
   window.cheapestStationId = cheapestStationId;
-  console.log("Cheapest stations in viewport:", cheapestStationId.length, "at price:", cheapestPrice);
+  console.log(\"Cheapest stations in viewport:\", cheapestStationId.length, \"at price:\", cheapestPrice);
 }
 
 function updateVisibleStations() {
@@ -879,7 +898,7 @@ function updateVisibleStations() {
   stationsWithPrices.sort((a, b) => a.distance - b.distance);
   const limitedStations = stationsWithPrices.slice(0, 50); // Show up to 50 stations
   
-  console.log("Showing stations:", limitedStations.length, "of", stationsWithPrices.length);
+  console.log(\"Showing stations:\", limitedStations.length, \"of\", stationsWithPrices.length);
   
   // Clear existing markers
   document.querySelectorAll('.fuel-marker').forEach(m => m.remove());
@@ -1057,7 +1076,7 @@ function updateVisibleStations() {
       };
       
       showFeatureCard(stationData);
-      console.log('Clicked station:', site.N, 'Price:', priceText + '¢/L');
+      console.log('Clicked station:', site.N, 'Price:', priceText);
     });
   });
   
@@ -1158,163 +1177,5 @@ function updateStationList() {
     const li = document.createElement('li');
     li.className = 'station-item';
     li.innerHTML = `
-      <img class="station-logo" src="${logoUrl}" alt="Brand logo" 
-           onerror="handleImageError(this)">
-      <div class="station-details">
-        <span class="station-name">${site.N}</span>
-        <span class="station-address">${site.A}</span>
-        <span class="station-distance">${distanceText}</span>
-      </div>
-      <span class="station-price" style="color:${isCheapest ? '#22C55E' : '#387CC2'};">
-        ${isCheapest ? '<i class="fas fa-crown" style="margin-right: 4px; color: #FFD700;"></i>' : ''}
-        ${priceText}¢/L
-      </span>
-    `;
-    
-    li.addEventListener('click', () => {
-      document.getElementById('bottom-toolbar')?.classList.remove('expanded');
-      resetActiveButtons();
-      setTimeout(() => {
-        console.log('Selected station from list:', site.N);
-      }, 200);
-    });
-    
-    list.appendChild(li);
-  });
+      <img class=\"station-logo\" src=\"${logoUrl}\" alt=\"Bran`
 }
-
-function createUserLocationMarker(lat, lng) {
-  document.querySelectorAll('.user-location-marker').forEach(m => m.remove());
-  
-  const userMarker = document.createElement('div');
-  userMarker.className = 'user-location-marker';
-  userMarker.style.cssText = `
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    background: #007AFF;
-    border: 3px solid white;
-    border-radius: 50%;
-    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
-    z-index: 2000;
-    pointer-events: none;
-  `;
-  
-  const coordinate = new mapkit.Coordinate(lat, lng);
-  const updatePosition = () => {
-    try {
-      const point = myMap.convertCoordinateToPointOnPage(coordinate);
-      const mapContainer = document.getElementById('map');
-      const mapRect = mapContainer.getBoundingClientRect();
-      
-      userMarker.style.left = (point.x - mapRect.left) + 'px';
-      userMarker.style.top = (point.y - mapRect.top) + 'px';
-      userMarker.style.transform = 'translate(-50%, -50%)';
-    } catch (e) {
-      console.log('User marker position update failed:', e);
-    }
-  };
-  
-  updatePosition();
-  document.getElementById('map').appendChild(userMarker);
-  userMarker.updatePosition = updatePosition;
-  
-  if (myMap) {
-    myMap.addEventListener('region-change-start', updatePosition);
-    myMap.addEventListener('region-change-end', updatePosition);
-  }
-  
-  console.log("User location marker created at:", lat, lng);
-}
-
-async function fetchWeather(lat = BRISBANE_COORDS.lat, lng = BRISBANE_COORDS.lng) {
-  try {
-    const weatherIcons = {
-      '0': '☀️', '1': '🌤️', '2': '⛅', '3': '☁️', '45': '☁️', '48': '☁️',
-      '51': '🌦️', '53': '🌦️', '55': '🌦️', '61': '🌧️', '63': '🌧️', '65': '🌧️',
-      '71': '🌨️', '73': '🌨️', '75': '🌨️', '77': '🌨️', '80': '🌦️', '81': '🌦️',
-      '82': '🌧️', '85': '🌨️', '86': '🌨️', '95': '⛈️', '96': '⛈️', '99': '⛈️'
-    };
-    
-    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=4`);
-    const data = await res.json();
-    const { temperature, weathercode } = data.current_weather;
-    
-    const weatherTemp = document.getElementById('weather-temp');
-    const weatherIcon = document.getElementById('weather-icon');
-    
-    if (weatherTemp) weatherTemp.textContent = `${Math.round(temperature)}°`;
-    if (weatherIcon) weatherIcon.textContent = weatherIcons[weathercode] || '☀️';
-    
-    weatherForecast = data.daily;
-    
-    const weatherDisplay = document.getElementById('weather-display');
-    if (weatherDisplay) {
-      weatherDisplay.addEventListener('click', toggleWeatherForecast);
-    }
-    
-  } catch (err) {
-    console.error("Weather fetch error:", err);
-  }
-}
-
-function toggleWeatherForecast() {
-  const weatherDisplay = document.getElementById('weather-display');
-  const forecastEl = document.getElementById('weather-forecast');
-  
-  if (!weatherDisplay || !forecastEl) return;
-  
-  const isExpanded = weatherDisplay.classList.contains('expanded');
-  
-  if (isExpanded) {
-    weatherDisplay.classList.remove('expanded');
-  } else {
-    weatherDisplay.classList.add('expanded');
-    
-    if (weatherForecast && weatherForecast.time) {
-      const weatherIcons = {
-        '0': '☀️', '1': '🌤️', '2': '⛅', '3': '☁️', '45': '☁️', '48': '☁️',
-        '51': '🌦️', '53': '🌦️', '55': '🌦️', '61': '🌧️', '63': '🌧️', '65': '🌧️',
-        '71': '🌨️', '73': '🌨️', '75': '🌨️', '77': '🌨️', '80': '🌦️', '81': '🌦️',
-        '82': '🌧️', '85': '🌨️', '86': '🌨️', '95': '⛈️', '96': '⛈️', '99': '⛈️'
-      };
-      
-      const forecastHTML = weatherForecast.time.slice(1, 4).map((date, index) => {
-        const dayIndex = index + 1;
-        const dayName = new Date(date).toLocaleDateString('en-AU', { weekday: 'short' });
-        const maxTemp = Math.round(weatherForecast.temperature_2m_max[dayIndex]);
-        const minTemp = Math.round(weatherForecast.temperature_2m_min[dayIndex]);
-        const weatherCode = weatherForecast.weathercode[dayIndex];
-        const icon = weatherIcons[weatherCode] || '☀️';
-        
-        return `
-          <div class="forecast-day">
-            <div class="forecast-day-name">${dayName}</div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="font-size: 14px;">${icon}</span>
-              <div class="forecast-temps">${maxTemp}°/${minTemp}°</div>
-            </div>
-          </div>
-        `;
-      }).join('');
-      
-      forecastEl.innerHTML = forecastHTML;
-    }
-  }
-}
-
-function setupMapEvents() {
-  if (!myMap) return;
-  console.log('Map event handlers set up successfully');
-}
-
-// ========== EXPORTS ==========
-window.initializeMap = initializeMap;
-window.fetchSitesAndPrices = fetchSitesAndPrices;
-window.findCheapestStation = findCheapestStation;
-window.updateVisibleStations = updateVisibleStations;
-window.fetchWeather = fetchWeather;
-window.setupUIHandlers = setupUIHandlers;
-window.createUserLocationMarker = createUserLocationMarker;
-
-console.log('QLD Fuel Finder script loaded successfully');
