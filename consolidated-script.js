@@ -1,4 +1,4 @@
-// QLD Fuel Finder - Consolidated Script (Fixed)
+// QLD Fuel Finder - Consolidated Script
 
 // ========== CONSTANTS ==========
 const FUEL_TYPES = [
@@ -29,25 +29,6 @@ const BRAND_NAMES = {
   '3421204': 'Woodham Petroleum', '3421207': 'Tas Petroleum'
 };
 
-// Top 15 brands for the brand selector
-const TOP_BRANDS = [
-  '2031031', // Costco
-  '2', // Caltex
-  '5', // BP
-  '20', // Shell
-  '113', // 7 Eleven
-  '111', // Coles Express
-  '3421066', // Ampol
-  '16', // Mobil
-  '72', // Gull
-  '86', // Liberty
-  '169', // On the Run
-  '167', // Speedway
-  '23', // United
-  '5094', // Puma Energy
-  '12' // Independent
-];
-
 const BRISBANE_COORDS = { lat: -27.4698, lng: 153.0251 };
 
 // ========== GLOBAL STATE ==========
@@ -75,14 +56,6 @@ window.cheapestStationId = cheapestStationId;
 window.directionLine = directionLine;
 
 // ========== UTILITY FUNCTIONS ==========
-function getBrandLogo(brandId) {
-  return `images/${brandId}.png`;
-}
-
-window.handleImageError = function(img) {
-  img.src = 'images/default.png';
-}
-
 function extractSuburb(address) {
   // Extract suburb from address - typically the last part before state/postcode
   const parts = address.split(',');
@@ -93,6 +66,14 @@ function extractSuburb(address) {
     return suburb.replace(/\s+\d+.*$/, '').trim();
   }
   return '';
+}
+
+function getBrandLogo(brandId) {
+  return `images/${brandId}.png`;
+}
+
+window.handleImageError = function(img) {
+  img.src = 'images/default.png';
 }
 
 function getFuelIds(fuelKey) {
@@ -369,7 +350,7 @@ function toggleToolbarPanel(panelName) {
   const toolbar = document.getElementById('bottom-toolbar');
   
   const isExpanded = toolbar?.classList.contains('expanded');
-  const currentPanel = ['search', 'list'].find(p => 
+  const currentPanel = ['search', 'list', 'feature'].find(p => 
     document.getElementById(`${p}-panel`)?.style.display !== 'none'
   );
   
@@ -390,7 +371,7 @@ function toggleToolbarPanel(panelName) {
 }
 
 function showToolbarPanel(panelName) {
-  ['search', 'list'].forEach(name => {
+  ['search', 'list', 'feature'].forEach(name => {
     const panel = document.getElementById(`${name}-panel`);
     if (panel) {
       panel.style.display = name === panelName ? 'flex' : 'none';
@@ -406,7 +387,7 @@ function resetActiveButtons() {
 
 window.resetActiveButtons = resetActiveButtons;
 
-// Close toolbar panel function - FIXED
+// Close toolbar panel function
 window.closeToolbarPanel = function() {
   document.getElementById('bottom-toolbar')?.classList.remove('expanded');
   resetActiveButtons();
@@ -476,10 +457,10 @@ function showFeatureCard(station) {
           
           <!-- Bottom Right: Action Buttons -->
           <div class="feature-bottom-right">
-            <button class="feature-icon-btn navigation" onclick="getDirections(${site.Lat}, ${site.Lng}, '${site.N.replace(/'/g, "\\'")}')">
+            <button class="feature-icon-btn navigation" onclick="getDirections(${site.Lat}, ${site.Lng}, '${site.N.replace(/'/g, "\\\'")}')">
               <i class="fas fa-directions"></i>
             </button>
-            <button class="feature-icon-btn share" onclick="shareStation('${site.S}', '${site.N.replace(/'/g, "\\'")}')">
+            <button class="feature-icon-btn share" onclick="shareStation('${site.S}', '${site.N.replace(/'/g, "\\\'")}')">
               <i class="fas fa-share"></i>
             </button>
           </div>
@@ -632,14 +613,14 @@ function setupSearch() {
     });
   }
   
-  async function navigateToSuburb(suburbName) {
+  function navigateToSuburb(suburbName) {
     console.log('Navigating to suburb:', suburbName);
     
-    // Try to find coordinates in our hardcoded list first
+    // Try to find coordinates for the suburb
     let coords = suburbCoords[suburbName];
     
     if (!coords) {
-      // Try partial matches in hardcoded list
+      // Try partial matches
       const matchKey = Object.keys(suburbCoords).find(key => 
         key.toLowerCase().includes(suburbName.toLowerCase()) ||
         suburbName.toLowerCase().includes(key.toLowerCase())
@@ -651,49 +632,16 @@ function setupSearch() {
     }
     
     if (!coords) {
-      // Use Apple's geocoding API to find the location
-      try {
-        console.log('Geocoding with Apple Maps:', suburbName);
-        
-        const geocoder = new mapkit.Geocoder();
-        const searchQuery = `${suburbName}, Queensland, Australia`;
-        
-        const response = await new Promise((resolve, reject) => {
-          geocoder.lookup(searchQuery, (error, data) => {
-            if (error) {
-              reject(error);
-            } else {
-              resolve(data);
-            }
-          });
-        });
-        
-        if (response && response.results && response.results.length > 0) {
-          const result = response.results[0];
-          coords = {
-            lat: result.coordinate.latitude,
-            lng: result.coordinate.longitude
-          };
-          console.log('Geocoded coordinates for', suburbName, ':', coords);
-        } else {
-          throw new Error('No results found');
-        }
-        
-      } catch (error) {
-        console.error('Geocoding failed:', error);
-        
-        // Fallback coordinates for general regions
-        if (suburbName.toLowerCase().includes('gold coast')) {
-          coords = { lat: -28.0167, lng: 153.4000 };
-        } else if (suburbName.toLowerCase().includes('sunshine coast')) {
-          coords = { lat: -26.6500, lng: 153.0667 };
-        } else if (suburbName.toLowerCase().includes('brisbane')) {
-          coords = { lat: -27.4698, lng: 153.0251 };
-        } else {
-          console.log('No coordinates found for:', suburbName);
-          alert(`Sorry, we couldn't find "${suburbName}". Please try a different location or check the spelling.`);
-          return;
-        }
+      // Fallback coordinates for general regions
+      if (suburbName.toLowerCase().includes('gold coast')) {
+        coords = { lat: -28.0167, lng: 153.4000 };
+      } else if (suburbName.toLowerCase().includes('sunshine coast')) {
+        coords = { lat: -26.6500, lng: 153.0667 };
+      } else if (suburbName.toLowerCase().includes('brisbane')) {
+        coords = { lat: -27.4698, lng: 153.0251 };
+      } else {
+        // Default to Brisbane if no match found
+        coords = { lat: -27.4698, lng: 153.0251 };
       }
     }
     
@@ -725,46 +673,8 @@ function setupSearch() {
         suburb.toLowerCase().includes(query)
       ).slice(0, 20);
       
-      // If no matches in our predefined list, show the search term as an option
-      if (filtered.length === 0 && query.length > 2) {
-        const searchTerm = e.target.value.trim();
-        // Capitalize first letter of each word
-        const formattedSearchTerm = searchTerm
-          .split(' ')
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-          .join(' ');
-        
-        suburbListEl.innerHTML = `
-          <li class="suburb-item search-suggestion" data-suburb="${searchTerm}">
-            <i class="fas fa-search" style="margin-right: 8px; color: #666;"></i>
-            Search for "${formattedSearchTerm}"
-          </li>
-        `;
-        
-        // Add click handler for the search suggestion
-        suburbListEl.querySelector('.search-suggestion').addEventListener('click', () => {
-          navigateToSuburb(searchTerm);
-          // Close search panel
-          document.getElementById('bottom-toolbar')?.classList.remove('expanded');
-          resetActiveButtons();
-        });
-      } else {
-        displaySuburbs(filtered);
-      }
+      displaySuburbs(filtered);
     }, 300);
-  });
-  
-  // Handle Enter key to search for any location
-  searchInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      const query = e.target.value.trim();
-      if (query.length > 2) {
-        navigateToSuburb(query);
-        // Close search panel
-        document.getElementById('bottom-toolbar')?.classList.remove('expanded');
-        resetActiveButtons();
-      }
-    }
   });
   
   // Show initial suburbs
@@ -772,25 +682,18 @@ function setupSearch() {
 }
 
 function populateBrands() {
+  const topBrandIds = ['2031031', '2', '5', '20', '113', '111'];
   const stationGrid = document.getElementById('station-select-grid');
   
   if (stationGrid) {
-    // Clear existing options (keep "All" option)
-    const allOption = stationGrid.querySelector('.station-option[data-brand="all"]');
-    stationGrid.innerHTML = '';
-    if (allOption) {
-      stationGrid.appendChild(allOption);
-    }
-    
-    // Add top 15 brands
-    TOP_BRANDS.forEach((brandId) => {
-      if (BRAND_NAMES[brandId]) {
+    topBrandIds.forEach((id) => {
+      if (BRAND_NAMES[id]) {
         const stationDiv = document.createElement('div');
         stationDiv.className = 'station-option';
-        stationDiv.dataset.brand = brandId;
+        stationDiv.dataset.brand = id;
         stationDiv.innerHTML = `
-          <img class="station-logo" src="${getBrandLogo(brandId)}" alt="${BRAND_NAMES[brandId]} logo" onerror="handleImageError(this)">
-          <span class="station-option-name">${BRAND_NAMES[brandId]}</span>
+          <img class="station-logo" src="${getBrandLogo(id)}" alt="${BRAND_NAMES[id]} logo" onerror="handleImageError(this)">
+          <span class="station-option-name">${BRAND_NAMES[id]}</span>
         `;
         stationGrid.appendChild(stationDiv);
       }
@@ -1031,10 +934,9 @@ function updateVisibleStations() {
     const drawPriceText = (ctx, text, x, y, isCheapest) => {
       ctx.save();
       
-      ctx.font = 'bold 10px system-ui, -apple-system, Arial'; // smaller and tighter (was 11px)
+      ctx.font = 'bold 11px system-ui, -apple-system, Arial'; // smaller again (was 12px)
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.letterSpacing = '-0.5px'; // Tighter letter spacing
       
       // Text shadow
       ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
@@ -1073,8 +975,8 @@ function updateVisibleStations() {
           ctx.drawImage(logoImg, 17, 26, 30, 30); // was 25, now 26
           ctx.restore();
           
-          // Draw price text (moved down and tighter spacing)
-          drawPriceText(ctx, priceText, 32, 18, isCheapest); // was 16, now 18
+          // Draw price text (moved down 2px more)
+          drawPriceText(ctx, priceText, 32, 16, isCheapest); // was 14, now 16
         };
         
         logoImg.onerror = () => {
@@ -1089,7 +991,7 @@ function updateVisibleStations() {
           ctx.stroke();
           ctx.restore();
           
-          drawPriceText(ctx, priceText, 32, 18, isCheapest); // was 16, now 18
+          drawPriceText(ctx, priceText, 32, 16, isCheapest); // was 14, now 16
         };
         
         logoImg.src = logoUrl;
@@ -1161,7 +1063,7 @@ function updateVisibleStations() {
       };
       
       showFeatureCard(stationData);
-      console.log('Clicked station:', site.N, 'Price:', priceText);
+      console.log('Clicked station:', site.N, 'Price:', priceText + '¢/L');
     });
   });
   
@@ -1267,10 +1169,11 @@ function updateStationList() {
       <div class="station-details">
         <span class="station-name">${site.N}</span>
         <span class="station-address">${site.A}</span>
+        <span class="station-distance">${distanceText}</span>
       </div>
       <span class="station-price" style="color:${isCheapest ? '#22C55E' : '#387CC2'};">
         ${isCheapest ? '<i class="fas fa-crown" style="margin-right: 4px; color: #FFD700;"></i>' : ''}
-        ${priceText}
+        ${priceText}¢/L
       </span>
     `;
     
@@ -1350,7 +1253,7 @@ async function fetchWeather(lat = BRISBANE_COORDS.lat, lng = BRISBANE_COORDS.lng
       '82': '🌧️', '85': '🌨️', '86': '🌨️', '95': '⛈️', '96': '⛈️', '99': '⛈️'
     };
     
-    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=5`);
+    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=4`);
     const data = await res.json();
     const { temperature, weathercode } = data.current_weather;
     
@@ -1393,8 +1296,7 @@ function toggleWeatherForecast() {
         '82': '🌧️', '85': '🌨️', '86': '🌨️', '95': '⛈️', '96': '⛈️', '99': '⛈️'
       };
       
-      // Show 5-day forecast (days 1-5, skipping today)
-      const forecastHTML = weatherForecast.time.slice(1, 6).map((date, index) => {
+      const forecastHTML = weatherForecast.time.slice(1, 4).map((date, index) => {
         const dayIndex = index + 1;
         const dayName = new Date(date).toLocaleDateString('en-AU', { weekday: 'short' });
         const maxTemp = Math.round(weatherForecast.temperature_2m_max[dayIndex]);
@@ -1407,173 +1309,7 @@ function toggleWeatherForecast() {
             <div class="forecast-day-name">${dayName}</div>
             <div style="display: flex; align-items: center; gap: 8px;">
               <span style="font-size: 14px;">${icon}</span>
-              <div class="forecast-temps">${minTemp}°/${maxTemp}°</div>
-            </div>
-          </div>
-        `;
-      }).join('');
-      
-      forecastEl.innerHTML = forecastHTML;
-    }
-  }
-}
-
-function setupMapEvents() {
-  if (!myMap) return;
-  console.log('Map event handlers set up successfully');
-}
-
-// ========== EXPORTS ==========
-window.initializeMap = initializeMap;
-window.fetchSitesAndPrices = fetchSitesAndPrices;
-window.findCheapestStation = findCheapestStation;
-window.updateVisibleStations = updateVisibleStations;
-window.fetchWeather = fetchWeather;
-window.setupUIHandlers = setupUIHandlers;
-window.createUserLocationMarker = createUserLocationMarker;
-
-console.log('QLD Fuel Finder script loaded successfully');
-      </div>
-      <span class="station-price" style="color:${isCheapest ? '#22C55E' : '#387CC2'};">
-        ${isCheapest ? '<i class="fas fa-crown" style="margin-right: 4px; color: #FFD700;"></i>' : ''}
-        ${priceText}
-      </span>
-    `;
-    
-    li.addEventListener('click', () => {
-      // Close the toolbar
-      document.getElementById('bottom-toolbar')?.classList.remove('expanded');
-      resetActiveButtons();
-      
-      // Show feature card for the clicked station
-      const stationData = {
-        site,
-        price,
-        distance,
-        isCheapest
-      };
-      
-      setTimeout(() => {
-        showFeatureCard(stationData);
-        console.log('Selected station from list:', site.N);
-      }, 200);
-    });
-    
-    list.appendChild(li);
-  });
-}
-
-function createUserLocationMarker(lat, lng) {
-  document.querySelectorAll('.user-location-marker').forEach(m => m.remove());
-  
-  const userMarker = document.createElement('div');
-  userMarker.className = 'user-location-marker';
-  userMarker.style.cssText = `
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    background: #007AFF;
-    border: 3px solid white;
-    border-radius: 50%;
-    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
-    z-index: 2000;
-    pointer-events: none;
-  `;
-  
-  const coordinate = new mapkit.Coordinate(lat, lng);
-  const updatePosition = () => {
-    try {
-      const point = myMap.convertCoordinateToPointOnPage(coordinate);
-      const mapContainer = document.getElementById('map');
-      const mapRect = mapContainer.getBoundingClientRect();
-      
-      userMarker.style.left = (point.x - mapRect.left) + 'px';
-      userMarker.style.top = (point.y - mapRect.top) + 'px';
-      userMarker.style.transform = 'translate(-50%, -50%)';
-    } catch (e) {
-      console.log('User marker position update failed:', e);
-    }
-  };
-  
-  updatePosition();
-  document.getElementById('map').appendChild(userMarker);
-  userMarker.updatePosition = updatePosition;
-  
-  if (myMap) {
-    myMap.addEventListener('region-change-start', updatePosition);
-    myMap.addEventListener('region-change-end', updatePosition);
-  }
-  
-  console.log("User location marker created at:", lat, lng);
-}
-
-async function fetchWeather(lat = BRISBANE_COORDS.lat, lng = BRISBANE_COORDS.lng) {
-  try {
-    const weatherIcons = {
-      '0': '☀️', '1': '🌤️', '2': '⛅', '3': '☁️', '45': '☁️', '48': '☁️',
-      '51': '🌦️', '53': '🌦️', '55': '🌦️', '61': '🌧️', '63': '🌧️', '65': '🌧️',
-      '71': '🌨️', '73': '🌨️', '75': '🌨️', '77': '🌨️', '80': '🌦️', '81': '🌦️',
-      '82': '🌧️', '85': '🌨️', '86': '🌨️', '95': '⛈️', '96': '⛈️', '99': '⛈️'
-    };
-    
-    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=5`);
-    const data = await res.json();
-    const { temperature, weathercode } = data.current_weather;
-    
-    const weatherTemp = document.getElementById('weather-temp');
-    const weatherIcon = document.getElementById('weather-icon');
-    
-    if (weatherTemp) weatherTemp.textContent = `${Math.round(temperature)}°`;
-    if (weatherIcon) weatherIcon.textContent = weatherIcons[weathercode] || '☀️';
-    
-    weatherForecast = data.daily;
-    
-    const weatherDisplay = document.getElementById('weather-display');
-    if (weatherDisplay) {
-      weatherDisplay.addEventListener('click', toggleWeatherForecast);
-    }
-    
-  } catch (err) {
-    console.error("Weather fetch error:", err);
-  }
-}
-
-function toggleWeatherForecast() {
-  const weatherDisplay = document.getElementById('weather-display');
-  const forecastEl = document.getElementById('weather-forecast');
-  
-  if (!weatherDisplay || !forecastEl) return;
-  
-  const isExpanded = weatherDisplay.classList.contains('expanded');
-  
-  if (isExpanded) {
-    weatherDisplay.classList.remove('expanded');
-  } else {
-    weatherDisplay.classList.add('expanded');
-    
-    if (weatherForecast && weatherForecast.time) {
-      const weatherIcons = {
-        '0': '☀️', '1': '🌤️', '2': '⛅', '3': '☁️', '45': '☁️', '48': '☁️',
-        '51': '🌦️', '53': '🌦️', '55': '🌦️', '61': '🌧️', '63': '🌧️', '65': '🌧️',
-        '71': '🌨️', '73': '🌨️', '75': '🌨️', '77': '🌨️', '80': '🌦️', '81': '🌦️',
-        '82': '🌧️', '85': '🌨️', '86': '🌨️', '95': '⛈️', '96': '⛈️', '99': '⛈️'
-      };
-      
-      // Show 5-day forecast (days 1-5, skipping today)
-      const forecastHTML = weatherForecast.time.slice(1, 6).map((date, index) => {
-        const dayIndex = index + 1;
-        const dayName = new Date(date).toLocaleDateString('en-AU', { weekday: 'short' });
-        const maxTemp = Math.round(weatherForecast.temperature_2m_max[dayIndex]);
-        const minTemp = Math.round(weatherForecast.temperature_2m_min[dayIndex]);
-        const weatherCode = weatherForecast.weathercode[dayIndex];
-        const icon = weatherIcons[weatherCode] || '☀️';
-        
-        return `
-          <div class="forecast-day">
-            <div class="forecast-day-name">${dayName}</div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="font-size: 14px;">${icon}</span>
-              <div class="forecast-temps">${minTemp}°/${maxTemp}°</div>
+              <div class="forecast-temps">${maxTemp}°/${minTemp}°</div>
             </div>
           </div>
         `;
