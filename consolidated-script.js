@@ -61,6 +61,8 @@ let cheapestStationId = [];
 let stationLimit = 999;
 let directionLine = null;
 let weatherForecast = [];
+let selectedStation = null;
+let featureCardTimeout = null;
 
 // Make key variables globally accessible
 window.myMap = myMap;
@@ -393,6 +395,140 @@ window.closeToolbarPanel = function() {
   document.getElementById('bottom-toolbar')?.classList.remove('expanded');
   resetActiveButtons();
 };
+
+// ========== FEATURE CARD FUNCTIONS ==========
+function showFeatureCard(station) {
+  selectedStation = station;
+  const site = station.site;
+  const price = station.price;
+  const distance = station.distance;
+  const isCheapest = station.isCheapest;
+  
+  const brandName = BRAND_NAMES[site.B] || 'Unknown';
+  const logoUrl = getBrandLogo(site.B);
+  const priceText = (price / 10).toFixed(1);
+  const distanceText = distance ? `${distance.toFixed(1)} km away` : '';
+  
+  const featureContent = document.getElementById('feature-content');
+  if (!featureContent) return;
+  
+  // Create feature card HTML
+  const cardHTML = `
+    <div class="feature-card" style="opacity: 0; transform: translateY(20px); transition: all 0.4s ease;">
+      <div class="feature-header">
+        <div class="feature-station-info">
+          <img class="feature-logo" src="${logoUrl}" alt="${brandName} logo" onerror="handleImageError(this)">
+          <div class="feature-station-details">
+            <h3 class="feature-station-name">${site.N}</h3>
+            <p class="feature-station-brand">${brandName}</p>
+          </div>
+        </div>
+        <button class="feature-close-btn" onclick="hideFeatureCard()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="feature-price-section">
+        <div class="feature-price">
+          ${isCheapest ? '<i class="fas fa-crown" style="color: #FFD700; margin-right: 8px;"></i>' : ''}
+          <span class="price-value" style="color: ${isCheapest ? '#22C55E' : '#387CC2'};">${priceText}¢/L</span>
+          ${isCheapest ? '<span class="cheapest-label">Cheapest in area</span>' : ''}
+        </div>
+        ${distanceText ? `<div class="feature-distance">${distanceText}</div>` : ''}
+      </div>
+      
+      <div class="feature-address">
+        <i class="fas fa-map-marker-alt"></i>
+        <span>${site.A}</span>
+      </div>
+      
+      <div class="feature-actions">
+        <button class="feature-btn feature-btn-primary" onclick="getDirections('${site.Lat}', '${site.Lng}', '${site.N.replace(/'/g, "\\'")}')
+          <i class="fas fa-directions"></i>
+          Directions
+        </button>
+        <button class="feature-btn feature-btn-secondary" onclick="shareStation('${site.S}', '${site.N.replace(/'/g, "\\'")}')
+          <i class="fas fa-share"></i>
+          Share
+        </button>
+      </div>
+    </div>
+  `;
+  
+  featureContent.innerHTML = cardHTML;
+  
+  // Show the toolbar panel
+  showToolbarPanel('feature');
+  document.getElementById('bottom-toolbar')?.classList.add('expanded');
+  resetActiveButtons();
+  
+  // Fade in the card
+  clearTimeout(featureCardTimeout);
+  featureCardTimeout = setTimeout(() => {
+    const card = featureContent.querySelector('.feature-card');
+    if (card) {
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }
+  }, 100);
+}
+
+function hideFeatureCard() {
+  const featureContent = document.getElementById('feature-content');
+  const card = featureContent?.querySelector('.feature-card');
+  
+  if (card) {
+    // Fade out animation
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    
+    clearTimeout(featureCardTimeout);
+    featureCardTimeout = setTimeout(() => {
+      document.getElementById('bottom-toolbar')?.classList.remove('expanded');
+      resetActiveButtons();
+      selectedStation = null;
+      if (featureContent) {
+        featureContent.innerHTML = '';
+      }
+    }, 400);
+  } else {
+    // Immediate close if no card
+    document.getElementById('bottom-toolbar')?.classList.remove('expanded');
+    resetActiveButtons();
+    selectedStation = null;
+    if (featureContent) {
+      featureContent.innerHTML = '';
+    }
+  }
+}
+
+function getDirections(lat, lng, stationName) {
+  const url = `https://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`;
+  window.open(url, '_blank');
+}
+
+function shareStation(stationId, stationName) {
+  const url = `${window.location.origin}${window.location.pathname}?station=${stationId}`;
+  
+  if (navigator.share) {
+    navigator.share({
+      title: `${stationName} - QLD Fuel Watch`,
+      text: `Check out fuel prices at ${stationName}`,
+      url: url
+    }).catch(console.error);
+  } else {
+    navigator.clipboard.writeText(url).then(() => {
+      alert('Station link copied to clipboard!');
+    }).catch(() => {
+      prompt('Copy this link:', url);
+    });
+  }
+}
+
+// Export functions to global scope
+window.hideFeatureCard = hideFeatureCard;
+window.getDirections = getDirections;
+window.shareStation = shareStation;
 
 function setupSearch() {
   const searchInput = document.getElementById('search-input');
@@ -738,7 +874,7 @@ function updateVisibleStations() {
   });
   
   stationsWithPrices.sort((a, b) => a.distance - b.distance);
-  const limitedStations = stationsWithPrices.slice(0, 90); // Show up to 50 stations
+  const limitedStations = stationsWithPrices.slice(0, 50); // Show up to 50 stations
   
   console.log("Showing stations:", limitedStations.length, "of", stationsWithPrices.length);
   
@@ -831,7 +967,7 @@ function updateVisibleStations() {
           ctx.restore();
           
           // Draw price text (moved down 2px more)
-          drawPriceText(ctx, priceText, 32, 18, isCheapest); // was 14, now 16
+          drawPriceText(ctx, priceText, 32, 18, isCheapest); // was 14, now 18
         };
         
         logoImg.onerror = () => {
@@ -846,7 +982,7 @@ function updateVisibleStations() {
           ctx.stroke();
           ctx.restore();
           
-          drawPriceText(ctx, priceText, 32, 16, isCheapest); // was 14, now 16
+          drawPriceText(ctx, priceText, 32, 18, isCheapest); // was 14, now 18
         };
         
         logoImg.src = logoUrl;
@@ -906,6 +1042,18 @@ function updateVisibleStations() {
     canvas.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
+      
+      // Show feature card for this station
+      const stationData = {
+        site,
+        price,
+        distance: userLocation ? 
+          getDistance(userLocation.lat, userLocation.lng, site.Lat, site.Lng) : 
+          getDistance(myMap.region.center.latitude, myMap.region.center.longitude, site.Lat, site.Lng),
+        isCheapest
+      };
+      
+      showFeatureCard(stationData);
       console.log('Clicked station:', site.N, 'Price:', priceText + '¢/L');
     });
   });
