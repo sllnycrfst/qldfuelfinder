@@ -39,13 +39,13 @@ const TOP_BRANDS = [
   '111', // Coles Express
   '3421066', // Ampol
   '16', // Mobil
-  '3421139', // Pearl
+  '3421139', // Pearl Energy
   '86', // Liberty
   '169', // On the Run
-  '167', // Speedway
+  '3421183', // U-Go
   '23', // United
   '5094', // Puma Energy
-  '12' // Independent
+  '3421073' // EG Ampol
 ];
 
 const BRISBANE_COORDS = { lat: -27.4698, lng: 153.0251 };
