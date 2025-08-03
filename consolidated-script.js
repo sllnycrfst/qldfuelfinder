@@ -722,15 +722,18 @@ function updateVisibleStations() {
     if (isCheapest) canvas.classList.add('cheapest');
     canvas.dataset.stationId = site.S;
     
-    // Set canvas size - simple approach for correct size
-    const canvasWidth = 56;
-    const canvasHeight = 70;
+    // Set canvas size - proper high-DPI rendering
+    const displayWidth = 56;
+    const displayHeight = 70;
+    const pixelRatio = window.devicePixelRatio || 1;
     
-    // Use 1:1 canvas sizing
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
-    canvas.style.width = canvasWidth + 'px';
-    canvas.style.height = canvasHeight + 'px';
+    // Set actual canvas size in memory (scaled for high-DPI)
+    canvas.width = displayWidth * pixelRatio;
+    canvas.height = displayHeight * pixelRatio;
+    
+    // Set display size (what user sees)
+    canvas.style.width = displayWidth + 'px';
+    canvas.style.height = displayHeight + 'px';
     
     // Override CSS styles that cause issues
     canvas.style.cssText = `
@@ -748,7 +751,8 @@ function updateVisibleStations() {
     `;
     
     const ctx = canvas.getContext('2d');
-    // Use better rendering settings for quality
+    // Scale the drawing context so everything draws at the correct size
+    ctx.scale(pixelRatio, pixelRatio);
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
     
@@ -819,7 +823,7 @@ function updateVisibleStations() {
     
     // Function to draw the complete marker
     const drawMarker = () => {
-      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+      ctx.clearRect(0, 0, displayWidth, displayHeight);
       
       const yOffset = isCheapest ? 14 : 0;
       
