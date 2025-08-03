@@ -721,13 +721,19 @@ function updateVisibleStations() {
     canvas.className = 'fuel-marker';
     if (isCheapest) canvas.classList.add('cheapest');
     canvas.dataset.stationId = site.S;
-    canvas.width = 56;
-    canvas.height = 70; // Extra height for crown
     
-    canvas.style.cssText = `
+    // Set canvas size for crisp rendering
+    const pixelRatio = window.devicePixelRatio || 1;
+    const canvasWidth = 56;
+    const canvasHeight = 70;
+    
+    canvas.width = canvasWidth * pixelRatio;
+    canvas.height = canvasHeight * pixelRatio;
+    canvas.style.width = canvasWidth + 'px';
+    canvas.style.height = canvasHeight + 'px';
+    
+    canvas.style.cssText += `
       position: absolute;
-      width: 56px;
-      height: 70px;
       cursor: pointer;
       z-index: ${isCheapest ? 1002 : 1001};
       pointer-events: auto;
@@ -736,64 +742,7 @@ function updateVisibleStations() {
     `;
     
     const ctx = canvas.getContext('2d');
-    
-    // Function to draw the complete marker
-    const drawMarker = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      // Draw crown if cheapest (at top)
-      if (isCheapest) {
-        drawCrown(ctx, 28, 8); // Centered at top
-      }
-      
-      // Draw marker base image
-      const markerImg = new Image();
-      markerImg.onload = () => {
-        const yOffset = isCheapest ? 14 : 0;
-        ctx.drawImage(markerImg, 0, yOffset, 56, 56);
-        
-        // Draw station logo
-        const logoImg = new Image();
-        logoImg.onload = () => {
-          // Create circular clipping path for logo
-          ctx.save();
-          ctx.beginPath();
-          ctx.arc(28, yOffset + 28, 15, 0, 2 * Math.PI);
-          ctx.clip();
-          
-          // White background
-          ctx.fillStyle = 'white';
-          ctx.fill();
-          
-          // Draw logo
-          ctx.drawImage(logoImg, 13, yOffset + 13, 30, 30);
-          ctx.restore();
-          
-          // Draw price text
-          drawPriceText(ctx, priceText, 28, yOffset + 3, isCheapest);
-        };
-        
-        logoImg.onerror = () => {
-          // Draw default logo if image fails
-          ctx.save();
-          ctx.beginPath();
-          ctx.arc(28, yOffset + 28, 15, 0, 2 * Math.PI);
-          ctx.fillStyle = 'white';
-          ctx.fill();
-          ctx.strokeStyle = '#ccc';
-          ctx.lineWidth = 2;
-          ctx.stroke();
-          ctx.restore();
-          
-          // Draw price text
-          drawPriceText(ctx, priceText, 28, yOffset + 3, isCheapest);
-        };
-        
-        logoImg.src = logoUrl;
-      };
-      
-      markerImg.src = 'images/mymarker.png';
-    };
+    ctx.scale(pixelRatio, pixelRatio);
     
     // Function to draw crown
     const drawCrown = (ctx, x, y) => {
@@ -860,7 +809,81 @@ function updateVisibleStations() {
       ctx.restore();
     };
     
-    // Draw the marker
+    // Function to draw the complete marker
+    const drawMarker = () => {
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+      
+      const yOffset = isCheapest ? 14 : 0;
+      
+      // Draw crown if cheapest (at top)
+      if (isCheapest) {
+        drawCrown(ctx, 28, 8);
+      }
+      
+      // Draw marker base image
+      const markerImg = new Image();
+      markerImg.crossOrigin = 'anonymous';
+      markerImg.onload = () => {
+        ctx.drawImage(markerImg, 0, yOffset, 56, 56);
+        
+        // Draw station logo
+        const logoImg = new Image();
+        logoImg.crossOrigin = 'anonymous';
+        logoImg.onload = () => {
+          // Create circular clipping path for logo
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(28, yOffset + 28, 15, 0, 2 * Math.PI);
+          ctx.clip();
+          
+          // White background
+          ctx.fillStyle = 'white';
+          ctx.fill();
+          
+          // Draw logo
+          ctx.drawImage(logoImg, 13, yOffset + 13, 30, 30);
+          ctx.restore();
+          
+          // Draw price text
+          drawPriceText(ctx, priceText, 28, yOffset + 3, isCheapest);
+        };
+        
+        logoImg.onerror = () => {
+          // Draw default logo if image fails
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(28, yOffset + 28, 15, 0, 2 * Math.PI);
+          ctx.fillStyle = 'white';
+          ctx.fill();
+          ctx.strokeStyle = '#ccc';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.restore();
+          
+          // Draw price text
+          drawPriceText(ctx, priceText, 28, yOffset + 3, isCheapest);
+        };
+        
+        logoImg.src = logoUrl;
+      };
+      
+      markerImg.onerror = () => {
+        // Fallback: draw a simple marker shape if image fails
+        ctx.save();
+        ctx.fillStyle = isCheapest ? '#22C55E' : '#387CC2';
+        ctx.beginPath();
+        ctx.arc(28, yOffset + 28, 20, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.restore();
+        
+        // Draw price text on fallback
+        drawPriceText(ctx, priceText, 28, yOffset + 28, isCheapest);
+      };
+      
+      markerImg.src = 'images/mymarker.png';
+    };
+    
+    // Draw the marker immediately
     drawMarker();
     
     const coordinate = new mapkit.Coordinate(site.Lat, site.Lng);
@@ -870,9 +893,8 @@ function updateVisibleStations() {
         const mapContainer = document.getElementById('map');
         const mapRect = mapContainer.getBoundingClientRect();
         
-        canvas.style.left = (point.x - mapRect.left) + 'px';
-        canvas.style.top = (point.y - mapRect.top) + 'px';
-        canvas.style.transform = 'translate(-50%, -100%)';
+        canvas.style.left = (point.x - mapRect.left - canvasWidth/2) + 'px';
+        canvas.style.top = (point.y - mapRect.top - canvasHeight) + 'px';
       } catch (e) {
         // Position update failed
       }
@@ -897,11 +919,14 @@ function updateVisibleStations() {
     });
   };
   
-  let animationId;
+  // Immediate position updates for smooth panning
   if (myMap) {
+    // Remove old listeners to avoid duplicates
     myMap.removeEventListener('region-change-start', updateAllMarkers);
     myMap.removeEventListener('region-change-end', updateAllMarkers);
     
+    // Add continuous update during pan/zoom
+    let animationId;
     myMap.addEventListener('region-change-start', () => {
       const animate = () => {
         updateAllMarkers();
@@ -915,7 +940,11 @@ function updateVisibleStations() {
         cancelAnimationFrame(animationId);
         animationId = null;
       }
+      updateAllMarkers();
     });
+    
+    // Also update on any region change
+    myMap.addEventListener('region-change', updateAllMarkers);
   }
 }
 
