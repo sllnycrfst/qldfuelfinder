@@ -621,11 +621,12 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: absolute;
+  position: fixed;
+  bottom: 12px
   left: 30px;
   right: 30px;
   padding: 0;
-  z-index: 10;
+  z-index: 1000;
 }
 
 .toolbar-btn {
@@ -1445,7 +1446,7 @@ html, body {
   .toolbar-buttons {
     left: 20px;
     right: 20px;
-    top: 10px;
+    bottom: 20px;
   }
   
   .toolbar-btn {
