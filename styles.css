@@ -1445,6 +1445,7 @@ html, body {
   .toolbar-buttons {
     left: 20px;
     right: 20px;
+    top: 10px;
   }
   
   .toolbar-btn {
