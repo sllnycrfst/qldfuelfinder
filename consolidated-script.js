@@ -972,16 +972,25 @@ function updateVisibleStations() {
     }
   });
   
-  // Add new canvas-based markers - ONLY animate truly new ones
+  // Create markers for stations that don't already have them
   limitedStations.forEach(({ site, price, isCheapest }) => {
-    // Skip if marker already exists
-    if (existingMarkers.has(site.S)) {
-      return;
+    // Skip if marker already exists - DON'T remove existing markers
+    const existingMarker = document.querySelector(`[data-station-id="${site.S}"]`);
+    if (existingMarker) {
+      // Update existing marker if needed (price might have changed)
+      if (isCheapest !== existingMarker.classList.contains('cheapest')) {
+        if (isCheapest) {
+          existingMarker.classList.add('cheapest');
+        } else {
+          existingMarker.classList.remove('cheapest');
+        }
+      }
+      return; // Keep existing marker, don't create new one
     }
     
     const priceText = (price / 10).toFixed(1);
     const logoUrl = getBrandLogo(site.B);
-    const isNewMarker = true; // This is definitely a new marker
+    const isNewMarker = true; // This is definitely a new marker since we checked above
     
     // Create canvas element
     const canvas = document.createElement('canvas');
@@ -1216,7 +1225,7 @@ function updateVisibleStations() {
     });
   });
   
-  // IMPROVED movement system - multiple update methods for ultra-smooth tracking
+  // IMPROVED movement system - update all markers (existing and new)
   const updateAllMarkers = () => {
     document.querySelectorAll('.fuel-marker, .user-location-marker').forEach(marker => {
       if (marker.updatePosition) {
@@ -1226,13 +1235,13 @@ function updateVisibleStations() {
   };
   
   if (myMap) {
-    // Clean up old listeners
+    // Clean up old listeners to prevent duplicates
     myMap.removeEventListener('region-change-start', updateAllMarkers);
     myMap.removeEventListener('region-change-end', updateAllMarkers);
     myMap.removeEventListener('region-change', updateAllMarkers);
     
-    // Triple update system for perfect movement
-    myMap.addEventListener('region-change', updateAllMarkers); // Immediate
+    // Smooth movement system for all markers
+    myMap.addEventListener('region-change', updateAllMarkers); // Immediate updates
     
     let isMoving = false;
     let animationId;
@@ -1254,7 +1263,9 @@ function updateVisibleStations() {
         cancelAnimationFrame(animationId);
       }
       // Final position update
-      setTimeout(updateAllMarkers, 10);
+      setTimeout(() => {
+        updateAllMarkers();
+      }, 10);
     });
   }
 }
