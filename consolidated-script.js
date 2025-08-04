@@ -1411,7 +1411,7 @@ async function fetchWeather(lat = BRISBANE_COORDS.lat, lng = BRISBANE_COORDS.lng
       '82': '🌧️', '85': '🌨️', '86': '🌨️', '95': '⛈️', '96': '⛈️', '99': '⛈️'
     };
     
-    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=4`);
+    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=6`);
     const data = await res.json();
     const { temperature, weathercode } = data.current_weather;
     
@@ -1465,9 +1465,9 @@ function toggleWeatherForecast() {
         return `
           <div class="forecast-day">
             <div class="forecast-day-name">${dayName}</div>
-            <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 4px;">
               <span style="font-size: 14px;">${icon}</span>
-              <div class="forecast-temps">${maxTemp}°/${minTemp}°</div>
+              <div class="forecast-temps">${minTemp}°/${maxTemp}°</div>
             </div>
           </div>
         `;
