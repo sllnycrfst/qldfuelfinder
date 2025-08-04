@@ -1062,7 +1062,6 @@ html, body {
   }
 }
 
-
 #feature-content {
   padding: 0;
   display: flex;
@@ -1418,7 +1417,7 @@ html, body {
   border-color: rgba(56, 124, 194, 0.4);
 }
 
-@media (max-width: 500px) {
+@media (max-width: 480px) {
   .bottom-toolbar {
     bottom: 20px;
     width: calc(100% - 24px);
