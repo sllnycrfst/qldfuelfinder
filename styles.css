@@ -151,7 +151,7 @@ html, body {
 /* FIXED: Station select grid now extends LEFT and DOWN from the button */
 .station-select-grid {
   position: fixed;
-  top: 241px; /* Position below the button (197px + 44px) */
+  top: 137px; /* Position below the button (197px + 44px) */
   right: 82px; /* Position 12px to the left of button (20px + 50px + 12px) */
   display: grid;
   grid-template-columns: repeat(4, 1fr);
