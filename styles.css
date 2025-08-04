@@ -622,7 +622,6 @@ html, body {
   justify-content: space-between;
   align-items: center;
   position: absolute;
-  bottom: 19px;
   left: 30px;
   right: 30px;
   padding: 0;
@@ -1446,7 +1445,6 @@ html, body {
   .toolbar-buttons {
     left: 20px;
     right: 20px;
-    bottom: 6px;
   }
   
   .toolbar-btn {
