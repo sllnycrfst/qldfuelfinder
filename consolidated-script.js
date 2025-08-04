@@ -754,7 +754,7 @@ function setupSearch() {
 }
 
 function populateBrands() {
-  const topBrandIds = ['2031031', '2', '5', '20', '113', '111'];
+  const topBrandIds = ['113', '3421066', '20', '5', '110', '2031031', '2', '111', '16', '3421139', '5094'];
   const stationGrid = document.getElementById('station-select-grid');
   
   if (stationGrid) {
