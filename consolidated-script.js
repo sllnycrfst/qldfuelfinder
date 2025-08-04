@@ -44,6 +44,7 @@ let directionLine = null;
 let weatherForecast = [];
 let selectedStation = null;
 let featureCardTimeout = null;
+let existingMarkers = new Set(); // Track existing markers to prevent re-animation
 
 // Make key variables globally accessible
 window.myMap = myMap;
@@ -958,13 +959,29 @@ function updateVisibleStations() {
   
   console.log("Showing stations:", limitedStations.length, "of", stationsWithPrices.length);
   
-  // Clear existing markers
-  document.querySelectorAll('.fuel-marker').forEach(m => m.remove());
+  // Get current markers to track which ones to keep
+  const currentMarkerIds = new Set(limitedStations.map(({ site }) => site.S));
   
-  // Add new canvas-based markers - ORIGINAL QUALITY with movement fixes
+  // Remove markers that are no longer in viewport
+  const allMarkers = document.querySelectorAll('.fuel-marker');
+  allMarkers.forEach(marker => {
+    const stationId = marker.dataset.stationId;
+    if (!currentMarkerIds.has(stationId)) {
+      marker.remove();
+      existingMarkers.delete(stationId);
+    }
+  });
+  
+  // Add new canvas-based markers - ONLY animate truly new ones
   limitedStations.forEach(({ site, price, isCheapest }) => {
+    // Skip if marker already exists
+    if (existingMarkers.has(site.S)) {
+      return;
+    }
+    
     const priceText = (price / 10).toFixed(1);
     const logoUrl = getBrandLogo(site.B);
+    const isNewMarker = true; // This is definitely a new marker
     
     // Create canvas element
     const canvas = document.createElement('canvas');
@@ -981,7 +998,7 @@ function updateVisibleStations() {
     canvas.width = displayWidth * pixelRatio;
     canvas.height = displayHeight * pixelRatio;
     
-    // Set display size (what user sees) with CSS override - FIXED for touch passthrough
+    // Set display size - START HIDDEN for new markers only
     canvas.style.cssText = `
       position: absolute !important;
       width: ${displayWidth}px !important;
@@ -993,7 +1010,6 @@ function updateVisibleStations() {
       filter: none !important;
       opacity: 0 !important;
       transform: scale(0.8) !important;
-      touch-action: none !important;
     `;
     
     const ctx = canvas.getContext('2d');
@@ -1109,7 +1125,10 @@ function updateVisibleStations() {
     document.getElementById('map').appendChild(canvas);
     canvas.updatePosition = updatePosition;
     
-    // SMOOTH MARKER ANIMATION - fade in and grow to normal size
+    // Track this marker as existing
+    existingMarkers.add(site.S);
+    
+    // ANIMATE ONLY NEW MARKERS - fade in and grow to normal size
     setTimeout(() => {
       canvas.style.opacity = '1';
       canvas.style.transform = 'scale(1)';
@@ -1133,23 +1152,33 @@ function updateVisibleStations() {
       canvas.style.zIndex = isCheapest ? '1002' : '1001';
     });
     
-    // Better touch handling - allow map interaction while still detecting taps
-    let tapStartTime = 0;
+    // IMPROVED touch handling - minimize interference with map
+    let touchStartTime = 0;
+    let touchStartPos = { x: 0, y: 0 };
     let hasMoved = false;
     
     canvas.addEventListener('touchstart', (e) => {
-      tapStartTime = Date.now();
+      touchStartTime = Date.now();
+      const touch = e.touches[0];
+      touchStartPos = { x: touch.clientX, y: touch.clientY };
       hasMoved = false;
     }, { passive: true });
     
-    canvas.addEventListener('touchmove', () => {
-      hasMoved = true;
+    canvas.addEventListener('touchmove', (e) => {
+      const touch = e.touches[0];
+      const deltaX = Math.abs(touch.clientX - touchStartPos.x);
+      const deltaY = Math.abs(touch.clientY - touchStartPos.y);
+      
+      if (deltaX > 10 || deltaY > 10) {
+        hasMoved = true;
+      }
     }, { passive: true });
     
     canvas.addEventListener('touchend', (e) => {
-      const tapDuration = Date.now() - tapStartTime;
-      if (!hasMoved && tapDuration < 300) {
-        // This was a tap, not a drag
+      const touchDuration = Date.now() - touchStartTime;
+      
+      // Only trigger if it was a quick tap with minimal movement
+      if (!hasMoved && touchDuration < 200) {
         e.preventDefault();
         e.stopPropagation();
         
@@ -1166,7 +1195,7 @@ function updateVisibleStations() {
         showFeatureCard(stationData);
         console.log('Tapped station:', site.N, 'Price:', priceText + '¢/L');
       }
-    });
+    }, { passive: false }); // Not passive so we can preventDefault
     
     canvas.addEventListener('click', (e) => {
       e.preventDefault();
