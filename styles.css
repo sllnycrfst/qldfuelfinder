@@ -103,7 +103,7 @@ html, body {
 /* ========== STATION SELECT (BRAND SELECT) ========== */
 .station-select-button {
   position: fixed;
-  top: 197px; /* moved down 120px from 77px */
+  top: 137px; /* moved down 120px from 77px */
   right: 20px;
   width: 50px;
   height: 44px;
@@ -250,7 +250,7 @@ html, body {
 /* ========== FUEL SELECT ========== */
 .fuel-select-button {
   position: fixed;
-  top: 251px; /* moved down 120px from 131px */
+  top: 191px; /* moved down 120px from 131px */
   right: 20px;
   width: 50px;
   height: 44px;
