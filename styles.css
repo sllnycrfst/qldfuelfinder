@@ -524,7 +524,7 @@ html, body {
   transform: translateX(-50%);
   width: calc(100% - 40px);
   max-width: 500px;
-  height: 88px;
+  height: 76px;
   border-radius: 38px;
   z-index: 1499;
   transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
