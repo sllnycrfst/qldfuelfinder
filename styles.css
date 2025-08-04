@@ -1420,7 +1420,7 @@ html, body {
 
 @media (max-width: 768px) {
   .bottom-toolbar {
-    bottom: 26px;
+    bottom: 20px;
     width: calc(100% - 24px);
     border-radius: 30px 30px 30px 30px;
   }
