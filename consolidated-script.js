@@ -106,8 +106,8 @@ window.zoomIn = function() {
   
   if (currentSpan > 0.01) {
     const newSpan = new mapkit.CoordinateSpan(
-      currentRegion.span.latitudeDelta * 0.5,
-      currentRegion.span.longitudeDelta * 0.5
+      currentRegion.span.latitudeDelta * 0.6,
+      currentRegion.span.longitudeDelta * 0.6
     );
     const newRegion = new mapkit.CoordinateRegion(currentRegion.center, newSpan);
     myMap.setRegionAnimated(newRegion, true);
@@ -121,8 +121,8 @@ window.zoomOut = function() {
   
   if (currentSpan < 2.0) {
     const newSpan = new mapkit.CoordinateSpan(
-      currentRegion.span.latitudeDelta * 2.0,
-      currentRegion.span.longitudeDelta * 2.0
+      currentRegion.span.latitudeDelta * 1.8,
+      currentRegion.span.longitudeDelta * 1.8
     );
     const newRegion = new mapkit.CoordinateRegion(currentRegion.center, newSpan);
     myMap.setRegionAnimated(newRegion, true);
@@ -166,9 +166,7 @@ function initializeMap() {
       showsUserLocationControl: false,
       showsCompass: mapkit.FeatureVisibility.Hidden,
       showsScale: mapkit.FeatureVisibility.Hidden,
-      showsPointsOfInterest: false,
-      minZoomLevel: 4,
-      maxZoomLevel: 18
+      showsPointsOfInterest: false
     });
 
     console.log("Map initialized successfully");
