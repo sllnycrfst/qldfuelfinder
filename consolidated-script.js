@@ -35,7 +35,7 @@ const BRISBANE_COORDS = { lat: -27.4698, lng: 153.0251 };
 let myMap;
 let allSites = [];
 let priceMap = {};
-let currentFuel = 'E10';
+let currentFuel = '91';
 let currentBrand = 'all';
 let userLocation = null;
 let cheapestStationId = [];
