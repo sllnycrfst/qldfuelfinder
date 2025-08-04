@@ -137,8 +137,8 @@ html, body {
 }
 
 .station-select-logo {
-  width: 34px;
-  height: 34px;
+  width: 28px;
+  height: 28px;
   border-radius: 20%;
   object-fit: contain;
 }
@@ -231,16 +231,16 @@ html, body {
 }
 
 .station-logo {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  border-radius: 20%;
   object-fit: contain;
-  background: white;
+  background: none;
   padding: 2px;
 }
 
 .station-option-name {
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   color: #2a2d3f;
   text-align: center;
