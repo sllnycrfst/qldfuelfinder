@@ -519,13 +519,13 @@ html, body {
 /* ========== BOTTOM TOOLBAR ========== */
 .bottom-toolbar {
   position: fixed;
-  bottom: 20px;
+  bottom: 18px;
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 40px);
   max-width: 500px;
-  height: 76px;
-  border-radius: 38px;
+  height: 68px;
+  border-radius: 30px;
   z-index: 1499;
   transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
   overflow: hidden;
@@ -1418,21 +1418,24 @@ html, body {
   border-color: rgba(56, 124, 194, 0.4);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 500px) {
   .bottom-toolbar {
     bottom: 20px;
     width: calc(100% - 24px);
     border-radius: 30px 30px 30px 30px;
   }
 
-  .toolbar-buttons {
-    gap: 140px;
+  .toolbar-btn, .toolbar-buttons {
+    width: 50px;
+    height: 50px;
+    font-size: 22px;
+    margin-left: 20px;
+    margin-right: 20px;
   }
   
-  .toolbar-btn {
-    width: 60px;
-    height: 60px;
-    font-size: 26px;
+  /* Smaller blur effects on small screens - only for non-canvas markers */
+    .fuel-marker:not(.canvas-marker):not(.focused) {
+    filter: blur(0.3px) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
   }
   
   /* Move map type control down to same height as weather widget on mobile */
@@ -1476,37 +1479,5 @@ html, body {
   /* Mobile blur effects - only for non-canvas markers */
   .fuel-marker:not(.canvas-marker):not(.focused) {
     filter: blur(0.5px) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
-  }
-}
-
-@media (max-width: 480px) {
-  .toolbar-buttons {
-    gap: 80px;
-  }
-  
-  .toolbar-btn {
-    width: 56px;
-    height: 56px;
-    font-size: 24px;
-  }
-  
-  /* Smaller blur effects on small screens - only for non-canvas markers */
-  .fuel-marker:not(.canvas-marker):not(.focused) {
-    filter: blur(0.3px) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
-  }
-  
-  /* Adjust grids for smaller screens but keep positioning relative to buttons */
-  .fuel-select-grid.active {
-    width: calc(100vw - 120px); /* Account for button position and margins */
-    right: 82px;
-    max-width: 280px;
-    height: auto;
-  }
-
-  .station-select-grid.active {
-    width: calc(100vw - 120px); /* Account for button position and margins */
-    right: 82px;
-    max-width: 300px;
-    height: auto;
   }
 }
