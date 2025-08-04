@@ -613,14 +613,14 @@ function setupSearch() {
     });
   }
   
-  function navigateToSuburb(suburbName) {
+  async function navigateToSuburb(suburbName) {
     console.log('Navigating to suburb:', suburbName);
     
-    // Try to find coordinates for the suburb
+    // Try to find coordinates in our hardcoded list first
     let coords = suburbCoords[suburbName];
     
     if (!coords) {
-      // Try partial matches
+      // Try partial matches in hardcoded list
       const matchKey = Object.keys(suburbCoords).find(key => 
         key.toLowerCase().includes(suburbName.toLowerCase()) ||
         suburbName.toLowerCase().includes(key.toLowerCase())
@@ -632,16 +632,49 @@ function setupSearch() {
     }
     
     if (!coords) {
-      // Fallback coordinates for general regions
-      if (suburbName.toLowerCase().includes('gold coast')) {
-        coords = { lat: -28.0167, lng: 153.4000 };
-      } else if (suburbName.toLowerCase().includes('sunshine coast')) {
-        coords = { lat: -26.6500, lng: 153.0667 };
-      } else if (suburbName.toLowerCase().includes('brisbane')) {
-        coords = { lat: -27.4698, lng: 153.0251 };
-      } else {
-        // Default to Brisbane if no match found
-        coords = { lat: -27.4698, lng: 153.0251 };
+      // Use Apple's geocoding API to find the location
+      try {
+        console.log('Geocoding with Apple Maps:', suburbName);
+        
+        const geocoder = new mapkit.Geocoder();
+        const searchQuery = `${suburbName}, Queensland, Australia`;
+        
+        const response = await new Promise((resolve, reject) => {
+          geocoder.lookup(searchQuery, (error, data) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(data);
+            }
+          });
+        });
+        
+        if (response && response.results && response.results.length > 0) {
+          const result = response.results[0];
+          coords = {
+            lat: result.coordinate.latitude,
+            lng: result.coordinate.longitude
+          };
+          console.log('Geocoded coordinates for', suburbName, ':', coords);
+        } else {
+          throw new Error('No results found');
+        }
+        
+      } catch (error) {
+        console.error('Geocoding failed:', error);
+        
+        // Fallback coordinates for general regions
+        if (suburbName.toLowerCase().includes('gold coast')) {
+          coords = { lat: -28.0167, lng: 153.4000 };
+        } else if (suburbName.toLowerCase().includes('sunshine coast')) {
+          coords = { lat: -26.6500, lng: 153.0667 };
+        } else if (suburbName.toLowerCase().includes('brisbane')) {
+          coords = { lat: -27.4698, lng: 153.0251 };
+        } else {
+          console.log('No coordinates found for:', suburbName);
+          alert(`Sorry, we couldn't find "${suburbName}". Please try a different location or check the spelling.`);
+          return;
+        }
       }
     }
     
@@ -673,8 +706,46 @@ function setupSearch() {
         suburb.toLowerCase().includes(query)
       ).slice(0, 20);
       
-      displaySuburbs(filtered);
+      // If no matches in our predefined list, show the search term as an option
+      if (filtered.length === 0 && query.length > 2) {
+        const searchTerm = e.target.value.trim();
+        // Capitalize first letter of each word
+        const formattedSearchTerm = searchTerm
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+          .join(' ');
+        
+        suburbListEl.innerHTML = `
+          <li class="suburb-item search-suggestion" data-suburb="${searchTerm}">
+            <i class="fas fa-search" style="margin-right: 8px; color: #666;"></i>
+            Search for "${formattedSearchTerm}"
+          </li>
+        `;
+        
+        // Add click handler for the search suggestion
+        suburbListEl.querySelector('.search-suggestion').addEventListener('click', () => {
+          navigateToSuburb(searchTerm);
+          // Close search panel
+          document.getElementById('bottom-toolbar')?.classList.remove('expanded');
+          resetActiveButtons();
+        });
+      } else {
+        displaySuburbs(filtered);
+      }
     }, 300);
+  });
+  
+  // Handle Enter key to search for any location
+  searchInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      const query = e.target.value.trim();
+      if (query.length > 2) {
+        navigateToSuburb(query);
+        // Close search panel
+        document.getElementById('bottom-toolbar')?.classList.remove('expanded');
+        resetActiveButtons();
+      }
+    }
   });
   
   // Show initial suburbs
@@ -682,7 +753,7 @@ function setupSearch() {
 }
 
 function populateBrands() {
-  const topBrandIds = ['113', '3421066', '5', '2', '111', '2031031', '20', '86'];
+  const topBrandIds = ['2031031', '2', '5', '20', '113', '111'];
   const stationGrid = document.getElementById('station-select-grid');
   
   if (stationGrid) {
@@ -910,7 +981,7 @@ function updateVisibleStations() {
     canvas.width = displayWidth * pixelRatio;
     canvas.height = displayHeight * pixelRatio;
     
-    // Set display size (what user sees) with CSS override
+    // Set display size (what user sees) with CSS override - FIXED for touch passthrough
     canvas.style.cssText = `
       position: absolute !important;
       width: ${displayWidth}px !important;
@@ -920,8 +991,9 @@ function updateVisibleStations() {
       pointer-events: auto !important;
       transition: none !important;
       filter: none !important;
-      opacity: 1 !important;
-      transform: none !important;
+      opacity: 0 !important;
+      transform: scale(0.8) !important;
+      touch-action: none !important;
     `;
     
     const ctx = canvas.getContext('2d');
@@ -961,18 +1033,18 @@ function updateVisibleStations() {
         // Draw station logo
         const logoImg = new Image();
         logoImg.onload = () => {
-          // Create circular clipping path for logo
+          // Create circular clipping path for logo (moved down 1px, larger radius)
           ctx.save();
           ctx.beginPath();
-          ctx.arc(32, 41, 15, 0, 2 * Math.PI); // moved down 1px more (was 40)
+          ctx.arc(32, 42, 16, 0, 2 * Math.PI); // increased radius from 15 to 16
           ctx.clip();
           
           // White background
           ctx.fillStyle = 'white';
           ctx.fill();
           
-          // Draw logo (reduced size by 2px)
-          ctx.drawImage(logoImg, 17, 26, 28, 28); // was 30x30, now 28x28
+          // Draw logo (moved down 1px and reduced border radius)
+          ctx.drawImage(logoImg, 17, 27, 28, 28); // moved from y=26 to y=27
           ctx.restore();
           
           // Draw price text (moved down 2px more)
@@ -980,10 +1052,10 @@ function updateVisibleStations() {
         };
         
         logoImg.onerror = () => {
-          // Draw default logo if image fails
+          // Draw default logo if image fails (moved down 1px, larger radius)
           ctx.save();
           ctx.beginPath();
-          ctx.arc(32, 41, 15, 0, 2 * Math.PI); // moved down 1px more
+          ctx.arc(32, 42, 16, 0, 2 * Math.PI); // increased radius from 15 to 16
           ctx.fillStyle = 'white';
           ctx.fill();
           ctx.strokeStyle = '#ccc';
@@ -1037,15 +1109,63 @@ function updateVisibleStations() {
     document.getElementById('map').appendChild(canvas);
     canvas.updatePosition = updatePosition;
     
-    // Manual hover effects to override CSS
+    // SMOOTH MARKER ANIMATION - fade in and grow to normal size
+    setTimeout(() => {
+      canvas.style.opacity = '1';
+      canvas.style.transform = 'scale(1)';
+      canvas.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    }, Math.random() * 200); // Stagger animations slightly
+    
+    // IMPROVED hover and click events with better touch handling
+    let isHovering = false;
+    
     canvas.addEventListener('mouseenter', () => {
+      isHovering = true;
+      canvas.style.transition = 'transform 0.2s ease';
       canvas.style.transform = 'scale(1.1)';
       canvas.style.zIndex = '1003';
     });
     
     canvas.addEventListener('mouseleave', () => {
-      canvas.style.transform = 'none';
+      isHovering = false;
+      canvas.style.transition = 'transform 0.2s ease';
+      canvas.style.transform = 'scale(1)';
       canvas.style.zIndex = isCheapest ? '1002' : '1001';
+    });
+    
+    // Better touch handling - allow map interaction while still detecting taps
+    let tapStartTime = 0;
+    let hasMoved = false;
+    
+    canvas.addEventListener('touchstart', (e) => {
+      tapStartTime = Date.now();
+      hasMoved = false;
+    }, { passive: true });
+    
+    canvas.addEventListener('touchmove', () => {
+      hasMoved = true;
+    }, { passive: true });
+    
+    canvas.addEventListener('touchend', (e) => {
+      const tapDuration = Date.now() - tapStartTime;
+      if (!hasMoved && tapDuration < 300) {
+        // This was a tap, not a drag
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Show feature card for this station
+        const stationData = {
+          site,
+          price,
+          distance: userLocation ? 
+            getDistance(userLocation.lat, userLocation.lng, site.Lat, site.Lng) : 
+            getDistance(myMap.region.center.latitude, myMap.region.center.longitude, site.Lat, site.Lng),
+          isCheapest
+        };
+        
+        showFeatureCard(stationData);
+        console.log('Tapped station:', site.N, 'Price:', priceText + '¢/L');
+      }
     });
     
     canvas.addEventListener('click', (e) => {
@@ -1173,7 +1293,7 @@ function updateStationList() {
       </div>
       <span class="station-price" style="color:${isCheapest ? '#22C55E' : '#387CC2'};">
         ${isCheapest ? '<i class="fas fa-crown" style="margin-right: 4px; color: #FFD700;"></i>' : ''}
-        ${priceText}
+        ${priceText}¢/L
       </span>
     `;
     
