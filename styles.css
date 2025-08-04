@@ -619,14 +619,12 @@ html, body {
 
 .toolbar-buttons {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  gap: 120px;
   position: absolute;
   bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
+  left: 30px;
+  right: 30px;
   padding: 0;
   z-index: 10;
 }
@@ -644,25 +642,52 @@ html, body {
   background: transparent;
   border: none;
   font-size: 28px;
+  position: relative;
+}
+
+.toolbar-btn::before {
+  content: '';
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: transparent;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: -1;
+}
+
+.toolbar-btn:hover::before {
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .toolbar-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
   transform: translateY(-3px);
   color: #387cc2;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .toolbar-btn:active {
   transform: translateY(-1px) scale(0.95);
 }
 
+.toolbar-btn.active::before {
+  background: rgba(56, 124, 194, 0.25);
+  box-shadow: 0 2px 8px rgba(56, 124, 194, 0.4);
+}
+
 .toolbar-btn.active {
   color: #387cc2;
-  background: rgba(56, 124, 194, 0.25);
-  box-shadow: 0 4px 16px rgba(56, 124, 194, 0.4);
-  border: 0px solid rgba(56, 124, 194, 0.4);
 }
+
+/* Position specific buttons */
+.toolbar-btn:first-child {
+  margin-right: auto;
+}
+
+.toolbar-btn:last-child {
+  margin-left: auto;
+}
+
 
 /* ========== SEARCH PANEL ========== */
 .search-bar {
@@ -1418,18 +1443,21 @@ html, body {
 }
 
 @media (max-width: 480px) {
-  .bottom-toolbar {
-    bottom: 20px;
-    width: calc(100% - 24px);
-    border-radius: 30px 30px 30px 30px;
+  .toolbar-buttons {
+    left: 20px;
+    right: 20px;
   }
-
-  .toolbar-btn, .toolbar-buttons {
+  
+  .toolbar-btn {
     width: 50px;
     height: 50px;
     font-size: 22px;
-    margin-left: 20px;
-    margin-right: 20px;
+  }
+  
+  .toolbar-btn::before {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
   }
   
   /* Smaller blur effects on small screens - only for non-canvas markers */
