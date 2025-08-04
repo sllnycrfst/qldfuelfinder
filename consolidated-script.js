@@ -1,4 +1,4 @@
-// QLD Fuel Finder - Consolidated Script
+// Fuel Daddy - Consolidated Script
 
 // ========== CONSTANTS ==========
 const FUEL_TYPES = [
@@ -131,7 +131,7 @@ window.zoomOut = function() {
 
 // ========== INITIALIZATION ==========
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("Initializing QLD Fuel Finder...");
+  console.log("Initializing Fuel Daddy...");
   
   mapkit.init({
     authorizationCallback: function(done) {
@@ -1494,4 +1494,4 @@ window.fetchWeather = fetchWeather;
 window.setupUIHandlers = setupUIHandlers;
 window.createUserLocationMarker = createUserLocationMarker;
 
-console.log('QLD Fuel Finder script loaded successfully');
+console.log('Fuel Daddy script loaded successfully');
