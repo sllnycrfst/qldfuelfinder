@@ -1465,7 +1465,7 @@ function toggleWeatherForecast() {
         return `
           <div class="forecast-day">
             <div class="forecast-day-name">${dayName}</div>
-            <div style="display: flex; align-items: center; gap: 4px;">
+            <div style="display: flex; align-items: left; gap: 6px;">
               <span style="font-size: 14px;">${icon}</span>
               <div class="forecast-temps">${minTemp}°/${maxTemp}°</div>
             </div>
