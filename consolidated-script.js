@@ -1067,7 +1067,7 @@ function updateVisibleStations() {
           ctx.fill();
           
           // Draw logo (moved down 1px and reduced border radius)
-          ctx.drawImage(logoImg, 17, 27, 28, 28); // moved from y=26 to y=27
+          ctx.drawImage(logoImg, 19, 27, 28, 28); // moved from y=26 to y=27
           ctx.restore();
           
           // Draw price text (moved down 2px more)
