@@ -285,7 +285,7 @@ html, body {
 /* FIXED: Fuel select grid now extends LEFT and DOWN from the button */
 .fuel-select-grid {
   position: fixed;
-  top: 295px; /* Position below the button (251px + 44px) */
+  top: 191px; /* Position below the button (251px + 44px) */
   right: 82px; /* Position 12px to the left of button (20px + 50px + 12px) */
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1473,6 +1473,7 @@ html, body {
   
   .fuel-select-grid {
     width: 260px;
+    height: auto;
     grid-template-columns: repeat(3, 1fr);
     right: 82px; /* Keep same positioning relative to button */
   }
@@ -1486,7 +1487,7 @@ html, body {
     width: 300px;
     right: 82px; /* Keep same positioning relative to button */
     grid-template-columns: repeat(3, 1fr);
-    height: 240px; /* Keep fixed height */
+    height: auto; /* Keep fixed height */
   }
 
   .weather-display {
