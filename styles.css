@@ -253,7 +253,7 @@ html, body {
 /* ========== FUEL SELECT ========== */
 .fuel-select-button {
   position: fixed;
-  top: 120px; /* moved down 120px from 131px */
+  top: 136px; /* moved down 120px from 131px */
   right: 16px;
   width: 40px;
   height: 40px;
@@ -1471,14 +1471,14 @@ html, body {
   
   /* Move map type control down to same height as weather widget on mobile */
   .map-type-control {
-    top: 25px; /* Same as weather widget mobile positioning */
+    top: 20px; /* Same as weather widget mobile positioning */
   }
   
   .fuel-select-grid {
     width: auto;
     height: auto;
     grid-template-columns: repeat(3, 1fr);
-    right: 80px; /* Keep same positioning relative to button */
+    right: 60px; /* Keep same positioning relative to button */
   }
   
   .fuel-select-grid.active {
@@ -1488,13 +1488,13 @@ html, body {
 
   .station-select-grid {
     width: auto;
-    right: 80px; /* Keep same positioning relative to button */
+    right: 60px; /* Keep same positioning relative to button */
     grid-template-columns: repeat(3, 1fr);
     height: auto; /* Keep fixed height */
   }
 
   .weather-display {
-    top: 25px;
+    top: 20px;
     left: 15px;
     padding: 8px 12px;
   }
