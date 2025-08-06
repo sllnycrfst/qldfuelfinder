@@ -42,8 +42,8 @@ html, body {
 /* ========== MAP TYPE CONTROL ========== */
 .map-type-control {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: 16px;
+  right: 16px;
   z-index: 1000;
   display: flex;
   gap: 8px;
@@ -61,8 +61,8 @@ html, body {
 }
 
 .map-type-option {
-  width: 36px;
-  height: 36px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -106,10 +106,10 @@ html, body {
 /* ========== STATION SELECT (BRAND SELECT) ========== */
 .station-select-button {
   position: fixed;
-  top: 137px; /* moved down 120px from 77px */
-  right: 20px;
-  width: 50px;
-  height: 44px;
+  top: 80px; /* moved down 120px from 77px */
+  right: 16px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -147,19 +147,19 @@ html, body {
 }
 
 .station-select-text {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
 }
 
 /* FIXED: Station select grid now extends LEFT and DOWN from the button */
 .station-select-grid {
   position: fixed;
-  top: 137px; /* Position below the button (197px + 44px) */
-  right: 82px; /* Position 12px to the left of button (20px + 50px + 12px) */
+  top: 80px; /* Position below the button (197px + 44px) */
+  right: 80px; /* Position 12px to the left of button (20px + 50px + 12px) */
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
-  padding: 12px;
+  padding: 8px;
   border-radius: 16px;
   z-index: 999;
   opacity: 0;
@@ -253,10 +253,10 @@ html, body {
 /* ========== FUEL SELECT ========== */
 .fuel-select-button {
   position: fixed;
-  top: 191px; /* moved down 120px from 131px */
-  right: 20px;
-  width: 50px;
-  height: 44px;
+  top: 120px; /* moved down 120px from 131px */
+  right: 16px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -288,12 +288,12 @@ html, body {
 /* FIXED: Fuel select grid now extends LEFT and DOWN from the button */
 .fuel-select-grid {
   position: fixed;
-  top: 191px; /* Position below the button (251px + 44px) */
+  top: 120px; /* Position below the button (251px + 44px) */
   right: 82px; /* Position 12px to the left of button (20px + 50px + 12px) */
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
-  padding: 10px;
+  padding: 8px;
   border-radius: 16px;
   z-index: 999;
   opacity: 0;
@@ -374,7 +374,7 @@ html, body {
 .zoom-controls {
   position: fixed;
   bottom: 170px;
-  right: 20px;
+  right: 16px;
   z-index: 1000;
   display: flex;
   flex-direction: column;
@@ -392,8 +392,8 @@ html, body {
 }
 
 .zoom-btn {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   font-size: 16px;
   border: none;
   border-radius: 0;
@@ -429,8 +429,8 @@ html, body {
 /* ========== WEATHER DISPLAY - FIXED TO EXPAND DOWN ========== */
 .weather-display {
   position: fixed;
-  top: 20px;
-  left: 20px;
+  top: 16px;
+  left: 16px;
   z-index: 1000;
   display: flex;
   flex-direction: column;
@@ -525,10 +525,10 @@ html, body {
   bottom: 18px;
   left: 50%;
   transform: translateX(-50%);
-  width: calc(100% - 40px);
+  width: calc(100% - 60px);
   max-width: 500px;
-  height: 68px;
-  border-radius: 30px;
+  height: 60px;
+  border-radius: 22px;
   z-index: 1499;
   transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
   overflow: hidden;
@@ -1449,7 +1449,7 @@ html, body {
   .toolbar-buttons {
     left: 20px;
     right: 20px;
-    bottom: 8px;
+    bottom: 6px;
   }
   
   .toolbar-btn {
@@ -1471,14 +1471,14 @@ html, body {
   
   /* Move map type control down to same height as weather widget on mobile */
   .map-type-control {
-    top: 35px; /* Same as weather widget mobile positioning */
+    top: 25px; /* Same as weather widget mobile positioning */
   }
   
   .fuel-select-grid {
-    width: 260px;
+    width: auto;
     height: auto;
     grid-template-columns: repeat(3, 1fr);
-    right: 82px; /* Keep same positioning relative to button */
+    right: 80px; /* Keep same positioning relative to button */
   }
   
   .fuel-select-grid.active {
@@ -1487,14 +1487,14 @@ html, body {
   }
 
   .station-select-grid {
-    width: 300px;
-    right: 82px; /* Keep same positioning relative to button */
+    width: auto;
+    right: 80px; /* Keep same positioning relative to button */
     grid-template-columns: repeat(3, 1fr);
     height: auto; /* Keep fixed height */
   }
 
   .weather-display {
-    top: 35px;
+    top: 25px;
     left: 15px;
     padding: 8px 12px;
   }
