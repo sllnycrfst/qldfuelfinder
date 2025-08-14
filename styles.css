@@ -436,7 +436,7 @@ html, body {
   flex-direction: column;
   align-items: flex-start;
   gap: 0;
-  padding: 4px 8px;
+  padding: 2px 8px;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
