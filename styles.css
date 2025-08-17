@@ -555,7 +555,7 @@ html, body {
 .weather-temp {
   font-size: 15px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
+  color: #272a39;
   text-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
@@ -584,13 +584,13 @@ html, body {
 .forecast-day-name {
   font-size: 13px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
+  color: #272a39;
   min-width: 65px;
 }
 
 .forecast-temps {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.8);
+  color: #272a39;
 }
 
 /* ========== BOTTOM TOOLBAR ========== */
@@ -670,7 +670,7 @@ html, body {
 .panel-title {
   font-size: 22px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.95);
+  color: #272a39;
   margin: 0;
 }
 
@@ -685,7 +685,7 @@ html, body {
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
-  color: rgba(255, 255, 255, 0.7);
+  color: #272a39;
   font-size: 16px;
 }
 
@@ -720,7 +720,7 @@ html, body {
   border-radius: 22px;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
-  color: rgba(255, 255, 255, 0.7);
+  color: #272a39;
   background: transparent;
   border: none;
   font-size: 30px;
@@ -793,7 +793,7 @@ html, body {
 }
 
 .search-bar i {
-  color: rgba(255, 255, 255, 0.7);
+  color: #272a39;
   font-size: 20px;
 }
 
@@ -803,13 +803,13 @@ html, body {
   border: none;
   outline: none;
   font-size: 16px;
-  color: rgba(255, 255, 255, 0.95);
+  color: #272a39;
   font-weight: 500;
   -webkit-text-size-adjust: 100%;
 }
 
 #search-input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: #272a39;
 }
 
 .suburb-list {
@@ -826,7 +826,7 @@ html, body {
   border-radius: 12px;
   cursor: pointer;
   font-size: 15px;
-  color: rgba(255, 255, 255, 0.9);
+  color: #272a39;
   transition: all 0.3s ease;
   margin-bottom: 6px;
   border: 1px solid transparent;
@@ -890,19 +890,19 @@ html, body {
 .station-name {
   font-size: 16px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.95);
+  color: #272a39;
   margin-bottom: 5px;
 }
 
 .station-address {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.6);
+  color: #272a39;
   margin-bottom: 3px;
 }
 
 .station-distance {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.5);
+  color: #272a39;
 }
 
 .station-price {
