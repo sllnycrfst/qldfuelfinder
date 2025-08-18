@@ -304,7 +304,7 @@ html, body {
 }
 
 .fuel-select-button:hover {
-  background: rgba(214, 95, 28, 0.15);
+  background: #1f242e;
   color: #d65f1c;
   transform: translateY(-2px);
   box-shadow: 
@@ -448,8 +448,8 @@ html, body {
 }
 
 .zoom-btn {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   font-size: 16px;
   border: none;
   border-radius: 0;
