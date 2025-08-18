@@ -1059,11 +1059,11 @@ function updateVisibleStations() {
           // Create circular clipping path for logo (moved down 1px, larger radius)
           ctx.save();
           ctx.beginPath();
-          ctx.arc(34, 42, 13, 0, 2 * Math.PI); // increased radius from 15 to 16
+          ctx.arc(33, 42, 13, 0, 2 * Math.PI); // increased radius from 15 to 16
           ctx.clip();
           
           // Create disc-like shadow effect
-          const gradient = ctx.createRadialGradient(34, 42, 0, 32, 42, 13);
+          const gradient = ctx.createRadialGradient(33, 42, 0, 32, 42, 13);
           gradient.addColorStop(0, '#ffffff');        // Pure white center
           gradient.addColorStop(0.7, '#f8f9fa');      // Light grey
           gradient.addColorStop(1, '#dee2e6');        // Darker edge for shadow
