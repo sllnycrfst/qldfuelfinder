@@ -1063,7 +1063,7 @@ function updateVisibleStations() {
           ctx.clip();
           
           // dark background
-          ctx.fillStyle = #272d3a;
+          ctx.fillStyle = '#272d3a';
           ctx.fill();
           
           // Draw logo (moved down 1px and reduced border radius)
