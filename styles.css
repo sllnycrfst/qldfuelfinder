@@ -1309,7 +1309,8 @@ html, body {
   }
   
   .map-type-control {
-    top: 20px;
+    top: 16px;
+    right: 12px;
   }
   
   .fuel-select-grid {
