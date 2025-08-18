@@ -1062,8 +1062,8 @@ function updateVisibleStations() {
           ctx.arc(32, 42, 16, 0, 2 * Math.PI); // increased radius from 15 to 16
           ctx.clip();
           
-          // White background
-          ctx.fillStyle = 'white';
+          // dark background
+          ctx.fillStyle = #272d3a;
           ctx.fill();
           
           // Draw logo (moved down 1px and reduced border radius)
