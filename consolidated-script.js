@@ -1059,20 +1059,26 @@ function updateVisibleStations() {
           // Create circular clipping path for logo (moved down 1px, larger radius)
           ctx.save();
           ctx.beginPath();
-          ctx.arc(32, 42, 16, 0, 2 * Math.PI); // increased radius from 15 to 16
+          ctx.arc(34, 42, 13, 0, 2 * Math.PI); // increased radius from 15 to 16
           ctx.clip();
           
           // Create disc-like shadow effect
-          const gradient = ctx.createRadialGradient(32, 42, 0, 32, 42, 16);
+          const gradient = ctx.createRadialGradient(34, 42, 0, 32, 42, 13);
           gradient.addColorStop(0, '#ffffff');        // Pure white center
           gradient.addColorStop(0.7, '#f8f9fa');      // Light grey
           gradient.addColorStop(1, '#dee2e6');        // Darker edge for shadow
 
           ctx.fillStyle = gradient;
           ctx.fill();
+          // Add drop shadow for the logo
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';     // Semi-transparent black
+          ctx.shadowBlur = 4;                         // Blur amount
+          ctx.shadowOffsetX = 1;                      // Horizontal offset
+          ctx.shadowOffsetY = 3;                      // Vertical offset
+
           
           // Draw logo (moved down 1px and reduced border radius)
-          ctx.drawImage(logoImg, 18, 29, 25, 25); // moved from y=26 to y=27
+          ctx.drawImage(logoImg, 20, 29, 25, 25); // moved from y=26 to y=27
           ctx.restore();
           
           // Draw price text (moved down 2px more)
