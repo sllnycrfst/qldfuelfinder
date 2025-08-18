@@ -1044,6 +1044,80 @@ function updateVisibleStations() {
       ctx.restore();
     };
     
+  // Create markers for stations that don't already have them
+  limitedStations.forEach(({ site, price, isCheapest }) => {
+    // Skip if marker already exists - DON'T remove existing markers
+    const existingMarker = document.querySelector(`[data-station-id="${site.S}"]`);
+    if (existingMarker) {
+      // Update existing marker if needed (price might have changed)
+      if (isCheapest !== existingMarker.classList.contains('cheapest')) {
+        if (isCheapest) {
+          existingMarker.classList.add('cheapest');
+        } else {
+          existingMarker.classList.remove('cheapest');
+        }
+      }
+      return; // Keep existing marker, don't create new one
+    }
+    
+    const priceText = (price / 10).toFixed(1);
+    const logoUrl = getBrandLogo(site.B);
+    const isNewMarker = true; // This is definitely a new marker since we checked above
+    
+    // Create canvas element
+    const canvas = document.createElement('canvas');
+    canvas.className = 'fuel-marker';
+    if (isCheapest) canvas.classList.add('cheapest');
+    canvas.dataset.stationId = site.S;
+    
+    // HIGH QUALITY canvas setup like the original
+    const displayWidth = 64;
+    const displayHeight = 78;
+    const pixelRatio = window.devicePixelRatio || 1;
+    
+    // Set actual canvas size in memory (scaled for high-DPI)
+    canvas.width = displayWidth * pixelRatio;
+    canvas.height = displayHeight * pixelRatio;
+    
+    // Set display size - START HIDDEN for new markers only
+    canvas.style.cssText = `
+      position: absolute !important;
+      width: ${displayWidth}px !important;
+      height: ${displayHeight}px !important;
+      cursor: pointer !important;
+      z-index: ${isCheapest ? 1002 : 1001} !important;
+      pointer-events: auto !important;
+      transition: none !important;
+      filter: none !important;
+      opacity: 0 !important;
+      transform: scale(0.8) !important;
+    `;
+    
+    const ctx = canvas.getContext('2d');
+    // Scale the drawing context for high-DPI
+    ctx.scale(pixelRatio, pixelRatio);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    
+    // Function to draw price text
+    const drawPriceText = (ctx, text, x, y, isCheapest) => {
+      ctx.save();
+      
+      ctx.font = 'bold 10px system-ui, -apple-system, Arial'; // reduced from 11px to 10px
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      // Text shadow
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+      ctx.fillText(text, x + 1, y + 1);
+      
+      // Main text
+      ctx.fillStyle = isCheapest ? '#00e153' : 'white';
+      ctx.fillText(text, x, y);
+      
+      ctx.restore();
+    };
+    
     // Function to draw the complete marker
     const drawMarker = () => {
       ctx.clearRect(0, 0, displayWidth, displayHeight);
@@ -1067,7 +1141,7 @@ function updateVisibleStations() {
           gradient.addColorStop(0, '#ffffff');        // Pure white center
           gradient.addColorStop(0.7, '#f8f9fa');      // Light grey
           gradient.addColorStop(1, '#dee2e6');        // Darker edge for shadow
-
+  
           ctx.fillStyle = gradient;
           ctx.fill();
           
@@ -1098,9 +1172,9 @@ function updateVisibleStations() {
       };
       
       markerImg.onerror = () => {
-        // Fallback
+        // Fallback - MAIN MARKER BACKGROUND COLOR
         ctx.save();
-        ctx.fillStyle = '#323541';
+        ctx.fillStyle = '#323541'; // ✅ Updated to your desired color
         ctx.beginPath();
         ctx.arc(32, 38, 20, 0, 2 * Math.PI);
         ctx.fill();
@@ -1111,41 +1185,6 @@ function updateVisibleStations() {
       
       markerImg.src = 'images/mymarker.png';
     };
-    
-    // Draw the marker immediately
-    drawMarker();
-    
-    const coordinate = new mapkit.Coordinate(site.Lat, site.Lng);
-    const updatePosition = () => {
-      try {
-        const point = myMap.convertCoordinateToPointOnPage(coordinate);
-        const mapContainer = document.getElementById('map');
-        const mapRect = mapContainer.getBoundingClientRect();
-        
-        // FIXED positioning - direct style updates for no lag
-        const left = Math.round(point.x - mapRect.left - displayWidth/2);
-        const top = Math.round(point.y - mapRect.top - displayHeight + 8);
-        
-        canvas.style.left = left + 'px';
-        canvas.style.top = top + 'px';
-      } catch (e) {
-        // Position update failed
-      }
-    };
-    
-    updatePosition();
-    document.getElementById('map').appendChild(canvas);
-    canvas.updatePosition = updatePosition;
-    
-    // Track this marker as existing
-    existingMarkers.add(site.S);
-    
-    // ANIMATE ONLY NEW MARKERS - fade in and grow to normal size
-    setTimeout(() => {
-      canvas.style.opacity = '1';
-      canvas.style.transform = 'scale(1)';
-      canvas.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-    }, Math.random() * 200); // Stagger animations slightly
     
     // IMPROVED hover and click events with better touch handling
     let isHovering = false;
