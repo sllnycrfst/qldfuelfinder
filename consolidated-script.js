@@ -1070,12 +1070,6 @@ function updateVisibleStations() {
 
           ctx.fillStyle = gradient;
           ctx.fill();
-          // Add drop shadow for the logo
-          ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';     // Semi-transparent black
-          ctx.shadowBlur = 4;                         // Blur amount
-          ctx.shadowOffsetX = 1;                      // Horizontal offset
-          ctx.shadowOffsetY = 3;                      // Vertical offset
-
           
           // Draw logo (moved down 1px and reduced border radius)
           ctx.drawImage(logoImg, 19, 29, 25, 25); // moved from y=26 to y=27
