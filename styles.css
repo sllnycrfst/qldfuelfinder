@@ -109,8 +109,8 @@ html, body {
   position: fixed;
   top: 80px;
   right: 16px;
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -131,7 +131,7 @@ html, body {
 }
 
 .station-select-button:hover {
-  background: rgba(214, 95, 28, 0.15);
+  background: #1f242e;
   color: #d65f1c;
   transform: translateY(-2px);
   box-shadow: 
@@ -145,8 +145,8 @@ html, body {
 }
 
 .station-select-logo {
-  width: 30px;
-  height: 30px;
+  width: 24px;
+  height: 24px;
   border-radius: 25%;
   object-fit: contain;
 }
@@ -163,8 +163,8 @@ html, body {
   right: 80px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  padding: 15px;
+  gap: 8px;
+  padding: 12px;
   border-radius: 20px;
   z-index: 999;
   opacity: 0;
@@ -195,14 +195,14 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 12px 8px;
+  gap: 6px;
+  padding: 8px 6px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
   border: 2px solid transparent;
-  min-height: 70px;
+  min-height: 60px;
   opacity: 0;
   transform: scale(0.8);
   animation: fadeInScale 0.4s ease forwards;
@@ -283,8 +283,8 @@ html, body {
   position: fixed;
   top: 136px;
   right: 16px;
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -324,8 +324,8 @@ html, body {
   right: 82px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  padding: 15px;
+  gap: 8px;
+  padding: 12px;
   border-radius: 20px;
   z-index: 999;
   opacity: 0;
@@ -355,7 +355,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 14px 10px;
+  padding: 8px 6px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   cursor: pointer;
@@ -364,8 +364,8 @@ html, body {
   font-size: 12px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.9);
-  min-height: 48px;
-  min-width: 70px;
+  min-height: 44px;
+  min-width: 64px;
   opacity: 0;
   transform: scale(0.8);
   animation: fadeInScale 0.4s ease forwards;
@@ -510,7 +510,7 @@ html, body {
 }
 
 .weather-display:hover {
-  background: rgba(214, 95, 28, 0.15);
+  background: #1f242e;
   transform: translateY(-2px);
   box-shadow: 
     0 12px 40px rgba(0, 0, 0, 0.15),
@@ -1332,9 +1332,9 @@ html, body {
   }
 
   .weather-display {
-    top: 20px;
-    left: 15px;
-    padding: 10px 15px;
+    top: 16px;
+    left: 12px;
+    padding: 6px 12px;
   }
   
   .weather-display.expanded {
