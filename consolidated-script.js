@@ -1062,8 +1062,13 @@ function updateVisibleStations() {
           ctx.arc(32, 42, 16, 0, 2 * Math.PI); // increased radius from 15 to 16
           ctx.clip();
           
-          // dark background
-          ctx.fillStyle = '#272d3a';
+          // Create disc-like shadow effect
+          const gradient = ctx.createRadialGradient(32, 42, 0, 32, 42, 16);
+          gradient.addColorStop(0, '#ffffff');        // Pure white center
+          gradient.addColorStop(0.7, '#f8f9fa');      // Light grey
+          gradient.addColorStop(1, '#dee2e6');        // Darker edge for shadow
+
+          ctx.fillStyle = gradient;
           ctx.fill();
           
           // Draw logo (moved down 1px and reduced border radius)
@@ -1095,7 +1100,7 @@ function updateVisibleStations() {
       markerImg.onerror = () => {
         // Fallback
         ctx.save();
-        ctx.fillStyle = isCheapest ? '#22C55E' : '#387CC2';
+        ctx.fillStyle = '#323541';
         ctx.beginPath();
         ctx.arc(32, 38, 20, 0, 2 * Math.PI);
         ctx.fill();
