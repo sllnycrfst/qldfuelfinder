@@ -397,7 +397,7 @@ window.closeToolbarPanel = function() {
 function getFuelDisplayName(fuelKey) {
   const fuel = FUEL_TYPES.find(f => f.key === fuelKey);
   return fuel ? fuel.name : fuelKey;
-
+}
 
 function setupMobileFullscreen() {
   const fullscreenBtn = document.getElementById('mobile-fullscreen-btn');
@@ -427,8 +427,6 @@ function setupMobileFullscreen() {
       }
     }
   });
-}
-
 }
 
 function showFeatureCard(station) {
