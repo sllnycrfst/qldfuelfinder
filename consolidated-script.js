@@ -39,7 +39,7 @@ let currentFuel = '91';
 let currentBrand = 'all';
 let userLocation = null;
 let cheapestStationId = [];
-let stationLimit = 999;
+let stationLimit = 200;
 let directionLine = null;
 let weatherForecast = [];
 let selectedStation = null;
@@ -223,6 +223,7 @@ function setupUIHandlers() {
   populateBrands();
   setupFilters();
   setupSearch();
+  setupMobileFullscreen();
   
   // Map click to close panels and feature cards
   document.getElementById('map')?.addEventListener('click', function(e) {
@@ -331,7 +332,7 @@ function setupToolbar() {
         error => {
           console.log("Location error:", error);
           if (error.code === 1) {
-            alert("Please enable location access to use this feature.");
+            alert("Fuel Daddy is requesting location access to find nearby fuel stations.");
           }
         }
       );
@@ -396,6 +397,38 @@ window.closeToolbarPanel = function() {
 function getFuelDisplayName(fuelKey) {
   const fuel = FUEL_TYPES.find(f => f.key === fuelKey);
   return fuel ? fuel.name : fuelKey;
+
+
+function setupMobileFullscreen() {
+  const fullscreenBtn = document.getElementById('mobile-fullscreen-btn');
+  
+  if (fullscreenBtn) {
+    fullscreenBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          console.log('Error attempting to enable fullscreen:', err.message);
+        });
+        fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>';
+      } else {
+        document.exitFullscreen();
+        fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
+      }
+    });
+  }
+  
+  // Listen for fullscreen changes
+  document.addEventListener('fullscreenchange', () => {
+    const btn = document.getElementById('mobile-fullscreen-btn');
+    if (btn) {
+      if (document.fullscreenElement) {
+        btn.innerHTML = '<i class="fas fa-compress"></i>';
+      } else {
+        btn.innerHTML = '<i class="fas fa-expand"></i>';
+      }
+    }
+  });
+}
+
 }
 
 function showFeatureCard(station) {
@@ -457,7 +490,7 @@ function showFeatureCard(station) {
           <!-- Bottom Right: Action Buttons -->
           <div class="feature-bottom-right">
             <button class="feature-icon-btn navigation" onclick="getDirections(${site.Lat}, ${site.Lng}, '${site.N.replace(/'/g, "\\\'")}')">
-              <i class="fas fa-directions"></i>
+              <i class="fas fa-route"></i>
             </button>
             <button class="feature-icon-btn share" onclick="shareStation('${site.S}', '${site.N.replace(/'/g, "\\\'")}')">
               <i class="fas fa-share"></i>
@@ -953,7 +986,7 @@ function updateVisibleStations() {
   });
   
   stationsWithPrices.sort((a, b) => a.distance - b.distance);
-  const limitedStations = stationsWithPrices.slice(0, 50); // Show up to 50 stations
+  const limitedStations = stationsWithPrices.slice(0, 150); // Show up to 150 stations
   
   console.log("Showing stations:", limitedStations.length, "of", stationsWithPrices.length);
   
@@ -1072,7 +1105,7 @@ function updateVisibleStations() {
           ctx.fill();
           
           // Draw logo (moved down 1px and reduced border radius)
-          ctx.drawImage(logoImg, 20, 30, 25, 25); // moved from y=26 to y=27
+          ctx.drawImage(logoImg, 19, 29, 25, 25); // moved from y=26 to y=27
           ctx.restore();
           
           // Draw price text (moved down 2px more)
@@ -1335,7 +1368,6 @@ function updateStationList() {
         <span class="station-distance">${distanceText}</span>
       </div>
       <span class="station-price" style="color:${isCheapest ? '#22C55E' : '#ff8c00'};">
-        ${isCheapest ? '<i class="fas fa-crown" style="margin-right: 4px; color: #FFD700;"></i>' : ''}
         ${priceText}
       </span>
     `;
