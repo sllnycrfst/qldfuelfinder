@@ -1334,7 +1334,7 @@ function updateStationList() {
         <span class="station-address">${site.A}</span>
         <span class="station-distance">${distanceText}</span>
       </div>
-      <span class="station-price" style="color:${isCheapest ? '#22C55E' : '#387CC2'};">
+      <span class="station-price" style="color:${isCheapest ? '#22C55E' : '#ff8c00'};">
         ${isCheapest ? '<i class="fas fa-crown" style="margin-right: 4px; color: #FFD700;"></i>' : ''}
         ${priceText}
       </span>
