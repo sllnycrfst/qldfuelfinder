@@ -892,6 +892,24 @@ async function fetchSitesAndPrices() {
   }
 }
 
+// After you successfully load stations and prices, add this:
+function sendDataToParent(stations, prices) {
+  if (window.parent && window.parent !== window) {
+    console.log('Sending data to parent:', stations.length, 'stations,', prices.length, 'prices');
+    window.parent.postMessage({
+      type: 'fuelData',
+      stations: stations,
+      prices: prices
+    }, '*');
+  }
+}
+
+// Call this after your data is loaded
+// For example, if you have something like:
+// loadStations().then(stations => loadPrices().then(prices => {
+//   sendDataToParent(stations, prices);
+// }));
+
 // ========== STATION MANAGEMENT ==========
 function findCheapestStation() {
   if (!allSites.length || !myMap) return;
