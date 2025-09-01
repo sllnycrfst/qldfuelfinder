@@ -861,6 +861,18 @@ function setupFilters() {
   });
 }
 
+// ========== DATA SENDING TO PARENT ==========
+function sendDataToParent(stations, prices) {
+  if (window.parent && window.parent !== window) {
+    console.log('Sending data to parent:', stations.length, 'stations,', prices.length, 'prices');
+    window.parent.postMessage({
+      type: 'fuelData',
+      stations: stations,
+      prices: prices
+    }, '*');
+  }
+}
+
 // ========== DATA FETCHING ==========
 async function fetchSitesAndPrices() {
   try {
@@ -884,6 +896,9 @@ async function fetchSitesAndPrices() {
     window.priceMap = priceMap;
     console.log("Prices loaded");
     
+    // Send data to parent (Fuel Daddy dashboard)
+    sendDataToParent(allSites, allPrices);
+    
     findCheapestStation();
     updateVisibleStations();
     
@@ -892,23 +907,7 @@ async function fetchSitesAndPrices() {
   }
 }
 
-// After you successfully load stations and prices, add this:
-function sendDataToParent(stations, prices) {
-  if (window.parent && window.parent !== window) {
-    console.log('Sending data to parent:', stations.length, 'stations,', prices.length, 'prices');
-    window.parent.postMessage({
-      type: 'fuelData',
-      stations: stations,
-      prices: prices
-    }, '*');
-  }
-}
 
-// Call this after your data is loaded
-// For example, if you have something like:
-// loadStations().then(stations => loadPrices().then(prices => {
-//   sendDataToParent(stations, prices);
-// }));
 
 // ========== STATION MANAGEMENT ==========
 function findCheapestStation() {
